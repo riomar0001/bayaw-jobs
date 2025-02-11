@@ -1,0 +1,24 @@
+{
+  "compilerOptions": {
+    "target": "ES2022",
+    "module": "NodeNext",
+    "moduleResolution": "NodeNext",
+    "outDir": "./dist",
+    "rootDir": "./backend",
+    "strict": true,
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+    "forceConsistentCasingInFileNames": true,
+    "baseUrl": "./",
+    "paths": {
+      "@/*": ["./backend/*"],
+      "@controllers/*": ["./backend/controllers/*"],
+      "@middlewares/*": ["./backend/middlewares/*"],
+      "@configs/*": ["./backend/configs/*"],
+      "@utils/*": ["./backend/utils/*"],
+      "@routes/*": ["./backend/routes/*"]
+    }
+  },
+  "include": ["backend/**/*.ts"],
+  "exclude": ["node_modules"]
+}
