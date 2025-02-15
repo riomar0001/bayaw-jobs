@@ -11,13 +11,11 @@ const AuthUser = async (res: Response, req: Request) => {
     const { username_email, password } = req.body;
 
     if (!username_email || password) {
-      res.status(4).json({
+      res.status(400).json({
         success: false,
         message: "Username or Password is required",
       });
     }
-    
-    
 
     return res.status(200).json({
       success: true,

@@ -2,6 +2,9 @@ import express, { Response, Request } from "express";
 import cookieParser from "cookie-parser";
 import dotenv from "dotenv";
 import cors from "cors";
+import path from "path";
+import fs from "fs";
+import { fileURLToPath } from "url";
 
 dotenv.config();
 
@@ -29,8 +32,15 @@ app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 
 app.get("/", (req: Request, res: Response) => {
-  console.log("Server is Running");
-  return res.status(200).json({ message: "hello Bayaw!" });
-});
+  const __filename = fileURLToPath(import.meta.url);
+  const __dirname = path.dirname(__filename);
+  const distPath = path.join(__dirname, "../frontend/dist", "index.html");
+
+  if (fs.existsSync(distPath)) {
+    return res.sendFile(distPath);
+  } else {
+    return res.json({ message: "Hello World" });
+  }
+}); 
 
 export default app;
