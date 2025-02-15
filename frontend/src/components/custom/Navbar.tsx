@@ -1,0 +1,25 @@
+import { Button } from "../ui/button";
+
+const Navbar = () => {
+    return (
+        <div className="bg-white w-full h-[75px] border-2 border-neutral-300 flex items-center justify-between px-24">
+            <div className="flex items-center gap-x-5">
+                <img src="/BrandLogo.svg" className="w-10 h-10" />
+                <h1 className="text-2xl font-medium">BayawJobs</h1>
+            </div>
+
+            <div className="flex space-x-10">
+                <h1 className="hover:font-medium cursor-pointer">Find Jobs</h1>
+                <h1 className="hover:font-medium cursor-pointer">Companies</h1>
+                <h1 className="hover:font-medium cursor-pointer">Career Monitoring</h1>
+            </div>
+
+            <div className="space-x-5">
+                <Button className="bg-transparent border border-black text-black hover:text-white">Sign In</Button>
+                <Button>Sign Up</Button>
+            </div>
+        </div>
+    );
+};
+
+export default Navbar;
