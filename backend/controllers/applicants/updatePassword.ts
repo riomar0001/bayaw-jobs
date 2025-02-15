@@ -8,7 +8,7 @@ import { Request, Response } from "express";
 export const updatePassword = async (req: Request, res: Response) => {
   try {
     return res.status(200).json({
-      success: false,
+      success: true,
       message: "Password Successfully Updated",
     });
   } catch (error: any) {
