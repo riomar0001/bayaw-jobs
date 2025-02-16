@@ -5,6 +5,8 @@ import { protect } from "@/middlewares/ApplicantAuthHandler";
 import authApplicant from "@/controllers/applicants/Auth";
 import checkAuthApplicant from "@/controllers/applicants/checkAuth";
 import updateContact from "@/controllers/applicants/updateContact";
+import addExperience from "@/controllers/applicants/addExperience";
+import updateExperience from "@/controllers/applicants/updateExperience";
 
 const router = express.Router();
 
@@ -19,13 +21,14 @@ router.get("/auth", protect, checkAuthApplicant);
  * @Format router.post("path", "middleware", "controller");
  */
 router.post("/auth", authApplicant);
+router.post("/experience", protect, addExperience);
 
 /**
  * @Reminder Place all PUT requests here
  * @Format router.put("path", "middleware", "controller");
  */
 router.put("/contact", protect, updateContact);
-
+router.put("/experience/:experience_id", protect, updateExperience);
 /**
  * @Reminder Place all DELETE requests here
  * @Format router.delete("path", "middleware", "controller");
