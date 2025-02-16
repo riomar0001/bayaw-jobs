@@ -1,10 +1,19 @@
 import express from "express";
-import { upload as uploadProfilePicture } from "@/middlewares/uploadProfilePictureHandler";
-import { upload as uploadResume } from "@/middlewares/uploadResumeHandler";
 import { protect } from "@/middlewares/ApplicantAuthHandler";
 import authApplicant from "@/controllers/applicants/Auth";
 import checkAuthApplicant from "@/controllers/applicants/checkAuth";
 import updateContact from "@/controllers/applicants/updateContact";
+import {
+  registerAccount,
+  accountOnboarding,
+} from "@/controllers/applicants/registerAccount";
+import updateProfilePicture from "@/controllers/applicants/updateProfilePicture";
+import uploadProfilePicture from "@/middlewares/uploadProfilePictureHandler";
+import uploadResume from "@/middlewares/uploadResumeHandler";
+import updateResume from "@/controllers/applicants/updateResume";
+import addExperience from "@/controllers/applicants/addExperience";
+import updateExperience from "@/controllers/applicants/updateExperience";
+import deleteExperience from "@/controllers/applicants/deleteExperience";
 
 const router = express.Router();
 
@@ -19,16 +28,38 @@ router.get("/auth", protect, checkAuthApplicant);
  * @Format router.post("path", "middleware", "controller");
  */
 router.post("/auth", authApplicant);
+router.post("/", registerAccount);
+router.post(
+  "/onboarding",
+  protect,
+  uploadResume.fields([{ name: "resume", maxCount: 1 }]),
+  accountOnboarding
+);
+router.post("/experience", protect, addExperience);
 
 /**
  * @Reminder Place all PUT requests here
  * @Format router.put("path", "middleware", "controller");
  */
 router.put("/contact", protect, updateContact);
+router.put(
+  "/profile-picture",
+  protect,
+  uploadProfilePicture.fields([{ name: "profile_picture", maxCount: 1 }]),
+  updateProfilePicture
+);
+router.put(
+  "/resume",
+  protect,
+  uploadResume.fields([{ name: "resume", maxCount: 1 }]),
+  updateResume
+);
+router.put("/experience/:experience_id", protect, updateExperience);
 
 /**
  * @Reminder Place all DELETE requests here
  * @Format router.delete("path", "middleware", "controller");
  */
+router.delete("/experience/:experience_id", protect, deleteExperience);
 
 export default router;
