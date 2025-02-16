@@ -7,7 +7,7 @@ import { FaStar } from "react-icons/fa";
 const Hero = () => {
     return (
         <div className="h-screen">
-            <div className="text-center space-y-6 px-24 pt-16">
+            <div className="text-center space-y-6 px-24 pt-20">
                 <h1 className="text-lg text-[#1783D0]">#1 Platform for Jobs</h1>
                 <h1 className="text-7xl font-semibold">Find Your Dream Job That Suit With Exciting Opportunities</h1>
                 <h1 className="text-xl text-neutral-500 font-light">Discover your next career move with ease</h1>
