@@ -1,10 +1,11 @@
+import { logos } from "@/constants";
 import { Button } from "../../ui/button";
 
 const Navbar = () => {
     return (
         <div className="bg-white w-full h-[75px] border-b-2 border-neutral-300 flex items-center justify-between px-24">
             <div className="flex items-center gap-x-5">
-                <img src="/BrandLogo.svg" className="w-10 h-10" />
+                <img src={logos.brandlogo} className="w-10 h-10" />
                 <h1 className="text-2xl font-medium">BayawJobs</h1>
             </div>
 

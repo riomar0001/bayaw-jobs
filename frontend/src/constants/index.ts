@@ -7,6 +7,7 @@ import atnt from "../assets/icons/AT&T.svg";
 import mcdo from "../assets/icons/McDonalds.svg";
 import meta from "../assets/icons/Meta.svg";
 import sony from "../assets/icons/Sony.svg";
+import brandlogo from "../assets/icons/BrandLogo.svg";
 
 
 export const images = {
@@ -21,6 +22,8 @@ export const logos = {
     mcdo,
     meta,
     sony,
+    brandlogo,
+    
 }
 
 

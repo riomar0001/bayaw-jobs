@@ -1,3 +1,4 @@
+import { logos } from "@/constants";
 import { FaTwitterSquare, FaLinkedin, FaFacebookSquare } from "react-icons/fa";
 
 const Footer = () => {
@@ -5,7 +6,7 @@ const Footer = () => {
         <div className="bg-white border border-neutral-300 w-full h-[400px] flex flex-col justify-between">
             <div className="flex justify-between px-24 py-12">
                 <div className="flex gap-x-5">
-                    <img src="/BrandLogo.svg" className="w-10 h-10" />
+                    <img src={logos.brandlogo} className="w-10 h-10" />
                     <h1 className="text-2xl font-medium">BayawJobs</h1>
                 </div>
 
