@@ -7,6 +7,7 @@ import checkAuthApplicant from "@/controllers/applicants/checkAuth";
 import updateContact from "@/controllers/applicants/updateContact";
 import addExperience from "@/controllers/applicants/addExperience";
 import updateExperience from "@/controllers/applicants/updateExperience";
+import deleteExperience from "@/controllers/applicants/deleteExperience";
 
 const router = express.Router();
 
@@ -29,9 +30,11 @@ router.post("/experience", protect, addExperience);
  */
 router.put("/contact", protect, updateContact);
 router.put("/experience/:experience_id", protect, updateExperience);
+
 /**
  * @Reminder Place all DELETE requests here
  * @Format router.delete("path", "middleware", "controller");
  */
+router.delete("/experience/:experience_id", protect, deleteExperience);
 
 export default router;
