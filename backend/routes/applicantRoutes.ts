@@ -30,9 +30,7 @@ router.post("/auth", authApplicant);
 router.post("/", registerAccount);
 router.post(
   "/onboarding",
-
   protect,
-  // uploadProfilePicture.fields([{ name: "profile_picture", maxCount: 1 }]),
   uploadResume.fields([{ name: "resume", maxCount: 1 }]),
   accountOnboarding
 );
@@ -55,8 +53,8 @@ router.put(
   uploadResume.fields([{ name: "resume", maxCount: 1 }]),
   updateResume
 );
-
 router.put("/experience/:experience_id", protect, updateExperience);
+
 /**
  * @Reminder Place all DELETE requests here
  * @Format router.delete("path", "middleware", "controller");
