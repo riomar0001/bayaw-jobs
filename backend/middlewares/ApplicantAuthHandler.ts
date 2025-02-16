@@ -3,8 +3,12 @@ import jwt from "jsonwebtoken";
 import prisma from "@configs/prismaConfig";
 
 interface DecodedToken {
-  id: string;
-  isDoneOnboarding: boolean;
+  applicant: {
+    id: string;
+    username: string;
+    email: string;
+    done_onboarding: boolean;
+  };
 }
 
 export const protect = async (
@@ -21,20 +25,20 @@ export const protect = async (
   }
 
   try {
-    if (process.env.JWT_SECRET) {
+    if (!process.env.JWT_SECRET_APPLICANT) {
       return res.status(500).json({
         success: false,
-        message: "Internal Server Error, JWT_SECRET not found",
+        message: "Internal Server Error, env JWT_SECRET_APPLICANT not found",
       });
     }
 
     const decoded = jwt.verify(
       token,
-      process.env.JWT_SECRET as string
+      process.env.JWT_SECRET_APPLICANT as string
     ) as DecodedToken;
 
     const applicantAccountExists = await prisma.applicants.findUnique({
-      where: { id: decoded.id },
+      where: { id: decoded.applicant.id },
       select: { id: true },
     });
 

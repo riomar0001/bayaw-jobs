@@ -3,8 +3,12 @@ import jwt from "jsonwebtoken";
 import prisma from "@configs/prismaConfig";
 
 interface DecodedToken {
-  id: string;
-  isDoneOnboarding: boolean;
+  company: {
+    id: string;
+    username: string;
+    email: string;
+    done_onboarding: boolean;
+  };
 }
 
 export const protect = async (
@@ -21,24 +25,24 @@ export const protect = async (
   }
 
   try {
-    if (process.env.JWT_SECRET) {
+    if (!process.env.JWT_SECRET_COMPANY) {
       return res.status(500).json({
         success: false,
-        message: "Internal Server Error, JWT_SECRET not found",
+        message: "Internal Server Error, env JWT_SECRET_COMPANY not found",
       });
     }
 
     const decoded = jwt.verify(
       token,
-      process.env.JWT_SECRET as string
+      process.env.JWT_SECRET_COMPANY as string
     ) as DecodedToken;
 
-    const companyExists = await prisma.companies.findUnique({
-      where: { id: decoded.id },
+    const companyAccountExists = await prisma.companies.findUnique({
+      where: { id: decoded.company.id },
       select: { id: true },
     });
 
-    if (!companyExists) {
+    if (!companyAccountExists) {
       return res
         .status(403)
         .json({ success: false, message: "Forbidden, user not found" });

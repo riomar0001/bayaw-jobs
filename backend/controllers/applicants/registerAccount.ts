@@ -14,7 +14,7 @@ export const registerAccount = async (req: Request, res: Response) => {
     } catch (error: any) {
         return res.status(500).json({
             success: false,
-            message: "Server error",
+            message: "Internal Server Error",
             error: error.message,
         });
     }
