@@ -1,11 +1,11 @@
-import { Request, Response } from "express";
+import { Response, Request } from "express";
 
 /**
- * @description Get a specific applicant with related contact, CV, and experience data
- * @route GET /api/applicants/:id
- * @access Private
+ * @desc    Get jobs based on company ID
+ * @route   GET /jobs/company
+ * @access  Private
  */
-export const getInfo = async (req: Request, res: Response) => {
+export const getPostedJob = async (req: Request, res: Response) => {
     try {
         return res.status(200).json({
             success: true,
@@ -20,4 +20,4 @@ export const getInfo = async (req: Request, res: Response) => {
     }
 };
 
-export default getInfo;
+export default getPostedJob;

@@ -1,23 +1,23 @@
-import { Request, Response } from "express";
+import e, { Response, Request } from "express";
 
 /**
  * @description Update applicant details
  * @route PUT /api/applicants/:applicantId
  * @access Private (authentication middleware required)
  */
-export const updateAccount = async (req: Request, res: Response) => {
+export const updateCompanyIndustry = async (req: Request, res: Response) => {
     try {
         return res.status(200).json({
             success: true,
-            message: "Account Successfully Updated",
-    });
+            message: "Company Industry Successfully Updated",
+        });
     } catch (error: any) {
         return res.status(500).json({
             success: false,
             message: "Internal Server Error",
             error: error.message,
-    });
+        });
     }
 };
 
-export default updateAccount;
+export default updateCompanyIndustry;

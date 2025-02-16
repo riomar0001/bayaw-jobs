@@ -11,7 +11,7 @@ const generateApplicantToken = (res: Response, applicant: any) => {
   if (!token) {
     return res.status(403).json({
       success: false,
-      message: "Invalid Token",
+      message: "Failed to generate token",
     });
   }
 

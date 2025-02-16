@@ -3,24 +3,24 @@ import jwt from "jsonwebtoken";
 import dotenv from "dotenv";
 dotenv.config();
 
-const generateApplicantToken = (res: Response, applicant: any) => {
-  const token = jwt.sign({ applicant }, process.env.JWT_SECRET_APPLICANT!, {
+const generateCompanyToken = (res: Response, company: any) => {
+  const token = jwt.sign({ company }, process.env.JWT_SECRET_COMPANY!, {
     expiresIn: "3h",
   });
 
   if (!token) {
     return res.status(403).json({
       success: false,
-      message: "Invalid Token",
+      message: "Failed to generate token",
     });
   }
 
-  res.cookie("applicant_access_token", token, {
+  res.cookie("company_access_token", token, {
     httpOnly: true,
-    secure: process.env.NODE_ENV === "production",
+    secure: process.env.NODE_ENV === "production", //CSRF Protection
     sameSite: "strict",
     maxAge: 30 * 24 * 60 * 60 * 1000,
   });
 };
 
-export default generateApplicantToken;
+export default generateCompanyToken;

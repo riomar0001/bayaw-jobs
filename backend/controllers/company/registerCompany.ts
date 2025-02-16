@@ -1,15 +1,15 @@
-import { Request, Response } from "express";
+import { Response, Request } from "express";
 
 /**
- * @description registration of a new user
- * @route POST /api/applcants/
+ * @description Registration of a new company
+ * @route POST /api/companies/
  * @access Public
  */
-export const registerAccount = async (req: Request, res: Response) => {
+export const registerCompany = async (req: Request, res: Response) => {
     try {
         return res.status(200).json({
             success: true,
-            message: "Account Successfully Created",
+            message: "Company successfully registered",
         });
     } catch (error: any) {
         return res.status(500).json({
@@ -20,4 +20,4 @@ export const registerAccount = async (req: Request, res: Response) => {
     }
 };
 
-export default registerAccount;
+export default registerCompany;

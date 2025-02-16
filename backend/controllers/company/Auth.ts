@@ -1,7 +1,7 @@
 import { Response, Request } from "express";
 import prisma from "@/configs/prismaConfig";
 import { verifyPassword } from "@/utils/passwordUtils";
-import generateApplicantToken from "@/utils/generateApplicantToken";
+import generateCompanyToken from "@/utils/generateCompanyToken";
 import bcrypt from "bcryptjs";
 
 /**
@@ -9,19 +9,19 @@ import bcrypt from "bcryptjs";
  * @route POST /api/companies/auth
  * @access Public
  */
-export const authApplicant = async (req: Request, res: Response) => {
+export const authCompany = async (req: Request, res: Response) => {
   try {
     const { username_email, password } = req.body;
 
     if (!username_email || !password) {
       return res.status(400).json({
         success: false,
-        user_type: "applicant",
+        user_type: "company",
         message: "Username or Password is required",
       });
     }
 
-    const company = await prisma.applicants.findFirst({
+    const company = await prisma.companies.findFirst({
       where: {
         OR: [
           {
@@ -44,12 +44,10 @@ export const authApplicant = async (req: Request, res: Response) => {
     if (!company) {
       return res.status(400).json({
         success: false,
-        user_type: "applicant",
+        user_type: "company",
         message: "Invalid Email or Username",
       });
     }
-
-    console.log(company);
 
     // Check Password
     const passwordVerification = verifyPassword(password, company.password);
@@ -57,30 +55,28 @@ export const authApplicant = async (req: Request, res: Response) => {
     if (!passwordVerification) {
       return res.status(400).json({
         success: false,
-        user_type: "applicant",
+        user_type: "company",
         message: "Invalid Password",
       });
     }
 
     company.password = undefined!;
 
-    generateApplicantToken(res, company);
+    generateCompanyToken(res, company);
 
     return res.status(200).json({
       success: true,
-      user_type: "applicant",
+      user_type: "company",
       message: "Login Success",
     });
   } catch (error: any) {
-    console.log(error);
-
     return res.status(500).json({
       success: false,
-      user_type: "applicant",
+      user_type: "company",
       message: "Internal Server Error",
       error: error.message,
     });
   }
 };
 
-export default authApplicant;
+export default authCompany;
