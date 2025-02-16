@@ -1,4 +1,11 @@
 import { Request, Response } from "express";
+import jwt from "jsonwebtoken";
+import { DecodedToken } from "@/types/types";
+import prisma from "@/configs/prismaConfig";
+import fs from "fs";
+import supabase from "@/configs/supabaseConfig";
+import { hashPassword } from "@/utils/passwordUtils";
+import generateApplicantToken from "@/utils/generateApplicantToken";
 
 /**
  * @description registration of a new user
@@ -6,18 +13,189 @@ import { Request, Response } from "express";
  * @access Public
  */
 export const registerAccount = async (req: Request, res: Response) => {
-    try {
-        return res.status(200).json({
-            success: true,
-            message: "Account Successfully Created",
-        });
-    } catch (error: any) {
-        return res.status(500).json({
-            success: false,
-            message: "Internal Server Error",
-            error: error.message,
-        });
+  try {
+    const { username, email, password } = req.body;
+
+    if (!username || !email || !password) {
+      return res.status(400).json({
+        success: false,
+        user_type: "applicant",
+        message: "All fields are required",
+      });
     }
+
+    const accountExist = await prisma.applicants.findFirst({
+      where: {
+        OR: [
+          {
+            username,
+          },
+          {
+            email,
+          },
+        ],
+      },
+    });
+
+    if (accountExist) {
+      return res.status(400).json({
+        success: false,
+        user_type: "applicant",
+        message: "Account already exist",
+      });
+    }
+
+    const hashedPassword = await hashPassword(password);
+
+    const newAccount = await prisma.applicants.create({
+      data: {
+        username,
+        email,
+        password: hashedPassword,
+        created_at: new Date(),
+        done_onboarding: false,
+      },
+    });
+
+    if (!newAccount) {
+      return res.status(400).json({
+        success: false,
+        user_type: "applicant",
+        message: "Account Registration Failed",
+      });
+    }
+
+    newAccount.password = undefined!;
+
+    generateApplicantToken(res, newAccount);
+
+    return res.status(200).json({
+      success: true,
+      user_type: "applicant",
+      message: "Account Successfully Created",
+    });
+  } catch (error: any) {
+    return res.status(500).json({
+      success: false,
+      user_type: "applicant",
+      message: "Internal Server Error",
+      error: error.message,
+    });
+  }
 };
 
-export default registerAccount;
+export const accountOnboarding = async (req: Request, res: Response) => {
+  try {
+    const applicant_token = req.cookies.applicant_access_token;
+
+    const applicant_token_info = jwt.verify(
+      applicant_token,
+      process.env.JWT_SECRET_APPLICANT!
+    ) as DecodedToken;
+
+    const applicant_id = applicant_token_info.applicant.id;
+
+    const resume = Array.isArray(req.files)
+      ? undefined
+      : req.files?.resume?.[0];
+
+    const { first_name, last_name, contact_no, date_of_birth } = req.body;
+
+    if (!first_name || !last_name || !contact_no || !date_of_birth) {
+      return res.status(400).json({
+        success: false,
+        user_type: "applicant",
+        message: "All fields are required",
+      });
+    }
+
+    if (!resume) {
+      return res.status(400).json({
+        success: false,
+        user_type: "applicant",
+        message: "Profile Picture and Resume are required",
+      });
+    }
+
+    const accountExist = await prisma.applicants.findUnique({
+      where: {
+        id: applicant_id,
+      },
+      select: {
+        id: true,
+        done_onboarding: true,
+      },
+    });
+
+    if (!accountExist) {
+      return res.status(404).json({
+        success: false,
+        user_type: "applicant",
+        message: "Account does not exist",
+      });
+    }
+
+    if (accountExist.done_onboarding) {
+      return res.status(400).json({
+        success: false,
+        user_type: "applicant",
+        message: "Account has already been onboarded",
+      });
+    }
+
+    const resumeFilePath = resume.path;
+    const resumeFileName = `resume_${applicant_id}.pdf`;
+    const resumeFileBuffer = fs.readFileSync(resumeFilePath);
+
+    const { data, error } = await supabase.storage
+      .from("applicant_resume")
+      .upload(resumeFileName, resumeFileBuffer, {
+        cacheControl: "3600",
+        upsert: true,
+        contentType: "application/pdf",
+      });
+
+    if (error) throw error;
+
+    const onboardAccount = await prisma.applicants.update({
+      where: {
+        id: applicant_id,
+      },
+      data: {
+        first_name,
+        last_name,
+        contact_no,
+        date_of_birth,
+        profile_picture: "default_profile_picture.jpg",
+        resume: resumeFileName,
+        done_onboarding: true,
+        updated_at: new Date(),
+      },
+    });
+
+    if (!onboardAccount) {
+      return res.status(404).json({
+        success: false,
+        user_type: "applicant",
+        message: "Account Onboarding Failed",
+      });
+    }
+
+    fs.unlinkSync(resume.path);
+
+    return res.status(200).json({
+      success: true,
+      user_type: "applicant",
+      message: "Account Onboarding Successful",
+    });
+  } catch (error: any) {
+    console.log(error);
+
+    return res.status(500).json({
+      success: false,
+      user_type: "applicant",
+      message: "Internal Server Error",
+      error: error.message,
+    });
+  }
+};

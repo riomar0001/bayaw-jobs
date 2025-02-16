@@ -19,13 +19,13 @@ model applicants {
   username        String           @unique
   email           String           @unique
   password        String
-  first_name      String
-  last_name       String
-  contact_no      String
-  date_of_birth   DateTime
-  done_onboarding Boolean
-  resume_link     String
-  profile_picture String
+  first_name      String?
+  last_name       String?
+  contact_no      String?
+  date_of_birth   String?
+  done_onboarding Boolean          @default(false)
+  resume          String?
+  profile_picture String?
   created_at      DateTime         @default(now())
   updated_at      DateTime         @default(now())
   job_applicants  job_applicants[]
@@ -43,25 +43,25 @@ model applicants_experience {
   created_at   DateTime @default(now())
   updated_at   DateTime @default(now())
 
-  applicant applicants @relation(fields: [applicant_id], references: [id])
+  applicant applicants @relation(fields: [applicant_id], references: [id], onDelete: Cascade)
 }
 
 model companies {
   id              String   @id @default(uuid())
   username        String   @unique
   password        String
-  name            String
-  address         String
-  description     String
-  contact_no      String
+  name            String?
+  address         String?
+  description     String?
+  contact_no      String?
   email           String   @unique
-  logo_link       String
-  industry_id     String //Foreign Key
-  done_onboarding Boolean
+  logo_link       String?
+  industry_id     String? //Foreign Key
+  done_onboarding Boolean  @default(false)
   created_at      DateTime @default(now())
   updated_at      DateTime @default(now())
 
-  industry industries @relation(fields: [industry_id], references: [id])
+  industry industries? @relation(fields: [industry_id], references: [id])
 
   posted_jobs jobs[]
 }
@@ -90,7 +90,7 @@ model jobs {
   created_at    DateTime @default(now())
   updated_at    DateTime @default(now())
 
-  company companies @relation(fields: [company_id], references: [id])
+  company companies @relation(fields: [company_id], references: [id], onDelete: Cascade)
 
   job_applications job_applicants[]
 }
@@ -103,6 +103,6 @@ model job_applicants {
   created_at   DateTime @default(now())
   updated_at   DateTime @default(now())
 
-  job       jobs       @relation(fields: [job_id], references: [id])
-  applicant applicants @relation(fields: [applicant_id], references: [id])
+  job       jobs       @relation(fields: [job_id], references: [id], onDelete: Cascade)
+  applicant applicants @relation(fields: [applicant_id], references: [id], onDelete: Cascade)
 }

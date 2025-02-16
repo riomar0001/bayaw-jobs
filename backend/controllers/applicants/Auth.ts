@@ -21,7 +21,7 @@ export const authApplicant = async (req: Request, res: Response) => {
       });
     }
 
-    const company = await prisma.applicants.findFirst({
+    const account = await prisma.applicants.findFirst({
       where: {
         OR: [
           {
@@ -41,7 +41,7 @@ export const authApplicant = async (req: Request, res: Response) => {
       },
     });
 
-    if (!company) {
+    if (!account) {
       return res.status(400).json({
         success: false,
         user_type: "applicant",
@@ -49,10 +49,8 @@ export const authApplicant = async (req: Request, res: Response) => {
       });
     }
 
-    console.log(company);
-
     // Check Password
-    const passwordVerification = verifyPassword(password, company.password);
+    const passwordVerification = verifyPassword(password, account.password);
 
     if (!passwordVerification) {
       return res.status(400).json({
@@ -62,9 +60,9 @@ export const authApplicant = async (req: Request, res: Response) => {
       });
     }
 
-    company.password = undefined!;
+    account.password = undefined!;
 
-    generateApplicantToken(res, company);
+    generateApplicantToken(res, account);
 
     return res.status(200).json({
       success: true,
