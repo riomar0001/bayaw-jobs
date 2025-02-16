@@ -1,9 +1,10 @@
 import express from "express";
 import { upload as uploadProfilePicture } from "@/middlewares/uploadProfilePictureHandler";
 import { upload as uploadResume } from "@/middlewares/uploadResumeHandler";
+import { protect } from "@/middlewares/ApplicantAuthHandler";
 import authApplicant from "@/controllers/applicants/Auth";
 import checkAuthApplicant from "@/controllers/applicants/checkAuth";
-import { protect } from "@/middlewares/ApplicantAuthHandler";
+import updateContact from "@/controllers/applicants/updateContact";
 
 const router = express.Router();
 
@@ -23,6 +24,7 @@ router.post("/auth", authApplicant);
  * @Reminder Place all PUT requests here
  * @Format router.put("path", "middleware", "controller");
  */
+router.put("/contact", protect, updateContact);
 
 /**
  * @Reminder Place all DELETE requests here
