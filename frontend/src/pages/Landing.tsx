@@ -1,10 +1,10 @@
-import AccountRegistration from "@/components/landing/sections/AccountRegistration";
-import DiscoverCareer from "@/components/landing/sections/DiscoverCareer";
-import Hero from "@/components/landing/sections/Hero";
-import JobsPick from "@/components/landing/sections/JobsPick";
-import LatestJobs from "@/components/landing/sections/LatestJobs";
-import TrustCompanies from "@/components/landing/sections/TrustCompanies";
-import WhyUs from "@/components/landing/sections/WhyUs";
+import AccountRegistration from "@/components/customs/landing/sections/AccountRegistration";
+import DiscoverCareer from "@/components/customs/landing/sections/DiscoverCareer";
+import Hero from "@/components/customs/landing/sections/Hero";
+import JobsPick from "@/components/customs/landing/sections/JobsPick";
+import LatestJobs from "@/components/customs/landing/sections/LatestJobs";
+import TrustCompanies from "@/components/customs/landing/sections/TrustCompanies";
+import WhyUs from "@/components/customs/landing/sections/WhyUs";
 
 const Landing = () => {
     return (
