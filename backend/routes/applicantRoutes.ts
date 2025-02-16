@@ -13,6 +13,7 @@ import uploadResume from "@/middlewares/uploadResumeHandler";
 import updateResume from "@/controllers/applicants/updateResume";
 import addExperience from "@/controllers/applicants/addExperience";
 import updateExperience from "@/controllers/applicants/updateExperience";
+import deleteExperience from "@/controllers/applicants/deleteExperience";
 
 const router = express.Router();
 
@@ -59,5 +60,6 @@ router.put("/experience/:experience_id", protect, updateExperience);
  * @Reminder Place all DELETE requests here
  * @Format router.delete("path", "middleware", "controller");
  */
+router.delete("/experience/:experience_id", protect, deleteExperience);
 
 export default router;
