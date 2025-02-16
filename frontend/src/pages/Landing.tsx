@@ -8,7 +8,7 @@ import WhyUs from "@/components/customs/landing/sections/WhyUs";
 
 const Landing = () => {
     return (
-        <div>
+        <div className="bg-neutral-100">
             <Hero />
             <TrustCompanies />
             <JobsPick/>
