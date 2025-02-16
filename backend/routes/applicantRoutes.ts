@@ -11,6 +11,8 @@ import updateProfilePicture from "@/controllers/applicants/updateProfilePicture"
 import uploadProfilePicture from "@/middlewares/uploadProfilePictureHandler";
 import uploadResume from "@/middlewares/uploadResumeHandler";
 import updateResume from "@/controllers/applicants/updateResume";
+import addExperience from "@/controllers/applicants/addExperience";
+import updateExperience from "@/controllers/applicants/updateExperience";
 
 const router = express.Router();
 
@@ -34,6 +36,7 @@ router.post(
   uploadResume.fields([{ name: "resume", maxCount: 1 }]),
   accountOnboarding
 );
+router.post("/experience", protect, addExperience);
 
 /**
  * @Reminder Place all PUT requests here
@@ -53,6 +56,7 @@ router.put(
   updateResume
 );
 
+router.put("/experience/:experience_id", protect, updateExperience);
 /**
  * @Reminder Place all DELETE requests here
  * @Format router.delete("path", "middleware", "controller");
