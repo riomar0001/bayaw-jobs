@@ -7,7 +7,7 @@ import { FaStar } from "react-icons/fa";
 const Hero = () => {
     return (
         <div className="h-screen">
-            <div className="text-center space-y-6 mt-16 px-24">
+            <div className="text-center space-y-6 px-24 pt-16">
                 <h1 className="text-lg text-[#1783D0]">#1 Platform for Jobs</h1>
                 <h1 className="text-7xl font-semibold">Find Your Dream Job That Suit With Exciting Opportunities</h1>
                 <h1 className="text-xl text-neutral-500 font-light">Discover your next career move with ease</h1>
@@ -16,7 +16,7 @@ const Hero = () => {
             <div className="flex items-center justify-center mt-16 space-x-2">
                 <div className="relative flex items-center w-96">
                     <Search className="absolute left-3" color="gray" size={20} />
-                    <Input placeholder="Job title, Salary, or Companies" className="h-12 w-full pl-10" />
+                    <Input placeholder="Job title, Salary, or Companies" className="h-12 w-full pl-10 bg-white" />
                 </div>
 
                 <Button className="bg-[#1783D0] h-12 w-28">Search</Button>
