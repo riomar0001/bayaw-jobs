@@ -210,7 +210,7 @@ export const accountOnboarding = async (req: Request, res: Response) => {
             description,
             contact_no,
             email,
-            industry_id: addIndustry?.id ?? "",
+            industry_id: addIndustry?.id,
           },
         },
         companies_logo: {
