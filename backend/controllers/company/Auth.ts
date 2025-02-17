@@ -21,7 +21,7 @@ export const authCompany = async (req: Request, res: Response) => {
       });
     }
 
-    const company = await prisma.companies.findFirst({
+    const company = await prisma.companies_account.findFirst({
       where: {
         OR: [
           {

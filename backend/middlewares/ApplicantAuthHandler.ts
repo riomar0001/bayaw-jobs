@@ -37,7 +37,7 @@ export const protect = async (
       process.env.JWT_SECRET_APPLICANT as string
     ) as DecodedToken;
 
-    const applicantAccountExists = await prisma.applicants.findUnique({
+    const applicantAccountExists = await prisma.applicants_account.findUnique({
       where: { id: decoded.applicant.id },
       select: { id: true },
     });

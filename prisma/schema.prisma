@@ -14,95 +14,188 @@ datasource db {
   directUrl = env("DIRECT_URL")
 }
 
-model applicants {
-  id              String           @id @default(uuid())
-  username        String           @unique
-  email           String           @unique
-  password        String
-  first_name      String?
-  last_name       String?
-  contact_no      String?
-  date_of_birth   String?
-  done_onboarding Boolean          @default(false)
-  resume          String?
-  profile_picture String?
-  created_at      DateTime         @default(now())
-  updated_at      DateTime         @default(now())
-  job_applicants  job_applicants[]
+//=====================Applicants Schemas=====================
+model applicants_account {
+  id                              String                           @id @default(uuid())
+  username                        String                           @unique
+  email                           String                           @unique
+  password                        String
+  done_onboarding                 Boolean                          @default(false)
+  created_at                      DateTime                         @default(now())
+  updated_at                      DateTime                         @default(now())
+  applicants_personal_information applicants_personal_information?
+  applicants_resume               applicants_resume?
+  applicants_profile_picture      applicants_profile_picture?
+  applicants_social_media         applicants_social_media?
+  applicants_education            applicants_education[]
+  applicants_experience           applicants_experience[]
+  job_applicants                  job_applicants[]
+}
 
-  applicants_experience applicants_experience[]
+model applicants_personal_information {
+  id                    String             @id @default(uuid())
+  applicants_account_id String             @unique //Foreign Key
+  first_name            String
+  last_name             String
+  contact_no            String
+  date_of_birth         String?
+  address               String?
+  professional_title    String?
+  website               String?
+  work_type             WorkType[]         @default([])
+  created_at            DateTime           @default(now())
+  updated_at            DateTime           @default(now())
+  applicant             applicants_account @relation(fields: [applicants_account_id], references: [id], onDelete: Cascade)
+}
+
+model applicants_social_media {
+  id                    String             @id @default(uuid())
+  applicants_account_id String             @unique //Foreign Key
+  facebook              String?
+  twitter               String?
+  linkedin              String?
+  github                String?
+  created_at            DateTime           @default(now())
+  updated_at            DateTime           @default(now())
+  applicant             applicants_account @relation(fields: [applicants_account_id], references: [id], onDelete: Cascade)
+}
+
+model applicants_profile_picture {
+  id                    String             @id @default(uuid())
+  applicants_account_id String             @unique //Foreign Key
+  profile_picture       String
+  created_at            DateTime           @default(now())
+  updated_at            DateTime           @default(now())
+  applicant             applicants_account @relation(fields: [applicants_account_id], references: [id], onDelete: Cascade)
+}
+
+model applicants_resume {
+  id                    String             @id @default(uuid())
+  applicants_account_id String             @unique //Foreign Key
+  resume_file           String
+  created_at            DateTime           @default(now())
+  updated_at            DateTime           @default(now())
+  applicant             applicants_account @relation(fields: [applicants_account_id], references: [id], onDelete: Cascade)
 }
 
 model applicants_experience {
-  id           String   @id @default(uuid())
-  applicant_id String
-  company      String
-  location     String
-  position     String
-  worked_years String
-  created_at   DateTime @default(now())
-  updated_at   DateTime @default(now())
-
-  applicant applicants @relation(fields: [applicant_id], references: [id], onDelete: Cascade)
+  id                    String             @id @default(uuid())
+  applicants_account_id String //Foreign Key
+  company               String
+  location              String
+  position              String
+  worked_years          String
+  created_at            DateTime           @default(now())
+  updated_at            DateTime           @default(now())
+  applicant             applicants_account @relation(fields: [applicants_account_id], references: [id], onDelete: Cascade)
 }
 
-model companies {
-  id              String   @id @default(uuid())
-  username        String   @unique
-  password        String
-  name            String?
-  address         String?
-  description     String?
-  contact_no      String?
-  email           String   @unique
-  logo_link       String?
-  industry_id     String? //Foreign Key
-  done_onboarding Boolean  @default(false)
-  created_at      DateTime @default(now())
-  updated_at      DateTime @default(now())
-
-  industry industries? @relation(fields: [industry_id], references: [id])
-
-  posted_jobs jobs[]
+model applicants_education {
+  id                    String             @id @default(uuid())
+  applicants_account_id String
+  school_name           String
+  degree                String
+  field_of_study        String
+  start_date            String
+  end_date              String
+  created_at            DateTime           @default(now())
+  updated_at            DateTime           @default(now())
+  applicants            applicants_account @relation(fields: [applicants_account_id], references: [id], onDelete: Cascade)
 }
 
-model industries {
-  id         String   @id @default(uuid())
-  name       String   @unique
-  created_at DateTime @default(now())
-  updated_at DateTime @default(now())
+//=====================Companies Schemas=====================
 
-  companies companies[]
+model companies_account {
+  id                     String                  @id @default(uuid())
+  username               String                  @unique
+  password               String
+  email                  String                  @unique
+  done_onboarding        Boolean                 @default(false)
+  created_at             DateTime                @default(now())
+  updated_at             DateTime                @default(now())
+  posted_jobs            job_offers[]
+  companies_information  companies_information?
+  companies_social_media companies_social_media?
+  companies_logo         companies_logo?
 }
 
-model jobs {
-  id            String   @id @default(uuid())
-  company_id    String //Foreign Key
-  title         String
-  description   String
-  location      String
-  category      String?
-  salary_from   Int?
-  salary_to     Int?
-  work_schedule String?
-  years_exp     Int?
-  is_closed     Boolean
-  created_at    DateTime @default(now())
-  updated_at    DateTime @default(now())
+model companies_information {
+  id                 String              @id @default(uuid())
+  company_account_id String              @unique //Foreign Key
+  name               String
+  address            String
+  description        String
+  contact_no         String
+  email              String
+  industry_id        String? //Foreign Key
+  created_at         DateTime            @default(now())
+  updated_at         DateTime            @default(now())
+  industry           company_industries? @relation(fields: [industry_id], references: [id])
+  companies          companies_account   @relation(fields: [company_account_id], references: [id], onDelete: Cascade)
+}
 
-  company companies @relation(fields: [company_id], references: [id], onDelete: Cascade)
+model companies_logo {
+  id                 String            @id @default(uuid())
+  company_account_id String            @unique //Foreign Key
+  logo_file          String
+  created_at         DateTime          @default(now())
+  updated_at         DateTime          @default(now())
+  companies          companies_account @relation(fields: [company_account_id], references: [id], onDelete: Cascade)
+}
 
-  job_applications job_applicants[]
+model companies_social_media {
+  id                 String            @id @default(uuid())
+  company_account_id String            @unique //Foreign Key
+  facebook           String?
+  twitter            String?
+  linkedin           String?
+  github             String?
+  created_at         DateTime          @default(now())
+  updated_at         DateTime          @default(now())
+  companies          companies_account @relation(fields: [company_account_id], references: [id], onDelete: Cascade)
+}
+
+model company_industries {
+  id                    String                  @id @default(uuid())
+  name                  String                  @unique
+  created_at            DateTime                @default(now())
+  updated_at            DateTime                @default(now())
+  companies_information companies_information[]
+}
+
+model job_offers {
+  id                 String            @id @default(uuid())
+  company_account_id String //Foreign Key
+  title              String
+  description        String
+  location           String
+  category           String?
+  salary_from        Int?
+  salary_to          Int?
+  work_schedule      String?
+  years_exp          Int?
+  is_closed          Boolean
+  created_at         DateTime          @default(now())
+  updated_at         DateTime          @default(now())
+  companies          companies_account @relation(fields: [company_account_id], references: [id], onDelete: Cascade)
+  job_applications   job_applicants[]
 }
 
 model job_applicants {
-  id           String   @id @default(uuid())
-  job_id       String //Foreign Key
-  applicant_id String //Foreign Key
-  status       String
-  created_at   DateTime @default(now())
-  updated_at   DateTime @default(now())
+  id                    String             @id @default(uuid())
+  job_id                String //Foreign Key
+  applicants_account_id String //Foreign Key
+  status                String
+  created_at            DateTime           @default(now())
+  updated_at            DateTime           @default(now())
+  job_offers            job_offers         @relation(fields: [job_id], references: [id], onDelete: Cascade)
+  applicants            applicants_account @relation(fields: [applicants_account_id], references: [id], onDelete: Cascade)
+}
 
-  job       jobs       @relation(fields: [job_id], references: [id], onDelete: Cascade)
-  applicant applicants @relation(fields: [applicant_id], references: [id], onDelete: Cascade)
+enum WorkType {
+  FullTime
+  PartTime
+  Contractual
+  Freelance
+  Internship
 }

@@ -1,12 +1,13 @@
 import { Request, Response } from "express";
 import jwt from "jsonwebtoken";
-import { DecodedApplicantToken } from "@/types/types";
+import { DecodedCompanyToken } from "@/types/types";
 import prisma from "@/configs/prismaConfig";
 import fs from "fs";
 import supabase from "@/configs/supabaseConfig";
 import { hashPassword } from "@/utils/passwordUtils";
-import generateApplicantToken from "@/utils/generateApplicantToken";
-import { create } from "domain";
+import generateCompanyToken from "@/utils/generateCompanyToken";
+import sharp from "sharp";
+import path from "path";
 
 /**
  * @description registration of a new user
@@ -20,12 +21,12 @@ export const registerAccount = async (req: Request, res: Response) => {
     if (!username || !email || !password) {
       return res.status(400).json({
         success: false,
-        user_type: "applicant",
+        user_type: "company",
         message: "All fields are required",
       });
     }
 
-    const accountExist = await prisma.applicants_account.findFirst({
+    const accountExist = await prisma.companies_account.findFirst({
       where: {
         OR: [
           {
@@ -41,14 +42,14 @@ export const registerAccount = async (req: Request, res: Response) => {
     if (accountExist) {
       return res.status(400).json({
         success: false,
-        user_type: "applicant",
+        user_type: "company",
         message: "Account already exist",
       });
     }
 
     const hashedPassword = await hashPassword(password);
 
-    const newAccount = await prisma.applicants_account.create({
+    const newAccount = await prisma.companies_account.create({
       data: {
         username,
         email,
@@ -61,24 +62,24 @@ export const registerAccount = async (req: Request, res: Response) => {
     if (!newAccount) {
       return res.status(400).json({
         success: false,
-        user_type: "applicant",
+        user_type: "company",
         message: "Account Registration Failed",
       });
     }
 
     newAccount.password = undefined!;
 
-    generateApplicantToken(res, newAccount);
+    generateCompanyToken(res, newAccount);
 
     return res.status(200).json({
       success: true,
-      user_type: "applicant",
+      user_type: "company",
       message: "Account Successfully Created",
     });
   } catch (error: any) {
     return res.status(500).json({
       success: false,
-      user_type: "applicant",
+      user_type: "company",
       message: "Internal Server Error",
       error: error.message,
     });
@@ -87,52 +88,48 @@ export const registerAccount = async (req: Request, res: Response) => {
 
 export const accountOnboarding = async (req: Request, res: Response) => {
   try {
-    const applicant_token = req.cookies.applicant_access_token;
+    const company_token = req.cookies.company_access_token;
 
-    const applicant_token_info = jwt.verify(
-      applicant_token,
-      process.env.JWT_SECRET_APPLICANT!
-    ) as DecodedApplicantToken;
+    const company_token_info = jwt.verify(
+      company_token,
+      process.env.JWT_SECRET_COMPANY!
+    ) as DecodedCompanyToken;
 
-    const applicant_id = applicant_token_info.applicant.id;
+    const company_id = company_token_info.company.id;
 
-    const resume = Array.isArray(req.files)
-      ? undefined
-      : req.files?.resume?.[0];
+    const logo = Array.isArray(req.files) ? undefined : req.files?.logo?.[0];
 
-    const {
-      first_name,
-      last_name,
-      contact_no,
-      date_of_birth,
-      address,
-      professional_title,
-      website,
-      work_type,
-    } = req.body;
+    const { name, address, description, contact_no, email, industry } =
+      req.body;
 
-    if (!first_name || !last_name || !contact_no) {
+    if (
+      !name ||
+      !address ||
+      !description ||
+      !contact_no ||
+      !industry ||
+      !email ||
+      !logo
+    ) {
       return res.status(400).json({
         success: false,
-        user_type: "applicant",
+        user_type: "company",
         message: "All fields are required",
+        missing_fields: {
+          name: !name,
+          address: !address,
+          description: !description,
+          contact_no: !contact_no,
+          industry: !industry,
+          email: !email,
+          logo: !logo,
+        },
       });
     }
 
-    console.log(work_type);
-    
-
-    if (!resume) {
-      return res.status(400).json({
-        success: false,
-        user_type: "applicant",
-        message: "Profile Picture and Resume are required",
-      });
-    }
-
-    const accountExist = await prisma.applicants_account.findUnique({
+    const accountExist = await prisma.companies_account.findUnique({
       where: {
-        id: applicant_id,
+        id: company_id,
       },
       select: {
         id: true,
@@ -143,7 +140,7 @@ export const accountOnboarding = async (req: Request, res: Response) => {
     if (!accountExist) {
       return res.status(404).json({
         success: false,
-        user_type: "applicant",
+        user_type: "company",
         message: "Account does not exist",
       });
     }
@@ -151,59 +148,74 @@ export const accountOnboarding = async (req: Request, res: Response) => {
     if (accountExist.done_onboarding) {
       return res.status(400).json({
         success: false,
-        user_type: "applicant",
+        user_type: "company",
         message: "Account has already been onboarded",
       });
     }
 
-    const resumeFilePath = resume.path;
-    const resumeFileName = `resume_${applicant_id}.pdf`;
-    const resumeFileBuffer = fs.readFileSync(resumeFilePath);
+    // // Upload to Supabase Storage (Bucket: "applicant_profile_picture")
+    const logoFilePath = logo.path;
+    const logoFileName = `company_logo_${company_id}.jpeg`;
+    const logoFileBuffer = fs.readFileSync(logoFilePath);
 
-    const { data, error } = await supabase.storage
-      .from("applicant_resume")
-      .upload(resumeFileName, resumeFileBuffer, {
+    const processedImagePath = path.join(
+      path.dirname(logoFilePath),
+      logoFileName
+    );
+    await sharp(logoFilePath).jpeg({ quality: 80 }).toFile(processedImagePath);
+
+    const { error } = await supabase.storage
+      .from("company_logo")
+      .upload(logoFileName, logoFileBuffer, {
         cacheControl: "3600",
         upsert: true,
-        contentType: "application/pdf",
+        contentType: "image/jpeg",
       });
 
     if (error) {
       return res.status(500).json({
         success: false,
         user_type: "applicant",
-        message: "Resume Upload Failed",
+        message: "Failed to upload company logo",
         error: error.message,
       });
     }
 
-    const onboardAccount = await prisma.applicants_account.update({
+    const checkIndustry = await prisma.company_industries.findFirst({
       where: {
-        id: applicant_id,
+        name: industry,
+      },
+    });
+
+    let addIndustry = checkIndustry;
+    if (!checkIndustry) {
+      addIndustry = await prisma.company_industries.create({
+        data: {
+          name: industry,
+        },
+      });
+    }
+
+    const onboardAccount = await prisma.companies_account.update({
+      where: {
+        id: company_id,
       },
       data: {
         done_onboarding: true,
         updated_at: new Date(),
-        applicants_personal_information: {
+        companies_information: {
           create: {
-            first_name,
-            last_name,
+            name,
+            address,
+            description,
             contact_no,
-            date_of_birth: date_of_birth || null,
-            address: address || null,
-            professional_title: professional_title || null,
-            website: website || null,
-            work_type: work_type || [],
+            email,
+            industry_id: addIndustry?.id,
           },
         },
-        applicants_resume: {
+        companies_logo: {
           create: {
-            resume_file: resumeFileName,
-          },
-        },
-        applicants_profile_picture: {
-          create: {
-            profile_picture: "default_profile_picture.jpg",
+            logo_file: logoFileName,
           },
         },
       },
@@ -212,16 +224,16 @@ export const accountOnboarding = async (req: Request, res: Response) => {
     if (!onboardAccount) {
       return res.status(404).json({
         success: false,
-        user_type: "applicant",
+        user_type: "company",
         message: "Account Onboarding Failed",
       });
     }
 
-    fs.unlinkSync(resume.path);
+    fs.unlinkSync(logo.path);
 
     return res.status(200).json({
       success: true,
-      user_type: "applicant",
+      user_type: "company",
       message: "Account Onboarding Successful",
     });
   } catch (error: any) {
@@ -229,7 +241,7 @@ export const accountOnboarding = async (req: Request, res: Response) => {
 
     return res.status(500).json({
       success: false,
-      user_type: "applicant",
+      user_type: "company",
       message: "Internal Server Error",
       error: error.message,
     });

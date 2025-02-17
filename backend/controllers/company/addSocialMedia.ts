@@ -1,15 +1,15 @@
 import e, { Response, Request } from "express";
 
 /**
- * @description Update applicant details
- * @route PUT /api/applicants/:applicantId
+ * @description Update company details (logo, industry, address, or general information)
+ * @route PUT /api/company/:companyId
  * @access Private (authentication middleware required)
  */
-export const updateCompanyContact = async (req: Request, res: Response) => {
+export const updateCompanyAccount = async (req: Request, res: Response) => {
     try {
         return res.status(200).json({
             success: true,
-            message: "Company Contact Successfully Updated",
+            message: "Company Details Successfully Updated",
         });
     } catch (error: any) {
         return res.status(500).json({
@@ -20,4 +20,4 @@ export const updateCompanyContact = async (req: Request, res: Response) => {
     }
 };
 
-export default updateCompanyContact;
+export default updateCompanyAccount;

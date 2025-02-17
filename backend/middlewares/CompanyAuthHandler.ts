@@ -37,7 +37,7 @@ export const protect = async (
       process.env.JWT_SECRET_COMPANY as string
     ) as DecodedToken;
 
-    const companyAccountExists = await prisma.companies.findUnique({
+    const companyAccountExists = await prisma.companies_account.findUnique({
       where: { id: decoded.company.id },
       select: { id: true },
     });

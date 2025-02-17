@@ -3,7 +3,11 @@ import path from "path";
 import fs from "fs";
 
 // Ensure the directory exists
-const uploadDir = "storage/logos";
+const uploadDir = "storage/logo";
+
+if (!fs.existsSync(uploadDir)) {
+  fs.mkdirSync(uploadDir, { recursive: true });
+}
 
 if (!fs.existsSync(uploadDir)) {
   fs.mkdirSync(uploadDir, { recursive: true });
@@ -18,7 +22,7 @@ const storage = multer.diskStorage({
   },
 });
 
-export const upload = multer({
+const upload = multer({
   storage,
   limits: { fileSize: 1024 * 1024 * 10 }, // 10 MB max size
   fileFilter: (req, file, cb) => {
@@ -31,4 +35,4 @@ export const upload = multer({
   },
 });
 
-
+export default upload;

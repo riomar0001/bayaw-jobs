@@ -2,7 +2,7 @@ import { Request, Response } from "express";
 import prisma from "@/configs/prismaConfig";
 import jwt from "jsonwebtoken";
 
-interface DecodedToken {
+interface DecodedApplicantToken {
   applicant: {
     id: string;
     username: string;
@@ -32,7 +32,7 @@ export const addExperience = async (req: Request, res: Response) => {
     const applicant_token_info = jwt.verify(
       applicant_token,
       process.env.JWT_SECRET_APPLICANT!
-    ) as DecodedToken;
+    ) as DecodedApplicantToken;
 
     const applicant_id = applicant_token_info.applicant.id;
 

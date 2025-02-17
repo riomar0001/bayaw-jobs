@@ -1,15 +1,15 @@
 import { Request, Response } from "express";
 
 /**
- * @description Update applicant details
- * @route PUT /api/applicants/:applicantId
- * @access Private (authentication middleware required)
+ * @description Get a specific applicant with related contact, CV, and experience data
+ * @route GET /api/applicants/:id
+ * @access Private
  */
-export const updateAccount = async (req: Request, res: Response) => {
+export const getInfo = async (req: Request, res: Response) => {
   try {
     return res.status(200).json({
       success: true,
-      message: "Account Successfully Updated",
+      data: {},
     });
   } catch (error: any) {
     return res.status(500).json({
@@ -20,4 +20,4 @@ export const updateAccount = async (req: Request, res: Response) => {
   }
 };
 
-export default updateAccount;
+export default getInfo;

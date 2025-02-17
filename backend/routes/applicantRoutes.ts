@@ -2,7 +2,6 @@ import express from "express";
 import { protect } from "@/middlewares/ApplicantAuthHandler";
 import authApplicant from "@/controllers/applicants/Auth";
 import checkAuthApplicant from "@/controllers/applicants/checkAuth";
-import updateContact from "@/controllers/applicants/updateContact";
 import {
   registerAccount,
   accountOnboarding,
@@ -14,6 +13,7 @@ import updateResume from "@/controllers/applicants/updateResume";
 import addExperience from "@/controllers/applicants/addExperience";
 import updateExperience from "@/controllers/applicants/updateExperience";
 import deleteExperience from "@/controllers/applicants/deleteExperience";
+import logoutAccount from "@/controllers/applicants/logoutAccount";
 
 const router = express.Router();
 
@@ -36,12 +36,12 @@ router.post(
   accountOnboarding
 );
 router.post("/experience", protect, addExperience);
+router.post("/logout", protect, logoutAccount);
 
 /**
  * @Reminder Place all PUT requests here
  * @Format router.put("path", "middleware", "controller");
  */
-router.put("/contact", protect, updateContact);
 router.put(
   "/profile-picture",
   protect,
