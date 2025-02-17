@@ -30,7 +30,7 @@ const AllExperiences = () => {
                             </div>
                         </div>
                     </div>
-                    <hr className="border my-6" />
+                    {sample.id !== ExperiencesSample[ExperiencesSample.length - 1].id && <hr className="border my-6" />}
                 </section>
             ))}
 
