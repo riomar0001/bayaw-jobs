@@ -7,7 +7,7 @@ const Footer = () => {
             <div className="flex justify-between px-24 py-12">
                 <div className="flex gap-x-5">
                     <img src={logos.brandlogo} className="w-10 h-10" />
-                    <h1 className="text-2xl font-medium">BayawJobs</h1>
+                    <h1 className="text-2xl font-medium">JobTally</h1>
                 </div>
 
                 <div className="flex gap-x-16">
