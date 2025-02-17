@@ -16,7 +16,7 @@ const JobsPickCard = ({
   timestamp,
 }: JobsPickCardProps) => {
   return (
-    <div className="w-[450px] h-auto bg-white border border-neutral-200 rounded-xl flex flex-col justify-start items-start space-y-6 px-8 py-6 hover:border-[#1783D0] cursor-pointer">
+    <div className="w-[450px] h-auto bg-white border border-neutral-200 rounded-xl flex flex-col justify-start items-start space-y-6 px-8 py-6 hover:border-lochmara-500 cursor-pointer">
       <div className="flex gap-4 items-center">
 
         <img src={images.sample_profile_1} className="w-12 h-12 rounded-full" />
@@ -72,8 +72,8 @@ const JobsPickCard = ({
       <span className="bg-neutral-200 p-[0.5px] w-full"></span>
 
       <div className="flex justify-between w-full">
-        <p className="text-xs text-[#1783D0] pt-3">{timestamp}</p>
-        <Button className="bg-[#1783D0] h-10 hover:bg-[#1783D0]/90">Job Details</Button>
+        <p className="text-xs text-lochmara-500 pt-3">{timestamp}</p>
+        <Button className="bg-lochmara-500 h-10 hover:bg-lochmara-500/90">Job Details</Button>
       </div>
     </div>
   );
