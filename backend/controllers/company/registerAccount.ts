@@ -127,14 +127,6 @@ export const accountOnboarding = async (req: Request, res: Response) => {
       });
     }
 
-    // if (!logo) {
-    //   return res.status(400).json({
-    //     success: false,
-    //     user_type: "company",
-    //     message: "Logo is required",
-    //   });
-    // }
-
     const accountExist = await prisma.companies_account.findUnique({
       where: {
         id: company_id,
