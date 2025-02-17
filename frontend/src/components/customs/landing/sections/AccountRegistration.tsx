@@ -13,8 +13,8 @@ const AccountRegistration = () => {
         <Tabs defaultValue="jobseeker">
           <div className="flex justify-center mb-8">
             <TabsList>
-              <TabsTrigger value="jobseeker" className="data-[state=active]:text-white data-[state=active]:bg-[#1783D0] text-base font-normal">Job Seekers</TabsTrigger>
-              <TabsTrigger value="employer" className="data-[state=active]:text-white data-[state=active]:bg-[#1783D0] text-base font-normal">Employers</TabsTrigger>
+              <TabsTrigger value="jobseeker" className="data-[state=active]:text-white data-[state=active]:bg-lochmara-500 text-base font-normal">Job Seekers</TabsTrigger>
+              <TabsTrigger value="employer" className="data-[state=active]:text-white data-[state=active]:bg-lochmara-500 text-base font-normal">Employers</TabsTrigger>
             </TabsList>
           </div>
 

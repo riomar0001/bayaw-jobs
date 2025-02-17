@@ -50,7 +50,7 @@ export default {
                     4: "hsl(var(--chart-4))",
                     5: "hsl(var(--chart-5))",
                 },
-                bayaw: {
+                lochmara: {
                     50: "#f1f8fe",
                     100: "#e1effd",
                     200: "#bddffa",

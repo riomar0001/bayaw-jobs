@@ -33,9 +33,9 @@ const Footer = () => {
                 </div>
 
                 <div className="flex gap-x-3">
-                    <FaFacebookSquare size={35} className="text-gray-400 hover:text-[#1783D0]" />
-                    <FaLinkedin size={35} className="text-gray-400 hover:text-[#1783D0]" />
-                    <FaTwitterSquare size={35} className="text-gray-400 hover:text-[#1783D0]" />
+                    <FaFacebookSquare size={35} className="text-gray-400 hover:text-lochmara-500" />
+                    <FaLinkedin size={35} className="text-gray-400 hover:text-lochmara-500" />
+                    <FaTwitterSquare size={35} className="text-gray-400 hover:text-lochmara-500" />
                 </div>
             </div>
 

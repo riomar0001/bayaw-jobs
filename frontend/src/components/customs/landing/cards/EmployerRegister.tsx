@@ -52,8 +52,8 @@ const EmployerRegister = () => {
             </div>
 
             <div className="flex justify-between items-center">
-                <h1 className="text-sm text-[#1783D0] hover:text-neutral-600 hover:font-medium cursor-pointer">Forgot Your Password?</h1>
-                <Button className="bg-[#1783D0] text-white hover:bg-neutral-500">Create account</Button>
+                <h1 className="text-sm text-lochmara-500 hover:underline cursor-pointer">Forgot Your Password?</h1>
+                <Button className="bg-lochmara-500 text-white hover:bg-neutral-500">Create account</Button>
             </div>
         </div>
     )
