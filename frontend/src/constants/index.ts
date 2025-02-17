@@ -104,3 +104,29 @@ export const JobsPickItems = [
     
 ];
 
+export const ExperiencesSample = [
+    {
+        id: 1,
+        company: "Trendyol.com",
+        companyImage: sample_profile_1,
+        role: "Front-end Developer",
+        duration: "1 Year 2 Months",
+        date: "Oct 2022 - Dec 2021"
+    },
+    {
+        id: 2,
+        company: "TiklaGelsin",
+        companyImage: sample_profile_2,
+        role: "Front-end Developer",
+        duration: "1 Year 2 Months",
+        date: "Oct 2022 - Dec 2021"
+    },
+    {
+        id: 3,
+        company: "Pazarama",
+        companyImage: sample_profile_3,
+        role: "Front-end Developer",
+        duration: "1 Year 2 Months",
+        date: "Oct 2022 - Dec 2021"
+    },
+]

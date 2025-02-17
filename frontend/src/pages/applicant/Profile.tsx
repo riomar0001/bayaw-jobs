@@ -1,4 +1,5 @@
 import AccountHead from "@/components/customs/applicant/AccountHead"
+import AllExperiences from "@/components/customs/applicant/AllExperiences"
 import AllPersonalInfo from "@/components/customs/applicant/AllPersonalInfo"
 import Resume from "@/components/customs/applicant/Resume"
 
@@ -10,6 +11,7 @@ const Profile = () => {
                 <AccountHead />
                 <AllPersonalInfo />
                 <Resume />
+                <AllExperiences/>
             </div>
 
 
