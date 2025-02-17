@@ -3,10 +3,9 @@ import { FaChartPie, FaSuitcase } from "react-icons/fa";
 import { FaLocationDot } from "react-icons/fa6";
 import { AiFillDollarCircle } from "react-icons/ai";
 import { Button } from "@/components/ui/button";
-import { CiBookmark } from "react-icons/ci";
 import { BiSolidBuilding } from "react-icons/bi";
 
-const JobsPickCard: React.FC<JobsPickCardProps> = ({
+const JobsPickCard = ({
   jobtitle,
   company,
   type,
@@ -15,27 +14,27 @@ const JobsPickCard: React.FC<JobsPickCardProps> = ({
   salary,
   category,
   timestamp,
-}) => {
+}: JobsPickCardProps) => {
   return (
-    <div className="w-[450px] h-auto bg-white border border-neutral-200 rounded-xl flex flex-col justify-start items-start space-y-6 px-8 py-6">
+    <div className="w-[450px] h-auto bg-white border border-neutral-200 rounded-xl flex flex-col justify-start items-start space-y-6 px-8 py-6 hover:border-[#1783D0] cursor-pointer">
       <div className="flex gap-4 items-center">
+
         <img src={images.sample_profile_1} className="w-12 h-12 rounded-full" />
         <div className="flex flex-col flex-grow">
           <h1 className="text-lg text-stone-800 font-medium">{jobtitle}</h1>
           <p className="text-sm text-neutral-500">{company}</p>
         </div>
-        <div className="flex justify-end flex-grow">
-          {" "}
-          {/* Added flex and justify-end here */}
-          <CiBookmark className="text-[#1783D0] border-neutral-500 cursor-pointer rounded-xl w-6 h-6" />
-        </div>
+
       </div>
+
       <div className="flex gap-8 w-full justify-between">
+
         <div className="flex flex-col gap-2">
           <div className="flex items-center gap-2">
             <BiSolidBuilding className="text-neutral-500" />
             <p className="text-sm text-stone-800">{company}</p>
           </div>
+
           <div className="flex items-center gap-2">
             <FaChartPie className="text-neutral-500" />
             <p className="text-sm text-stone-800">{type}</p>
@@ -74,7 +73,7 @@ const JobsPickCard: React.FC<JobsPickCardProps> = ({
 
       <div className="flex justify-between w-full">
         <p className="text-xs text-[#1783D0] pt-3">{timestamp}</p>
-        <Button className="bg-[#1783D0] h-10">Job Details</Button>
+        <Button className="bg-[#1783D0] h-10 hover:bg-[#1783D0]/90">Job Details</Button>
       </div>
     </div>
   );

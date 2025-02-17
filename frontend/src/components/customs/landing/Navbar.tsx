@@ -6,7 +6,7 @@ const Navbar = () => {
         <div className="bg-white w-full h-[75px] border-b-2 border-neutral-300 flex items-center justify-between px-24">
             <div className="flex items-center gap-x-5">
                 <img src={logos.brandlogo} className="w-10 h-10" />
-                <h1 className="text-2xl font-medium">BayawJobs</h1>
+                <h1 className="text-2xl font-medium">JobTally</h1>
             </div>
 
             <div className="flex space-x-10">
