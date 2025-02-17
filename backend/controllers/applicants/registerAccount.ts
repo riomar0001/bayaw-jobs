@@ -1,11 +1,12 @@
 import { Request, Response } from "express";
 import jwt from "jsonwebtoken";
-import { DecodedToken } from "@/types/types";
+import { DecodedApplicantToken } from "@/types/types";
 import prisma from "@/configs/prismaConfig";
 import fs from "fs";
 import supabase from "@/configs/supabaseConfig";
 import { hashPassword } from "@/utils/passwordUtils";
 import generateApplicantToken from "@/utils/generateApplicantToken";
+import { create } from "domain";
 
 /**
  * @description registration of a new user
@@ -24,7 +25,7 @@ export const registerAccount = async (req: Request, res: Response) => {
       });
     }
 
-    const accountExist = await prisma.applicants.findFirst({
+    const accountExist = await prisma.applicants_account.findFirst({
       where: {
         OR: [
           {
@@ -47,7 +48,7 @@ export const registerAccount = async (req: Request, res: Response) => {
 
     const hashedPassword = await hashPassword(password);
 
-    const newAccount = await prisma.applicants.create({
+    const newAccount = await prisma.applicants_account.create({
       data: {
         username,
         email,
@@ -91,7 +92,7 @@ export const accountOnboarding = async (req: Request, res: Response) => {
     const applicant_token_info = jwt.verify(
       applicant_token,
       process.env.JWT_SECRET_APPLICANT!
-    ) as DecodedToken;
+    ) as DecodedApplicantToken;
 
     const applicant_id = applicant_token_info.applicant.id;
 
@@ -99,9 +100,18 @@ export const accountOnboarding = async (req: Request, res: Response) => {
       ? undefined
       : req.files?.resume?.[0];
 
-    const { first_name, last_name, contact_no, date_of_birth } = req.body;
+    const {
+      first_name,
+      last_name,
+      contact_no,
+      date_of_birth,
+      address,
+      professional_title,
+      website,
+      work_type,
+    } = req.body;
 
-    if (!first_name || !last_name || !contact_no || !date_of_birth) {
+    if (!first_name || !last_name || !contact_no) {
       return res.status(400).json({
         success: false,
         user_type: "applicant",
@@ -117,7 +127,7 @@ export const accountOnboarding = async (req: Request, res: Response) => {
       });
     }
 
-    const accountExist = await prisma.applicants.findUnique({
+    const accountExist = await prisma.applicants_account.findUnique({
       where: {
         id: applicant_id,
       },
@@ -155,21 +165,44 @@ export const accountOnboarding = async (req: Request, res: Response) => {
         contentType: "application/pdf",
       });
 
-    if (error) throw error;
+    if (error) {
+      return res.status(500).json({
+        success: false,
+        user_type: "applicant",
+        message: "Resume Upload Failed",
+        error: error.message,
+      });
+    }
 
-    const onboardAccount = await prisma.applicants.update({
+    const onboardAccount = await prisma.applicants_account.update({
       where: {
         id: applicant_id,
       },
       data: {
-        first_name,
-        last_name,
-        contact_no,
-        date_of_birth,
-        profile_picture: "default_profile_picture.jpg",
-        resume: resumeFileName,
         done_onboarding: true,
         updated_at: new Date(),
+        applicants_personal_information: {
+          create: {
+            first_name,
+            last_name,
+            contact_no,
+            date_of_birth: date_of_birth || null,
+            address: address || null,
+            professional_title: professional_title || null,
+            website: website || null,
+            work_type: work_type || [],
+          },
+        },
+        applicants_resume: {
+          create: {
+            resume_file: resumeFileName,
+          },
+        },
+        applicants_profile_picture: {
+          create: {
+            profile_picture: "default_profile_picture.jpg",
+          },
+        },
       },
     });
 

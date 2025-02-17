@@ -21,7 +21,7 @@ export const authApplicant = async (req: Request, res: Response) => {
       });
     }
 
-    const account = await prisma.applicants.findFirst({
+    const account = await prisma.applicants_account.findFirst({
       where: {
         OR: [
           {

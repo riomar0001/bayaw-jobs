@@ -1,6 +1,6 @@
 import { Request, Response } from "express";
 import jwt from "jsonwebtoken";
-import { DecodedToken } from "@/types/types";
+import { DecodedApplicantToken } from "@/types/types";
 import prisma from "@/configs/prismaConfig";
 import fs from "fs";
 import supabase from "@/configs/supabaseConfig";
@@ -20,7 +20,7 @@ const updateProfilePicture = async (req: Request, res: Response) => {
     const applicant_token_info = jwt.verify(
       applicant_token,
       process.env.JWT_SECRET_APPLICANT!
-    ) as DecodedToken;
+    ) as DecodedApplicantToken;
 
     const applicant_id = applicant_token_info.applicant.id;
 
@@ -37,9 +37,8 @@ const updateProfilePicture = async (req: Request, res: Response) => {
     }
 
     console.log(profile_picture.path);
-    
 
-    const accountExist = await prisma.applicants.findUnique({
+    const accountExist = await prisma.applicants_profile_picture.findUnique({
       where: {
         id: applicant_id,
       },
@@ -68,15 +67,22 @@ const updateProfilePicture = async (req: Request, res: Response) => {
 
     const { error } = await supabase.storage
       .from("applicant_profile_picture")
-      .upload(profilePicFileName, fs.readFileSync(processedImagePath), {
+      .upload(profilePicFileName, profilePicFileBuffer, {
         cacheControl: "3600",
         upsert: true,
         contentType: "image/jpeg",
       });
 
-    if (error) throw error;
+    if (error) {
+      return res.status(500).json({
+        success: false,
+        user_type: "applicant",
+        message: "Failed to upload profile picture",
+        error: error.message,
+      });
+    }
 
-    const updateProfilePic = await prisma.applicants.update({
+    const updateProfilePic = await prisma.applicants_profile_picture.update({
       where: {
         id: applicant_id,
       },
@@ -93,7 +99,6 @@ const updateProfilePicture = async (req: Request, res: Response) => {
         message: "Failed to update profile picture",
       });
     }
-
 
     fs.unlinkSync(profile_picture.path);
     fs.unlinkSync(`storage\\profilePictures\\${profilePicFileName}`);

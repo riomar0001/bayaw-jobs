@@ -2,7 +2,7 @@ import { Request, Response } from "express";
 import prisma from "@/configs/prismaConfig";
 import jwt from "jsonwebtoken";
 
-interface DecodedToken {
+interface DecodedApplicantToken {
   applicant: {
     id: string;
     username: string;
@@ -31,7 +31,7 @@ export const updateExperience = async (req: Request, res: Response) => {
     const applicant_token_info = jwt.verify(
       applicant_token,
       process.env.JWT_SECRET_APPLICANT!
-    ) as DecodedToken;
+    ) as DecodedApplicantToken;
 
     const applicant_id = applicant_token_info.applicant.id;
     const { experience_id } = req.params;
@@ -44,25 +44,25 @@ export const updateExperience = async (req: Request, res: Response) => {
         message: "Please provide all required fields",
       });
     }
-    
+
     // if applicant exists
-    const applicantExists = await prisma.applicants.count({
-        where: { id: applicant_id },
+    const applicantExists = await prisma.applicants_experience.count({
+      where: { id: applicant_id },
+    });
+
+    if (applicantExists === 0) {
+      return res.status(404).json({
+        success: false,
+        user_type: "applicant",
+        error: "Applicant not found",
       });
-  
-      if (applicantExists === 0) {
-        return res.status(404).json({
-          success: false,
-          user_type: "applicant",
-          error: "Applicant not found",
-        });
-      }
+    }
 
     // if exp exists
     const existingExperience = await prisma.applicants_experience.findUnique({
       where: {
         id: experience_id,
-        applicant_id: applicant_id, // Ensuring the applicant owns this experience
+        applicants_account_id: applicant_id, // Ensuring the applicant owns this experience
       },
     });
 

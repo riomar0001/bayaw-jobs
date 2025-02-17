@@ -11,8 +11,11 @@ if (!SUPABASE_URL || !SUPABASE_SERVICE_ROLE_KEY) {
 
 const supabase = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY);
 
-async function getSignedProfilePicture(fileName: string, expiresIn = 3600) {
-  const bucketName = "applicant_profile_picture"; // Update if using a different bucket
+export async function getSignedResume(
+  fileName: string,
+  expiresIn = 3600
+) {
+  const bucketName = "applicant_resume"; // Update if using a different bucket
 
   const { data, error } = await supabase.storage
     .from(bucketName)

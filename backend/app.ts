@@ -38,15 +38,14 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 
-
 // Routes
 app.use("/api/company", companyRoutes);
 app.use("/api/applicant", applicantRoutes);
 app.use("/api/jobs", jobRoutes);
 
-// Serve Static Files
 app.get("/", (req: Request, res: Response) => {
-  const __filename = fileURLToPath(import.meta.url); //Mag Error jud ni siya diri pasagdai lang
+  //@ts-expect-error
+  const __filename = fileURLToPath(import.meta.url);
   const __dirname = path.dirname(__filename);
   const distPath = path.join(__dirname, "../frontend/dist", "index.html");
 

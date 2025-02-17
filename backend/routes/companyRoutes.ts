@@ -1,8 +1,12 @@
 import express from "express";
-import { upload as uploadLogo } from "@/middlewares/uploadLogoHandler";
+import uploadLogoHandler from "@/middlewares/uploadLogoHandler";
 import { protect } from "@/middlewares/CompanyAuthHandler";
 import authCompany from "@/controllers/company/Auth";
 import checkAuthCompany from "@/controllers/company/checkAuth";
+import {
+  registerAccount,
+  accountOnboarding,
+} from "@/controllers/company/registerAccount";
 
 const router = express.Router();
 
@@ -17,11 +21,20 @@ router.get("/auth", protect, checkAuthCompany);
  * @Format router.post("path", "middleware", "controller");
  */
 router.post("/auth", authCompany);
+router.post("/", registerAccount);
+router.post(
+  "/onboarding",
+  protect,
+  uploadLogoHandler.fields([{ name: "logo", maxCount: 1 }]),
+  accountOnboarding
+);
 
 /**
  * @Reminder Place all PUT requests here
  * @Format router.put("path", "middleware", "controller");
  */
+
+
 
 /**
  * @Reminder Place all DELETE requests here

@@ -1,6 +1,6 @@
 import { Request, Response } from "express";
 import jwt from "jsonwebtoken";
-import { DecodedToken } from "@/types/types";
+import { DecodedApplicantToken } from "@/types/types";
 import prisma from "@/configs/prismaConfig";
 import fs from "fs";
 import supabase from "@/configs/supabaseConfig";
@@ -19,7 +19,7 @@ export const updateResume = async (req: Request, res: Response) => {
     const applicant_token_info = jwt.verify(
       applicant_token,
       process.env.JWT_SECRET_APPLICANT!
-    ) as DecodedToken;
+    ) as DecodedApplicantToken;
 
     const applicant_id = applicant_token_info.applicant.id;
 
@@ -35,7 +35,7 @@ export const updateResume = async (req: Request, res: Response) => {
       });
     }
 
-    const accountExist = await prisma.applicants.findUnique({
+    const accountExist = await prisma.applicants_resume.findUnique({
       where: {
         id: applicant_id,
       },
@@ -63,12 +63,12 @@ export const updateResume = async (req: Request, res: Response) => {
 
     if (error) throw error;
 
-    const update = await prisma.applicants.update({
+    const update = await prisma.applicants_resume.update({
       where: {
         id: applicant_id,
       },
       data: {
-        resume: resumeFileName,
+        resume_file: resumeFileName,
         updated_at: new Date(),
       },
     });
