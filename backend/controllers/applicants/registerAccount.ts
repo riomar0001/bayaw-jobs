@@ -119,6 +119,9 @@ export const accountOnboarding = async (req: Request, res: Response) => {
       });
     }
 
+    console.log(work_type);
+    
+
     if (!resume) {
       return res.status(400).json({
         success: false,

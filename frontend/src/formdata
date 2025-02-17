@@ -1,0 +1,35 @@
+import axios from "axios";
+import fs from "fs"; // Only for Node.js (if running on the backend)
+
+// Create FormData object
+const formData = new FormData();
+
+// Append string values
+formData.append("first_name", "John");
+formData.append("last_name", "Doe");
+formData.append("contact_no", "+639123456789");
+formData.append("date_of_birth", "1998-01-15");
+formData.append("address", "Davao City, Philippines");
+formData.append("professional_title", "Software Engineer");
+formData.append("website", "https://johndoe.dev");
+
+// Append array values (Laravel/Express will interpret as an array)
+const workTypes = ["FullTime", "PartTime", "Freelance"];
+workTypes.forEach(type => formData.append("work_type[]", type)); 
+
+// Append file (Browser)
+const fileInput = document.querySelector("#resume"); // Example input element
+formData.append("resume", fileInput.files[0]); 
+
+// Append file (Node.js)
+const resumeFile = fs.createReadStream("./resume.pdf"); // Only for Node.js
+formData.append("resume", resumeFile, "resume.pdf");
+
+// Send request with Axios
+axios.post("https://your-api.com/submit", formData, {
+    headers: {
+        "Content-Type": "multipart/form-data"
+    }
+})
+.then(response => console.log(response.data))
+.catch(error => console.error(error));
