@@ -12,12 +12,11 @@ interface DecodedApplicantToken {
 }
 
 /**
- * @description Adds a new education entry for an applicant
- * @route POST /api/applicants/onboarding
+ * @description Delete an applicant's education
+ * @route DELETE /api/applicants/:education_id
  * @access Private (authentication middleware required)
  */
-
-export const addEducation = async (req: Request, res: Response) => {
+export const deleteEducation = async (req: Request, res: Response) => {
   try {
     const applicant_token = req.cookies.applicant_access_token;
 
@@ -35,58 +34,44 @@ export const addEducation = async (req: Request, res: Response) => {
     ) as DecodedApplicantToken;
 
     const applicant_id = applicant_token_info.applicant.id;
+    const { education_id } = req.params;
 
-    const { school_name, degree, field_of_study, start_date, end_date } = req.body;
-    
-    if (!school_name || !degree || !field_of_study || !start_date || !end_date) {
-      return res.status(400).json({
-        success: false,
-        user_type: "applicant",
-        message: "All fields are required",
-      });
-    }
-
-    const createQuery = await prisma.applicants_education.create({
-      data: {
-        school_name,
-        degree,
-        field_of_study,
-        start_date,
-        end_date,
-        applicants: {
-          connect: {
-            id: applicant_id,
-          },
-        },
+    // Check if education exists and belongs to the applicant
+    const existingEducation = await prisma.applicants_education.findFirst({
+      where: {
+        id: education_id,
+        applicants_account_id: applicant_id,
       },
     });
 
-    //fail
-    if (!createQuery) {
-      return res.status(400).json({
+    if (!existingEducation) {
+      return res.status(404).json({
         success: false,
         user_type: "applicant",
-        message: "Failed to add education",
+        message: "Education not found",
       });
     }
-    //success
+
+    // Delete the education from db
+    await prisma.applicants_education.delete({
+      where: { id: education_id },
+    });
+
     return res.status(200).json({
       success: true,
       user_type: "applicant",
-      message: "Education added successfully",
-      data: createQuery,
+      message: "Education deleted successfully",
     });
-
   } catch (error: any) {
-    console.error("Error adding experience:", error);
+    console.error("Error deleting education:", error);
 
     return res.status(500).json({
       success: false,
       user_type: "applicant",
-      message: "Internal Server Error",
+      message: "Internal server error",
       error: error.message,
     });
   }
 };
 
-export default addEducation;
+export default deleteEducation;
