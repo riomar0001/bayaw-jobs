@@ -4,7 +4,7 @@ import { PencilLine } from "lucide-react"
 
 const AllExperiences = () => {
     return (
-        <div className="bg-white border border-neutral-300 w-[750px] h-auto rounded-lg px-12 py-6">
+        <div className="bg-white border border-neutral-100 w-[750px] h-auto rounded-lg px-12 py-6">
             <section className="flex justify-between items-center mb-6">
                 <h1 className="font-semibold text-xl">All Experiences</h1>
                 <h1 className="font-semibold text-base text-lochmara-500 flex items-center gap-x-2 hover:underline cursor-pointer">

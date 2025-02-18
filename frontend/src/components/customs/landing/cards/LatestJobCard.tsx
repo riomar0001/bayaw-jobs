@@ -6,7 +6,7 @@ const LatestJobCard = ({
   category,
 }: LatestJobCardProps) => {
   return (
-    <div className="w-[450px] h-auto bg-white border border-neutral-200 rounded-xl flex flex-col justify-start items-start space-y-6 px-8 py-6 hover:border-lochmara-500 cursor-pointer">
+    <div className="w-[400px] h-auto bg-white border border-neutral-200 rounded-xl flex flex-col justify-start items-start space-y-6 px-8 py-6 hover:border-lochmara-500 cursor-pointer">
       <div className="flex gap-4 items-center">
 
         <img src={images.sample_profile_1} className="w-12 h-12 rounded-full" />
@@ -28,10 +28,9 @@ const LatestJobCard = ({
           <div className="flex items-center gap-2">
             <p className="text-md text-stone-800">{jobquantity} Job opportunities</p>
           </div>
-
         </div>
 
-        
+
       </div>
 
       <div className="flex gap-2 flex-wrap">
@@ -46,7 +45,7 @@ const LatestJobCard = ({
       </div>
 
 
-      
+
     </div>
   );
 };

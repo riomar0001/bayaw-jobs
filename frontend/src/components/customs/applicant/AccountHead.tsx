@@ -4,7 +4,7 @@ import { FaLinkedin } from "react-icons/fa"
 
 const AccountHead = () => {
     return (
-        <div className="bg-white border border-neutral-300 w-[750px] h-auto rounded-lg px-12 py-6">
+        <div className="bg-white border border-neutral-100 w-[750px] h-auto rounded-lg px-12 py-6">
             <div className="flex justify-between items-center">
                 <div className="flex items-center gap-x-6">
                     <img src={images.sample_profile_1} className="w-14 h-14 rounded-full object-cover" />

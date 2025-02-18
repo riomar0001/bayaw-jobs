@@ -117,7 +117,7 @@ export const LatestJobItems = [
         jobquantity: "25",
         category: ["Tech Startups", "Finance", "Innovators"],
     },
-   ];
+];
 
 export const ExperiencesSample = [
     {
@@ -162,5 +162,29 @@ export const EducationSample = [
         course: "Master degree in Computer Science and Mathematics",
         date: "January, 2012",
         location: "Istanbul, Turkey",
+    },
+];
+
+export const ActivePositionsSample = [
+    {
+        id: 1,
+        role: "Front-End Developer",
+        company: "Trendyol Inch.",
+        companyImage: sample_profile_1,
+        status: "Interview"
+    },
+    {
+        id: 2,
+        role: "Sr. Front-End Developer",
+        company: "Trendyol Inch.",
+        companyImage: sample_profile_2,
+        status: "Invited"
+    },
+    {
+        id: 3,
+        role: "Product Designer",
+        company: "Water District",
+        companyImage: sample_profile_3,
+        status: "Rejected"
     },
 ];
