@@ -14,6 +14,10 @@ import addExperience from "@/controllers/applicants/addExperience";
 import updateExperience from "@/controllers/applicants/updateExperience";
 import deleteExperience from "@/controllers/applicants/deleteExperience";
 import logoutAccount from "@/controllers/applicants/logoutAccount";
+import addEducation from "@/controllers/applicants/addEducation";
+import updateEducation from "@/controllers/applicants/updateEducation";
+import deleteEducation from "@/controllers/applicants/deleteEducation";
+
 
 const router = express.Router();
 
@@ -37,6 +41,8 @@ router.post(
 );
 router.post("/experience", protect, addExperience);
 router.post("/logout", protect, logoutAccount);
+router.post("/education", protect, addEducation);
+
 
 /**
  * @Reminder Place all PUT requests here
@@ -55,11 +61,14 @@ router.put(
   updateResume
 );
 router.put("/experience/:experience_id", protect, updateExperience);
+router.put("/education/:education_id", protect, updateEducation);
+
 
 /**
  * @Reminder Place all DELETE requests here
  * @Format router.delete("path", "middleware", "controller");
  */
 router.delete("/experience/:experience_id", protect, deleteExperience);
+router.delete("/education/:education_id", protect, deleteEducation);
 
 export default router;

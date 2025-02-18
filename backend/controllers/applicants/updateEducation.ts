@@ -13,7 +13,7 @@ interface DecodedApplicantToken {
 
 /**
  * @description Adds a new education entry for an applicant
- * @route POST /api/applicants/onboarding
+ * @route PUT /api/applicants/onboarding
  * @access Private (authentication middleware required)
  */
 
@@ -88,7 +88,7 @@ export const updateEducation = async (req: Request, res: Response) => {
       message: "Education Successfully Updated",
       data: updateQuery,
     });
-    
+
   } catch (error) {
     console.error(error);
     res.status(500).json({
