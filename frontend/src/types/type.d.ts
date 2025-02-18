@@ -13,3 +13,10 @@ declare interface JobsPickCardProps {
   category: string[];
   timestamp: string;
 }
+
+declare interface LatestJobCardProps {
+  company: string;
+  jobquantity: string;
+  category: string[];
+}
+
