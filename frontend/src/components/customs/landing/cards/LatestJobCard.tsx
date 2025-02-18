@@ -28,7 +28,6 @@ const LatestJobCard = ({
           <div className="flex items-center gap-2">
             <p className="text-md text-stone-800">{jobquantity} Job opportunities</p>
           </div>
-
         </div>
 
 
