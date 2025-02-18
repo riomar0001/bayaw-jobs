@@ -1,4 +1,4 @@
-import { EducationSample, images } from "@/constants"
+import { EducationSample } from "@/constants"
 
 const Education = () => {
     return (
