@@ -6,9 +6,17 @@ import { useState } from "react";
 
 const AccountRegistration = () => {
   const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setConfirmShowPassword] = useState(false);
+
 
   const togglePasswordVisibility = () => {
     setShowPassword(!showPassword);
+
+  };
+
+  const toggleConfirmPasswordVisibility = () => {
+    setConfirmShowPassword(!showConfirmPassword);
+
   };
 
   const registrationForms = [
@@ -35,7 +43,7 @@ const AccountRegistration = () => {
         {
           label: "Confirm Password",
           placeholder: "Re-enter your password",
-          type: "password",
+          type: "confirmpassword",
           icon: <Lock color="black" size={20} />,
         },
       ],
@@ -63,7 +71,7 @@ const AccountRegistration = () => {
         {
           label: "Confirm Password",
           placeholder: "Re-enter your password",
-          type: "password",
+          type: "confirmpassword",
           icon: <Lock color="black" size={20} />,
         },
       ],
@@ -113,6 +121,16 @@ const AccountRegistration = () => {
                         onClick={togglePasswordVisibility}
                       >
                         {showPassword ? <EyeOff color="black" size={20} /> : <Eye color="black" size={20} />}
+
+                      </div>
+                    )}
+                    {field.type === "confirmpassword" && (
+                      <div
+                        className="absolute right-4 top-1/2 transform -translate-y-1/2 cursor-pointer"
+                        onClick={toggleConfirmPasswordVisibility}
+                      >
+                        {showConfirmPassword ? <EyeOff color="black" size={20} /> : <Eye color="black" size={20} />}
+
                       </div>
                     )}
                   </div>
