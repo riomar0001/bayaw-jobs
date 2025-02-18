@@ -98,6 +98,27 @@ export const JobsPickItems = [
     },
 ];
 
+export const LatestJobItems = [
+    {
+        id: 1,
+        company: "Huawei Technology",
+        jobquantity: "25",
+        category: ["Tech Startups", "Innovators"],
+    },
+    {
+        id: 1,
+        company: "Amazon",
+        jobquantity: "30",
+        category: ["Tech Startups", "Ecommerce"],
+    },
+    {
+        id: 1,
+        company: "Huawei Technology",
+        jobquantity: "25",
+        category: ["Tech Startups", "Finance", "Innovators"],
+    },
+   ];
+
 export const ExperiencesSample = [
     {
         id: 1,
