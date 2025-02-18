@@ -2,7 +2,7 @@ import { Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectVa
 
 const CareerStatus = () => {
     return (
-        <div className="bg-white border border-neutral-300 w-[380px] h-auto rounded-lg p-6">
+        <div className="bg-white border border-neutral-100 w-[380px] h-auto rounded-lg p-6">
             <h1 className="text-lg font-medium mb-3">Career Status</h1>
 
                 <Select>

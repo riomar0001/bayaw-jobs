@@ -2,7 +2,7 @@ import { EducationSample } from "@/constants"
 
 const Education = () => {
     return (
-        <div className="bg-white border border-neutral-300 w-[750px] h-auto rounded-lg px-12 py-6">
+        <div className="bg-white border border-neutral-100 w-[750px] h-auto rounded-lg px-12 py-6">
             <h1 className="font-semibold text-xl mb-6">Education</h1>
 
             {EducationSample.map((sample) => (

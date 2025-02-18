@@ -3,7 +3,7 @@ import { Download, FileUser, ScrollText } from "lucide-react"
 
 const Resume = () => {
     return (
-        <div className="bg-white border border-neutral-300 w-[750px] h-auto rounded-lg px-12 py-6">
+        <div className="bg-white border border-neutral-100 w-[750px] h-auto rounded-lg px-12 py-6">
             <h1 className="font-semibold text-xl mb-6">Resume</h1>
             
 

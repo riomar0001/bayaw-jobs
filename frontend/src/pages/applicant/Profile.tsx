@@ -10,9 +10,9 @@ import ResumeSmall from "@/components/customs/applicant/ResumeSmall"
 
 const Profile = () => {
     return (
-        <div className="bg-neutral-100 flex justify-center gap-x-8 px-24 py-12">
+        <div className="bg-neutral-100 flex justify-center gap-x-5 px-24 py-12">
 
-            <div className="space-y-8">
+            <div className="space-y-5">
                 <AccountHead />
                 <AllPersonalInfo />
                 <Resume />
@@ -20,7 +20,7 @@ const Profile = () => {
                 <Education />
             </div>
 
-            <div className="space-y-8">
+            <div className="space-y-5">
                 <ActivePositions />
                 <CareerStatus />
                 <PersonalInformations />
