@@ -86,6 +86,14 @@ export const updateExperience = async (req: Request, res: Response) => {
       },
     });
 
+    if (!updatedExperience) {
+      return res.status(400).json({
+        success: false,
+        user_type: "applicant",
+        message: "Failed to update experience",
+      });
+    }
+
     return res.status(200).json({
       success: true,
       user_type: "applicant",
