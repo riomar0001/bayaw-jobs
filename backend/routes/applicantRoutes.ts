@@ -17,6 +17,9 @@ import logoutAccount from "@/controllers/applicants/logoutAccount";
 import addEducation from "@/controllers/applicants/addEducation";
 import updateEducation from "@/controllers/applicants/updateEducation";
 import deleteEducation from "@/controllers/applicants/deleteEducation";
+import getExperience from "@/controllers/applicants/getExperience";
+import getEducation from "@/controllers/applicants/getEducation";
+import checkRole from "@/middlewares/checkRole";
 
 
 const router = express.Router();
@@ -26,6 +29,10 @@ const router = express.Router();
  * @Format router.get("path", "middleware", "controller");
  */
 router.get("/auth", protect, checkAuthApplicant);
+router.get("/experience", protect, checkRole, getExperience.getAllExperiences);
+router.get("/experience/:experience_id", protect, getExperience.getExperienceById);
+router.get("/education", protect, checkRole, getEducation.getAllEducation);
+router.get("/education/:education_id", protect, getEducation.getEducationById);
 
 /**
  * @Reminder Place all POST requests here
