@@ -6,7 +6,7 @@ import { Link } from "react-router-dom"
 const ProfileEmployer = () => {
     return (
         <div className="p-12">
-            <Link to={"emplyer/dashboard"}>
+            <Link to={"employer/dashboard"}>
                 <Button className="mb-3">
                     <ArrowLeft size={15} />
                     Go Back
