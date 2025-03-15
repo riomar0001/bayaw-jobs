@@ -14,6 +14,7 @@ const JobsPick = () => {
                                 company={item.company}
                                 jobquantity={item.jobquantity}
                                 category={item.category}
+                                image={item.image}
                             />
                         );
                     })}

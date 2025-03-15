@@ -18,6 +18,7 @@ const JobsPick = () => {
                             salary={item.salary}
                             category={item.category}
                             timestamp={item.timestamp}
+                            image={item.image}
                         />
                     );
                 })}

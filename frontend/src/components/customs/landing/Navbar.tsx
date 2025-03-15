@@ -14,16 +14,20 @@ const Navbar = () => {
             </Link>
 
             <div className="flex space-x-10">
-                <h1 className="hover:font-medium cursor-pointer">Find Jobs</h1>
-                <h1 className="hover:font-medium cursor-pointer">Companies</h1>
-                <h1 className="hover:font-medium cursor-pointer">Company Login</h1>
+                <h1 className="hover:underline cursor-pointer">Find Jobs</h1>
+                <h1 className="hover:underline cursor-pointer">Companies</h1>
+                <h1 className="hover:underline cursor-pointer">Company Login</h1>
             </div>
 
             <div className="space-x-5">
-                <Button className="bg-transparent border border-lochmara-500 text-lochmara-500 hover:bg-lochmara-500 hover:text-white">
-                    Sign In
-                </Button>
-                <Button className="bg-lochmara-500">Sign Up</Button>
+                <Link to={"/login"}>
+                    <Button className="bg-transparent border border-lochmara-500 text-lochmara-500 hover:bg-lochmara-500 hover:text-white">
+                        Sign In
+                    </Button>
+                </Link>
+                <Link to={"/register"}>
+                    <Button className="bg-lochmara-500">Sign Up</Button>
+                </Link>
             </div>
         </div>
     );

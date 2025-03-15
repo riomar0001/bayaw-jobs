@@ -1,15 +1,14 @@
-import { images } from "@/constants";
-
 const LatestJobCard = ({
   company,
   jobquantity,
   category,
+  image,
 }: LatestJobCardProps) => {
   return (
     <div className="w-[400px] h-auto bg-white border border-neutral-200 rounded-xl flex flex-col justify-start items-start space-y-6 px-8 py-6 hover:border-lochmara-500 cursor-pointer">
       <div className="flex gap-4 items-center">
 
-        <img src={images.sample_profile_1} className="w-12 h-12 rounded-full" />
+        <img src={image} className="w-12 h-12 rounded-full object-cover" />
         <div className="flex flex-col flex-grow">
           <h1 className="text-sm text-neutral-500 font-medium">Company</h1>
           <p className="text-xl text-stone-800 ">{company}</p>

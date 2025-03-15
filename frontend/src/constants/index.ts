@@ -3,6 +3,9 @@ import sample_profile_2 from "../assets/images/sample-profile2.jpg";
 import sample_profile_3 from "../assets/images/sample-profile3.jpg";
 import choose_us from "../assets/images/chooseus.png";
 import union from "../assets/icons/Union.svg";
+import sample_company_1 from "../assets/images/sample-company-1.jpg";
+import sample_company_2 from "../assets/images/sample-company-2.jpg";
+import sample_company_3 from "../assets/images/sample-company-3.jpg";
 
 import apple from "../assets/icons/Apple.svg";
 import atnt from "../assets/icons/AT&T.svg";
@@ -17,6 +20,9 @@ export const images = {
     sample_profile_3,
     choose_us,
     union,
+    sample_company_1,
+    sample_company_2,
+    sample_company_3,
 };
 
 export const logos = {
@@ -62,6 +68,7 @@ export const JobsPickItems = [
         salary: "15-25k",
         category: ["Fortune", "Innovation Hub", "Global Presence"],
         timestamp: "4 Days Ago",
+        image: images.sample_company_1,
     },
     {
         id: 2,
@@ -73,6 +80,7 @@ export const JobsPickItems = [
         salary: "15-25k",
         category: ["Global Tech Leader", "Hardware Innovation", "Global Presence"],
         timestamp: "1 Week Ago",
+        image: images.sample_company_2,
     },
     {
         id: 3,
@@ -84,6 +92,7 @@ export const JobsPickItems = [
         salary: "15-25k",
         category: ["Start-up", "Creative Hub", "UI/UX Design"],
         timestamp: "14 June 2024",
+        image: images.sample_company_3,
     },
     {
         id: 4,
@@ -95,6 +104,7 @@ export const JobsPickItems = [
         salary: "15-25k",
         category: ["Markey Disruptor", "Music Streaming", "Data Analytics"],
         timestamp: "7 July 2024",
+        image: images.sample_company_1,
     },
 ];
 
@@ -104,18 +114,21 @@ export const LatestJobItems = [
         company: "Huawei Technology",
         jobquantity: "25",
         category: ["Tech Startups", "Innovators"],
+        image: images.sample_company_1,
     },
     {
         id: 1,
         company: "Amazon",
         jobquantity: "30",
         category: ["Tech Startups", "Ecommerce"],
+        image: images.sample_company_2,
     },
     {
         id: 1,
         company: "Huawei Technology",
         jobquantity: "25",
         category: ["Tech Startups", "Finance", "Innovators"],
+        image: images.sample_company_3,
     },
 ];
 
@@ -188,3 +201,36 @@ export const ActivePositionsSample = [
         status: "Rejected"
     },
 ];
+
+export const DashboardJobsSample = [
+    {
+        position: "Janitor",
+        description: "Lorem ipsum, dolor sit amet consectetur adipisicing elit. ",
+        address: "Matina",
+        category: "Part Time",
+        minSalary: "1000",
+        maxSalary: "2000",
+        schedule: "On-Site",
+        date: "15/03/2025"
+    },
+    {
+        position: "Gamer",
+        description: "Lorem ipsum, dolor sit amet consectetur adipisicing elit. ",
+        address: "Bangkal",
+        category: "Full Time",
+        minSalary: "5000",
+        maxSalary: "10000",
+        schedule: "Remote",
+        date: "15/03/2025"
+    },
+    {
+        position: "Full-Stack Dev",
+        description: "Lorem ipsum, dolor sit amet consectetur adipisicing elit. ",
+        address: "Somehere, Davao City",
+        category: "Full Time",
+        minSalary: "50000",
+        maxSalary: "100000",
+        schedule: "Remote",
+        date: "15/03/2025"
+    },
+]
