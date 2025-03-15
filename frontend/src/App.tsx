@@ -12,6 +12,7 @@ import Login from "./pages/Login"
 import EditProfile from "./pages/applicant/EditProfile";
 import EmployerLayout from "./layouts/EmployerLayout";
 import Dashboard from "./pages/employer/Dashboard";
+import AddJob from "./pages/employer/AddJob";
 
 
 const router = createBrowserRouter(
@@ -27,6 +28,7 @@ const router = createBrowserRouter(
 
             <Route element={<EmployerLayout />}>
                 <Route path="/employer/dashboard" element={<Dashboard/>} />
+                <Route path="/employer/add-job" element={<AddJob/>} />
             </Route>
         </>
 

@@ -8,7 +8,7 @@ const JobCard = ({ position, description, address, category, minSalary, maxSalar
             <h1 className="text-2xl font-bold">{position} </h1>
             <h1 className="text-base font-light text-gray-800">{description} </h1>
 
-            <div className="mt-6 font-thin">
+            <div className="mt-6 font-thin text-sm">
                 <div className="flex items-center gap-x-3">
                     <MapPin size={15} />
                     <h1>{address} </h1>
