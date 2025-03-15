@@ -30,7 +30,7 @@ const WhyItems = [
 const WhyUs = () => {
     return (
         <div className="w-full h-auto flex flex-col items-center justify-center px-24 pt-12 pb-24">
-            <h1 className="text-4xl font-medium text-center mb-8">Why choose BayawJobs</h1>
+            <h1 className="text-4xl font-medium text-center mb-8">Why choose JobTally</h1>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-8 w-full max-w-4xl">
                 {WhyItems.map((item) => (

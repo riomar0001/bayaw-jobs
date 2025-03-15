@@ -188,3 +188,36 @@ export const ActivePositionsSample = [
         status: "Rejected"
     },
 ];
+
+export const DashboardJobsSample = [
+    {
+        position: "Janitor",
+        description: "Lorem ipsum, dolor sit amet consectetur adipisicing elit. ",
+        address: "Matina",
+        category: "Part Time",
+        minSalary: "1000",
+        maxSalary: "2000",
+        schedule: "On-Site",
+        date: "15/03/2025"
+    },
+    {
+        position: "Gamer",
+        description: "Lorem ipsum, dolor sit amet consectetur adipisicing elit. ",
+        address: "Bangkal",
+        category: "Full Time",
+        minSalary: "5000",
+        maxSalary: "10000",
+        schedule: "Remote",
+        date: "15/03/2025"
+    },
+    {
+        position: "Full-Stack Dev",
+        description: "Lorem ipsum, dolor sit amet consectetur adipisicing elit. ",
+        address: "Somehere, Davao City",
+        category: "Full Time",
+        minSalary: "50000",
+        maxSalary: "100000",
+        schedule: "Remote",
+        date: "15/03/2025"
+    },
+]

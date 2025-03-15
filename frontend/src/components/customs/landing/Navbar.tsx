@@ -14,9 +14,9 @@ const Navbar = () => {
             </Link>
 
             <div className="flex space-x-10">
-                <h1 className="hover:font-medium cursor-pointer">Find Jobs</h1>
-                <h1 className="hover:font-medium cursor-pointer">Companies</h1>
-                <h1 className="hover:font-medium cursor-pointer">Company Login</h1>
+                <h1 className="hover:underline cursor-pointer">Find Jobs</h1>
+                <h1 className="hover:underline cursor-pointer">Companies</h1>
+                <h1 className="hover:underline cursor-pointer">Company Login</h1>
             </div>
 
             <div className="space-x-5">

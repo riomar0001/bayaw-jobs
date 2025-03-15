@@ -20,3 +20,16 @@ declare interface LatestJobCardProps {
   category: string[];
 }
 
+
+
+declare interface JobCardProps {
+  position: string;
+  description: string;
+  address: string;
+  category: string;
+  minSalary: string;
+  maxSalary: string;
+  schedule: string;
+  date: string;
+}
+
