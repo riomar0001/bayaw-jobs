@@ -7,9 +7,17 @@ import { Textarea } from "@/components/ui/textarea";
 
 const AccountRegistration = () => {
   const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setConfirmShowPassword] = useState(false);
+
 
   const togglePasswordVisibility = () => {
     setShowPassword(!showPassword);
+
+  };
+
+  const toggleConfirmPasswordVisibility = () => {
+    setConfirmShowPassword(!showConfirmPassword);
+
   };
 
 

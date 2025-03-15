@@ -1,8 +1,8 @@
 import {
-    Route,
-    createBrowserRouter,
-    createRoutesFromElements,
-    RouterProvider,
+  Route,
+  createBrowserRouter,
+  createRoutesFromElements,
+  RouterProvider,
 } from "react-router-dom";
 import MainLayout from "./layouts/MainLayout";
 import Landing from "./pages/Landing";
@@ -39,7 +39,7 @@ const router = createBrowserRouter(
 );
 
 const App = () => {
-    return <RouterProvider router={router} />;
+  return <RouterProvider router={router} />;
 };
 
 export default App;
