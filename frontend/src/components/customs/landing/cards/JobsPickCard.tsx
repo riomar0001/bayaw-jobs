@@ -1,4 +1,3 @@
-import { images } from "@/constants";
 import { FaChartPie, FaSuitcase } from "react-icons/fa";
 import { FaLocationDot } from "react-icons/fa6";
 import { AiFillDollarCircle } from "react-icons/ai";
@@ -14,12 +13,13 @@ const JobsPickCard = ({
   salary,
   category,
   timestamp,
+  image,
 }: JobsPickCardProps) => {
   return (
     <div className="w-[450px] h-auto bg-white border border-neutral-200 rounded-xl flex flex-col justify-start items-start space-y-6 px-8 py-6 hover:border-lochmara-500 cursor-pointer">
       <div className="flex gap-4 items-center">
 
-        <img src={images.sample_profile_1} className="w-12 h-12 rounded-full" />
+        <img src={image} className="w-12 h-12 rounded-full object-cover" />
         <div className="flex flex-col flex-grow">
           <h1 className="text-lg text-stone-800 font-medium">{jobtitle}</h1>
           <p className="text-sm text-neutral-500">{company}</p>

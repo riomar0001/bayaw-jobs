@@ -20,10 +20,14 @@ const Navbar = () => {
             </div>
 
             <div className="space-x-5">
-                <Button className="bg-transparent border border-lochmara-500 text-lochmara-500 hover:bg-lochmara-500 hover:text-white">
-                    Sign In
-                </Button>
-                <Button className="bg-lochmara-500">Sign Up</Button>
+                <Link to={"/login"}>
+                    <Button className="bg-transparent border border-lochmara-500 text-lochmara-500 hover:bg-lochmara-500 hover:text-white">
+                        Sign In
+                    </Button>
+                </Link>
+                <Link to={"/register"}>
+                    <Button className="bg-lochmara-500">Sign Up</Button>
+                </Link>
             </div>
         </div>
     );
