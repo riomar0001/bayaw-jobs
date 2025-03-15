@@ -13,6 +13,7 @@ import EditProfile from "./pages/applicant/EditProfile";
 import EmployerLayout from "./layouts/EmployerLayout";
 import Dashboard from "./pages/employer/Dashboard";
 import AddJob from "./pages/employer/AddJob";
+import ProfileEmployer from "./pages/employer/ProfileEmployer";
 
 
 const router = createBrowserRouter(
@@ -29,6 +30,7 @@ const router = createBrowserRouter(
             <Route element={<EmployerLayout />}>
                 <Route path="/employer/dashboard" element={<Dashboard/>} />
                 <Route path="/employer/add-job" element={<AddJob/>} />
+                <Route path="/employer/profile" element={<ProfileEmployer/>} />
             </Route>
         </>
 

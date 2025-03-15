@@ -3,14 +3,17 @@ import { Input } from "@/components/ui/input"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Textarea } from "@/components/ui/textarea"
 import { ArrowLeft } from "lucide-react"
+import { Link } from "react-router-dom"
 
 const AddJob = () => {
     return (
         <div className="p-12">
-            <Button className="mb-3" onClick={() => window.history.back()}>
-                <ArrowLeft size={15} />
-                Go Back
-            </Button>
+            <Link to={"/employer/dashboard"}>
+                <Button className="mb-3">
+                    <ArrowLeft size={15} />
+                    Go Back
+                </Button>
+            </Link>
 
             <div className="flex gap-x-5">
                 <section className="flex-1">
@@ -71,7 +74,7 @@ const AddJob = () => {
                     </div>
                 </section>
 
-                <section className="">
+                <section>
                     <div className="bg-white border border-neutral-300 rounded-lg p-6">
                         <h1 className="font-semibold">Actions</h1>
                         <h1 className="font-light text-neutral-500">Perform actions on the Job below.</h1>

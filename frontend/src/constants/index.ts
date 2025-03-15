@@ -3,6 +3,7 @@ import sample_profile_2 from "../assets/images/sample-profile2.jpg";
 import sample_profile_3 from "../assets/images/sample-profile3.jpg";
 import choose_us from "../assets/images/chooseus.png";
 import union from "../assets/icons/Union.svg";
+import sample_company_1 from "../assets/images/sample-company-1.jpg";
 
 import apple from "../assets/icons/Apple.svg";
 import atnt from "../assets/icons/AT&T.svg";
@@ -17,6 +18,7 @@ export const images = {
     sample_profile_3,
     choose_us,
     union,
+    sample_company_1,
 };
 
 export const logos = {
