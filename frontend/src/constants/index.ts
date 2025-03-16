@@ -234,3 +234,16 @@ export const DashboardJobsSample = [
         date: "15/03/2025"
     },
 ]
+
+
+export const CompanyProfileSample = [
+    {
+        companyIndustry: "Tech Industry",
+        companyName: "KONAMI",
+        companyDescription: "Lorem ipsum dolor sit amet consectetur adipisicing elit. Quia cum repellat distinctio recusandae dignissimos aspernatur velit, cumque error. Ratione quasi sit maxime reiciendis perferendis vero perspiciatis est iusto facilis modi.",
+        companyImage: images.sample_company_1,
+        companyAddress: "03 Red Stone, Calinan, Davao City",
+        email: "konami@gmail.com",
+        contactNumber: "09987654321"
+    }
+]

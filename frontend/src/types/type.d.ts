@@ -35,3 +35,13 @@ declare interface JobCardProps {
   date: string;
 }
 
+declare interface CompanyProfileProps {
+  companyIndustry: string;
+  companyName: string;
+  companyDescription: string;
+  companyAddress: string;
+  companyImage: any;
+  email: string;
+  contactNumber: string;
+}
+
