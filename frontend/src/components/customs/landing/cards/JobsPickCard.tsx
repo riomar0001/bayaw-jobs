@@ -16,7 +16,7 @@ const JobsPickCard = ({
   image,
 }: JobsPickCardProps) => {
   return (
-    <div className="w-[450px] h-auto bg-white border border-neutral-200 rounded-xl flex flex-col justify-start items-start space-y-6 px-8 py-6 hover:border-lochmara-500 cursor-pointer">
+    <div className="w-[430px] h-auto bg-white border border-neutral-200 rounded-xl flex flex-col justify-start items-start space-y-6 px-8 py-6 hover:border-lochmara-500 cursor-pointer">
       <div className="flex gap-4 items-center">
 
         <img src={image} className="w-12 h-12 rounded-full object-cover" />
