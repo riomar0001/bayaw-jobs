@@ -5,7 +5,7 @@ import { Textarea } from "@/components/ui/textarea"
 import { ArrowLeft } from "lucide-react"
 import { Link } from "react-router-dom"
 
-const AddJob = () => {
+const EditJob = () => {
     return (
         <div className="p-12">
             <Link to={"/employer/jobs"}>
@@ -19,8 +19,8 @@ const AddJob = () => {
                 <section className="flex-1">
                     <div className="bg-white border border-neutral-300 rounded-lg w-full px-12 py-10">
                         <div className="mb-8">
-                            <h1 className="text-2xl font-bold">Post New Job</h1>
-                            <h1 className="text-base font-normal text-neutral-500">Fill in the form below to post a new job</h1>
+                            <h1 className="text-2xl font-bold">Edit Job Details</h1>
+                            <h1 className="text-base font-normal text-neutral-500">Edit the job details below.</h1>
                         </div>
 
                         <div className="mt-4">
@@ -77,9 +77,9 @@ const AddJob = () => {
                 <section>
                     <div className="bg-white border border-neutral-300 rounded-lg p-6">
                         <h1 className="font-semibold">Actions</h1>
-                        <h1 className="font-light text-neutral-500">Perform actions on the Job below.</h1>
+                        <h1 className="font-light text-neutral-500">Update the job details below.</h1>
                         <hr className="my-5" />
-                        <Button className="w-full">Save</Button>
+                        <Button className="w-full">Save Changes</Button>
                     </div>
                 </section>
 
@@ -89,4 +89,4 @@ const AddJob = () => {
     )
 }
 
-export default AddJob
+export default EditJob
