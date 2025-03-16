@@ -14,6 +14,7 @@ import EmployerLayout from "./layouts/EmployerLayout";
 import Dashboard from "./pages/employer/Dashboard";
 import AddJob from "./pages/employer/AddJob";
 import ProfileEmployer from "./pages/employer/ProfileEmployer";
+import EditJob from "./components/customs/employer/EditJob";
 
 
 const router = createBrowserRouter(
@@ -28,7 +29,8 @@ const router = createBrowserRouter(
             </Route>
 
             <Route element={<EmployerLayout />}>
-                <Route path="/employer/dashboard" element={<Dashboard/>} />
+                <Route path="/employer/jobs" element={<Dashboard/>} />
+                <Route path="/employer/jobs/edit-job" element={<EditJob/>} />
                 <Route path="/employer/add-job" element={<AddJob/>} />
                 <Route path="/employer/profile" element={<ProfileEmployer/>} />
             </Route>

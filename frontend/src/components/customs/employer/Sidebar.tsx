@@ -13,7 +13,7 @@ const Sidebar = () => {
             </Link>
 
 
-            <Link to={"/employer/dashboard"}>
+            <Link to={"/employer/jobs"}>
                 <div className="flex items-center space-x-5 hover:underline cursor-pointer">
                     <BriefcaseBusiness size={20} color="gray" />
                     <h1>Jobs</h1>

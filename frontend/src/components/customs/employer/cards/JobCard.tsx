@@ -1,5 +1,6 @@
 import { Button } from "@/components/ui/button"
 import { Banknote, BriefcaseBusiness, MapPin } from "lucide-react"
+import { Link } from "react-router-dom"
 
 
 const JobCard = ({ position, description, address, category, minSalary, maxSalary, schedule, date }: JobCardProps) => {
@@ -39,7 +40,10 @@ const JobCard = ({ position, description, address, category, minSalary, maxSalar
 
             <div className="mt-6 flex justify-between">
                 <Button variant={"destructive"}>Delete</Button>
-                <Button>View Job</Button>
+
+                <Link to={"/employer/jobs/edit-job"}>
+                    <Button>View Job</Button>
+                </Link>
             </div>
 
         </div>
