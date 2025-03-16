@@ -106,6 +106,18 @@ export const JobsPickItems = [
         timestamp: "7 July 2024",
         image: images.sample_company_1,
     },
+    {
+        id: 5,
+        jobtitle: "Data Scientist",
+        company: "Spotify",
+        type: "Music/Entertainment",
+        companystatus: "Listed Company",
+        location: "Stockholm",
+        salary: "15-25k",
+        category: ["Markey Disruptor", "Music Streaming", "Data Analytics"],
+        timestamp: "7 July 2024",
+        image: images.sample_company_1,
+    },
 ];
 
 export const LatestJobItems = [

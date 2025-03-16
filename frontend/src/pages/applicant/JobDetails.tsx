@@ -1,80 +1,58 @@
+import JobDetailsCard from "@/components/customs/applicant/cards/JobDetailsCard";
 import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { images } from "@/constants";
 import { ArrowLeft } from "lucide-react";
 import { Link } from "react-router-dom";
 
 const JobDetails = () => {
   return (
-    <div className="p-12">
-      <Link to={"/find-jobs/"}>
-        <Button className="mb-3">
-          <ArrowLeft size={15} />
-          Go Back
+    <div className="bg-gradient-to-b from-sky-50 to-neutral-100 min-h-screen px-6 py-8 md:px-12 lg:px-24 xl:px-36">
+      <Link to={"/find-jobs/"} className="inline-block mb-6">
+        <Button variant="outline" className="flex items-center gap-2 hover:bg-sky-50 transition-colors">
+          <ArrowLeft size={16} className="text-lochmara-500" />
+          <span>Back to Jobs</span>
         </Button>
       </Link>
 
-      <div className="flex gap-x-5">
-        <section className="flex-1">
-          <div className="bg-white border border-neutral-300 rounded-lg w-full px-12 py-10">
-            <div className="mb-8">
-              <h1 className="text-2xl font-bold">Job Details</h1>
-              <h1 className="text-base font-normal text-neutral-500">
-                View details of the Job Offer below.
-              </h1>
-            </div>
+      <div className="flex flex-col lg:flex-row gap-6">
+        <JobDetailsCard
+          position="Mobile App Developer"
+          company="KONAMI"
+          image={images.sample_company_1}
+          category="On-site"
+          location="Calinan"
+          schedule="Full Time"
+          minSalary="40000"
+          maxSalary="75000"
+          description="Lorem ipsum dolor sit amet consectetur adipisicing elit. Architecto, deserunt illum inventore, vero molestiae maxime recusandae tenetur, minus molestias iusto quidem! Ex inventore eos labore sequi quos. Architecto, dolores ipsa!"
+          status="Active"
+        />
 
-            <div className="mt-4">
-              <h1 className="font-semibold">Job Status</h1>
-              <h1 className="text-neutral-500">Open</h1>
-            </div>
+        <section className="w-full lg:w-80">
+          <Card className="border-neutral-200 shadow-sm">
+            <CardHeader className="border-b border-neutral-100">
+              <CardTitle className="text-lg">Actions</CardTitle>
+              <p className="text-sm text-neutral-500">Apply for this position</p>
+            </CardHeader>
+            <CardContent className="pt-6">
+              <Button className="w-full bg-lochmara-500 hover:bg-lochmara-600 transition-colors py-6 text-base font-medium">
+                Apply Now
+              </Button>
 
-            <div className="mt-4">
-              <h1 className="font-semibold">Job Posted Date</h1>
-              <h1 className="text-neutral-500">Yesterday</h1>
-            </div>
+              <div className="mt-6 bg-amber-50 border border-amber-200 rounded-lg p-4">
+                <p className="text-sm text-amber-800">
+                  <span className="font-medium">Note:</span> Make sure your profile is up to date before applying.
+                </p>
+              </div>
 
-            <div className="mt-4">
-              <h1 className="font-semibold">Company</h1>
-              <h1 className="text-neutral-500">Bayaw</h1>
-            </div>
-
-            <div className="mt-4">
-              <h1 className="font-semibold">Position</h1>
-              <h1 className="text-neutral-500">Standing Position</h1>
-            </div>
-
-            <div className="mt-4">
-              <h1 className="font-semibold">Job Description</h1>
-              <h1 className="text-neutral-500">Standing Position</h1>
-            </div>
-
-            <div className="mt-4">
-              <h1 className="font-semibold">Job Category</h1>
-              <h1 className="text-neutral-500">On Site</h1>
-            </div>
-            <div className="mt-4">
-              <h1 className="font-semibold">Job Address</h1>
-              <h1 className="text-neutral-500">Calinan</h1>
-            </div>
-            <div className="mt-4">
-              <h1 className="font-semibold">Salary Range</h1>
-              <h1 className="text-neutral-500">1 Slp</h1>
-            </div>
-            <div className="mt-4">
-              <h1 className="font-semibold">Work Schedule</h1>
-              <h1 className="text-neutral-500">Full Time</h1>
-            </div>
-          </div>
-        </section>
-
-        <section>
-          <div className="bg-white border border-neutral-300 rounded-lg p-6">
-            <h1 className="font-semibold">Actions</h1>
-            <h1 className="font-light text-neutral-500">
-              Perform actions on the job below.
-            </h1>
-            <hr className="my-5" />
-            <Button className="w-full">Apply Job</Button>
-          </div>
+              <div className="mt-6 flex items-center justify-center">
+                <Button variant="ghost" className="text-neutral-500 hover:text-lochmara-500 text-sm">
+                  Save for later
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
         </section>
       </div>
     </div>
