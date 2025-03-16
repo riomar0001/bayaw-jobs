@@ -31,7 +31,7 @@ const FindJobs = () => {
       <div className="w-full h-auto px-16 pb-16">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-10 w-full">
           {JobsPickItems.map((item) => (
-            <Link to={"/find-jobs/details"} >
+            <a href={"/find-jobs/details"} >
               <JobsPickCard
                 key={item.id}
                 jobtitle={item.jobtitle}
@@ -44,7 +44,7 @@ const FindJobs = () => {
                 timestamp={item.timestamp}
                 image={item.image}
               />
-            </Link>
+            </a>
           ))}
         </div>
       </div>

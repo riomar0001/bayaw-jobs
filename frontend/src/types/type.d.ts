@@ -45,3 +45,16 @@ declare interface CompanyProfileProps {
   contactNumber: string;
 }
 
+declare interface JobDetailsCardProps {
+    position: string;
+    status: string;
+    company: string;
+    category: string;
+    location: string;
+    minSalary: string;
+    maxSalary: string;
+    schedule: string;
+    description: string;
+    image: any;
+}
+
