@@ -245,6 +245,16 @@ export const DashboardJobsSample = [
         schedule: "Remote",
         date: "15/03/2025"
     },
+    {
+        position: "Full-Stack Dev",
+        description: "Lorem ipsum, dolor sit amet consectetur adipisicing elit. ",
+        address: "Somehere, Davao City",
+        category: "Full Time",
+        minSalary: "50000",
+        maxSalary: "100000",
+        schedule: "Remote",
+        date: "15/03/2025"
+    },
 ]
 
 

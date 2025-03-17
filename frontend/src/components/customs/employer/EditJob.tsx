@@ -7,8 +7,8 @@ import { Link } from "react-router-dom"
 
 const EditJob = () => {
     return (
-        <div className="p-12">
-            <Link to={"/employer/jobs"}>
+        <div className="px-36 py-12">
+            <Link to={"/employer/jobs/job-details"}>
                 <Button className="mb-3">
                     <ArrowLeft size={15} />
                     Go Back
