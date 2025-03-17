@@ -1,5 +1,7 @@
 import CompanyProfileCard from "@/components/customs/employer/cards/CompanyProfileCard"
 import { Button } from "@/components/ui/button"
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
+import { Input } from "@/components/ui/input"
 import { CompanyProfileSample } from "@/constants"
 import { ArrowLeft } from "lucide-react"
 import { Link } from "react-router-dom"
@@ -23,7 +25,7 @@ const ProfileEmployer = () => {
                         companyName={item.companyName}
                         companyDescription={item.companyDescription}
                         companyImage={item.companyImage}
-                        companyAddress={item.companyAddress} 
+                        companyAddress={item.companyAddress}
                         email={item.email}
                         contactNumber={item.contactNumber}
                     />
@@ -35,10 +37,49 @@ const ProfileEmployer = () => {
                         <h1 className="font-semibold">Actions</h1>
                         <h1 className="font-light text-neutral-500">Perform actions on the member below.</h1>
                         <hr className="my-5" />
-                        <Button className="w-full mb-2">Update Account Email</Button>
-                        <Button className="w-full">Update Password</Button>
+
+                        <Dialog>
+                            <DialogTrigger className="w-full">
+                                <Button className="w-full mb-2">Update Account Email</Button>
+                            </DialogTrigger>
+                            <DialogContent>
+                                <DialogHeader>
+                                    <DialogTitle>Update Account Email</DialogTitle>
+                                    <DialogDescription className="space-y-4">
+                                        <div>
+                                            <h1 className="text-gray-500 font-light">Current Account Email</h1>
+                                            <h1 className="text-lochmara-400 font-medium">user@gmail.com</h1>
+                                        </div>
+                                        <div>
+                                            <h1 className="text-gray-500 font-light">New Email Address</h1>
+                                            <Input placeholder="Enter new email" />
+                                        </div>
+                                    </DialogDescription>
+                                </DialogHeader>
+                            </DialogContent>
+                        </Dialog>
+
+
+
+                        <Dialog>
+                            <DialogTrigger className="w-full">
+                                <Button className="w-full mb-2">Update Password</Button>
+                            </DialogTrigger>
+                            <DialogContent>
+                                <DialogHeader>
+                                    <DialogTitle>Update Password</DialogTitle>
+                                    <DialogDescription className="space-y-3">
+                                        <Input placeholder="Current Password" />
+                                        <Input placeholder="New Password" />
+                                        <Input placeholder="Confirm New Password" />
+                                    </DialogDescription>
+                                </DialogHeader>
+                            </DialogContent>
+                        </Dialog>
+
                         <hr className="my-8" />
                         <Button className="w-full" variant={"destructive"}>Delete Company</Button>
+
                     </div>
                 </section>
 
