@@ -20,7 +20,10 @@ import deleteEducation from "@/controllers/applicants/deleteEducation";
 import getExperience from "@/controllers/applicants/getExperience";
 import getEducation from "@/controllers/applicants/getEducation";
 import checkRole from "@/middlewares/checkRole";
-
+import getSocialMedia from "@/controllers/applicants/getSocialMedia";
+import addSocialMedia from "@/controllers/applicants/addSocialMedia";
+import updateSocialMedia from "@/controllers/applicants/updateSocialMedia";
+import deleteSocialMedia from "@/controllers/applicants/deleteSocialMedia";
 
 const router = express.Router();
 
@@ -33,6 +36,8 @@ router.get("/experience", protect, checkRole, getExperience.getAllExperiences);
 router.get("/experience/:experience_id", protect, getExperience.getExperienceById);
 router.get("/education", protect, checkRole, getEducation.getAllEducation);
 router.get("/education/:education_id", protect, getEducation.getEducationById);
+router.get("/social-media", protect, checkRole, getSocialMedia.getAllSocialMedia);
+router.get("/social-media/:social_media_id", protect, getSocialMedia.getSocialMediaById);
 
 /**
  * @Reminder Place all POST requests here
@@ -49,7 +54,7 @@ router.post(
 router.post("/experience", protect, addExperience);
 router.post("/logout", protect, logoutAccount);
 router.post("/education", protect, addEducation);
-
+router.post("/social-media", protect, addSocialMedia);
 
 /**
  * @Reminder Place all PUT requests here
@@ -69,7 +74,7 @@ router.put(
 );
 router.put("/experience/:experience_id", protect, updateExperience);
 router.put("/education/:education_id", protect, updateEducation);
-
+router.put("/social-media/:social_media_id", protect, updateSocialMedia);
 
 /**
  * @Reminder Place all DELETE requests here
@@ -77,5 +82,6 @@ router.put("/education/:education_id", protect, updateEducation);
  */
 router.delete("/experience/:experience_id", protect, deleteExperience);
 router.delete("/education/:education_id", protect, deleteEducation);
+router.delete("/social-media/:social_media_id", protect, deleteSocialMedia);
 
 export default router;
