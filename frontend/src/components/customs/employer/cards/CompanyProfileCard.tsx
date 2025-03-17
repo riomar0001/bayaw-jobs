@@ -1,6 +1,5 @@
-import { images } from "@/constants"
 
-const CompanyProfileCard = () => {
+const CompanyProfileCard = ({ companyIndustry, companyName, companyDescription, companyAddress, companyImage, email, contactNumber }: CompanyProfileProps) => {
     return (
         <section className="flex-1">
             <div className="bg-white border border-neutral-300 rounded-lg w-full px-12 py-10">
@@ -14,7 +13,7 @@ const CompanyProfileCard = () => {
                 <div className="flex items-center justify-between">
                     <div>
                         <h1 className="font-light text-gray-500">Company Industry</h1>
-                        <h1 className="font-semibold">Tech Industry</h1>
+                        <h1 className="font-semibold">{companyIndustry} </h1>
                     </div>
                     <h1 className="text-gray-500 text-sm hover:underline cursor-pointer">Update Industry</h1>
                 </div>
@@ -23,10 +22,10 @@ const CompanyProfileCard = () => {
 
                 <div className="flex items-center justify-between">
                     <div className="flex items-center gap-x-4">
-                        <img src={images.sample_company_1} className="w-12 h-12 rounded-full object-cover border border-neutral-300" />
+                        <img src={companyImage} className="w-12 h-12 rounded-full object-cover border border-neutral-300" />
                         <div>
                             <h1 className="font-light text-gray-500">Company Name</h1>
-                            <h1 className="font-semibold text-lg">KONAMI</h1>
+                            <h1 className="font-semibold text-lg">{companyName} </h1>
                         </div>
                     </div>
                     <h1 className="text-gray-500 text-sm hover:underline cursor-pointer">Update Company</h1>
@@ -34,7 +33,7 @@ const CompanyProfileCard = () => {
 
                 <div className="mt-3">
                     <h1 className="font-light text-gray-500">Company Description</h1>
-                    <h1 className="font-light">Lorem ipsum dolor sit amet consectetur adipisicing elit. Quia cum repellat distinctio recusandae dignissimos aspernatur velit, cumque error. Ratione quasi sit maxime reiciendis perferendis vero perspiciatis est iusto facilis modi.</h1>
+                    <h1 className="font-light">{companyDescription} </h1>
                 </div>
 
                 <hr className="my-4" />
@@ -42,7 +41,7 @@ const CompanyProfileCard = () => {
                 <div className="flex items-center justify-between">
                     <div>
                         <h1 className="font-light text-gray-500">Company Address</h1>
-                        <h1 className="font-semibold">03 Red Stone, Calinan, Davao City</h1>
+                        <h1 className="font-semibold">{companyAddress} </h1>
                     </div>
                     <h1 className="text-gray-500 text-sm hover:underline cursor-pointer">Update Address</h1>
                 </div>
@@ -52,9 +51,9 @@ const CompanyProfileCard = () => {
                 <div className="flex items-center justify-between">
                     <div>
                         <h1 className="font-light text-gray-500">Email Address</h1>
-                        <h1 className="font-semibold mb-2">konami@gmail.com</h1>
+                        <h1 className="font-semibold mb-2">{email} </h1>
                         <h1 className="font-light text-gray-500">Contact Number</h1>
-                        <h1 className="font-semibold">09987654321</h1>
+                        <h1 className="font-semibold">{contactNumber} </h1>
                     </div>
                     <h1 className="text-gray-500 text-sm hover:underline cursor-pointer">Update Contact Info</h1>
                 </div>

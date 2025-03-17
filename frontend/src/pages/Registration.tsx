@@ -7,22 +7,15 @@ import { Textarea } from "@/components/ui/textarea";
 
 const AccountRegistration = () => {
   const [showPassword, setShowPassword] = useState(false);
-  const [showConfirmPassword, setConfirmShowPassword] = useState(false);
-
 
   const togglePasswordVisibility = () => {
     setShowPassword(!showPassword);
 
   };
 
-  const toggleConfirmPasswordVisibility = () => {
-    setConfirmShowPassword(!showConfirmPassword);
-
-  };
-
 
   return (
-    <div className="bg-white w-full h-auto pt-12 pb-24">
+    <div className="bg-neutral-100 w-full h-auto pt-12 pb-24">
       <h1 className="text-4xl font-medium text-center mb-8">Account Registration</h1>
 
       <div className="flex justify-center">
