@@ -19,8 +19,9 @@ import updateEducation from "@/controllers/applicants/updateEducation";
 import deleteEducation from "@/controllers/applicants/deleteEducation";
 import getExperience from "@/controllers/applicants/getExperience";
 import getEducation from "@/controllers/applicants/getEducation";
+import getBasicInfo from "@/controllers/applicants/getBasicInformation";
 import checkRole from "@/middlewares/checkRole";
-
+import { getResume, downloadResume } from "@/controllers/applicants/getResume";
 
 const router = express.Router();
 
@@ -28,11 +29,18 @@ const router = express.Router();
  * @Reminder Place all GET requests here
  * @Format router.get("path", "middleware", "controller");
  */
+router.get("/", protect, getBasicInfo);
 router.get("/auth", protect, checkAuthApplicant);
-router.get("/experience", protect, checkRole, getExperience.getAllExperiences);
-router.get("/experience/:experience_id", protect, getExperience.getExperienceById);
-router.get("/education", protect, checkRole, getEducation.getAllEducation);
+router.get("/experience", protect, getExperience.getAllExperiences);
+router.get(
+  "/experience/:experience_id",
+  protect,
+  getExperience.getExperienceById
+);
+router.get("/education", protect, getEducation.getAllEducation);
 router.get("/education/:education_id", protect, getEducation.getEducationById);
+router.get("/resume/:applicant_id", getResume);
+router.get("/resume/download/:applicant_id", downloadResume);
 
 /**
  * @Reminder Place all POST requests here
@@ -49,7 +57,6 @@ router.post(
 router.post("/experience", protect, addExperience);
 router.post("/logout", protect, logoutAccount);
 router.post("/education", protect, addEducation);
-
 
 /**
  * @Reminder Place all PUT requests here
@@ -69,7 +76,6 @@ router.put(
 );
 router.put("/experience/:experience_id", protect, updateExperience);
 router.put("/education/:education_id", protect, updateEducation);
-
 
 /**
  * @Reminder Place all DELETE requests here

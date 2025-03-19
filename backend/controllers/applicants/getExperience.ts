@@ -35,7 +35,7 @@ export const getAllExperiences = async (req: Request, res: Response) => {
 
     const applicant_id = applicant_token_info.applicant.id;
 
-    const experiences = await prisma.applicants_experience.findMany({
+    const experiences = await prisma.applicants_experience.findFirst({
       where: { applicants_account_id: applicant_id },
     });
 
@@ -43,7 +43,7 @@ export const getAllExperiences = async (req: Request, res: Response) => {
       success: true,
       user_type: "applicant",
       message: "Experiences found",
-      data: experiences,
+      experiences,
     });
   } catch (error: any) {
     return res.status(500).json({

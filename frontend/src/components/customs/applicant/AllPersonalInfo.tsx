@@ -1,6 +1,24 @@
 import { Banknote, BriefcaseBusiness, Cake, MailSearch, MapPinHouse, PencilLine, Smartphone } from "lucide-react"
+import { useState, useEffect } from "react"
+import axios from "axios";
+
 
 const AllPersonalInfo = () => {
+    const [personalInfo, setPersonalInfo] = useState<any>({});
+
+
+    useEffect(() => {
+        const fetchPersonalInfo = async () => {
+            try {
+                const response = await axios.get("/api/applicant");
+                const data = response.data;
+                setPersonalInfo(data.accountPersonalInfo);
+            } catch (error) {
+                console.error(error);
+            }
+        }
+        fetchPersonalInfo();
+    }, []);
     return (
         <div className="bg-white border border-neutral-100 w-[750px] h-auto rounded-lg px-12 py-6">
             <section className="flex justify-between items-center mb-6">
@@ -16,7 +34,7 @@ const AllPersonalInfo = () => {
                         <MailSearch className="text-neutral-500" size={20} />
                     </section>
                     <section>
-                        <h1 className="font-medium text-black text-base">jerome.bell@example.com</h1>
+                        <h1 className="font-medium text-black text-base">{personalInfo.email}</h1>
                         <h1 className="font-normal text-neutral-500 text-sm">Mail Address</h1>
                     </section>
                 </div>
@@ -27,7 +45,7 @@ const AllPersonalInfo = () => {
                         <Smartphone className="text-neutral-500" size={20} />
                     </section>
                     <section>
-                        <h1 className="font-medium text-black text-base">+63 998 765 4321</h1>
+                        <h1 className="font-medium text-black text-base">{personalInfo.contact_no}</h1>
                         <h1 className="font-normal text-neutral-500 text-sm">Philippine Number</h1>
                     </section>
                 </div>
@@ -38,19 +56,8 @@ const AllPersonalInfo = () => {
                         <Cake className="text-neutral-500" size={20} />
                     </section>
                     <section>
-                        <h1 className="font-medium text-black text-base">03 September 2000</h1>
+                        <h1 className="font-medium text-black text-base">{personalInfo.date_of_birth}</h1>
                         <h1 className="font-normal text-neutral-500 text-sm">24 Years Old</h1>
-                    </section>
-                </div>
-
-
-                <div className="flex items-center gap-x-5">
-                    <section className="bg-neutral-100 w-10 h-10 rounded-lg flex justify-center items-center">
-                        <Banknote className="text-neutral-500" size={20} />
-                    </section>
-                    <section>
-                        <h1 className="font-medium text-black text-base">PHP 24,000.00</h1>
-                        <h1 className="font-normal text-neutral-500 text-sm">Salary Expectation</h1>
                     </section>
                 </div>
             </div>
@@ -63,7 +70,7 @@ const AllPersonalInfo = () => {
                         <MapPinHouse className="text-neutral-500" size={20} />
                     </section>
                     <section>
-                        <h1 className="font-medium text-black text-base">Istanbul, Izmir, Ankara, Turkey, US, Europe</h1>
+                        <h1 className="font-medium text-black text-base">{personalInfo.address}</h1>
                         <h1 className="font-normal text-neutral-500 text-sm">Location</h1>
                     </section>
 
@@ -74,7 +81,9 @@ const AllPersonalInfo = () => {
                         <BriefcaseBusiness className="text-neutral-500" size={20} />
                     </section>
                     <section>
-                        <h1 className="font-medium text-black text-base">Remote, Fulltime, Part-Time, Intership, Freelance</h1>
+                        <h1 className="font-medium text-black text-base">
+                            {personalInfo.work_type ? personalInfo.work_type.join(", ") : "No Work Type"}
+                        </h1>
                         <h1 className="font-normal text-neutral-500 text-sm">Work Type</h1>
                     </section>
                 </div>

@@ -1,8 +1,8 @@
 import {
-  Route,
-  createBrowserRouter,
-  createRoutesFromElements,
-  RouterProvider,
+    Route,
+    createBrowserRouter,
+    createRoutesFromElements,
+    RouterProvider,
 } from "react-router-dom";
 import MainLayout from "./layouts/MainLayout";
 import Landing from "./pages/Landing";
@@ -18,7 +18,8 @@ import EditJob from "./components/customs/employer/EditJob";
 import FindJobs from "./pages/applicant/FindJobs";
 import JobDetails from "./pages/applicant/JobDetails";
 import JobDetailsEmployer from "./pages/employer/JobDetailsEmpoyer";
-
+import EmployerLogin from "./pages/employer/Login";
+import { AuthProvider } from "./contexts/authContext";
 
 const router = createBrowserRouter(
     createRoutesFromElements(
@@ -32,13 +33,13 @@ const router = createBrowserRouter(
                 <Route path="/find-jobs" element={<FindJobs />} />
                 <Route path="/find-jobs/details" element={<JobDetails />} />
             </Route>
-
+            <Route path="/employer" element={<EmployerLogin />} />
             <Route element={<EmployerLayout />}>
-                <Route path="/employer/jobs" element={<Dashboard/>} />
-                <Route path="/employer/jobs/job-details" element={<JobDetailsEmployer/>} />
-                <Route path="/employer/jobs/edit-job" element={<EditJob/>} />
-                <Route path="/employer/add-job" element={<AddJob/>} />
-                <Route path="/employer/profile" element={<ProfileEmployer/>} />
+                <Route path="/employer/jobs" element={<Dashboard />} />
+                <Route path="/employer/jobs/job-details" element={<JobDetailsEmployer />} />
+                <Route path="/employer/jobs/edit-job" element={<EditJob />} />
+                <Route path="/employer/add-job" element={<AddJob />} />
+                <Route path="/employer/profile" element={<ProfileEmployer />} />
             </Route>
         </>
 
@@ -47,7 +48,11 @@ const router = createBrowserRouter(
 );
 
 const App = () => {
-  return <RouterProvider router={router} />;
+    return (
+        <AuthProvider>
+            <RouterProvider router={router} />
+        </AuthProvider>
+    );
 };
 
 export default App;

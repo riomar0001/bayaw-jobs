@@ -1,7 +1,21 @@
 import { Input } from '@/components/ui/input'
 import { Mail, Smartphone, User } from 'lucide-react'
+import { useEffect } from "react"
+import { useAuth } from "@/contexts/authContext"
+import { useNavigate } from "react-router-dom"
 
 const EditProfile = () => {
+
+
+
+    const navigate = useNavigate();
+    const { authStateApplicant } = useAuth();
+
+    useEffect(() => {
+        if (authStateApplicant?.authenticated === false) {
+            navigate("/login")
+        }
+    }, [authStateApplicant])
     return (
         <div className="bg-neutral-100 flex justify-center gap-x-5 px-24 py-12">
             <div className="bg-white border border-neutral-100 w-[1000px] h-auto rounded-lg px-12 py-6">
