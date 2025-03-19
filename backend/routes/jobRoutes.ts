@@ -2,6 +2,8 @@ import express from "express";
 import { protect } from "@/middlewares/CompanyAuthHandler";
 import { postJob } from "@/controllers/jobs/postJob";
 import { getJobByCompany } from "@/controllers/jobs/getJobByCompany";
+import { getJobById } from "@/controllers/jobs/getJobById";
+
 import { updateJob } from "@/controllers/jobs/updateJob";
 import { getAllJobs } from "@/controllers/jobs/getAllJobs";
 import { getRecentJobs } from "@/controllers/jobs/getRecentJobs";
@@ -14,7 +16,7 @@ const router = express.Router();
  * @Reminder Place all GET requests here
  * @Format router.get("path", "middleware", "controller");
  */
-
+router.get("/:job_id", protect, getJobById);
 router.get("/company", protect, getJobByCompany);
 router.get("/", protect, getAllJobs);
 router.get("/all/recent", getRecentJobs);

@@ -4,8 +4,13 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { images } from "@/constants";
 import { ArrowLeft, Pencil } from "lucide-react";
 import { Link } from "react-router-dom";
+import { useParams } from "react-router-dom";
 
 const JobDetailsEmployer = () => {
+
+  const { job_id } = useParams();
+
+
   return (
     <div className="min-h-screen px-6 py-8 md:px-12 lg:px-24 xl:px-36">
       <Link to={"/employer/jobs"} className="inline-block mb-6">
@@ -17,16 +22,7 @@ const JobDetailsEmployer = () => {
 
       <div className="flex flex-col lg:flex-row gap-6">
         <JobDetailsCard
-          position="Mobile App Developer"
-          company="KONAMI"
-          image={images.sample_company_1}
-          category="On-site"
-          location="Calinan"
-          schedule="Full Time"
-          minSalary="40000"
-          maxSalary="75000"
-          description="Lorem ipsum dolor sit amet consectetur adipisicing elit. Architecto, deserunt illum inventore, vero molestiae maxime recusandae tenetur, minus molestias iusto quidem! Ex inventore eos labore sequi quos. Architecto, dolores ipsa!"
-          status="Active"
+          jobId={job_id || ""}
         />
 
         <section className="w-full lg:w-80">

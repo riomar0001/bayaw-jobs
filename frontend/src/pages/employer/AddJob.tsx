@@ -1,4 +1,3 @@
-import AddJobCard from "@/components/customs/employer/cards/AddJobCard"
 import { Button } from "@/components/ui/button"
 import { ArrowLeft } from "lucide-react"
 import { Link } from "react-router-dom"

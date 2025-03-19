@@ -61,7 +61,7 @@ const router = createBrowserRouter(
             <Route element={<CompanyPrivateRoute />}>
                 <Route element={<EmployerLayout />}>
                     <Route path="/employer/jobs" element={<Dashboard />} />
-                    <Route path="/employer/jobs/job-details" element={<JobDetailsEmployer />} />
+                    <Route path="/employer/jobs/job-details/:job_id" element={<JobDetailsEmployer />} />
                     <Route path="/employer/jobs/edit-job" element={<EditJob />} />
                     <Route path="/employer/add-job" element={<AddJob />} />
                     <Route path="/employer/profile" element={<ProfileEmployer />} />
