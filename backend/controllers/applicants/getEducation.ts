@@ -87,14 +87,15 @@ export const getEducationById = async (req: Request, res: Response) => {
     const applicant_id = applicant_token_info.applicant.id;
     const { education_id } = req.params;
 
+    // Fetch the specific education entry by its unique ID
     const education = await prisma.applicants_education.findUnique({
       where: {
         id: education_id,
-        applicants_account_id: applicant_id,
       },
     });
 
-    if (!education) {
+    // Check if the education entry belongs to the authenticated applicant
+    if (!education || education.applicants_account_id !== applicant_id) {
       return res.status(404).json({
         success: false,
         user_type: "applicant",
@@ -111,6 +112,7 @@ export const getEducationById = async (req: Request, res: Response) => {
   } catch (error: any) {
     return res.status(500).json({
       success: false,
+      user_type: "applicant",
       message: "Internal Server Error",
       error: error.message,
     });

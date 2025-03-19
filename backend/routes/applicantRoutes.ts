@@ -19,7 +19,6 @@ import updateEducation from "@/controllers/applicants/updateEducation";
 import deleteEducation from "@/controllers/applicants/deleteEducation";
 import getExperience from "@/controllers/applicants/getExperience";
 import getEducation from "@/controllers/applicants/getEducation";
-import checkRole from "@/middlewares/checkRole";
 import getSocialMedia from "@/controllers/applicants/getSocialMedia";
 import addSocialMedia from "@/controllers/applicants/addSocialMedia";
 import updateSocialMedia from "@/controllers/applicants/updateSocialMedia";
@@ -32,11 +31,11 @@ const router = express.Router();
  * @Format router.get("path", "middleware", "controller");
  */
 router.get("/auth", protect, checkAuthApplicant);
-router.get("/experience", protect, checkRole, getExperience.getAllExperiences);
+router.get("/experience", protect, getExperience.getAllExperiences);
 router.get("/experience/:experience_id", protect, getExperience.getExperienceById);
-router.get("/education", protect, checkRole, getEducation.getAllEducation);
+router.get("/education", protect, getEducation.getAllEducation);
 router.get("/education/:education_id", protect, getEducation.getEducationById);
-router.get("/social-media", protect, checkRole, getSocialMedia.getAllSocialMedia);
+router.get("/social-media", protect, getSocialMedia.getAllSocialMedia);
 router.get("/social-media/:social_media_id", protect, getSocialMedia.getSocialMediaById);
 
 /**
