@@ -46,9 +46,9 @@ const Profile = () => {
 
             <div className="space-y-5">
                 <ActivePositions />
-                <CareerStatus />
+                {/* <CareerStatus /> */}
                 <PersonalInformations />
-                <ResumeSmall />
+                {/* <ResumeSmall /> */}
             </div>
 
         </div>

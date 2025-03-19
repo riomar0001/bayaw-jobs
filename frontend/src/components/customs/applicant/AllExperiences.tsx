@@ -1,8 +1,10 @@
 import { ExperiencesSample } from "@/constants"
-import { PencilLine } from "lucide-react"
+import { PencilLine, CirclePlus } from "lucide-react"
 import { useState, useEffect } from "react";
 import { useAuth } from "@/contexts/authContext";
 import axios from "axios";
+import UpdateExperience from "./modals/UpdateExperience";
+import AddExperience from "./modals/AddExperience";
 
 const AllExperiences = () => {
     const { authStateApplicant } = useAuth();
@@ -31,13 +33,11 @@ const AllExperiences = () => {
         <div className="bg-white border border-neutral-100 w-[750px] h-auto rounded-lg px-12 py-6">
             <section className="flex justify-between items-center mb-6">
                 <h1 className="font-semibold text-xl">All Experiences</h1>
-                <h1 className="font-semibold text-base text-lochmara-500 flex items-center gap-x-2 hover:underline cursor-pointer">
-                    <PencilLine size={15} />Edit
-                </h1>
+                <AddExperience />
             </section>
             {experiences.map((experience: any) => (
                 <section key={experience.id}>
-                    <div className="flex items-center gap-x-5">
+                    <div className="flex  justify-between items-center gap-x-5">
                         <div>
                             <h1 className="font-semibold text-base">{experience.company}</h1>
                             <div className="flex items-center gap-x-5">
@@ -47,6 +47,7 @@ const AllExperiences = () => {
                                 </h1>
                             </div>
                         </div>
+                        <UpdateExperience experience={experience} />
                     </div>
                     {experience.id !== ExperiencesSample[ExperiencesSample.length - 1].id && <hr className="border my-3" />}
                 </section>

@@ -4,6 +4,7 @@ import {
       createRoutesFromElements,
       RouterProvider,
 } from "react-router-dom";
+
 import MainLayout from "./layouts/MainLayout";
 import Landing from "./pages/Landing";
 import Profile from "./pages/applicant/Profile";
@@ -73,7 +74,7 @@ const App = () => {
     return (
         <AuthProvider>
             <RouterProvider router={router} />
-            <Toaster />
+            <Toaster position="bottom-right" richColors />
         </AuthProvider>
     );
 };
