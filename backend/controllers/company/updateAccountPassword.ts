@@ -12,7 +12,13 @@ import { hashPassword, verifyPassword } from "@/utils/passwordUtils";
 export const updateAccountPassword = async (req: Request, res: Response) => {
   try {
     const company_token = req.cookies.company_access_token;
-
+    if (!company_token) {
+      return res.status(401).json({
+        success: false,
+        user_type: "company",
+        message: "Unauthorized - No token provided",
+      });
+    }
     const company_token_info = jwt.verify(
       company_token,
       process.env.JWT_SECRET_COMPANY!
@@ -28,14 +34,9 @@ export const updateAccountPassword = async (req: Request, res: Response) => {
     });
     //   console.log(existingAccount);
 
-    const hashedCurrentPassword = await hashPassword(confirm_password);
-    const hashedConfirmPassword = await hashPassword(confirm_password);
-
-    console.log("Current Passowrd:", existingAccount?.password);
-    console.log("New Passowrd:", hashedCurrentPassword);
     
     const isPasswordValid = await verifyPassword(current_password, existingAccount?.password || "");
-
+    
     if (!isPasswordValid) { 
       return res.status(404).json({
         success: false,
@@ -43,7 +44,7 @@ export const updateAccountPassword = async (req: Request, res: Response) => {
         error: "Current password is incorrect",
       });
     }
-
+    
     if (new_password !== confirm_password) {
       return res.status(404).json({
         success: false,
@@ -51,6 +52,8 @@ export const updateAccountPassword = async (req: Request, res: Response) => {
         error: "New password and Confirm new password does not match",
       });
     }
+    
+    const hashedConfirmPassword = await hashPassword(confirm_password);
 
     if (!existingAccount) {
       return res.status(404).json({

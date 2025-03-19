@@ -10,7 +10,13 @@ import prisma from "@/configs/prismaConfig";
 export const deleteSocialMedia = async (req: Request, res: Response) => {
   try {
     const company_token = req.cookies.company_access_token;
-
+    if (!company_token) {
+      return res.status(401).json({
+        success: false,
+        user_type: "company",
+        message: "Unauthorized - No token provided",
+      });
+    }
     const company_token_info = jwt.verify(
       company_token,
       process.env.JWT_SECRET_COMPANY!
@@ -29,14 +35,22 @@ export const deleteSocialMedia = async (req: Request, res: Response) => {
     if (!existingSocials) {
       return res.status(404).json({
         success: false,
-        user_type: "applicant",
+        user_type: "social media",
         error: "No social medias are found",
       });
     }
 
-    await prisma.companies_social_media.delete({
+    const deleteSocialMedia = await prisma.companies_social_media.delete({
       where: { id: socialmedia_id, company_account_id: company_id },
     });
+
+    if (!deleteSocialMedia) {
+      return res.status(404).json({
+        success: false,
+        user_type: "company",
+        message: "Delete company unsuccessful",
+      });
+    }
 
     return res.status(200).json({
       success: true,
