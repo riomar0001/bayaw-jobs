@@ -91,6 +91,7 @@ export const getEducationById = async (req: Request, res: Response) => {
     const education = await prisma.applicants_education.findUnique({
       where: {
         id: education_id,
+        applicants_account_id: applicant_id,
       },
     });
 
