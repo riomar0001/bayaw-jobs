@@ -1,4 +1,4 @@
-import { Banknote, BriefcaseBusiness, Cake, MailSearch, MapPinHouse, PencilLine, Smartphone } from "lucide-react"
+import { BriefcaseBusiness, Cake, MailSearch, MapPinHouse, PencilLine, Smartphone } from "lucide-react"
 import { useState, useEffect } from "react"
 import axios from "axios";
 

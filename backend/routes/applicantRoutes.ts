@@ -34,7 +34,18 @@ const router = express.Router();
  */
 router.get("/", protect, getBasicInfo);
 router.get("/auth", protect, checkAuthApplicant);
-router.get("/experience", protect, getExperience.getAllExperiences);
+router.get(
+  "/experience/:applicant_id",
+  getExperience.getAllExperiences
+);
+router.get(
+  "/experience/:applicant_id/:experience_id",
+  getExperience.getExperienceById
+);
+router.get("/education", protect, getEducation.getAllEducation);
+router.get("/education/:education_id", protect, getEducation.getEducationById);
+router.get("/resume/:applicant_id", getResume);
+router.get("/resume/download/:applicant_id", downloadResume);
 router.get(
   "/experience/:experience_id",
   protect,
@@ -42,13 +53,12 @@ router.get(
 );
 router.get("/education", protect, getEducation.getAllEducation);
 router.get("/education/:education_id", protect, getEducation.getEducationById);
-router.get("/resume/:applicant_id", getResume);
-router.get("/resume/download/:applicant_id", downloadResume);
-router.get("/experience/:experience_id", protect, getExperience.getExperienceById);
-router.get("/education", protect, getEducation.getAllEducation);
-router.get("/education/:education_id", protect, getEducation.getEducationById);
 router.get("/social-media", protect, getSocialMedia.getAllSocialMedia);
-router.get("/social-media/:social_media_id", protect, getSocialMedia.getSocialMediaById);
+router.get(
+  "/social-media/:social_media_id",
+  protect,
+  getSocialMedia.getSocialMediaById
+);
 
 /**
  * @Reminder Place all POST requests here
