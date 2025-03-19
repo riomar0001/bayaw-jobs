@@ -8,7 +8,6 @@ import { hashPassword } from "@/utils/passwordUtils";
 import generateCompanyToken from "@/utils/generateCompanyToken";
 import sharp from "sharp";
 import path from "path";
-import { log } from "console";
 
 /**
  * @description registration of a new user
