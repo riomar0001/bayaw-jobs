@@ -18,7 +18,7 @@ const Profile = () => {
 
 
 
-    
+
 
     useEffect(() => {
 
@@ -47,8 +47,11 @@ const Profile = () => {
             <div className="space-y-5">
                 <ActivePositions />
                 <CareerStatus />
-                <PersonalInformations />
-                <ResumeSmall />
+                <PersonalInformations
+                    facebookURL="facebook.com/jerome.bell"
+                    twitterURL="twitter.com/jeromebell"
+                />
+                {/* <ResumeSmall /> */}
             </div>
 
         </div>

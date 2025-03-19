@@ -1,8 +1,8 @@
 import {
-      Route,
-      createBrowserRouter,
-      createRoutesFromElements,
-      RouterProvider,
+    Route,
+    createBrowserRouter,
+    createRoutesFromElements,
+    RouterProvider,
 } from "react-router-dom";
 import MainLayout from "./layouts/MainLayout";
 import Landing from "./pages/Landing";
@@ -22,8 +22,8 @@ import { EditProfileSample } from "./constants";
 import { Toaster } from "sonner";
 import EmployerLogin from "./pages/employer/Login";
 import { AuthProvider } from "./contexts/authContext";
-import OnboardingApplicant from "./pages/OnboardingApplicant";
-import OnboardingCompany from "./pages/OnboardingCompany";
+import OnboardingCompany from "./pages/employer/OnboardingCompany";
+import OnboardingApplicant from "./pages/applicant/OnboardingApplicant";
 
 const router = createBrowserRouter(
     createRoutesFromElements(
@@ -52,16 +52,15 @@ const router = createBrowserRouter(
                 <Route path="/find-jobs" element={<FindJobs />} />
                 <Route path="/find-jobs/details" element={<JobDetails />} />
                 <Route path="/applicant/onboarding" element={<OnboardingApplicant />} />
-                <Route path="/company/onboarding" element={<OnboardingCompany />} />
-                
             </Route>
             <Route path="/employer" element={<EmployerLogin />} />
             <Route element={<EmployerLayout />}>
-                <Route path="/employer/jobs" element={<Dashboard  />} />
-                <Route path="/employer/jobs/job-details" element={<JobDetailsEmployer  />} />
-                <Route path="/employer/jobs/edit-job" element={<EditJob  />} />
-                <Route path="/employer/add-job" element={<AddJob  />} />
-                <Route path="/employer/profile" element={<ProfileEmployer  />} />
+                <Route path="/employer/jobs" element={<Dashboard />} />
+                <Route path="/employer/jobs/job-details" element={<JobDetailsEmployer />} />
+                <Route path="/employer/jobs/edit-job" element={<EditJob />} />
+                <Route path="/employer/add-job" element={<AddJob />} />
+                <Route path="/employer/profile" element={<ProfileEmployer />} />
+                <Route path="/employer/onboarding" element={<OnboardingCompany />} />
             </Route>
         </>
 

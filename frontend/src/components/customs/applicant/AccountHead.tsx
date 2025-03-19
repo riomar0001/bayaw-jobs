@@ -17,6 +17,18 @@ const AccountHead = () => {
                 <Button className="bg-transparent text-lochmara-700 border border-lochmara-700 hover:bg-lochmara-700/80 hover:text-white">
                     <FaLinkedin /> LinkedIn Account
                 </Button>
+
+                {/* <div className="space-x-3">
+                    <Button className="bg-transparent text-lochmara-700 border border-lochmara-700 hover:bg-lochmara-700/80 hover:text-white">
+                        <FaLinkedin />
+                    </Button>
+                    <Button className="bg-transparent text-lochmara-700 border border-lochmara-700 hover:bg-lochmara-700/80 hover:text-white">
+                        <FaFacebook />
+                    </Button>
+                    <Button className="bg-transparent text-lochmara-700 border border-lochmara-700 hover:bg-lochmara-700/80 hover:text-white">
+                        <FaTwitter />
+                    </Button>
+                </div> */}
             </div>
         </div>
     )

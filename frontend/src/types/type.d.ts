@@ -67,5 +67,6 @@ declare interface EditProfileProps {
     birthdate: any;
     salaryExpectation: string;
     location: string;
+    profileImage?: string;
 }
 
