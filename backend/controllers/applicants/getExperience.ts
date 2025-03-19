@@ -18,24 +18,9 @@ interface DecodedApplicantToken {
  */
 export const getAllExperiences = async (req: Request, res: Response) => {
   try {
-    const applicant_token = req.cookies.applicant_access_token;
+    const { applicant_id } = req.params;
 
-    if (!applicant_token) {
-      return res.status(401).json({
-        success: false,
-        user_type: "applicant",
-        message: "Unauthorized - No token provided",
-      });
-    }
-
-    const applicant_token_info = jwt.verify(
-      applicant_token,
-      process.env.JWT_SECRET_APPLICANT!
-    ) as DecodedApplicantToken;
-
-    const applicant_id = applicant_token_info.applicant.id;
-
-    const experiences = await prisma.applicants_experience.findFirst({
+    const experiences = await prisma.applicants_experience.findMany({
       where: { applicants_account_id: applicant_id },
     });
 

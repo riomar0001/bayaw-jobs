@@ -25,6 +25,7 @@ import getSocialMedia from "@/controllers/applicants/getSocialMedia";
 import addSocialMedia from "@/controllers/applicants/addSocialMedia";
 import updateSocialMedia from "@/controllers/applicants/updateSocialMedia";
 import deleteSocialMedia from "@/controllers/applicants/deleteSocialMedia";
+import { updatePersonalInformation } from "@/controllers/applicants/updatePersonalInfomation";
 
 const router = express.Router();
 
@@ -34,21 +35,29 @@ const router = express.Router();
  */
 router.get("/", protect, getBasicInfo);
 router.get("/auth", protect, checkAuthApplicant);
-router.get("/experience", protect, getExperience.getAllExperiences);
+router.get("/experience/:applicant_id", getExperience.getAllExperiences);
+router.get("/education/:applicant_id", getEducation.getAllEducation);
+router.get("/social-media/:applicant_id", getSocialMedia.getAllSocialMedia);
+router.get("/resume/:applicant_id", getResume);
+router.get("/resume/download/:applicant_id", downloadResume);
+
 router.get(
   "/experience/:experience_id",
   protect,
   getExperience.getExperienceById
 );
-router.get("/education", protect, getEducation.getAllEducation);
 router.get("/education/:education_id", protect, getEducation.getEducationById);
-router.get("/resume/:applicant_id", getResume);
-router.get("/resume/download/:applicant_id", downloadResume);
-router.get("/experience/:experience_id", protect, getExperience.getExperienceById);
-router.get("/education", protect, getEducation.getAllEducation);
+router.get(
+  "/experience/:experience_id",
+  protect,
+  getExperience.getExperienceById
+);
 router.get("/education/:education_id", protect, getEducation.getEducationById);
-router.get("/social-media", protect, getSocialMedia.getAllSocialMedia);
-router.get("/social-media/:social_media_id", protect, getSocialMedia.getSocialMediaById);
+router.get(
+  "/social-media/:social_media_id",
+  protect,
+  getSocialMedia.getSocialMediaById
+);
 
 /**
  * @Reminder Place all POST requests here
@@ -86,6 +95,7 @@ router.put(
 router.put("/experience/:experience_id", protect, updateExperience);
 router.put("/education/:education_id", protect, updateEducation);
 router.put("/social-media/:social_media_id", protect, updateSocialMedia);
+router.put("/", protect, updatePersonalInformation);
 
 /**
  * @Reminder Place all DELETE requests here

@@ -47,7 +47,7 @@ export const updateExperience = async (req: Request, res: Response) => {
 
     // if applicant exists
     const applicantExists = await prisma.applicants_experience.count({
-      where: { id: applicant_id },
+      where: { applicants_account_id: applicant_id },
     });
 
     if (applicantExists === 0) {
