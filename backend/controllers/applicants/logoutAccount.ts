@@ -14,11 +14,13 @@ export const logoutAccount = async (req: Request, res: Response) => {
 
     return res.status(200).json({
       success: true,
+      user_type: "applicant",
       message: "Logout Successful",
     });
   } catch (error: any) {
     return res.status(500).json({
       success: false,
+      user_type: "applicant",
       message: "Internal Server Error",
       error: error.message,
     });

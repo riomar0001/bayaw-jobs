@@ -67,6 +67,8 @@ export const registerAccount = async (req: Request, res: Response) => {
     }
 
     newAccount.password = undefined!;
+    newAccount.created_at = undefined!;
+    newAccount.updated_at = undefined!;
 
     generateApplicantToken(res, newAccount);
 
@@ -74,6 +76,7 @@ export const registerAccount = async (req: Request, res: Response) => {
       success: true,
       user_type: "applicant",
       message: "Account Successfully Created",
+      data: newAccount,
     });
   } catch (error: any) {
     return res.status(500).json({
@@ -126,7 +129,7 @@ export const accountOnboarding = async (req: Request, res: Response) => {
       return res.status(400).json({
         success: false,
         user_type: "applicant",
-        message: "Profile Picture and Resume are required",
+        message: "Resume is required",
       });
     }
 

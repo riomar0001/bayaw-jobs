@@ -129,14 +129,14 @@ export const LatestJobItems = [
         image: images.sample_company_1,
     },
     {
-        id: 1,
+        id: 2,
         company: "Amazon",
         jobquantity: "30",
         category: ["Tech Startups", "Ecommerce"],
         image: images.sample_company_2,
     },
     {
-        id: 1,
+        id: 3,
         company: "Huawei Technology",
         jobquantity: "25",
         category: ["Tech Startups", "Finance", "Innovators"],

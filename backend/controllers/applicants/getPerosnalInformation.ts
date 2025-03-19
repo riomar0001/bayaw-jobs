@@ -16,7 +16,7 @@ interface DecodedApplicantToken {
  * @route GET /api/applicants/:id
  * @access Private
  */
-export const getBasicInfo = async (req: Request, res: Response) => {
+export const getInfo = async (req: Request, res: Response) => {
   try {
     const applicant_token = req.cookies.applicant_access_token;
 
@@ -49,16 +49,15 @@ export const getBasicInfo = async (req: Request, res: Response) => {
       success: true,
       user_type: "applicant",
       message: "Experiences found",
-      accountPersonalInfo: { ...accountInfo, ...accountPersonalInfo },
+      accountPersonalInfo,
     });
   } catch (error: any) {
     return res.status(500).json({
       success: false,
-      user_type: "applicant",
       message: "Internal Server Error",
       error: error.message,
     });
   }
 };
 
-export default getBasicInfo;
+export default getInfo;

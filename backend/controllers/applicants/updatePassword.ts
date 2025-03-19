@@ -14,6 +14,7 @@ export const updatePassword = async (req: Request, res: Response) => {
   } catch (error: any) {
     return res.status(500).json({
       success: false,
+      user_type: "applicant",
       message: "Username or Password is required",
       error: error.message,
     });

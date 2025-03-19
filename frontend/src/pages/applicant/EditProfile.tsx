@@ -10,6 +10,10 @@ import { cn } from '@/lib/utils';
 import { toast } from "sonner";
 import { Link } from "react-router-dom";
 
+import { useEffect } from "react"
+import { useAuth } from "@/contexts/authContext"
+import { useNavigate } from "react-router-dom"
+
 
 const EditProfile = ({
     firstName,
@@ -21,6 +25,14 @@ const EditProfile = ({
     salaryExpectation,
     location }: EditProfileProps) => {
 
+    const navigate = useNavigate();
+    const { authStateApplicant } = useAuth();
+
+    useEffect(() => {
+        if (authStateApplicant?.authenticated === false) {
+            navigate("/login")
+        }
+    }, [authStateApplicant])
 
     const [date, setDate] = useState<Date | undefined>(birthdate ? new Date(birthdate) : undefined)
 

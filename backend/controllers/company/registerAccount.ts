@@ -68,6 +68,8 @@ export const registerAccount = async (req: Request, res: Response) => {
     }
 
     newAccount.password = undefined!;
+    newAccount.created_at = undefined!;
+    newAccount.updated_at = undefined!;
 
     generateCompanyToken(res, newAccount);
 
@@ -75,6 +77,7 @@ export const registerAccount = async (req: Request, res: Response) => {
       success: true,
       user_type: "company",
       message: "Account Successfully Created",
+      data: newAccount,
     });
   } catch (error: any) {
     return res.status(500).json({
