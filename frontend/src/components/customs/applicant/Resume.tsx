@@ -1,9 +1,11 @@
 import { Button } from "@/components/ui/button"
 import { Download, FileUser, ScrollText } from "lucide-react"
+import { PencilLine } from "lucide-react"
 import { useState, useEffect } from "react";
 import axios from "axios";
 import { useAuth } from "@/contexts/authContext";
 import ViewApplicantResume from "./modals/ViewApplicantResume";
+import UpdateResume from "./modals/UpdateResume";
 
 
 const Resume = ({ data }: any) => {
@@ -58,7 +60,13 @@ const Resume = ({ data }: any) => {
     }, [applicant_id]);
     return (
         <div className="bg-white border border-neutral-100 w-[750px] h-auto rounded-lg px-12 py-6">
-            <h1 className="font-semibold text-xl mb-6">Resume</h1>
+            <section className="flex justify-between items-center mb-6">
+                <h1 className="font-semibold text-xl">Resume</h1>
+                {/* <h1 className="font-semibold text-base text-lochmara-500 flex items-center gap-x-2 hover:underline cursor-pointer">
+                    <PencilLine size={15} />Edit
+                </h1> */}
+                <UpdateResume />
+            </section>
 
 
             <section className="flex justify-between items-center">
