@@ -7,17 +7,17 @@ import TrustCompanies from "@/components/customs/landing/sections/TrustCompanies
 import WhyUs from "@/components/customs/landing/sections/WhyUs";
 
 const Landing = () => {
-    return (
-        <div className="bg-neutral-100">
-            <Hero />
-            <TrustCompanies />
-            <JobsPick/>
-            <LatestJobs/>
-            <WhyUs/>
-            <AccountRegistration/>
-            <DiscoverCareer/>
-        </div>
-    );
+  return (
+    <div className="bg-neutral-100">
+      <Hero />
+      <TrustCompanies />
+      <JobsPick />
+      <LatestJobs />
+      <WhyUs />
+      <AccountRegistration />
+      <DiscoverCareer />
+    </div>
+  );
 };
 
 export default Landing;
