@@ -28,11 +28,11 @@ export const updateSocialMedia = async (req: Request, res: Response) => {
     const company_id = company_token_info.company.id;
     const { socialmedia_id } = req.params;
     const { facebook, twitter, linkedin, github } = req.body;
-    
+
     const existingSocials = await prisma.companies_social_media.findFirst({
       where: {
         id: socialmedia_id,
-        company_account_id: company_id
+        company_account_id: company_id,
       },
     });
 
@@ -47,13 +47,13 @@ export const updateSocialMedia = async (req: Request, res: Response) => {
     const updateQuery = await prisma.companies_social_media.update({
       where: {
         id: socialmedia_id,
-        company_account_id: company_id
+        company_account_id: company_id,
       },
       data: {
-        facebook,
-        twitter,
-        linkedin,
-        github,
+        facebook: facebook !== undefined ? facebook : existingSocials.facebook,
+        twitter: twitter !== undefined ? twitter : existingSocials.twitter,
+        linkedin: linkedin !== undefined ? linkedin : existingSocials.linkedin,
+        github: github !== undefined ? github : existingSocials.github,
         updated_at: new Date(),
       },
     });

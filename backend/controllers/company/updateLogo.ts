@@ -115,6 +115,7 @@ export const updateLogo = async (req: Request, res: Response) => {
         message: "Failed to update company logo",
       });
     }
+    
     fs.unlinkSync(logo.path);
 
     return res.status(200).json({
