@@ -7,22 +7,20 @@ import prisma from "@/configs/prismaConfig";
  * @access  Public
  */
 
-export const getRecentJobs = async (req: Request, res: Response) => {
+export const getJobPicks = async (req: Request, res: Response) => {
   try {
-    const recentJobs = await prisma.job_offers.findMany({
+    const allJobs = await prisma.job_offers.findMany({
       where: {
-        is_closed: false, // Optional: Retrieve only open job offers
+        is_closed: false,
       },
-      orderBy: {
-        created_at: "desc", // Sort by the most recent jobs first
-      },
-      take: 3, // Limit to the three most recent jobs
     });
+
+    const shuffledJobs = allJobs.sort(() => Math.random() - 0.5).slice(0, 4);
 
     return res.status(200).json({
       success: true,
       message: "Recent jobs successfully retrieved",
-      data: { recentJobs },
+      data: { shuffledJobs },
     });
   } catch (error: any) {
     return res.status(500).json({
