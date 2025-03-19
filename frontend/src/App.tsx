@@ -22,8 +22,8 @@ import { EditProfileSample } from "./constants";
 import { Toaster } from "sonner";
 import EmployerLogin from "./pages/employer/Login";
 import { AuthProvider } from "./contexts/authContext";
-import OnboardingApplicant from "./pages/OnboardingApplicant";
-import OnboardingCompany from "./pages/OnboardingCompany";
+import OnboardingApplicant from "./pages/applicant/OnboardingApplicant";
+import OnboardingCompany from "./pages/employer/OnboardingCompany";
 
 const router = createBrowserRouter(
     createRoutesFromElements(
