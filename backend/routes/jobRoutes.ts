@@ -6,6 +6,10 @@ import { getJobById } from "@/controllers/jobs/getJobById";
 
 import { updateJob } from "@/controllers/jobs/updateJob";
 import { getAllJobs } from "@/controllers/jobs/getAllJobs";
+import { getRecentJobs } from "@/controllers/jobs/getRecentJobs";
+import { getJobPicks } from "@/controllers/jobs/getJobPicks";
+import { getApplicantByJobId } from "@/controllers/jobs/getApplicantsByJobId";
+
 const router = express.Router();
 
 /**
@@ -15,6 +19,9 @@ const router = express.Router();
 router.get("/:job_id", protect, getJobById);
 router.get("/company", protect, getJobByCompany);
 router.get("/", protect, getAllJobs);
+router.get("/all/recent", getRecentJobs);
+router.get("/all/picks", getJobPicks);
+router.get("/applicants/:job_posting_id", protect,getApplicantByJobId);
 
 /**
  * @Reminder Place all POST requests here

@@ -36,7 +36,7 @@ export const getJobByCompany = async (req: Request, res: Response) => {
         company_account_id: company_id,
       },
     });
-
+    
     return res.status(200).json({
       success: true,
       message: "Jobs found for this company",
