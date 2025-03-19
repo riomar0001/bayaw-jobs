@@ -1,9 +1,10 @@
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Eye, EyeOff, Lock, User } from "lucide-react";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/contexts/authContext";
+
 
 const Login = () => {
   const [showPassword, setShowPassword] = useState(false);
@@ -13,7 +14,7 @@ const Login = () => {
 
   const [error, setError] = useState("");
   const [isLoading, setIsLoading] = useState(false);
-  const { onLoginCompany } = useAuth();
+  const { onLoginCompany, authStateCompany } = useAuth();
   const navigate = useNavigate();
 
   const togglePasswordVisibility = () => {
@@ -45,7 +46,13 @@ const Login = () => {
     }
   };
 
-
+  useEffect(() => {
+    if (authStateCompany?.user_type === "company") {
+      authStateCompany?.done_onboarding
+        ? navigate("/employer/jobs")
+        : navigate("/employer/onboarding");
+    }
+  }, [authStateCompany, navigate]);
 
   return (
     <div className="bg-neutral-100 w-full py-56">

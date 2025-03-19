@@ -5,8 +5,6 @@ import { Link } from "react-router-dom"
 const Navbar = () => {
     return (
         <div className="bg-white w-full h-[75px] border-b-2 border-neutral-300 flex items-center justify-end px-12">
-
-
             <DropdownMenu>
                 <DropdownMenuTrigger>
                     <DoorOpen size={15} color="gray" />

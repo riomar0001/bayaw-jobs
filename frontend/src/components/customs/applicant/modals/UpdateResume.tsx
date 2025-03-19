@@ -13,9 +13,7 @@ import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
 import { PencilLine } from "lucide-react"
 import axios from "axios";
-
-import { UserPen } from "lucide-react";
-import React, { useState, useEffect } from "react";
+import { useState } from "react";
 
 const UpdateResume = () => {
     const [isOpen, setIsOpen] = useState(false);

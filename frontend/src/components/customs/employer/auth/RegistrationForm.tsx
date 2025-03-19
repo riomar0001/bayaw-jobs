@@ -44,7 +44,7 @@ const RegistrationForm = () => {
 
         try {
             await onRegisterCompany(username, email, password);
-            navigate("/");
+            navigate("/employer/jobs");
         } catch (err: any) {
             setError(err.message || "Registration failed. Please try again.");
         } finally {

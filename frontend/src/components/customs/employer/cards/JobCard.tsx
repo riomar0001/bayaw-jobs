@@ -62,11 +62,8 @@ const JobCard = ({ position, description, address, category, minSalary, maxSalar
                     </DialogContent>
                 </Dialog>
 
-                <Link to={"/employer/jobs/edit-job"}>
-
-                    <Link to={"/employer/jobs/job-details"} >
-                        <Button>View Job</Button>
-                    </Link>
+                <Link to={"/employer/jobs/job-details"} >
+                    <Button>View Job</Button>
                 </Link>
             </div>
 
