@@ -2,8 +2,7 @@ import e, { Response, Request } from "express";
 import jwt from "jsonwebtoken";
 import { DecodedCompanyToken } from "@/types/types";
 import prisma from "@/configs/prismaConfig";
-import fs from "fs";
-import supabase from "@/configs/supabaseConfig";
+
 
 /**
  * @description Update company details (logo, industry, address, or general information)
@@ -32,7 +31,7 @@ export const addSocialMedia = async (req: Request, res: Response) => {
             github
         }
     });
-
+    
     if (!socialMedias) {
         return res.status(400).json({
           success: false,

@@ -107,7 +107,7 @@ export const accountOnboarding = async (req: Request, res: Response) => {
     const { name, address, description, contact_no, email, industry } =
       req.body;
     
-    console.log(req.body);
+    // console.log(req.body);
     
 
     // console.log(name, address, description, contact_no, email, industry, logo);

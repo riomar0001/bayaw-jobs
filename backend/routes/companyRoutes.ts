@@ -10,7 +10,12 @@ import {
 import logoutAccount from "@/controllers/company/logoutAccount";
 const router = express.Router();
 import addSocialMedia from "@/controllers/company/addSocialMedia";
-
+import updateSocialMedia from "@/controllers/company/updateSocialMedia";
+import deleteSocialMedia from "@/controllers/company/deleteSocialMedia";
+import updateCompanyAccount from "@/controllers/company/updateAccount";
+import updateAccountPassword from "@/controllers/company/updateAccountPassword";
+import updateLogo from "@/controllers/company/updateLogo";
+import updateCompanyInformation from "@/controllers/company/updateInformation";
 /**
  * @Reminder Place all GET requests here
  * @Format router.get("path", "middleware", "controller");
@@ -33,17 +38,23 @@ router.post(
   accountOnboarding
 );
 
-
 /**
  * @Reminder Place all PUT requests here
  * @Format router.put("path", "middleware", "controller");
  */
-
+router.put("/update", protect, updateCompanyAccount);
+router.put("/update/password", protect, updateAccountPassword);
+router.put("/update/info", protect, updateCompanyInformation);
+router.put("/socials/:socialmedia_id", protect, updateSocialMedia);
+router.put("/industry", protect, updateSocialMedia);
+router.put("/logo/:logo_id", protect, updateLogo);
 
 
 /**
  * @Reminder Place all DELETE requests here
  * @Format router.delete("path", "middleware", "controller");
  */
+
+router.delete("/socials/:socialmedia_id", protect, deleteSocialMedia);
 
 export default router;
