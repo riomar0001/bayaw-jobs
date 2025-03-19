@@ -1,8 +1,8 @@
 import {
-    Route,
-    createBrowserRouter,
-    createRoutesFromElements,
-    RouterProvider,
+      Route,
+      createBrowserRouter,
+      createRoutesFromElements,
+      RouterProvider,
 } from "react-router-dom";
 import MainLayout from "./layouts/MainLayout";
 import Landing from "./pages/Landing";
@@ -18,8 +18,12 @@ import EditJob from "./components/customs/employer/EditJob";
 import FindJobs from "./pages/applicant/FindJobs";
 import JobDetails from "./pages/applicant/JobDetails";
 import JobDetailsEmployer from "./pages/employer/JobDetailsEmpoyer";
+import { EditProfileSample } from "./constants";
+import { Toaster } from "sonner";
 import EmployerLogin from "./pages/employer/Login";
 import { AuthProvider } from "./contexts/authContext";
+import OnboardingApplicant from "./pages/OnboardingApplicant";
+import OnboardingCompany from "./pages/OnboardingCompany";
 
 const router = createBrowserRouter(
     createRoutesFromElements(
@@ -27,19 +31,37 @@ const router = createBrowserRouter(
             <Route path="/" element={<MainLayout />}>
                 <Route index element={<Landing />} />
                 <Route path="/applicant/profile" element={<Profile />} />
-                <Route path="/applicant/profile/edit" element={<EditProfile />} />
+                <Route path="/applicant/profile/edit" element={
+                    EditProfileSample.map((item, index) => (
+                        <EditProfile
+                            key={index}
+                            firstName={item.firstName}
+                            lastName={item.lastName}
+                            email={item.email}
+                            contactNumber={item.contactNumber}
+                            linkedInURL={item.linkedInURL}
+                            birthdate={item.birthdate}
+                            salaryExpectation={item.salaryExpectation}
+                            location={item.location}
+                        />
+
+                    ))
+                } />
                 <Route path="/register" element={<Registration />} />
                 <Route path="/login" element={<Login />} />
                 <Route path="/find-jobs" element={<FindJobs />} />
                 <Route path="/find-jobs/details" element={<JobDetails />} />
+                <Route path="/applicant/onboarding" element={<OnboardingApplicant />} />
+                <Route path="/company/onboarding" element={<OnboardingCompany />} />
+                
             </Route>
             <Route path="/employer" element={<EmployerLogin />} />
             <Route element={<EmployerLayout />}>
-                <Route path="/employer/jobs" element={<Dashboard />} />
-                <Route path="/employer/jobs/job-details" element={<JobDetailsEmployer />} />
-                <Route path="/employer/jobs/edit-job" element={<EditJob />} />
-                <Route path="/employer/add-job" element={<AddJob />} />
-                <Route path="/employer/profile" element={<ProfileEmployer />} />
+                <Route path="/employer/jobs" element={<Dashboard  />} />
+                <Route path="/employer/jobs/job-details" element={<JobDetailsEmployer  />} />
+                <Route path="/employer/jobs/edit-job" element={<EditJob  />} />
+                <Route path="/employer/add-job" element={<AddJob  />} />
+                <Route path="/employer/profile" element={<ProfileEmployer  />} />
             </Route>
         </>
 
@@ -51,6 +73,7 @@ const App = () => {
     return (
         <AuthProvider>
             <RouterProvider router={router} />
+            <Toaster />
         </AuthProvider>
     );
 };

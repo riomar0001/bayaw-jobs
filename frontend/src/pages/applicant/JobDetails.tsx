@@ -3,17 +3,18 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { images } from "@/constants";
 import { ArrowLeft } from "lucide-react";
-import { Link } from "react-router-dom";
 
 const JobDetails = () => {
   return (
     <div className="bg-gradient-to-b from-sky-50 to-neutral-100 min-h-screen px-6 py-8 md:px-12 lg:px-24 xl:px-36">
-      <Link to={"/find-jobs/"} className="inline-block mb-6">
-        <Button variant="outline" className="flex items-center gap-2 hover:bg-sky-50 transition-colors">
-          <ArrowLeft size={16} className="text-lochmara-500" />
-          <span>Back to Jobs</span>
-        </Button>
-      </Link>
+      <Button 
+        variant="outline" 
+        className="flex items-center gap-2 hover:bg-sky-50 transition-colors mb-6"
+        onClick={() => window.history.back()}
+      >
+        <ArrowLeft size={16} className="text-lochmara-500" />
+        <span>Back to Jobs</span>
+      </Button>
 
       <div className="flex flex-col lg:flex-row gap-6">
         <JobDetailsCard
