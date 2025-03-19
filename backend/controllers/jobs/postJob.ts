@@ -36,16 +36,7 @@ export const postJob = async (req: Request, res: Response) => {
       years_exp,
     } = req.body;
 
-    if (
-      !title ||
-      !description ||
-      !location ||
-      !category ||
-      !salary_from ||
-      !salary_to ||
-      !work_schedule ||
-      !years_exp
-    ) {
+    if (!title || !description || !location) {
       return res.status(400).json({
         success: false,
         user_type: "company",
@@ -54,11 +45,11 @@ export const postJob = async (req: Request, res: Response) => {
           title: !title,
           description: !description,
           location: !location,
-          category: !category,
-          salary_from: !salary_from,
-          salary_to: !salary_to,
-          work_schedule: !work_schedule,
-          years_exp: !years_exp,
+          // category: !category,
+          // salary_from: !salary_from,
+          // salary_to: !salary_to,
+          // work_schedule: !work_schedule,
+          // years_exp: !years_exp,
         },
       });
     }

@@ -27,6 +27,19 @@ export const updateAccountPassword = async (req: Request, res: Response) => {
     const company_id = company_token_info.company.id;
     const { current_password, new_password, confirm_password } = req.body;
 
+    if (!current_password || !new_password || !confirm_password) {
+      return res.status(400).json({
+        success: false,
+        user_type: "company",
+        message: "All fields are required",
+        missing_fields: {
+          current_password: !current_password,
+          new_password: !new_password,
+          confirm_password: !confirm_password,
+        },
+      });
+    }
+
     const existingAccount = await prisma.companies_account.findFirst({
       where: {
         id: company_id,
@@ -34,17 +47,19 @@ export const updateAccountPassword = async (req: Request, res: Response) => {
     });
     //   console.log(existingAccount);
 
-    
-    const isPasswordValid = await verifyPassword(current_password, existingAccount?.password || "");
-    
-    if (!isPasswordValid) { 
+    const isPasswordValid = await verifyPassword(
+      current_password,
+      existingAccount?.password || ""
+    );
+
+    if (!isPasswordValid) {
       return res.status(404).json({
         success: false,
         user_type: "company",
         error: "Current password is incorrect",
       });
     }
-    
+
     if (new_password !== confirm_password) {
       return res.status(404).json({
         success: false,
@@ -52,7 +67,7 @@ export const updateAccountPassword = async (req: Request, res: Response) => {
         error: "New password and Confirm new password does not match",
       });
     }
-    
+
     const hashedConfirmPassword = await hashPassword(confirm_password);
 
     if (!existingAccount) {

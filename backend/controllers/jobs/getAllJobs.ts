@@ -1,4 +1,7 @@
+import prisma from "@/configs/prismaConfig";
 import { Request, Response } from "express";
+
+
 
 /**
  * @desc    Get all jobs with company name where is_closed is false
@@ -8,9 +11,12 @@ import { Request, Response } from "express";
 
 export const getAllJobs = async (req: Request, res: Response) => {
     try {
+
+        const allJobs = await prisma.job_offers.findMany();
         return res.status(200).json({
             success: true,
-            data: {},
+            message: "All jobs are retrieved",
+            data: {allJobs},
         });
     } catch (error: any) {
         return res.status(500).json({

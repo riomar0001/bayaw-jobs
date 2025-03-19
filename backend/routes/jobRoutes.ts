@@ -2,7 +2,8 @@ import express from "express";
 import { protect } from "@/middlewares/CompanyAuthHandler";
 import { postJob } from "@/controllers/jobs/postJob";
 import { getJobByCompany } from "@/controllers/jobs/getJobByCompany";
-
+import { updateJob } from "@/controllers/jobs/updateJob";
+import { getAllJobs } from "@/controllers/jobs/getAllJobs";
 const router = express.Router();
 
 /**
@@ -11,6 +12,7 @@ const router = express.Router();
  */
 
 router.get("/company", protect, getJobByCompany);
+router.get("/", protect, getAllJobs);
 
 /**
  * @Reminder Place all POST requests here
@@ -23,6 +25,7 @@ router.post("/", protect, postJob);
  * @Reminder Place all PUT requests here
  * @Format router.put("path", "middleware", "controller");
  */
+router.put("/:job_posting_id", protect, updateJob);
 
 /**
  * @Reminder Place all DELETE requests here
