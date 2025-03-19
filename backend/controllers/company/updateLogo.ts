@@ -12,6 +12,14 @@ export const updateLogo = async (req: Request, res: Response) => {
   try {
     const company_token = req.cookies.company_access_token;
 
+    if (!company_token) {
+      return res.status(401).json({
+        success: false,
+        user_type: "company",
+        message: "Unauthorized - No token provided",
+      });
+    }
+
     const company_token_info = jwt.verify(
       company_token,
       process.env.JWT_SECRET_COMPANY!
