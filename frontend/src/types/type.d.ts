@@ -67,7 +67,6 @@ declare interface EditProfileProps {
     facebookURL?: string;
     twitterURL?: string;
     birthdate: any;
-    salaryExpectation: string;
     location: string;
     profileImage?: string;
 }

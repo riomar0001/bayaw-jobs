@@ -22,8 +22,8 @@ import { EditProfileSample } from "./constants";
 import { Toaster } from "sonner";
 import EmployerLogin from "./pages/employer/Login";
 import { AuthProvider } from "./contexts/authContext";
-import OnboardingCompany from "./pages/employer/OnboardingCompany";
-import OnboardingApplicant from "./pages/applicant/OnboardingApplicant";
+import OnboardingApplicant from "./pages/applicant/ApplicantOnboarding";
+import OnboardingCompany from "./pages/employer/EmployerOnboarding";
 
 const router = createBrowserRouter(
     createRoutesFromElements(
@@ -43,7 +43,6 @@ const router = createBrowserRouter(
                             facebookURL={item.facebookURL}
                             twitterURL={item.twitterURL}
                             birthdate={item.birthdate}
-                            salaryExpectation={item.salaryExpectation}
                             location={item.location}
                         />
 

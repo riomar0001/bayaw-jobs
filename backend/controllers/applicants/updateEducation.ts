@@ -36,9 +36,16 @@ export const updateEducation = async (req: Request, res: Response) => {
 
     const applicant_id = applicant_token_info.applicant.id;
     const { education_id } = req.params;
-    const { school_name, degree, field_of_study, start_date, end_date } = req.body;
-    
-    if (!school_name || !degree || !field_of_study || !start_date || !end_date) {
+    const { school_name, degree, field_of_study, start_date, end_date } =
+      req.body;
+
+    if (
+      !school_name ||
+      !degree ||
+      !field_of_study ||
+      !start_date ||
+      !end_date
+    ) {
       return res.status(400).json({
         success: false,
         user_type: "applicant",
@@ -48,17 +55,17 @@ export const updateEducation = async (req: Request, res: Response) => {
     }
 
     const existingEducation = await prisma.applicants_education.findUnique({
-        where: {
-            id: education_id,
-        },
-        });
+      where: {
+        id: education_id,
+      },
+    });
 
-    if (!existingEducation) {  
-        return res.status(404).json({
-            success: false,
-            user_type: "applicant",
-            error: "Education not found",
-        });
+    if (!existingEducation) {
+      return res.status(404).json({
+        success: false,
+        user_type: "applicant",
+        error: "Education not found",
+      });
     }
 
     const updateQuery = await prisma.applicants_education.update({

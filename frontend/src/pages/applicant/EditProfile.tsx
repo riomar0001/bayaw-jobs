@@ -23,7 +23,6 @@ const EditProfile = ({
     facebookURL,
     twitterURL,
     birthdate,
-    salaryExpectation,
     location,
     profileImage }: EditProfileProps) => {
 
