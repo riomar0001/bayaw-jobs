@@ -106,6 +106,18 @@ export const JobsPickItems = [
         timestamp: "7 July 2024",
         image: images.sample_company_1,
     },
+    {
+        id: 5,
+        jobtitle: "Data Scientist",
+        company: "Spotify",
+        type: "Music/Entertainment",
+        companystatus: "Listed Company",
+        location: "Stockholm",
+        salary: "15-25k",
+        category: ["Markey Disruptor", "Music Streaming", "Data Analytics"],
+        timestamp: "7 July 2024",
+        image: images.sample_company_1,
+    },
 ];
 
 export const LatestJobItems = [
@@ -117,14 +129,14 @@ export const LatestJobItems = [
         image: images.sample_company_1,
     },
     {
-        id: 1,
+        id: 2,
         company: "Amazon",
         jobquantity: "30",
         category: ["Tech Startups", "Ecommerce"],
         image: images.sample_company_2,
     },
     {
-        id: 1,
+        id: 3,
         company: "Huawei Technology",
         jobquantity: "25",
         category: ["Tech Startups", "Finance", "Innovators"],
@@ -220,6 +232,16 @@ export const DashboardJobsSample = [
         category: "Full Time",
         minSalary: "5000",
         maxSalary: "10000",
+        schedule: "Remote",
+        date: "15/03/2025"
+    },
+    {
+        position: "Full-Stack Dev",
+        description: "Lorem ipsum, dolor sit amet consectetur adipisicing elit. ",
+        address: "Somehere, Davao City",
+        category: "Full Time",
+        minSalary: "50000",
+        maxSalary: "100000",
         schedule: "Remote",
         date: "15/03/2025"
     },

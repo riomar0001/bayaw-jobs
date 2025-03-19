@@ -1,14 +1,14 @@
-import JobDetailsCard from "@/components/customs/applicant/cards/JobDetailsCard";
+import JobDetailsCard from "@/components/customs/employer/cards/JobDetailsCard";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { images } from "@/constants";
-import { ArrowLeft } from "lucide-react";
+import { ArrowLeft, Pencil } from "lucide-react";
 import { Link } from "react-router-dom";
 
-const JobDetails = () => {
+const JobDetailsEmployer = () => {
   return (
-    <div className="bg-gradient-to-b from-sky-50 to-neutral-100 min-h-screen px-6 py-8 md:px-12 lg:px-24 xl:px-36">
-      <Link to={"/find-jobs/"} className="inline-block mb-6">
+    <div className="min-h-screen px-6 py-8 md:px-12 lg:px-24 xl:px-36">
+      <Link to={"/employer/jobs"} className="inline-block mb-6">
         <Button variant="outline" className="flex items-center gap-2 hover:bg-sky-50 transition-colors">
           <ArrowLeft size={16} className="text-lochmara-500" />
           <span>Back to Jobs</span>
@@ -33,24 +33,19 @@ const JobDetails = () => {
           <Card className="border-neutral-200 shadow-sm">
             <CardHeader className="border-b border-neutral-100">
               <CardTitle className="text-lg">Actions</CardTitle>
-              <p className="text-sm text-neutral-500">Apply for this position</p>
+              <p className="text-sm text-neutral-500">Perform actions on the job offer below</p>
             </CardHeader>
-            <CardContent className="pt-6">
-              <Button className="w-full bg-lochmara-500 hover:bg-lochmara-600 transition-colors py-6 text-base font-medium">
-                Apply Now
+            <CardContent className="pt-6 space-y-3">
+              <Link to={"/employer/jobs/edit-job"}>
+                <Button className="w-full bg-transparent transition-colors py-5 text-base text-black hover:text-white border border-neutral-300 shadow-none">
+                  <Pencil />
+                  Edit
+                </Button>
+              </Link>
+              <Button className="w-full bg-red-500 hover:bg-red-500/80 transition-colors py-5 text-base ">
+                Delete
               </Button>
 
-              <div className="mt-6 bg-amber-50 border border-amber-200 rounded-lg p-4">
-                <p className="text-sm text-amber-800">
-                  <span className="font-medium">Note:</span> Make sure your profile is up to date before applying.
-                </p>
-              </div>
-
-              <div className="mt-6 flex items-center justify-center">
-                <Button variant="ghost" className="text-neutral-500 hover:text-lochmara-500 text-sm">
-                  Save for later
-                </Button>
-              </div>
             </CardContent>
           </Card>
         </section>
@@ -59,4 +54,4 @@ const JobDetails = () => {
   );
 };
 
-export default JobDetails;
+export default JobDetailsEmployer;

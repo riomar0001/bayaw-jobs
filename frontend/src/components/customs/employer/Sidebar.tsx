@@ -5,7 +5,7 @@ import { Link } from "react-router-dom"
 const Sidebar = () => {
     return (
         <div className="bg-white w-64 h-screen border border-neutral-300 flex flex-col gap-y-5 px-12 py-10">
-            <Link to={"/employer/dashboard"}>
+            <Link to={"/employer/jobs"}>
                 <div className="flex items-center gap-x-5 mb-10">
                     <img src={logos.brandlogo} className="w-8 h-8" />
                     <h1 className="text-xl font-medium">JobTally</h1>

@@ -1,5 +1,5 @@
 import { Button } from "@/components/ui/button"
-import { Banknote, BriefcaseBusiness, MapPin } from "lucide-react"
+import { Banknote, BriefcaseBusiness, MapPin, Trash2 } from "lucide-react"
 import { Link } from "react-router-dom"
 
 
@@ -38,11 +38,17 @@ const JobCard = ({ position, description, address, category, minSalary, maxSalar
             </div>
 
 
-            <div className="mt-6 flex justify-between">
-                <Button variant={"destructive"}>Delete</Button>
+            <div className="mt-6 flex items-center justify-between">
+                {/* <Button variant={"destructive"}>Delete</Button> */}
+                {/* <h1 className="text-red-500 underline cursor-pointer text-sm">Delete</h1> */}
+
+                <Trash2 className="text-red-400 cursor-pointer font-thin" size={20} />
 
                 <Link to={"/employer/jobs/edit-job"}>
-                    <Button>View Job</Button>
+
+                    <Link to={"/employer/jobs/job-details"} >
+                        <Button>View Job</Button>
+                    </Link>
                 </Link>
             </div>
 
