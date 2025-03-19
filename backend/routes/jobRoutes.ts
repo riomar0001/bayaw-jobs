@@ -1,4 +1,6 @@
 import express from "express";
+import { protect } from "@/middlewares/CompanyAuthHandler";
+import { postJob } from "@/controllers/jobs/postJob";
 
 const router = express.Router();
 
@@ -12,6 +14,8 @@ const router = express.Router();
  * @Reminder Place all POST requests here
  * @Format router.post("path", "middleware", "controller");
  */
+
+router.post("/", protect, postJob);
 
 /**
  * @Reminder Place all PUT requests here

@@ -25,6 +25,7 @@ import EmployerLogin from "./pages/employer/Login";
 import { AuthProvider } from "./contexts/authContext";
 import OnboardingApplicant from "./pages/applicant/ApplicantOnboarding";
 import OnboardingCompany from "./pages/employer/EmployerOnboarding";
+import CompanyPrivateRoute from "./components/customs/employer/PrivateRoute";
 
 const router = createBrowserRouter(
     createRoutesFromElements(
@@ -56,14 +57,18 @@ const router = createBrowserRouter(
                 <Route path="/applicant/onboarding" element={<OnboardingApplicant />} />
             </Route>
             <Route path="/employer" element={<EmployerLogin />} />
-            <Route element={<EmployerLayout />}>
-                <Route path="/employer/jobs" element={<Dashboard />} />
-                <Route path="/employer/jobs/job-details" element={<JobDetailsEmployer />} />
-                <Route path="/employer/jobs/edit-job" element={<EditJob />} />
-                <Route path="/employer/add-job" element={<AddJob />} />
-                <Route path="/employer/profile" element={<ProfileEmployer />} />
-                <Route path="/employer/onboarding" element={<OnboardingCompany />} />
+
+            <Route element={<CompanyPrivateRoute />}>
+                <Route element={<EmployerLayout />}>
+                    <Route path="/employer/jobs" element={<Dashboard />} />
+                    <Route path="/employer/jobs/job-details" element={<JobDetailsEmployer />} />
+                    <Route path="/employer/jobs/edit-job" element={<EditJob />} />
+                    <Route path="/employer/add-job" element={<AddJob />} />
+                    <Route path="/employer/profile" element={<ProfileEmployer />} />
+                </Route>
+                
             </Route>
+            <Route path="/employer/onboarding" element={<OnboardingCompany />} />
         </>
 
 

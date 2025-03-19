@@ -5,22 +5,25 @@ import {
     DropdownMenuGroup,
     DropdownMenuItem,
     DropdownMenuLabel,
-    DropdownMenuPortal,
     DropdownMenuSeparator,
-    DropdownMenuShortcut,
-    DropdownMenuSub,
-    DropdownMenuSubContent,
-    DropdownMenuSubTrigger,
     DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 import { useNavigate } from "react-router-dom";
-import axios from "axios";
 import { useAuth } from "@/contexts/authContext";
 
 const AuthDropdown = ({ data }: any) => {
     const { onLogoutApplicant } = useAuth();
 
     const navigate = useNavigate();
+
+    const handleLogout = async () => {
+        try {
+            onLogoutApplicant?.();
+            navigate("/");
+        } catch (error: any) {
+            console.error(error);
+        }
+    };
     return (
         <DropdownMenu>
             <DropdownMenuTrigger asChild>
@@ -35,7 +38,7 @@ const AuthDropdown = ({ data }: any) => {
                     </DropdownMenuItem>
                 </DropdownMenuGroup>
                 <DropdownMenuSeparator />
-                <DropdownMenuItem className="cursor-pointer" onClick={onLogoutApplicant}>
+                <DropdownMenuItem className="cursor-pointer" onClick={handleLogout}>
                     Log out
                 </DropdownMenuItem>
             </DropdownMenuContent>

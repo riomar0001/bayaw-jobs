@@ -2,7 +2,6 @@ import { Button } from "@/components/ui/button"
 import { images } from "@/constants"
 import { FaLinkedin } from "react-icons/fa"
 import { useState, useEffect } from "react";
-import { useAuth } from "@/contexts/authContext";
 import axios from "axios";
 
 

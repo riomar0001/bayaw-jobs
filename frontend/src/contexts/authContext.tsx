@@ -93,21 +93,55 @@ interface AuthProviderProps {
 
 // Create the provider component
 export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
-  const [authStateCompany, setAuthStateCompany] = useState<CompanyAuthState | undefined>();
-  const [authStateApplicant, setAuthStateApplicant] = useState<ApplicantAuthState | undefined>();
+  // Initialize state directly from localStorage to prevent undefined flicker
+  const getInitialCompanyState = (): CompanyAuthState | undefined => {
+    try {
+      const savedState = localStorage.getItem('authStateCompany');
+      return savedState ? JSON.parse(savedState) as CompanyAuthState : undefined;
+    } catch (error) {
+      console.error('Error parsing company auth state:', error);
+      return undefined;
+    }
+  };
 
-  // Load auth state from localStorage on component mount
+  const getInitialApplicantState = (): ApplicantAuthState | undefined => {
+    try {
+      const savedState = localStorage.getItem('authStateApplicant');
+      return savedState ? JSON.parse(savedState) as ApplicantAuthState : undefined;
+    } catch (error) {
+      console.error('Error parsing applicant auth state:', error);
+      return undefined;
+    }
+  };
+
+  const [authStateCompany, setAuthStateCompany] = useState<CompanyAuthState | undefined>(getInitialCompanyState());
+  const [authStateApplicant, setAuthStateApplicant] = useState<ApplicantAuthState | undefined>(getInitialApplicantState());
+
+  // Keep useEffect to handle external localStorage changes
   useEffect(() => {
-    const savedCompanyState = localStorage.getItem('authStateCompany');
-    const savedApplicantState = localStorage.getItem('authStateApplicant');
+    const handleStorageChange = (event: StorageEvent) => {
+      if (event.key === 'authStateCompany') {
+        try {
+          const newState = event.newValue ? JSON.parse(event.newValue) as CompanyAuthState : undefined;
+          setAuthStateCompany(newState);
+        } catch (error) {
+          console.error('Error handling storage change for company:', error);
+        }
+      }
+      if (event.key === 'authStateApplicant') {
+        try {
+          const newState = event.newValue ? JSON.parse(event.newValue) as ApplicantAuthState : undefined;
+          setAuthStateApplicant(newState);
+        } catch (error) {
+          console.error('Error handling storage change for applicant:', error);
+        }
+      }
+    };
 
-    if (savedCompanyState) {
-      setAuthStateCompany(JSON.parse(savedCompanyState) as CompanyAuthState);
-    }
-
-    if (savedApplicantState) {
-      setAuthStateApplicant(JSON.parse(savedApplicantState) as ApplicantAuthState);
-    }
+    window.addEventListener('storage', handleStorageChange);
+    return () => {
+      window.removeEventListener('storage', handleStorageChange);
+    };
   }, []);
 
   // COMPANY AUTH FUNCTIONS
@@ -139,9 +173,9 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         authenticated: true
       };
 
-      setAuthStateCompany(newAuthState);
-      localStorage.setItem('authStateCompany', JSON.stringify(newAuthState));
 
+      localStorage.setItem('authStateCompany', JSON.stringify(newAuthState));
+      setAuthStateCompany(newAuthState);
       return data;
     } catch (error) {
       console.error('Register error:', error);

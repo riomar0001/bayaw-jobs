@@ -28,8 +28,7 @@ const AddJobCard: React.FC = () => {
     return (
         <section className="flex-1">
             <div className="bg-white border border-neutral-300 rounded-lg w-full px-12 py-10">
-                <div className="mb-6">
-                    {/* upload image */}
+                {/* <div className="mb-6">
                     <h1 className="font-semibold mb-2">Company Logo</h1>
                     <div className="relative">
                         {preview ? (
@@ -58,7 +57,7 @@ const AddJobCard: React.FC = () => {
                             </label>
                         )}
                     </div>
-                </div>
+                </div> */}
 
                 <div className="mb-8">
                     <h1 className="text-2xl font-bold">Post New Job</h1>
