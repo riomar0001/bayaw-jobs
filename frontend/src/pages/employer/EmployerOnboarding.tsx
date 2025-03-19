@@ -42,6 +42,8 @@ const EmployerOnboarding = () => {
   const navigate = useNavigate();
   const { authStateCompany } = useAuth();
 
+  console.log(authStateCompany);
+
 
   useEffect(() => {
     const fetchIndustries = async () => {
@@ -53,7 +55,7 @@ const EmployerOnboarding = () => {
           }
         );
 
-        setIndustries(response.data.industries);
+        setIndustries(response.data.data.industries);
       } catch (error) {
         console.error("Failed to fetch industries", error);
       }
@@ -104,18 +106,22 @@ const EmployerOnboarding = () => {
       const formData = new FormData();
       const compressedLogo = await compressImage(data.logo[0]);
 
-      console.log(isOtherSelected);
+      console.log(formData);
 
+
+      console.log(isOtherSelected);
+      formData.append("name", data.name);
       formData.append("address", data.address);
+      formData.append("description", data.description);
       formData.append("contact_no", data.contact_no);
-      formData.append("email", data.email);
       formData.append(
-        "industry_name",
+        "industry",
         isOtherSelected ? data.otherIndustry : data.industry
       );
+      formData.append("email", data.email);
       formData.append("logo", compressedLogo as any);
 
-      await axios.post(
+      const response = await axios.post(
         "/api/company/onboarding",
         formData,
         {
@@ -126,6 +132,23 @@ const EmployerOnboarding = () => {
         }
       );
 
+      let authStateCompany = localStorage.getItem('authStateCompany')
+        ? JSON.parse(localStorage.getItem('authStateCompany') as string)
+        : null;
+
+      // Check if authStateCompany exists
+      if (authStateCompany) {
+        // Update the done_onboarding property to true
+        authStateCompany.done_onboarding = true;
+
+        // Save the updated object back to localStorage
+        localStorage.setItem('authStateCompany', JSON.stringify(authStateCompany));
+
+        console.log('Updated authStateCompany:', authStateCompany);
+      } else {
+        console.warn('authStateCompany not found in localStorage');
+      }
+
       toast.success("Success! 🎉", {
         description: "Onboarding process completed successfully.",
         classNames: {
@@ -135,7 +158,7 @@ const EmployerOnboarding = () => {
           success: "bg-teal-100",
         },
       });
-      window.location.reload();
+      navigate("/employer/jobs")
     } catch (error: any) {
       setIsLoading(false);
       const errorMsg =
@@ -169,8 +192,9 @@ const EmployerOnboarding = () => {
       <div className="flex justify-center">
         <div className="w-[650px] h-auto bg-white border border-neutral-300 rounded-xl px-12 py-8">
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+            <h1 className="font-normal text-3xl mb-10">Finish Setting Up Your Account</h1>
             <div className="grid gap-4 sm:grid-cols-2 sm:gap-6">
-              <h1 className="font-normal text-3xl mb-10">Finish Setting Up Your Account</h1>
+
               <div className="sm:col-span-2">
                 <Label htmlFor="logo">Company Logo</Label>
                 <Input
