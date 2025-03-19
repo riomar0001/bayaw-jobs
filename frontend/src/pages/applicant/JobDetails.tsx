@@ -3,12 +3,13 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { images } from "@/constants";
 import { ArrowLeft } from "lucide-react";
+import { toast } from "sonner";
 
 const JobDetails = () => {
   return (
     <div className="bg-gradient-to-b from-sky-50 to-neutral-100 min-h-screen px-6 py-8 md:px-12 lg:px-24 xl:px-36">
-      <Button 
-        variant="outline" 
+      <Button
+        variant="outline"
         className="flex items-center gap-2 hover:bg-sky-50 transition-colors mb-6"
         onClick={() => window.history.back()}
       >
@@ -37,7 +38,16 @@ const JobDetails = () => {
               <p className="text-sm text-neutral-500">Apply for this position</p>
             </CardHeader>
             <CardContent className="pt-6">
-              <Button className="w-full bg-lochmara-500 hover:bg-lochmara-600 transition-colors py-6 text-base font-medium">
+              <Button
+                onClick={() => {
+                  window.scrollTo({ top: 0, behavior: "instant" });
+                  toast("Job Applied Successfully!", {
+                    description:
+                      "Await for the employers response to proceed.",
+                    className: "bg-[#8fe6a4]/80 border border-none text-[#092a13]"
+                  });
+                }}
+                className="w-full bg-lochmara-500 hover:bg-lochmara-600 transition-colors py-6 text-base font-medium">
                 Apply Now
               </Button>
 
@@ -48,7 +58,9 @@ const JobDetails = () => {
               </div>
 
               <div className="mt-6 flex items-center justify-center">
-                <Button variant="ghost" className="text-neutral-500 hover:text-lochmara-500 text-sm">
+                <Button
+                  variant="ghost"
+                  className="text-neutral-500 hover:text-lochmara-500 text-sm">
                   Save for later
                 </Button>
               </div>
