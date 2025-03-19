@@ -22,6 +22,8 @@ import { EditProfileSample } from "./constants";
 import { Toaster } from "sonner";
 import EmployerLogin from "./pages/employer/Login";
 import { AuthProvider } from "./contexts/authContext";
+import OnboardingApplicant from "./pages/OnboardingApplicant";
+import OnboardingCompany from "./pages/OnboardingCompany";
 
 const router = createBrowserRouter(
     createRoutesFromElements(
@@ -49,6 +51,9 @@ const router = createBrowserRouter(
                 <Route path="/login" element={<Login />} />
                 <Route path="/find-jobs" element={<FindJobs />} />
                 <Route path="/find-jobs/details" element={<JobDetails />} />
+                <Route path="/applicant/onboarding" element={<OnboardingApplicant />} />
+                <Route path="/company/onboarding" element={<OnboardingCompany />} />
+                
             </Route>
             <Route path="/employer" element={<EmployerLogin />} />
             <Route element={<EmployerLayout />}>
