@@ -41,7 +41,6 @@ router.post("/", registerAccount);
 router.post("/logout", protect, logoutAccount);
 router.post("/socials", protect, addSocialMedia);
 router.post("/industry", protect, addIndustry);
-
 router.post(
   "/onboarding",
   protect,
@@ -58,8 +57,12 @@ router.put("/password", protect, updateAccountPassword);
 router.put("/update/info", protect, updateCompanyInformation);
 router.put("/socials/:socialmedia_id", protect, updateSocialMedia);
 router.put("/industry", protect, updateCompanyIndustry);
-router.put("/logo/:logo_id", protect, updateLogo);
-
+router.put(
+  "/logo",
+  protect,
+  uploadLogoHandler.fields([{ name: "logo", maxCount: 1 }]),
+  updateLogo
+);
 
 /**
  * @Reminder Place all DELETE requests here

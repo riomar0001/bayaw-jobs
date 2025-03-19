@@ -24,7 +24,16 @@ export const updateCompanyAccount = async (req: Request, res: Response) => {
     ) as DecodedCompanyToken;
 
     const company_id = company_token_info.company.id;
-    const { new_email, new_username } = req.body;
+    const { new_email } = req.body;
+
+
+    if (!new_email) {
+      return res.status(404).json({
+        success: false,
+        user_type: "company",
+        message: "New email is Required!",
+      });
+    }
 
     const existingAccount = await prisma.companies_account.findFirst({
       where: {
@@ -47,13 +56,11 @@ export const updateCompanyAccount = async (req: Request, res: Response) => {
         id: company_id,
       },
       data: {
-        username: new_username || existingAccount.username,
-        email: new_email || existingAccount.password,
+        email: new_email,
         updated_at: new Date(),
       },
     });
     // console.log("UPDATE QUERY", updateQuery);
-    
     
     if (!updateQuery) {
       return res.status(400).json({
@@ -65,7 +72,7 @@ export const updateCompanyAccount = async (req: Request, res: Response) => {
 
     return res.status(200).json({
       success: true,
-      message: "Company Details Successfully Updated",
+      message: "Company Account Email Successfully Updated",
     });
   } catch (error: any) {
     return res.status(500).json({
