@@ -32,7 +32,7 @@ const JobDetailsEmployer = () => {
               <p className="text-sm text-neutral-500">Perform actions on the job offer below</p>
             </CardHeader>
             <CardContent className="pt-6 space-y-3">
-              <Link to={"/employer/jobs/edit-job"}>
+              <Link to={`/employer/jobs/edit-job/${job_id}`}>
                 <Button className="w-full bg-transparent transition-colors py-5 text-base text-black hover:text-white border border-neutral-300 shadow-none">
                   <Pencil />
                   Edit

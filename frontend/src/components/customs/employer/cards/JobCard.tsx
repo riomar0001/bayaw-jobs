@@ -3,9 +3,23 @@ import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, Di
 // import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Banknote, BriefcaseBusiness, MapPin, Trash2 } from "lucide-react"
 import { Link } from "react-router-dom"
+import { toast } from "sonner"
+import axios from "axios"
 
 
 const JobCard = ({ data }: any) => {
+    const handDelete = async () => {
+        try {
+            // Delete job
+            await axios.delete(`/api/jobs/${data.id}`)
+            toast.success("Job deleted successfully")
+            window.location.reload()
+        } catch (error) {
+            toast.error("Failed to delete job")
+        }
+    }
+
+
     return (
         <div className="bg-white border border-neutral-300 rounded-lg w-full min-h-[250px] p-5">
             <h1 className="text-2xl font-bold">{data.title} </h1>
@@ -58,7 +72,7 @@ const JobCard = ({ data }: any) => {
                             <DialogDescription className="space-y-3">
                                 <h1>Deleting this job will permanently be removed.</h1>
                                 <div className="flex justify-end">
-                                    <Button variant={"destructive"}>Remove</Button>
+                                    <Button variant={"destructive"} onClick={handDelete} >Remove</Button>
                                 </div>
                             </DialogDescription>
                         </DialogHeader>

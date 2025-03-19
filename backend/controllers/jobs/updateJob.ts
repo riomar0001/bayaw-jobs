@@ -52,7 +52,7 @@ export const updateJob = async (req: Request, res: Response) => {
           salary_from: !new_salary_from,
           salary_to: !new_salary_to,
           work_schedule: !new_work_schedule,
-          years_exp: !new_years_exp,
+          worked_years: !new_years_exp,
           category: !new_category,
         },
       });

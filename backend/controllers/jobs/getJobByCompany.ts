@@ -31,15 +31,19 @@ export const getJobByCompany = async (req: Request, res: Response) => {
 
     const company_id = company_token_info.company.id;
 
+    console.log(company_id);
+    
+
     const jobs = await prisma.job_offers.findMany({
       where: {
         company_account_id: company_id,
       },
     });
 
-    return res.status(200).json({
+    return res.status(201).json({
       success: true,
       message: "Jobs found for this company",
+      id: company_id,
       jobs,
     });
   } catch (error: any) {

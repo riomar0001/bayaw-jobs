@@ -6,14 +6,16 @@ import { getJobById } from "@/controllers/jobs/getJobById";
 
 import { updateJob } from "@/controllers/jobs/updateJob";
 import { getAllJobs } from "@/controllers/jobs/getAllJobs";
+import { deleteJob } from "@/controllers/jobs/deleteJob";
 const router = express.Router();
 
 /**
  * @Reminder Place all GET requests here
  * @Format router.get("path", "middleware", "controller");
  */
-router.get("/:job_id", protect, getJobById);
 router.get("/company", protect, getJobByCompany);
+router.get("/:job_id", protect, getJobById);
+
 router.get("/", protect, getAllJobs);
 
 /**
@@ -33,5 +35,6 @@ router.put("/:job_posting_id", protect, updateJob);
  * @Reminder Place all DELETE requests here
  * @Format router.delete("path", "middleware", "controller");
  */
+router.delete("/:job_id", protect, deleteJob);
 
 export default router;
