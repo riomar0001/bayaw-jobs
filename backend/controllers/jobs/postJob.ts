@@ -25,24 +25,6 @@ export const postJob = async (req: Request, res: Response) => {
 
     const company_id = company_token_info.company.id;
 
-    // model job_offers {
-    //     id                 String            @id @default(uuid())
-    //     company_account_id String
-    //     title              String
-    //     description        String
-    //     location           String
-    //     category           String?
-    //     salary_from        Int?
-    //     salary_to          Int?
-    //     work_schedule      String?
-    //     years_exp          Int?
-    //     is_closed          Boolean
-    //     created_at         DateTime          @default(now())
-    //     updated_at         DateTime          @default(now())
-    //     job_applications   job_applicants[]
-    //     companies          companies_account @relation(fields: [company_account_id], references: [id], onDelete: Cascade)
-    //   }
-
     const {
       title,
       description,
@@ -54,16 +36,7 @@ export const postJob = async (req: Request, res: Response) => {
       years_exp,
     } = req.body;
 
-    if (
-      !title ||
-      !description ||
-      !location ||
-      !category ||
-      !salary_from ||
-      !salary_to ||
-      !work_schedule ||
-      !years_exp
-    ) {
+    if (!title || !description || !location) {
       return res.status(400).json({
         success: false,
         user_type: "company",
@@ -72,11 +45,11 @@ export const postJob = async (req: Request, res: Response) => {
           title: !title,
           description: !description,
           location: !location,
-          category: !category,
-          salary_from: !salary_from,
-          salary_to: !salary_to,
-          work_schedule: !work_schedule,
-          years_exp: !years_exp,
+          // category: !category,
+          // salary_from: !salary_from,
+          // salary_to: !salary_to,
+          // work_schedule: !work_schedule,
+          // years_exp: !years_exp,
         },
       });
     }
@@ -88,7 +61,7 @@ export const postJob = async (req: Request, res: Response) => {
         description,
         location,
         category,
-        salary_from: Number(salary_from), 
+        salary_from: Number(salary_from),
         salary_to: Number(salary_to),
         work_schedule,
         years_exp: Number(years_exp),
