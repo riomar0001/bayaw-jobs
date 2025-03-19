@@ -8,6 +8,7 @@ import { getJobById } from "@/controllers/jobs/getJobById";
 
 import { updateJob } from "@/controllers/jobs/updateJob";
 import { getAllJobs } from "@/controllers/jobs/getAllJobs";
+import { deleteJob } from "@/controllers/jobs/deleteJob";
 import { getRecentJobs } from "@/controllers/jobs/getRecentJobs";
 import { getJobPicks } from "@/controllers/jobs/getJobPicks";
 import { getApplicantByJobId } from "@/controllers/jobs/getApplicantsByJobId";
@@ -20,8 +21,9 @@ const router = express.Router();
  * @Reminder Place all GET requests here
  * @Format router.get("path", "middleware", "controller");
  */
-router.get("/:job_id", protect, getJobById);
 router.get("/company", protect, getJobByCompany);
+router.get("/:job_id", protect, getJobById);
+
 router.get("/", protect, getAllJobs);
 router.get("/all/recent", getRecentJobs);
 router.get("/all/picks", getJobPicks);
@@ -45,5 +47,6 @@ router.put("/:job_posting_id", protect, updateJob);
  * @Reminder Place all DELETE requests here
  * @Format router.delete("path", "middleware", "controller");
  */
+router.delete("/:job_id", protect, deleteJob);
 
 export default router;

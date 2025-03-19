@@ -9,7 +9,7 @@ const Dashboard = () => {
   const [jobs, setJobs] = useState([])
   const [loading, setLoading] = useState(true)
 
-  console.log(jobs);
+  // console.log(jobs);
 
   useEffect(() => {
     // Fetch jobs from the API
