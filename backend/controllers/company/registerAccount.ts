@@ -8,6 +8,7 @@ import { hashPassword } from "@/utils/passwordUtils";
 import generateCompanyToken from "@/utils/generateCompanyToken";
 import sharp from "sharp";
 import path from "path";
+import { log } from "console";
 
 /**
  * @description registration of a new user
@@ -17,6 +18,10 @@ import path from "path";
 export const registerAccount = async (req: Request, res: Response) => {
   try {
     const { username, email, password } = req.body;
+
+    // console.log("USERNAME:", username);
+    // console.log("EMAIL:", email);
+    // console.log("PASSWORD:", password);
 
     if (!username || !email || !password) {
       return res.status(400).json({
