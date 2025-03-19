@@ -1,4 +1,6 @@
 import { Button } from "@/components/ui/button"
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Banknote, BriefcaseBusiness, MapPin, Trash2 } from "lucide-react"
 import { Link } from "react-router-dom"
 
@@ -42,7 +44,23 @@ const JobCard = ({ position, description, address, category, minSalary, maxSalar
                 {/* <Button variant={"destructive"}>Delete</Button> */}
                 {/* <h1 className="text-red-500 underline cursor-pointer text-sm">Delete</h1> */}
 
-                <Trash2 className="text-red-400 cursor-pointer font-thin" size={20} />
+
+                <Dialog>
+                    <DialogTrigger>
+                        <Trash2 className="text-red-400 cursor-pointer font-thin" size={20} />
+                    </DialogTrigger>
+                    <DialogContent>
+                        <DialogHeader>
+                            <DialogTitle>Are you sure?</DialogTitle>
+                            <DialogDescription className="space-y-3">
+                                <h1>Deleting this job will permanently be removed.</h1>
+                                <div className="flex justify-end">
+                                    <Button variant={"destructive"}>Remove</Button>
+                                </div>
+                            </DialogDescription>
+                        </DialogHeader>
+                    </DialogContent>
+                </Dialog>
 
                 <Link to={"/employer/jobs/edit-job"}>
 

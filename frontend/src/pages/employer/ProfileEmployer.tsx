@@ -7,6 +7,7 @@ import { ArrowLeft } from "lucide-react"
 import { Link } from "react-router-dom"
 
 const ProfileEmployer = () => {
+
     return (
         <div className="px-24 py-12">
             <Link to={"/employer/jobs"}>
@@ -78,7 +79,23 @@ const ProfileEmployer = () => {
                         </Dialog>
 
                         <hr className="my-8" />
-                        <Button className="w-full" variant={"destructive"}>Delete Company</Button>
+
+                        <Dialog>
+                            <DialogTrigger className="w-full">
+                                <Button className="w-full" variant={"destructive"}>Delete Company</Button>
+                            </DialogTrigger>
+                            <DialogContent>
+                                <DialogHeader>
+                                    <DialogTitle>Are you sure?</DialogTitle>
+                                    <DialogDescription className="space-y-3">
+                                        <h1>Deleting this company will permanently be removed, and you cannot undo the changes</h1>
+                                        <div className="flex justify-end">
+                                            <Button variant={"destructive"}>Remove</Button>
+                                        </div>
+                                    </DialogDescription>
+                                </DialogHeader>
+                            </DialogContent>
+                        </Dialog>
 
                     </div>
                 </section>

@@ -2,6 +2,8 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Eye, EyeOff, Lock, Mail, User } from "lucide-react";
 import { useState } from "react";
+import { Link } from "react-router-dom";
+import { toast } from "sonner";
 
 const Login = () => {
   const [showPassword, setShowPassword] = useState(false);
@@ -60,9 +62,18 @@ const Login = () => {
             <h1 className="text-sm text-lochmara-500 hover:underline cursor-pointer">
               Forgot Your Password?
             </h1>
-            <Button className="bg-lochmara-500 text-white hover:bg-neutral-500">
-              Log in
-            </Button>
+            <Link to={"/"}>
+              <Button onClick={() => {
+                window.scrollTo({ top: 0, behavior: "instant" });
+                toast("Success", {
+                  description:
+                    "User logged-in successfully",
+                  className: "bg-lochmara-500/80 border border-none text-white"
+                });
+              }} className="bg-lochmara-500 hover:bg-lochmara-500/80">
+                Log in
+              </Button>
+            </Link>
           </div>
         </div>
       </div>

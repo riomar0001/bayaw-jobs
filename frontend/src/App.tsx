@@ -19,6 +19,7 @@ import FindJobs from "./pages/applicant/FindJobs";
 import JobDetails from "./pages/applicant/JobDetails";
 import JobDetailsEmployer from "./pages/employer/JobDetailsEmpoyer";
 import { EditProfileSample } from "./constants";
+import { Toaster } from "sonner";
 
 
 const router = createBrowserRouter(
@@ -63,7 +64,12 @@ const router = createBrowserRouter(
 );
 
 const App = () => {
-    return <RouterProvider router={router} />;
+    return (
+        <>
+            <RouterProvider router={router} />
+            <Toaster />
+        </>
+    );
 };
 
 export default App;

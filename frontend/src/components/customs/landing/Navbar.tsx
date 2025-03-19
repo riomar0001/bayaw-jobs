@@ -18,7 +18,7 @@ const Navbar = () => {
           <h1 className="hover:underline cursor-pointer">Find Jobs</h1>
         </Link>
 
-        <h1 className="hover:underline cursor-pointer">Companies</h1>
+        {/* <h1 className="hover:underline cursor-pointer">Companies</h1> */}
         <h1 className="hover:underline cursor-pointer">Company Login</h1>
       </div>
 

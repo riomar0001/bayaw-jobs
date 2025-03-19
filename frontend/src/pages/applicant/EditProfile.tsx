@@ -7,6 +7,8 @@ import { useState } from 'react';
 import { Calendar } from '@/components/ui/calendar';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { cn } from '@/lib/utils';
+import { toast } from "sonner";
+import { Link } from "react-router-dom";
 
 
 const EditProfile = ({
@@ -19,7 +21,7 @@ const EditProfile = ({
     salaryExpectation,
     location }: EditProfileProps) => {
 
-        
+
     const [date, setDate] = useState<Date | undefined>(birthdate ? new Date(birthdate) : undefined)
 
     return (
@@ -181,7 +183,19 @@ const EditProfile = ({
 
                         <div className="flex justify-end mt-8">
                             <Button variant="outline" className="mr-3" onClick={() => window.history.back()}>Cancel</Button>
-                            <Button className="bg-lochmara-500 hover:bg-lochmara-500/80">Save Changes</Button>
+                            <Link to={"/applicant/profile"}>
+                                <Button onClick={() => {
+                                    window.scrollTo({ top: 0, behavior: "instant" });
+                                    toast("Profile Changed", {
+                                        description:
+                                            "New profile details is set to the account",
+                                        className: "bg-lochmara-500/80 border border-none text-white"
+                                    });
+                                }} className="bg-lochmara-500 hover:bg-lochmara-500/80"
+                                >
+                                    Save Changes
+                                </Button>
+                            </Link>
                         </div>
                     </div>
                 </div>

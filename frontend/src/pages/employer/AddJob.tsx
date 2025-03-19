@@ -2,6 +2,7 @@ import AddJobCard from "@/components/customs/employer/cards/AddJobCard"
 import { Button } from "@/components/ui/button"
 import { ArrowLeft } from "lucide-react"
 import { Link } from "react-router-dom"
+import { toast } from "sonner"
 
 const AddJob = () => {
     return (
@@ -21,7 +22,21 @@ const AddJob = () => {
                         <h1 className="font-semibold">Actions</h1>
                         <h1 className="font-light text-neutral-500">Perform actions on the Job below.</h1>
                         <hr className="my-5" />
-                        <Button className="w-full">Save</Button>
+                        <Link to={"/employer/jobs"}>
+                            <Button
+                                onClick={() => {
+                                    window.scrollTo({ top: 0, behavior: "instant" });
+                                    toast("Job Added", {
+                                        description:
+                                            "Job Added Successfully",
+                                        className: "bg-lochmara-500/80 border border-none text-white"
+                                    });
+                                }}
+                                className="w-full"
+                            >
+                                Save
+                            </Button>
+                        </Link>
                     </div>
                 </section>
 
