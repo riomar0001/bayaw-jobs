@@ -1,13 +1,16 @@
 import { Banknote, BriefcaseBusiness, Cake, MailSearch, MapPinHouse, PencilLine, Smartphone } from "lucide-react"
+import { Link } from "react-router-dom"
 
 const AllPersonalInfo = () => {
     return (
         <div className="bg-white border border-neutral-100 w-[750px] h-auto rounded-lg px-12 py-6">
             <section className="flex justify-between items-center mb-6">
                 <h1 className="font-semibold text-xl">All Personal Informations</h1>
-                <h1 className="font-semibold text-base text-lochmara-500 flex items-center gap-x-2 hover:underline cursor-pointer">
-                    <PencilLine size={15} />Edit
-                </h1>
+                <Link to={"/applicant/profile/edit"}>
+                    <h1 className="font-semibold text-base text-lochmara-500 flex items-center gap-x-2 hover:underline cursor-pointer">
+                        <PencilLine size={15} />Edit
+                    </h1>
+                </Link>
             </section>
 
             <div className="grid grid-cols-2 gap-6">
