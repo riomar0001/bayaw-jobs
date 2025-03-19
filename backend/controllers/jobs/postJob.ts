@@ -25,24 +25,6 @@ export const postJob = async (req: Request, res: Response) => {
 
     const company_id = company_token_info.company.id;
 
-    // model job_offers {
-    //     id                 String            @id @default(uuid())
-    //     company_account_id String
-    //     title              String
-    //     description        String
-    //     location           String
-    //     category           String?
-    //     salary_from        Int?
-    //     salary_to          Int?
-    //     work_schedule      String?
-    //     years_exp          Int?
-    //     is_closed          Boolean
-    //     created_at         DateTime          @default(now())
-    //     updated_at         DateTime          @default(now())
-    //     job_applications   job_applicants[]
-    //     companies          companies_account @relation(fields: [company_account_id], references: [id], onDelete: Cascade)
-    //   }
-
     const {
       title,
       description,

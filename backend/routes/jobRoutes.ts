@@ -1,6 +1,7 @@
 import express from "express";
 import { protect } from "@/middlewares/CompanyAuthHandler";
 import { postJob } from "@/controllers/jobs/postJob";
+import { getJobByCompany } from "@/controllers/jobs/getJobByCompany";
 
 const router = express.Router();
 
@@ -8,6 +9,8 @@ const router = express.Router();
  * @Reminder Place all GET requests here
  * @Format router.get("path", "middleware", "controller");
  */
+
+router.get("/company", protect, getJobByCompany);
 
 /**
  * @Reminder Place all POST requests here
