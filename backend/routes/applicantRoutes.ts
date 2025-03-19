@@ -34,26 +34,24 @@ const router = express.Router();
  */
 router.get("/", protect, getBasicInfo);
 router.get("/auth", protect, checkAuthApplicant);
-router.get(
-  "/experience/:applicant_id",
-  getExperience.getAllExperiences
-);
-router.get(
-  "/experience/:applicant_id/:experience_id",
-  getExperience.getExperienceById
-);
-router.get("/education", protect, getEducation.getAllEducation);
-router.get("/education/:education_id", protect, getEducation.getEducationById);
+router.get("/experience/:applicant_id", getExperience.getAllExperiences);
+router.get("/education/:applicant_id", getEducation.getAllEducation);
+router.get("/social-media/:applicant_id", getSocialMedia.getAllSocialMedia);
 router.get("/resume/:applicant_id", getResume);
 router.get("/resume/download/:applicant_id", downloadResume);
+
 router.get(
   "/experience/:experience_id",
   protect,
   getExperience.getExperienceById
 );
-router.get("/education", protect, getEducation.getAllEducation);
 router.get("/education/:education_id", protect, getEducation.getEducationById);
-router.get("/social-media", protect, getSocialMedia.getAllSocialMedia);
+router.get(
+  "/experience/:experience_id",
+  protect,
+  getExperience.getExperienceById
+);
+router.get("/education/:education_id", protect, getEducation.getEducationById);
 router.get(
   "/social-media/:social_media_id",
   protect,

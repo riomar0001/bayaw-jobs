@@ -1,8 +1,32 @@
 import { ExperiencesSample } from "@/constants"
 import { PencilLine } from "lucide-react"
-
+import { useState, useEffect } from "react";
+import { useAuth } from "@/contexts/authContext";
+import axios from "axios";
 
 const AllExperiences = () => {
+    const { authStateApplicant } = useAuth();
+    const [experiences, setExperiences] = useState([]);
+    const applicant_id = authStateApplicant?.user_id;
+
+    useEffect(() => {
+        const fetchResume = async () => {
+            if (!applicant_id) return;
+
+            try {
+                const response = await axios.get(`/api/applicant/experience/${applicant_id}`);
+                const data = response.data;
+
+                if (data.success) {
+                    setExperiences(data.experiences || "");
+                }
+            } catch (error: any) {
+                console.error(error.message);
+            }
+        }
+
+        fetchResume();
+    }, [applicant_id]);
     return (
         <div className="bg-white border border-neutral-100 w-[750px] h-auto rounded-lg px-12 py-6">
             <section className="flex justify-between items-center mb-6">
@@ -11,26 +35,20 @@ const AllExperiences = () => {
                     <PencilLine size={15} />Edit
                 </h1>
             </section>
-
-
-            {ExperiencesSample.map((sample) => (
-                <section key={sample.id}>
+            {experiences.map((experience: any) => (
+                <section key={experience.id}>
                     <div className="flex items-center gap-x-5">
-                        <img src={sample.companyImage} className="w-12 h-12 rounded-full object-cover" />
                         <div>
-                            <h1 className="font-semibold text-base">{sample.company}</h1>
+                            <h1 className="font-semibold text-base">{experience.company}</h1>
                             <div className="flex items-center gap-x-5">
-                                <h1 className="font-normal text-base">{sample.role} </h1>
+                                <h1 className="font-normal text-base">{experience.position} </h1>
                                 <h1 className="text-xs text-neutral-500 space-x-3">
-                                    <span>•</span>
-                                    <span>{sample.duration} </span>
-                                    <span>•</span>
-                                    <span>{sample.date} </span>
+                                    <span>{experience.worked_years} Years </span>
                                 </h1>
                             </div>
                         </div>
                     </div>
-                    {sample.id !== ExperiencesSample[ExperiencesSample.length - 1].id && <hr className="border my-6" />}
+                    {experience.id !== ExperiencesSample[ExperiencesSample.length - 1].id && <hr className="border my-3" />}
                 </section>
             ))}
 
