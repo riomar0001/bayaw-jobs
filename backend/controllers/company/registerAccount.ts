@@ -73,6 +73,8 @@ export const registerAccount = async (req: Request, res: Response) => {
     }
 
     newAccount.password = undefined!;
+    newAccount.created_at = undefined!;
+    newAccount.updated_at = undefined!;
 
     generateCompanyToken(res, newAccount);
 
@@ -80,6 +82,7 @@ export const registerAccount = async (req: Request, res: Response) => {
       success: true,
       user_type: "company",
       message: "Account Successfully Created",
+      data: newAccount,
     });
   } catch (error: any) {
     return res.status(500).json({
@@ -106,12 +109,10 @@ export const accountOnboarding = async (req: Request, res: Response) => {
 
     const { name, address, description, contact_no, email, industry } =
       req.body;
-    
+
     // console.log(req.body);
-    
 
     // console.log(name, address, description, contact_no, email, industry, logo);
-    
 
     if (
       !name ||
@@ -174,7 +175,7 @@ export const accountOnboarding = async (req: Request, res: Response) => {
       logoFileName
     );
     await sharp(logoFilePath).jpeg({ quality: 80 }).toFile(processedImagePath);
-    
+
     const { error } = await supabase.storage
       .from("company_logo")
       .upload(logoFileName, logoFileBuffer, {

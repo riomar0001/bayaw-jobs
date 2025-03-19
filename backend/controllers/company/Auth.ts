@@ -72,6 +72,7 @@ export const authCompany = async (req: Request, res: Response) => {
       success: true,
       user_type: "company",
       message: "Login Success",
+      data: company,
     });
   } catch (error: any) {
     return res.status(500).json({

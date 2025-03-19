@@ -58,3 +58,14 @@ declare interface JobDetailsCardProps {
     image: any;
 }
 
+declare interface EditProfileProps {
+    firstName: string;
+    lastName: string;
+    email: string;
+    contactNumber: string;
+    linkedInURL: string;
+    birthdate: any;
+    salaryExpectation: string;
+    location: string;
+}
+

@@ -35,6 +35,7 @@ export const authApplicant = async (req: Request, res: Response) => {
       select: {
         id: true,
         username: true,
+        
         email: true,
         password: true,
         done_onboarding: true,
@@ -68,6 +69,7 @@ export const authApplicant = async (req: Request, res: Response) => {
       success: true,
       user_type: "applicant",
       message: "Login Success",
+      data: account,
     });
   } catch (error: any) {
     console.log(error);

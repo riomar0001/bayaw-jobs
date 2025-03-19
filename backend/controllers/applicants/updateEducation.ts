@@ -50,6 +50,7 @@ export const updateEducation = async (req: Request, res: Response) => {
         success: false,
         user_type: "applicant",
         message: "All fields are required",
+        applicants_account_id: applicant_id,
       });
     }
 
@@ -95,12 +96,14 @@ export const updateEducation = async (req: Request, res: Response) => {
       message: "Education Successfully Updated",
       data: updateQuery,
     });
-  } catch (error) {
-    console.error(error);
+
+  } catch (error: any) {
+    console.error("Error updatating education:", error);
     res.status(500).json({
       success: false,
       user_type: "applicant",
-      error: "Server error",
+      message: "Internal Server error",
+      error: error.message,
     });
   }
 };

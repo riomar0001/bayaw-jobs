@@ -14,6 +14,7 @@ export const updateAccount = async (req: Request, res: Response) => {
   } catch (error: any) {
     return res.status(500).json({
       success: false,
+      user_type: "applicant",
       message: "Internal Server Error",
       error: error.message,
     });
