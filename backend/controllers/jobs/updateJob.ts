@@ -64,7 +64,7 @@ export const updateJob = async (req: Request, res: Response) => {
         company_account_id: company_id,
       },
     });
-
+    
     if (!jobExist) {
       return res.status(404).json({
         success: false,

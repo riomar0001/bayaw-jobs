@@ -1,5 +1,7 @@
 import express from "express";
 import { protect } from "@/middlewares/CompanyAuthHandler";
+import { protect as applicantProtect } from "@/middlewares/ApplicantAuthHandler";
+
 import { postJob } from "@/controllers/jobs/postJob";
 import { getJobByCompany } from "@/controllers/jobs/getJobByCompany";
 import { getJobById } from "@/controllers/jobs/getJobById";
@@ -10,6 +12,8 @@ import { deleteJob } from "@/controllers/jobs/deleteJob";
 import { getRecentJobs } from "@/controllers/jobs/getRecentJobs";
 import { getJobPicks } from "@/controllers/jobs/getJobPicks";
 import { getApplicantByJobId } from "@/controllers/jobs/getApplicantsByJobId";
+
+import { applyJob } from "@/controllers/jobs/applyJob";
 
 const router = express.Router();
 
@@ -23,7 +27,7 @@ router.get("/:job_id", protect, getJobById);
 router.get("/", protect, getAllJobs);
 router.get("/all/recent", getRecentJobs);
 router.get("/all/picks", getJobPicks);
-router.get("/applicants/:job_posting_id", protect,getApplicantByJobId);
+router.get("/applicants/:job_posting_id", protect, getApplicantByJobId);
 
 /**
  * @Reminder Place all POST requests here
@@ -31,6 +35,7 @@ router.get("/applicants/:job_posting_id", protect,getApplicantByJobId);
  */
 
 router.post("/", protect, postJob);
+router.post("/apply/:job_posting_id", applicantProtect, applyJob);
 
 /**
  * @Reminder Place all PUT requests here
