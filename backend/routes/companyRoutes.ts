@@ -7,8 +7,9 @@ import {
   registerAccount,
   accountOnboarding,
 } from "@/controllers/company/registerAccount";
-
+import logoutAccount from "@/controllers/company/logoutAccount";
 const router = express.Router();
+import addSocialMedia from "@/controllers/company/addSocialMedia";
 
 /**
  * @Reminder Place all GET requests here
@@ -22,12 +23,16 @@ router.get("/auth", protect, checkAuthCompany);
  */
 router.post("/auth", authCompany);
 router.post("/", registerAccount);
+router.post("/logout", protect, logoutAccount);
+router.post("/socials", protect, addSocialMedia);
+
 router.post(
   "/onboarding",
   protect,
   uploadLogoHandler.fields([{ name: "logo", maxCount: 1 }]),
   accountOnboarding
 );
+
 
 /**
  * @Reminder Place all PUT requests here

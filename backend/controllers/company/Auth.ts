@@ -3,6 +3,7 @@ import prisma from "@/configs/prismaConfig";
 import { verifyPassword } from "@/utils/passwordUtils";
 import generateCompanyToken from "@/utils/generateCompanyToken";
 import bcrypt from "bcryptjs";
+import { log } from "console";
 
 /**
  * @description Authenticate Company
@@ -12,6 +13,9 @@ import bcrypt from "bcryptjs";
 export const authCompany = async (req: Request, res: Response) => {
   try {
     const { username_email, password } = req.body;
+
+    console.log(username_email, password);
+    
 
     if (!username_email || !password) {
       return res.status(400).json({
