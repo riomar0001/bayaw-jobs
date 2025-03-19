@@ -25,6 +25,7 @@ import getSocialMedia from "@/controllers/applicants/getSocialMedia";
 import addSocialMedia from "@/controllers/applicants/addSocialMedia";
 import updateSocialMedia from "@/controllers/applicants/updateSocialMedia";
 import deleteSocialMedia from "@/controllers/applicants/deleteSocialMedia";
+import { updatePersonalInformation } from "@/controllers/applicants/updatePersonalInfomation";
 
 const router = express.Router();
 
@@ -94,6 +95,7 @@ router.put(
 router.put("/experience/:experience_id", protect, updateExperience);
 router.put("/education/:education_id", protect, updateEducation);
 router.put("/social-media/:social_media_id", protect, updateSocialMedia);
+router.put("/", protect, updatePersonalInformation);
 
 /**
  * @Reminder Place all DELETE requests here

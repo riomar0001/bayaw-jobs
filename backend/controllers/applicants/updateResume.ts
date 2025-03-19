@@ -27,17 +27,21 @@ export const updateResume = async (req: Request, res: Response) => {
       ? undefined
       : req.files?.resume?.[0];
 
+      console.log(resume);
+      
+
     if (!resume) {
       return res.status(400).json({
         success: false,
         user_type: "applicant",
         message: "Resume is required",
+        missing_fields: ["resume"],
       });
     }
 
     const accountExist = await prisma.applicants_resume.findUnique({
       where: {
-        id: applicant_id,
+        applicants_account_id: applicant_id,
       },
     });
 
@@ -65,7 +69,7 @@ export const updateResume = async (req: Request, res: Response) => {
 
     const update = await prisma.applicants_resume.update({
       where: {
-        id: applicant_id,
+        applicants_account_id: applicant_id,
       },
       data: {
         resume_file: resumeFileName,
