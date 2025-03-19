@@ -20,8 +20,10 @@ const AddJob = () => {
     const [maxSalary, setMaxSalary] = useState("")
     const [workSchedule, setWorkSchedule] = useState("")
 
-    handleSubmit = (e: ChangeEvent<HTMLFormElement>) => {
+    handleSubmit = async (e: ChangeEvent<HTMLFormElement>) => {
         e.preventDefault()
+
+        const response = await axios.post("/api/")
     }
 
 
