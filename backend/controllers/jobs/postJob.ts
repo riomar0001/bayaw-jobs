@@ -88,7 +88,7 @@ export const postJob = async (req: Request, res: Response) => {
         description,
         location,
         category,
-        salary_from: Number(salary_from),
+        salary_from: Number(salary_from), 
         salary_to: Number(salary_to),
         work_schedule,
         years_exp: Number(years_exp),

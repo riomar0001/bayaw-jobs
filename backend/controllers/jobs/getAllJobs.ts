@@ -13,8 +13,6 @@ export const getAllJobs = async (req: Request, res: Response) => {
     try {
 
         const allJobs = await prisma.job_offers.findMany();
-
-
         return res.status(200).json({
             success: true,
             message: "All jobs are retrieved",

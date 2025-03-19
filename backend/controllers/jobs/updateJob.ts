@@ -74,31 +74,31 @@ export const updateJob = async (req: Request, res: Response) => {
     }
 
     const updateQuery = await prisma.job_offers.update({
-        where: {
-          id: job_posting_id,
-          company_account_id: company_id
-        },
-        data: {
-            title: new_title,
-            description: new_description,
-            location: new_location,
-            salary_from: new_salary_from,
-            salary_to: new_salary_to,
-            work_schedule: new_work_schedule,
-            years_exp: new_years_exp,
-            category: new_category,
-          updated_at: new Date(),
-        },
+      where: {
+        id: job_posting_id,
+        company_account_id: company_id,
+      },
+      data: {
+        title: new_title,
+        description: new_description,
+        location: new_location,
+        salary_from: Number(new_salary_from),
+        salary_to: Number(new_salary_to),
+        work_schedule: new_work_schedule,
+        years_exp: Number(new_years_exp),
+        category: new_category,
+        updated_at: new Date(),
+      },
+    });
+    // console.log("UPDATE QUERY", updateQuery);
+
+    if (!updateQuery) {
+      return res.status(400).json({
+        success: false,
+        user_type: "company",
+        message: "Failed to update Job Offer",
       });
-      // console.log("UPDATE QUERY", updateQuery);
-      
-      if (!updateQuery) {
-        return res.status(400).json({
-          success: false,
-          user_type: "company",
-          message: "Failed to update Job Offer",
-        });
-      }
+    }
 
     return res.status(200).json({
       success: true,
