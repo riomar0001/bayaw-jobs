@@ -2,7 +2,11 @@ import { Button } from "@/components/ui/button"
 import { images } from "@/constants"
 import { FaLinkedin } from "react-icons/fa"
 
-const AccountHead = () => {
+interface AccountHeadProps {
+    linkedInURL?: string;
+}
+
+const AccountHead = ({ linkedInURL }: AccountHeadProps) => {
     return (
         <div className="bg-white border border-neutral-100 w-[750px] h-auto rounded-lg px-12 py-6">
             <div className="flex justify-between items-center">
@@ -14,9 +18,15 @@ const AccountHead = () => {
                     </section>
                 </div>
 
-                <Button className="bg-transparent text-lochmara-700 border border-lochmara-700 hover:bg-lochmara-700/80 hover:text-white">
-                    <FaLinkedin /> LinkedIn Account
-                </Button>
+                <a
+                    href={linkedInURL ? (linkedInURL.startsWith('http') ? linkedInURL : `https://${linkedInURL}`) : '#'}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                >
+                    <Button className="bg-transparent text-lochmara-700 border border-lochmara-700 hover:bg-lochmara-700/80 hover:text-white">
+                        <FaLinkedin /> LinkedIn Account
+                    </Button>
+                </a>
             </div>
         </div>
     )

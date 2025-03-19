@@ -63,9 +63,11 @@ declare interface EditProfileProps {
     lastName: string;
     email: string;
     contactNumber: string;
-    linkedInURL: string;
+    linkedInURL?: string;
+    facebookURL?: string;
+    twitterURL?: string;
     birthdate: any;
-    salaryExpectation: string;
     location: string;
+    profileImage?: string;
 }
 
