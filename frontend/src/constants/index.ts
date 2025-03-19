@@ -269,3 +269,17 @@ export const CompanyProfileSample = [
         contactNumber: "09987654321"
     }
 ]
+
+
+export const EditProfileSample = [
+    {
+        firstName: "Jerome",
+        lastName: "Bell",
+        email: "jerome.bell@example.com",
+        contactNumber: "09987654321",
+        linkedInURL: "https://linkedin.com/in/jerome-bell",
+        birthdate: new Date(2000, 0, 16),
+        salaryExpectation: "PHP 24,000",
+        location: "Istanbul, Izmir, Ankara, Turkey, US, Europe",
+    },
+]
