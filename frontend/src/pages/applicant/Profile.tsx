@@ -37,7 +37,7 @@ const Profile = () => {
     return (
         <div className="bg-neutral-100 flex justify-center gap-x-5 px-24 py-12">
             <div className="space-y-5">
-                <AccountHead />
+                <AccountHead linkedInURL="linkedin.com/in/user/" />
                 <AllPersonalInfo />
                 <Resume />
                 <AllExperiences />

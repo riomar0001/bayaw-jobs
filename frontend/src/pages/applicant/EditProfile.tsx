@@ -1,7 +1,7 @@
 import { format } from "date-fns"
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
-import { Mail, Smartphone, MapPin, Briefcase, DollarSign, Linkedin, CalendarIcon, Upload } from 'lucide-react';
+import { Mail, Smartphone, MapPin, Briefcase, DollarSign, Linkedin, CalendarIcon, Upload, Facebook, Twitter } from 'lucide-react';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useState, useRef } from 'react';
 import { Calendar } from '@/components/ui/calendar';
@@ -20,6 +20,8 @@ const EditProfile = ({
     email,
     contactNumber,
     linkedInURL,
+    facebookURL,
+    twitterURL,
     birthdate,
     salaryExpectation,
     location,
@@ -154,6 +156,7 @@ const EditProfile = ({
                                     <Input
                                         defaultValue={firstName}
                                         className="bg-neutral-50 h-12 pl-10 border border-neutral-200 rounded-md"
+                                        placeholder="Enter your first name"
                                     />
                                 </div>
                             </section>
@@ -165,6 +168,7 @@ const EditProfile = ({
                                     <Input
                                         defaultValue={lastName}
                                         className="bg-neutral-50 h-12 pl-10 border border-neutral-200 rounded-md"
+                                        placeholder="Enter your last name"
                                     />
                                 </div>
                             </section>
@@ -178,6 +182,7 @@ const EditProfile = ({
                                     <Input
                                         defaultValue={email}
                                         className="bg-neutral-50 h-12 pl-10 border border-neutral-200 rounded-md"
+                                        placeholder="Enter your email address"
                                     />
                                 </div>
                             </section>
@@ -189,12 +194,16 @@ const EditProfile = ({
                                     <Input
                                         defaultValue={contactNumber}
                                         className="bg-neutral-50 h-12 pl-10 border border-neutral-200 rounded-md"
+                                        placeholder="Enter your contact number details"
                                     />
                                 </div>
                             </section>
                         </div>
+                    </div>
 
-                        <div className="mb-6">
+                    <div>
+                        <h1 className="text-lg font-medium mb-4">Socials</h1>
+                        <div className="mb-8 space-y-3">
                             <section>
                                 <label className="text-sm text-gray-600 mb-1 block">LinkedIn Profile</label>
                                 <div className="relative">
@@ -202,6 +211,29 @@ const EditProfile = ({
                                     <Input
                                         defaultValue={linkedInURL}
                                         className="bg-neutral-50 h-12 pl-10 border border-neutral-200 rounded-md"
+                                        placeholder="Enter your LinkedIn url (optional)"
+                                    />
+                                </div>
+                            </section>
+                            <section>
+                                <label className="text-sm text-gray-600 mb-1 block">Facebook Profile</label>
+                                <div className="relative">
+                                    <Facebook className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500" size={18} />
+                                    <Input
+                                        defaultValue={facebookURL}
+                                        className="bg-neutral-50 h-12 pl-10 border border-neutral-200 rounded-md"
+                                        placeholder="Enter your facebook url (optional)"
+                                    />
+                                </div>
+                            </section>
+                            <section>
+                                <label className="text-sm text-gray-600 mb-1 block">Twitter Profile</label>
+                                <div className="relative">
+                                    <Twitter className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500" size={18} />
+                                    <Input
+                                        defaultValue={twitterURL}
+                                        className="bg-neutral-50 h-12 pl-10 border border-neutral-200 rounded-md"
+                                        placeholder="Enter your twitter url (optional)"
                                     />
                                 </div>
                             </section>
@@ -211,8 +243,7 @@ const EditProfile = ({
 
                     <div>
                         <h1 className="text-lg font-medium mb-4">Additional Information</h1>
-
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-2">
                             <section>
                                 <label className="text-sm text-gray-600 mb-1 block">Birth Date</label>
                                 <div className="relative">
@@ -244,30 +275,6 @@ const EditProfile = ({
                             </section>
 
                             <section>
-                                <label className="text-sm text-gray-600 mb-1 block">Salary Expectation</label>
-                                <div className="relative">
-                                    <DollarSign className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500" size={18} />
-                                    <Input
-                                        defaultValue={salaryExpectation}
-                                        className="bg-neutral-50 h-12 pl-10 border border-neutral-200 rounded-md"
-                                    />
-                                </div>
-                            </section>
-                        </div>
-
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
-                            <section>
-                                <label className="text-sm text-gray-600 mb-1 block">Location</label>
-                                <div className="relative">
-                                    <MapPin className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500" size={18} />
-                                    <Input
-                                        defaultValue={location}
-                                        className="bg-neutral-50 h-12 pl-10 border border-neutral-200 rounded-md"
-                                    />
-                                </div>
-                            </section>
-
-                            <section>
                                 <label className="text-sm text-gray-600 mb-1 block">Work Type</label>
                                 <div className="relative">
                                     <Briefcase className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500" size={18} />
@@ -285,6 +292,21 @@ const EditProfile = ({
                                     </Select>
                                 </div>
                             </section>
+                        </div>
+
+                        <div className="grid grid-cols-1 md:grid-cols-1 gap-6 mb-6">
+                            <section>
+                                <label className="text-sm text-gray-600 mb-1 block">Location</label>
+                                <div className="relative">
+                                    <MapPin className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500" size={18} />
+                                    <Input
+                                        defaultValue={location}
+                                        className="bg-neutral-50 h-12 pl-10 border border-neutral-200 rounded-md"
+                                        placeholder="Enter the location of your residency"
+                                    />
+                                </div>
+                            </section>
+
                         </div>
 
                         <div className="flex justify-end mt-8">
