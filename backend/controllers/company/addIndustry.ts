@@ -9,7 +9,7 @@ import { v4 as uuidv4 } from "uuid";
  * @access Private (authentication middleware required)
  */
 
-export const updateCompanyIndustry = async (req: Request, res: Response) => {
+export const addIndustry = async (req: Request, res: Response) => {
   try {
     const company_token = req.cookies.company_access_token;
 
@@ -72,13 +72,13 @@ export const updateCompanyIndustry = async (req: Request, res: Response) => {
       return res.status(400).json({
         success: false,
         user_type: "company",
-        message: "Failed to update industry",
+        message: "Failed to add industry",
       });
     }
 
     return res.status(200).json({
       success: true,
-      message: "Industry Successfully Updated",
+      message: "Industry Successfully Added",
     });
   } catch (error: any) {
     return res.status(500).json({
@@ -89,4 +89,4 @@ export const updateCompanyIndustry = async (req: Request, res: Response) => {
   }
 };
 
-export default updateCompanyIndustry;
+export default addIndustry;
