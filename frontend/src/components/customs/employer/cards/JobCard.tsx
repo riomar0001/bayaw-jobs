@@ -5,37 +5,40 @@ import { Banknote, BriefcaseBusiness, MapPin, Trash2 } from "lucide-react"
 import { Link } from "react-router-dom"
 
 
-const JobCard = ({ position, description, address, category, minSalary, maxSalary, schedule, date }: JobCardProps) => {
+const JobCard = ({ data }: any) => {
     return (
         <div className="bg-white border border-neutral-300 rounded-lg w-full min-h-[250px] p-5">
-            <h1 className="text-2xl font-bold">{position} </h1>
-            <h1 className="text-base font-light text-gray-800">{description} </h1>
+            <h1 className="text-2xl font-bold">{data.title} </h1>
+            <p className="text-base font-light text-gray-800 text-wrap">
+                {data.description.substring(0, 100)}...
+            </p>
 
             <div className="mt-6 font-thin text-sm">
                 <div className="flex items-center gap-x-3">
                     <MapPin size={15} />
-                    <h1>{address} </h1>
+                    <h1>{data.location} </h1>
                 </div>
 
                 <div className="flex items-center gap-x-3">
                     <BriefcaseBusiness size={15} />
-                    <h1>{category} </h1>
+                    <h1>{data.category} </h1>
                 </div>
 
                 <div className="flex items-center gap-x-3">
                     <Banknote size={15} />
-                    <h1>{minSalary} - {maxSalary}</h1>
+                    <h1>{data.salary_from} - {data.salary_to}</h1>
                 </div>
             </div>
 
 
             <div className="mt-6 flex gap-x-3">
                 <div className="bg-neutral-200 rounded-sm p-1 px-2 w-fit text-sm">
-                    <h1>{schedule} </h1>
+                    <h1>{data.work_schedule} </h1>
                 </div>
 
                 <div className="bg-neutral-200 rounded-sm p-1 px-2 w-fit text-sm">
-                    <h1>{date} </h1>
+                    <h1>{new Date(data.created_at).toLocaleDateString("en-US", { month: "short", day: "2-digit", year: "numeric" })}</h1>
+
                 </div>
             </div>
 
@@ -62,7 +65,7 @@ const JobCard = ({ position, description, address, category, minSalary, maxSalar
                     </DialogContent>
                 </Dialog>
 
-                <Link to={"/employer/jobs/job-details"} >
+                <Link to={`/employer/jobs/job-details/${data.id}`} >
                     <Button>View Job</Button>
                 </Link>
             </div>

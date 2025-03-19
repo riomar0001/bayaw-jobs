@@ -4,9 +4,10 @@ interface ApplicantsCardProps {
     name: string;
     email: string;
     contactNumber: string;
+    applicantId: string;
 }
 
-const ApplicantsCard = ({name, email, contactNumber}: ApplicantsCardProps) => {
+const ApplicantsCard = ({ name, email, contactNumber, applicantId }: ApplicantsCardProps) => {
     return (
         <div className="bg-neutral-50 p-4 rounded-lg border border-neutral-200 hover:bg-neutral-100 cursor-pointer">
             <div>
