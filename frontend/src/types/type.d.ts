@@ -55,7 +55,8 @@ declare interface JobDetailsCardProps {
     maxSalary: string;
     schedule: string;
     description: string;
-    image: any;
+    // image: any;
+    date: string
 }
 
 declare interface EditProfileProps {

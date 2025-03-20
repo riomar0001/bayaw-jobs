@@ -11,7 +11,6 @@ import prisma from "@/configs/prismaConfig";
 
 export const getJobById = async (req: Request, res: Response) => {
   try {
-
     const { job_id } = req.params;
 
     if (!job_id) {
@@ -25,6 +24,18 @@ export const getJobById = async (req: Request, res: Response) => {
     const job = await prisma.job_offers.findUnique({
       where: {
         id: job_id,
+      },
+
+      include: {
+        companies: {
+          select: {
+            companies_information: {
+              select: {
+                name: true,
+              },
+            },
+          },
+        },
       },
     });
 

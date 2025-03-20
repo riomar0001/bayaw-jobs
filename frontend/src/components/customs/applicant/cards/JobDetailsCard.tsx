@@ -1,9 +1,10 @@
 import { Badge } from "@/components/ui/badge"
 import { Card, CardContent, CardHeader } from "@/components/ui/card"
 import { Briefcase, Building, Calendar, Clock, DollarSign, MapPin } from "lucide-react"
+import { logos } from "@/constants";
 
 
-const JobDetailsCard = ({ position, status, company, category, location, minSalary, maxSalary, schedule, description, image }: JobDetailsCardProps) => {
+const JobDetailsCard = ({ position, status, company, category, location, minSalary, maxSalary, schedule, description, date }: JobDetailsCardProps) => {
     return (
         <section className="flex-1">
             <Card className="border-neutral-200 shadow-sm hover:shadow-md transition-shadow">
@@ -11,8 +12,8 @@ const JobDetailsCard = ({ position, status, company, category, location, minSala
                     <div className="flex items-center gap-4">
                         <div className="relative">
                             <img
-                                src={image}
-                                className="w-16 h-16 md:w-20 md:h-20 rounded-xl object-cover border border-neutral-200 shadow-sm"
+                                src={logos.brandlogo}
+                                className="w-16 h-16 md:w-20 md:h-20 rounded-xl p-3 object-cover border border-neutral-200 shadow-sm"
                                 alt="Company logo"
                             />
                             <Badge className="absolute -top-2 -right-2 bg-green-500 hover:bg-green-600">{status} </Badge>
@@ -85,7 +86,7 @@ const JobDetailsCard = ({ position, status, company, category, location, minSala
                                 <div className="flex justify-between items-center">
                                     <div>
                                         <p className="text-neutral-500 text-sm">Posted</p>
-                                        <p className="font-medium">Yesterday</p>
+                                        <p className="font-medium">{date}</p>
                                     </div>
                                     <div className="h-0.5 w-16 bg-neutral-200 hidden md:block"></div>
                                     <div>

@@ -4,10 +4,11 @@ import JobsPickCard from "@/components/customs/landing/cards/JobsPickCard";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 // import { JobsPickItems } from "@/constants";
-import { images } from "@/constants";
 import { Search } from "lucide-react";
 import axios from "axios";
 import { format } from "date-fns";
+import { logos } from "@/constants";
+
 import { toZonedTime } from "date-fns-tz";
 interface CompanyInfo {
   id: string;
@@ -54,8 +55,10 @@ const FindJobs = () => {
         const response = await axios.get(`/api/jobs/`);
         const data = response.data.allJobs;
 
-        console.log("Data", data);
+        // console.log("Data", data);
 
+
+        
         setJobs(data);
         // if (data.success) {
         //     setExperiences(data.experiences || "");
@@ -133,7 +136,7 @@ const FindJobs = () => {
                 toZonedTime(new Date(item.updated_at), timeZone),
                 "MMMM dd, yyyy"
               );
-              console.log("ITEM ID:", item.id);
+              // console.log("ITEM ID:", item.id);
               
               return (
                 <a href={`/find-jobs/details/${item.id}`} key={item.id}>
@@ -146,7 +149,7 @@ const FindJobs = () => {
                     salary={`${item.salary_from} - ${item.salary_to}`}
                     category={item.category.toString()}
                     timestamp={updatedAtPHT} // Use converted timestamp
-                    image={images.company_logo}
+                    image={logos.brandlogo}
                   />
                 </a>
               );

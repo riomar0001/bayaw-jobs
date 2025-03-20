@@ -18,7 +18,7 @@ const JobsPickCard = ({
   return (
     <div className="w-[430px] h-auto bg-white border border-neutral-200 rounded-xl flex flex-col justify-start items-start space-y-6 px-8 py-6 hover:border-lochmara-500 cursor-pointer">
       <div className="flex gap-4 items-center">
-        <img src={image} className="w-12 h-12 rounded-full object-cover" />
+        <img src={image} className="w-10 h-10 object-contain" />
         <div className="flex flex-col flex-grow">
           <h1 className="text-lg text-stone-800 font-medium">{jobtitle}</h1>
           <p className="text-sm text-neutral-500">{company}</p>
@@ -70,7 +70,7 @@ const JobsPickCard = ({
       <span className="bg-neutral-200 p-[0.5px] w-full"></span>
 
       <div className="flex justify-between w-full">
-        <p className="text-xs text-lochmara-500 pt-3">{timestamp}</p>
+        <p className="text-base text-lochmara-500 pt-3">{timestamp}</p>
         <Button className="bg-lochmara-500 h-10 hover:bg-lochmara-500/90">
           Job Details
         </Button>
