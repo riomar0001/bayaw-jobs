@@ -37,15 +37,15 @@ const router = createBrowserRouter(
                     EditProfileSample.map((item, index) => (
                         <EditProfile
                             key={index}
-                            firstName={item.firstName}
-                            lastName={item.lastName}
-                            email={item.email}
-                            contactNumber={item.contactNumber}
-                            linkedInURL={item.linkedInURL}
-                            facebookURL={item.facebookURL}
-                            twitterURL={item.twitterURL}
-                            birthdate={item.birthdate}
-                            location={item.location}
+                            // firstName={item.firstName}
+                            // lastName={item.lastName}
+                            // email={item.email}
+                            // contactNumber={item.contactNumber}
+                            // linkedInURL={item.linkedInURL}
+                            // facebookURL={item.facebookURL}
+                            // twitterURL={item.twitterURL}
+                            // birthdate={item.birthdate}
+                            // location={item.location}
                         />
 
                     ))

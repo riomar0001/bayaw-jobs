@@ -32,6 +32,7 @@ router.get("/industries", protect, getIndustries);
 router.get("/jobs", protect, getPostedJob);
 router.get("/all-jobs", protect, getIndustries);
 
+
 /**
  * @Reminder Place all POST requests here
  * @Format router.post("path", "middleware", "controller");

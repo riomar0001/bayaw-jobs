@@ -39,6 +39,14 @@ export const getJobById = async (req: Request, res: Response) => {
       },
     });
 
+    if (!job) {
+      return res.status(404).json({
+        success: false,
+        user_type: "applicants",
+        message: "Job not found",
+      });
+    }
+
     return res.status(200).json({
       success: true,
       message: "Job information found",

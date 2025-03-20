@@ -21,6 +21,14 @@ export const getAllJobs = async (req: Request, res: Response) => {
         },
       },
     });
+
+    if (!allJobs) {
+      return res.status(404).json({
+        success: false,
+        user_type: "applicants",
+        message: "Jobs not found",
+      });
+    }
     return res.status(200).json({
       success: true,
       message: "All jobs are retrieved",

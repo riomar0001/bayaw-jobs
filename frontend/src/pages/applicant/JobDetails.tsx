@@ -1,10 +1,10 @@
 import JobDetailsCard from "@/components/customs/applicant/cards/JobDetailsCard";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { images } from "@/constants";
+// import { images } from "@/constants";
 import { ArrowLeft } from "lucide-react";
 import { toast } from "sonner";
-import { Link, useParams, useNavigate } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
 import axios from "axios";
 import { format } from "date-fns";
@@ -39,8 +39,10 @@ const JobDetails = () => {
   const navigate = useNavigate();
   const [jobDetails, setJobDetails] = useState<JobDetails | null>(null);
 
+  const [isApplied, setIsApplied] = useState(false);
+
   useEffect(() => {
-    const fetchAllJobs = async () => {
+    const fetchJobData = async () => {
       try {
         const response = await axios.get(`/api/jobs/${job_id}`);
         const data = response.data.job;
@@ -55,8 +57,23 @@ const JobDetails = () => {
         console.error(error.message);
       }
     };
+    const checkIfApplied = async () => {
+      try {
+        const response = await axios.get(
+          `http://localhost:3000/api/jobs/applied/${job_id}`,
+          {
+            withCredentials: true,
+          }
+        );
+        console.log("CHECK IF APPLIED:", response);
 
-    fetchAllJobs();
+        setIsApplied(response.data.applied); // Set applied status
+      } catch (error) {
+        console.error("Error checking job application status:", error);
+      }
+    };
+    fetchJobData();
+    checkIfApplied();
   }, [job_id]);
 
   const changeTimeZone = (time: any) => {
@@ -69,12 +86,12 @@ const JobDetails = () => {
       console.error("Error formatting date:", error);
       return "Invalid Date";
     }
-  };  
+  };
 
   const handleApplyJob = async (e: any) => {
     e.preventDefault();
     try {
-      const response = await axios.post(`/api/jobs/apply/${job_id}`, {
+      await axios.post(`/api/jobs/apply/${job_id}`, {
         withCredentials: true,
       });
 
@@ -127,6 +144,37 @@ const JobDetails = () => {
     }
   };
 
+  const cancelJobApplication = async () => {
+    try {
+      const response = await axios.delete(
+        `http://localhost:3000/api/jobs/cancel/${job_id}`,
+        {
+          withCredentials: true,
+        }
+      );
+      console.log("Cancel:", response);
+
+      toast.success("Job Canceled Successfully!", {
+        description: "You canceled your job application.",
+        classNames: {
+          icon: "text-teal-800",
+          title: "text-teal-800",
+          description: "text-teal-800",
+          success: "bg-teal-100",
+        },
+      });
+
+      setTimeout(() => {
+        navigate(-1);
+        // window.location.reload();
+      }, 1000);
+
+      // setIsApplied(response.data.applied); // Set applied status
+    } catch (error) {
+      console.error("Error checking job application status:", error);
+    }
+  };
+
   return (
     <div className="bg-gradient-to-b from-sky-50 to-neutral-100 min-h-screen px-6 py-8 md:px-12 lg:px-24 xl:px-36">
       <Button
@@ -169,10 +217,14 @@ const JobDetails = () => {
             </CardHeader>
             <CardContent className="pt-6">
               <Button
-                onClick={handleApplyJob}
-                className="w-full bg-lochmara-500 hover:bg-lochmara-600 transition-colors py-6 text-base font-medium"
+                onClick={isApplied ? cancelJobApplication : handleApplyJob}
+                className={`w-full ${
+                  isApplied
+                    ? "bg-red-500 hover:bg-red-700"
+                    : "bg-lochmara-500 hover:bg-lochmara-600"
+                } transition-colors py-6 text-base font-medium`}
               >
-                Apply Now
+                {isApplied ? "Cancel Application" : "Apply Now"}
               </Button>
 
               <div className="mt-6 bg-amber-50 border border-amber-200 rounded-lg p-4">

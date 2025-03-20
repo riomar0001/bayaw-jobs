@@ -39,7 +39,13 @@ export const getJobByCompany = async (req: Request, res: Response) => {
         company_account_id: company_id,
       },
     });
-
+    if (!jobs) {
+      return res.status(404).json({
+        success: false,
+        user_type: "applicants",
+        message: "Jobs not found",
+      });
+    }
     return res.status(201).json({
       success: true,
       message: "Jobs found for this company",
