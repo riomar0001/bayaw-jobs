@@ -26,7 +26,7 @@ import addSocialMedia from "@/controllers/applicants/addSocialMedia";
 import updateSocialMedia from "@/controllers/applicants/updateSocialMedia";
 import deleteSocialMedia from "@/controllers/applicants/deleteSocialMedia";
 import { updatePersonalInformation } from "@/controllers/applicants/updatePersonalInfomation";
-
+import getProfilePicture from "@/controllers/applicants/getProfilePicture";
 const router = express.Router();
 
 /**
@@ -40,6 +40,9 @@ router.get("/education/:applicant_id", getEducation.getAllEducation);
 router.get("/social-media/:applicant_id", getSocialMedia.getAllSocialMedia);
 router.get("/resume/:applicant_id", getResume);
 router.get("/resume/download/:applicant_id", downloadResume);
+
+router.get("/profile-picture", protect, getProfilePicture); // Not sure if profile picture should be protected
+
 
 router.get(
   "/experience/:experience_id",

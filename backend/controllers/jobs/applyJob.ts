@@ -84,7 +84,7 @@ export const applyJob = async (req: Request, res: Response) => {
         status: "pending",
       },
     });
-
+    
     if (!apply) {
         return res.status(404).json({
           success: false,
@@ -92,7 +92,6 @@ export const applyJob = async (req: Request, res: Response) => {
           message: "Job Application Unsuccessful.",
         });
       }
-
 
     return res.status(200).json({
       success: true,
