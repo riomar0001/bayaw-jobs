@@ -129,7 +129,7 @@ const ApplicantOnboarding = () => {
           success: "bg-teal-100",
         },
       });
-      navigate("/applicant/profile");
+      window.location.reload();
     } catch (error: any) {
       setIsLoading(false);
       const errorMsg =
@@ -152,7 +152,7 @@ const ApplicantOnboarding = () => {
   useEffect(() => {
     if (authStateApplicant?.user_type === "applicant") {
       authStateApplicant?.done_onboarding
-        ? navigate("/applicant/jobs")
+        ? navigate("/applicant/profile")
         : navigate("/applicant/onboarding");
     }
   }, [authStateApplicant, navigate]);
