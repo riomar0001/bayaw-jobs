@@ -121,8 +121,7 @@ export const accountOnboarding = async (req: Request, res: Response) => {
         message: "All fields are required",
       });
     }
-
-    console.log(work_type);
+    // console.log(work_type);
     
 
     if (!resume) {
@@ -196,7 +195,7 @@ export const accountOnboarding = async (req: Request, res: Response) => {
             address: address || null,
             professional_title: professional_title || null,
             website: website || null,
-            work_type: work_type || [],
+            work_type: Array.isArray(work_type) ? work_type : [work_type],
           },
         },
         applicants_resume: {

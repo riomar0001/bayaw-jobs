@@ -21,8 +21,23 @@ const updateProfilePicture = async (req: Request, res: Response) => {
       applicant_token,
       process.env.JWT_SECRET_APPLICANT!
     ) as DecodedApplicantToken;
-
+    
     const applicant_id = applicant_token_info.applicant.id;
+    
+    const accountExist = await prisma.applicants_profile_picture.findUnique({
+      where: {
+        applicants_account_id: applicant_id,
+      },
+    });
+
+    if (!accountExist) {
+      return res.status(404).json({
+        success: false,
+        user_type: "applicant",
+        message: "Account not found",
+      });
+    }
+
 
     const profile_picture = Array.isArray(req.files)
       ? undefined
@@ -38,19 +53,6 @@ const updateProfilePicture = async (req: Request, res: Response) => {
 
     console.log(profile_picture.path);
 
-    const accountExist = await prisma.applicants_profile_picture.findUnique({
-      where: {
-        id: applicant_id,
-      },
-    });
-
-    if (!accountExist) {
-      return res.status(404).json({
-        success: false,
-        user_type: "applicant",
-        message: "Account not found",
-      });
-    }
 
     // // Upload to Supabase Storage (Bucket: "applicant_profile_picture")
     const profilePicFilePath = profile_picture.path;
@@ -84,7 +86,7 @@ const updateProfilePicture = async (req: Request, res: Response) => {
 
     const updateProfilePic = await prisma.applicants_profile_picture.update({
       where: {
-        id: applicant_id,
+        applicants_account_id: applicant_id,
       },
       data: {
         profile_picture: profilePicFileName,
@@ -107,6 +109,7 @@ const updateProfilePicture = async (req: Request, res: Response) => {
       success: true,
       user_type: "applicant",
       message: "Profile picture updated",
+
     });
   } catch (error: any) {
     console.log(error);
