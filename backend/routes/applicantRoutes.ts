@@ -41,7 +41,7 @@ router.get("/social-media/:applicant_id", getSocialMedia.getAllSocialMedia);
 router.get("/resume/:applicant_id", getResume);
 router.get("/resume/download/:applicant_id", downloadResume);
 
-router.get("/profile-picture", protect, getProfilePicture); // Not sure if profile picture should be protected
+router.get("/profile-picture/:account_id", getProfilePicture); // Not sure if profile picture should be protected
 
 
 router.get(

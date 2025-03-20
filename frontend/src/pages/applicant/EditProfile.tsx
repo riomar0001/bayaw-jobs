@@ -3,73 +3,140 @@ import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Mail, Smartphone, MapPin, Briefcase, DollarSign, Linkedin, CalendarIcon, Upload, Facebook, Twitter } from 'lucide-react';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { useState, useRef } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { Calendar } from '@/components/ui/calendar';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { cn } from '@/lib/utils';
 import { toast } from "sonner";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import axios from "axios";
+import { useAuth } from "@/contexts/authContext";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Label } from "@/components/ui/label";
 
-import { useEffect } from "react"
-import { useAuth } from "@/contexts/authContext"
-import { useNavigate } from "react-router-dom"
-
-const EditProfile = ({
-    firstName,
-    lastName,
-    email,
-    contactNumber,
-    linkedInURL,
-    facebookURL,
-    twitterURL,
-    birthdate,
-    location,
-    profileImage }: EditProfileProps) => {
-
+const EditProfile = () => {
     const navigate = useNavigate();
     const { authStateApplicant } = useAuth();
     const fileInputRef = useRef<HTMLInputElement>(null);
 
+    const [isLoading, setIsLoading] = useState(false);
+    const [firstName, setFirstName] = useState("");
+    const [lastName, setLastName] = useState("");
+    const [email, setEmail] = useState("");
+    const [contactNumber, setContactNumber] = useState("");
+    const [location, setLocation] = useState("");
+    const [professionalTitle, setProfessionalTitle] = useState("");
+    const [website, setWebsite] = useState("");
+    // Replace single workType with array of workTypes and selectedWorkTypes
+    const [workTypes] = useState([
+        { id: "FullTime", label: "Full Time" },
+        { id: "PartTime", label: "Part Time" },
+        { id: "Contractual", label: "Contract" },
+        { id: "Freelance", label: "Freelance" },
+        { id: "Internship", label: "Internship" }
+    ]);
+    const [selectedWorkTypes, setSelectedWorkTypes] = useState<string[]>([]);
+    const [date, setDate] = useState<Date | undefined>(undefined);
+    const [birthdate, setBirthdate] = useState<string>("");
+
+    // Handle work type selection changes
+    const handleWorkTypeChange = (id: string, checked: boolean) => {
+        if (checked) {
+            setSelectedWorkTypes(prev => [...prev, id]);
+        } else {
+            setSelectedWorkTypes(prev => prev.filter(type => type !== id));
+        }
+    };
+
     useEffect(() => {
         if (authStateApplicant?.authenticated === false) {
             navigate("/login")
+            return;
         }
-    }, [authStateApplicant])
 
-    const [date, setDate] = useState<Date | undefined>(birthdate ? new Date(birthdate) : undefined)
+        const fetchApplicantData = async () => {
+            try {
+                setIsLoading(true);
+                const response = await axios.get('/api/applicant/', { withCredentials: true });
+                const { accountPersonalInfo } = response.data;
 
-    // Profile image state
-    const [imagePreview, setImagePreview] = useState<string | null>(profileImage || null);
-    const [imageFile, setImageFile] = useState<File | null>(null);
+                if (accountPersonalInfo) {
+                    setFirstName(accountPersonalInfo.first_name || "");
+                    setLastName(accountPersonalInfo.last_name || "");
+                    setEmail(accountPersonalInfo.email || "");
+                    setContactNumber(accountPersonalInfo.contact_no || "");
+                    setLocation(accountPersonalInfo.address || "");
+                    setProfessionalTitle(accountPersonalInfo.professional_title || "");
+                    setWebsite(accountPersonalInfo.website || "");
 
-    // Handle image upload
-    const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        const file = e.target.files?.[0];
-        if (file) {
-            setImageFile(file);
+                    // Handle work types as an array
+                    if (accountPersonalInfo.work_type && accountPersonalInfo.work_type.length > 0) {
+                        setSelectedWorkTypes(accountPersonalInfo.work_type);
+                    }
 
-            // Create preview URL
-            const reader = new FileReader();
-            reader.onloadend = () => {
-                setImagePreview(reader.result as string);
+                    // Handle birthdate
+                    if (accountPersonalInfo.date_of_birth) {
+                        setBirthdate(accountPersonalInfo.date_of_birth);
+                        // Try to parse the date string if it's a valid date
+                        try {
+                            const parsedDate = new Date(accountPersonalInfo.date_of_birth);
+                            if (!isNaN(parsedDate.getTime())) {
+                                setDate(parsedDate);
+                            }
+                        } catch (error) {
+                            console.error("Error parsing date:", error);
+                        }
+                    }
+                }
+            } catch (error) {
+                console.error("Error fetching applicant data:", error);
+                toast.error("Failed to load profile data");
+            } finally {
+                setIsLoading(false);
+            }
+        };
+
+        fetchApplicantData();
+    }, [authStateApplicant, navigate]);
+
+    const handleSaveChanges = async () => {
+        try {
+            setIsLoading(true);
+
+            // Format the date to a string if it exists
+            const formattedDate = date ? format(date, "yyyy-MM-dd") : null;
+
+            // Create the request payload with work_type as an array
+            const payload = {
+                first_name: firstName,
+                last_name: lastName,
+                email: email,
+                contact_no: contactNumber,
+                address: location,
+                professional_title: professionalTitle,
+                website: website,
+                work_type: selectedWorkTypes,
+                date_of_birth: formattedDate
             };
-            reader.readAsDataURL(file);
-        }
-    };
 
-    // Handle image removal
-    const handleRemoveImage = () => {
-        setImagePreview(null);
-        setImageFile(null);
-        if (fileInputRef.current) {
-            fileInputRef.current.value = '';
-        }
-    };
+            // Send PUT request to update profile
+            await axios.put('/api/applicant/', payload, { withCredentials: true });
 
-    // Trigger file input click
-    const triggerFileInput = () => {
-        if (fileInputRef.current) {
-            fileInputRef.current.click();
+            toast("Profile Updated", {
+                description: "Your profile has been updated successfully",
+                className: "bg-lochmara-500/80 border border-none text-white"
+            });
+
+            navigate("/applicant/profile");
+        } catch (error: any) {
+            console.error("Error updating profile:", error);
+
+            const errorMessage = error.response?.data?.message || "Failed to update profile";
+            toast.error("Update Failed", {
+                description: errorMessage
+            });
+        } finally {
+            setIsLoading(false);
         }
     };
 
@@ -78,72 +145,17 @@ const EditProfile = ({
             <div className="bg-white border border-neutral-200 w-full max-w-4xl rounded-lg shadow-sm">
                 <div className="flex justify-between items-center border-b border-neutral-100 p-6">
                     <h1 className="font-semibold text-xl">Edit your information</h1>
-                    <Button variant="outline" className="bg-blue-50 text-blue-600 hover:bg-blue-100 border-blue-200">
-                        Save Changes
+                    <Button
+                        variant="outline"
+                        className="bg-blue-50 text-blue-600 hover:bg-blue-100 border-blue-200"
+                        disabled={isLoading}
+                        onClick={handleSaveChanges}
+                    >
+                        {isLoading ? "Saving..." : "Save Changes"}
                     </Button>
                 </div>
 
                 <div className="p-6">
-
-                    <div className="mb-8">
-                        {/* Upload image section */}
-                        <h2 className="text-lg font-medium mb-4">Profile Picture</h2>
-                        <div className="flex flex-col items-center md:flex-row md:items-start gap-6">
-                            {/* Image preview */}
-                            <div className="w-32 h-32 rounded-full bg-neutral-100 flex items-center justify-center overflow-hidden border border-neutral-200">
-                                {imagePreview ? (
-                                    <img
-                                        src={imagePreview}
-                                        alt="Profile preview"
-                                        className="w-full h-full object-cover"
-                                    />
-                                ) : (
-                                    <div className="text-neutral-400 flex flex-col items-center justify-center">
-                                        <Upload size={24} />
-                                        <span className="text-xs mt-1">No image</span>
-                                    </div>
-                                )}
-                            </div>
-
-                            {/* Upload controls */}
-                            <div className="flex flex-col gap-3 flex-1">
-                                <p className="text-sm text-gray-600">Upload a profile picture. JPG or PNG. Max 5MB.</p>
-                                <div className="flex gap-3">
-                                    <Button
-                                        variant="outline"
-                                        className="bg-neutral-50 border border-neutral-200"
-                                        type="button"
-                                        onClick={triggerFileInput}
-                                    >
-                                        Upload Image
-                                    </Button>
-                                    <input
-                                        ref={fileInputRef}
-                                        type="file"
-                                        accept="image/jpeg, image/png"
-                                        className="hidden"
-                                        onChange={handleImageChange}
-                                    />
-
-                                    {imagePreview && (
-                                        <Button
-                                            variant="outline"
-                                            className="text-red-500 hover:text-red-600 border-red-100 hover:bg-red-50"
-                                            onClick={handleRemoveImage}
-                                        >
-                                            Remove
-                                        </Button>
-                                    )}
-                                </div>
-                                {imageFile && (
-                                    <p className="text-sm text-gray-500">
-                                        {imageFile.name} ({(imageFile.size / (1024 * 1024)).toFixed(2)} MB)
-                                    </p>
-                                )}
-                            </div>
-                        </div>
-                    </div>
-
                     <div className="mb-8">
                         <h1 className="text-lg font-medium mb-4">Personal Information</h1>
 
@@ -153,7 +165,8 @@ const EditProfile = ({
                                 <div className="relative">
                                     <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500" size={18} />
                                     <Input
-                                        defaultValue={firstName}
+                                        value={firstName}
+                                        onChange={(e) => setFirstName(e.target.value)}
                                         className="bg-neutral-50 h-12 pl-10 border border-neutral-200 rounded-md"
                                         placeholder="Enter your first name"
                                     />
@@ -165,7 +178,8 @@ const EditProfile = ({
                                 <div className="relative">
                                     <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500" size={18} />
                                     <Input
-                                        defaultValue={lastName}
+                                        value={lastName}
+                                        onChange={(e) => setLastName(e.target.value)}
                                         className="bg-neutral-50 h-12 pl-10 border border-neutral-200 rounded-md"
                                         placeholder="Enter your last name"
                                     />
@@ -179,7 +193,8 @@ const EditProfile = ({
                                 <div className="relative">
                                     <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500" size={18} />
                                     <Input
-                                        defaultValue={email}
+                                        value={email}
+                                        onChange={(e) => setEmail(e.target.value)}
                                         className="bg-neutral-50 h-12 pl-10 border border-neutral-200 rounded-md"
                                         placeholder="Enter your email address"
                                     />
@@ -191,54 +206,43 @@ const EditProfile = ({
                                 <div className="relative">
                                     <Smartphone className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500" size={18} />
                                     <Input
-                                        defaultValue={contactNumber}
+                                        value={contactNumber}
+                                        onChange={(e) => setContactNumber(e.target.value)}
                                         className="bg-neutral-50 h-12 pl-10 border border-neutral-200 rounded-md"
                                         placeholder="Enter your contact number details"
                                     />
                                 </div>
                             </section>
                         </div>
-                    </div>
 
-                    <div>
-                        <h1 className="text-lg font-medium mb-4">Socials</h1>
-                        <div className="mb-8 space-y-3">
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
                             <section>
-                                <label className="text-sm text-gray-600 mb-1 block">LinkedIn Profile</label>
+                                <label className="text-sm text-gray-600 mb-1 block">Professional Title</label>
+                                <div className="relative">
+                                    <Briefcase className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500" size={18} />
+                                    <Input
+                                        value={professionalTitle}
+                                        onChange={(e) => setProfessionalTitle(e.target.value)}
+                                        className="bg-neutral-50 h-12 pl-10 border border-neutral-200 rounded-md"
+                                        placeholder="e.g. Software Developer, UX Designer"
+                                    />
+                                </div>
+                            </section>
+
+                            <section>
+                                <label className="text-sm text-gray-600 mb-1 block">Website</label>
                                 <div className="relative">
                                     <Linkedin className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500" size={18} />
                                     <Input
-                                        defaultValue={linkedInURL}
+                                        value={website}
+                                        onChange={(e) => setWebsite(e.target.value)}
                                         className="bg-neutral-50 h-12 pl-10 border border-neutral-200 rounded-md"
-                                        placeholder="Enter your LinkedIn url (optional)"
-                                    />
-                                </div>
-                            </section>
-                            <section>
-                                <label className="text-sm text-gray-600 mb-1 block">Facebook Profile</label>
-                                <div className="relative">
-                                    <Facebook className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500" size={18} />
-                                    <Input
-                                        defaultValue={facebookURL}
-                                        className="bg-neutral-50 h-12 pl-10 border border-neutral-200 rounded-md"
-                                        placeholder="Enter your facebook url (optional)"
-                                    />
-                                </div>
-                            </section>
-                            <section>
-                                <label className="text-sm text-gray-600 mb-1 block">Twitter Profile</label>
-                                <div className="relative">
-                                    <Twitter className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500" size={18} />
-                                    <Input
-                                        defaultValue={twitterURL}
-                                        className="bg-neutral-50 h-12 pl-10 border border-neutral-200 rounded-md"
-                                        placeholder="Enter your twitter url (optional)"
+                                        placeholder="Enter your website URL"
                                     />
                                 </div>
                             </section>
                         </div>
                     </div>
-
 
                     <div>
                         <h1 className="text-lg font-medium mb-4">Additional Information</h1>
@@ -262,7 +266,6 @@ const EditProfile = ({
                                         <PopoverContent align="start" className=" w-auto p-0">
                                             <Calendar
                                                 mode="single"
-                                                captionLayout="dropdown-buttons"
                                                 selected={date}
                                                 onSelect={setDate}
                                                 fromYear={1960}
@@ -274,21 +277,23 @@ const EditProfile = ({
                             </section>
 
                             <section>
-                                <label className="text-sm text-gray-600 mb-1 block">Work Type</label>
-                                <div className="relative">
-                                    <Briefcase className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500" size={18} />
-                                    <Select defaultValue="remote">
-                                        <SelectTrigger className="bg-neutral-50 h-12 pl-10 border border-neutral-200 rounded-md">
-                                            <SelectValue placeholder="Select work type" />
-                                        </SelectTrigger>
-                                        <SelectContent>
-                                            <SelectItem value="remote">Remote</SelectItem>
-                                            <SelectItem value="fulltime">Fulltime</SelectItem>
-                                            <SelectItem value="parttime">Part-Time</SelectItem>
-                                            <SelectItem value="intership">Intership</SelectItem>
-                                            <SelectItem value="freelance">Freelance</SelectItem>
-                                        </SelectContent>
-                                    </Select>
+                                <Label className="text-sm text-gray-600 mb-1 block">Work Types</Label>
+                                <div className="bg-neutral-50 p-3 border border-neutral-200 rounded-md grid grid-cols-2 gap-2">
+                                    {workTypes.map(type => (
+                                        <div key={type.id} className="flex items-center space-x-2">
+                                            <Checkbox
+                                                id={`work-type-${type.id}`}
+                                                checked={selectedWorkTypes.includes(type.id)}
+                                                onCheckedChange={(checked) => handleWorkTypeChange(type.id, checked === true)}
+                                            />
+                                            <label
+                                                htmlFor={`work-type-${type.id}`}
+                                                className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                                            >
+                                                {type.label}
+                                            </label>
+                                        </div>
+                                    ))}
                                 </div>
                             </section>
                         </div>
@@ -299,32 +304,27 @@ const EditProfile = ({
                                 <div className="relative">
                                     <MapPin className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500" size={18} />
                                     <Input
-                                        defaultValue={location}
+                                        value={location}
+                                        onChange={(e) => setLocation(e.target.value)}
                                         className="bg-neutral-50 h-12 pl-10 border border-neutral-200 rounded-md"
                                         placeholder="Enter the location of your residency"
                                     />
                                 </div>
                             </section>
-
                         </div>
 
-                        <div className="flex justify-end mt-8">
-                            <Button variant="outline" className="mr-3" onClick={() => window.history.back()}>Cancel</Button>
-                            <Link to={"/applicant/profile"}>
-                                <Button onClick={() => {
-                                    window.scrollTo({ top: 0, behavior: "instant" });
-                                    toast("Profile Changed", {
-                                        description:
-                                            "New profile details is set to the account",
-                                        className: "bg-lochmara-500/80 border border-none text-white"
-                                    });
-                                }} className="bg-lochmara-500 hover:bg-lochmara-500/80"
-                                >
-                                    Save Changes
-                                </Button>
-                            </Link>
-                        </div>
+                        <div className="flex justify-end mt-8"></div>
+                        <Button variant="outline" className="mr-3" onClick={() => window.history.back()}>Cancel</Button>
+                        <Button
+                            onClick={handleSaveChanges}
+                            className="bg-lochmara-500 hover:bg-lochmara-500/80"
+                            disabled={isLoading}
+                        >
+                            {isLoading ? "Saving..." : "Save Changes"}
+                        </Button>
                     </div>
+
+
                 </div>
             </div>
         </div>

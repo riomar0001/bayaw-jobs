@@ -15,11 +15,7 @@ import axios from "axios"
 const Profile = () => {
     const navigate = useNavigate();
     const { authStateApplicant } = useAuth();
-
-
-
-
-
+    
     useEffect(() => {
 
         if (authStateApplicant?.authenticated === false) {
@@ -27,7 +23,7 @@ const Profile = () => {
         }
 
         if (authStateApplicant?.done_onboarding === false) {
-            navigate("/")
+            navigate("/applicant/onboarding")
         }
 
     }, [authStateApplicant, navigate])
@@ -46,11 +42,11 @@ const Profile = () => {
 
             <div className="space-y-5">
                 <ActivePositions />
-                <CareerStatus />
-                <PersonalInformations
+                {/* <CareerStatus /> */}
+                {/* <PersonalInformations
                     facebookURL="facebook.com/jerome.bell"
                     twitterURL="twitter.com/jeromebell"
-                />
+                /> */}
                 {/* <ResumeSmall /> */}
             </div>
 
