@@ -8,30 +8,28 @@ import sharp from "sharp";
 import path from "path";
 
 /**
- * @description registration of a new user
- * @route PUT /api/applcants/profile-picture
+ * @description Get the profile picture of an applicant
+ * @route GET /api/applicants/profile-picture/:account_id
  * @access Public
  */
 
 const getProfilePicture = async (req: Request, res: Response) => {
   try {
-    const applicant_token = req.cookies.applicant_access_token;
-
-    const applicant_token_info = jwt.verify(
-      applicant_token,
-      process.env.JWT_SECRET_APPLICANT!
-    ) as DecodedApplicantToken;
+    const { account_id } = req.params;
     
-    const applicant_id = applicant_token_info.applicant.id;
+    if (!account_id) {
+      return res.status(400).json({
+        success: false,
+        user_type: "applicant",
+        message: "Account ID is required",
+      });
+    }
     
     const accountExist = await prisma.applicants_profile_picture.findUnique({
-      where: { 
-        applicants_account_id: applicant_id,
+      where: {
+        applicants_account_id: account_id,
       },
     });
-    
-    console.log("APP ID,", applicant_id);
-    
 
     if (!accountExist) {
       return res.status(404).json({
@@ -40,82 +38,37 @@ const getProfilePicture = async (req: Request, res: Response) => {
         message: "Account not found",
       });
     }
-
-
     
-
-
-    // const profile_picture = Array.isArray(req.files)
-    //   ? undefined
-    //   : req.files?.profile_picture?.[0];
-
-    // if (!profile_picture) {
-    //   return res.status(400).json({
-    //     success: false,
-    //     user_type: "applicant",
-    //     message: "Profile picture is required",
-    //   });
-    // }
-
+    // Get the profile picture filename
+    const profilePicFileName = accountExist.profile_picture;
     
-
-    // // // Upload to Supabase Storage (Bucket: "applicant_profile_picture")
-    // const profilePicFilePath = profile_picture.path;
-    // const profilePicFileName = `profile_${applicant_id}.jpeg`;
-    // const profilePicFileBuffer = fs.readFileSync(profilePicFilePath);
-
-    // const processedImagePath = path.join(
-    //   path.dirname(profilePicFilePath),
-    //   profilePicFileName
-    // );
-    // await sharp(profilePicFilePath)
-    //   .jpeg({ quality: 80 })
-    //   .toFile(processedImagePath);
-
-    // const { error } = await supabase.storage
-    //   .from("applicant_profile_picture")
-    //   .upload(profilePicFileName, profilePicFileBuffer, {
-    //     cacheControl: "3600",
-    //     upsert: true,
-    //     contentType: "image/jpeg",
-    //   });
-
-    // if (error) {
-    //   return res.status(500).json({
-    //     success: false,
-    //     user_type: "applicant",
-    //     message: "Failed to upload profile picture",
-    //     error: error.message,
-    //   });
-    // }
-
-    // const updateProfilePic = await prisma.applicants_profile_picture.update({
-    //   where: {
-    //     applicants_account_id: applicant_id,
-    //   },
-    //   data: {
-    //     profile_picture: profilePicFileName,
-    //     updated_at: new Date(),
-    //   },
-    // });
-
-    // if (!updateProfilePic) {
-    //   return res.status(500).json({
-    //     success: false,
-    //     user_type: "applicant",
-    //     message: "Failed to update profile picture",
-    //   });
-    // }
-
-    // fs.unlinkSync(profile_picture.path);
-    // fs.unlinkSync(`storage\\profilePictures\\${profilePicFileName}`);
+    if (!profilePicFileName) {
+      return res.status(200).json({
+        success: true,
+        user_type: "applicant",
+        message: "No profile picture found",
+        profile_picture: null,
+      });
+    }
+    
+    // Get the URL of the profile picture from Supabase
+    const { data } = supabase.storage
+      .from("applicant_profile_picture")
+      .getPublicUrl(profilePicFileName);
+      
+    if (!data || !data.publicUrl) {
+      return res.status(500).json({
+        success: false,
+        user_type: "applicant",
+        message: "Failed to retrieve profile picture",
+      });
+    }
 
     return res.status(200).json({
       success: true,
       user_type: "applicant",
       message: "Profile picture retrieved",
-      profile_picture: accountExist.profile_picture,
-
+      profile_picture: data.publicUrl,
     });
   } catch (error: any) {
     console.log(error);
