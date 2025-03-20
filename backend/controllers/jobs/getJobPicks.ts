@@ -13,6 +13,17 @@ export const getJobPicks = async (req: Request, res: Response) => {
       where: {
         is_closed: false,
       },
+      include: {
+        companies: {
+          select: {
+            companies_information: {
+              select: {
+                name: true,
+              },
+            },
+          },
+        },
+      },
     });
 
     const shuffledJobs = allJobs.sort(() => Math.random() - 0.5).slice(0, 4);
@@ -20,7 +31,7 @@ export const getJobPicks = async (req: Request, res: Response) => {
     return res.status(200).json({
       success: true,
       message: "Recent jobs successfully retrieved",
-      data: { shuffledJobs },
+      shuffledJobs,
     });
   } catch (error: any) {
     return res.status(500).json({
