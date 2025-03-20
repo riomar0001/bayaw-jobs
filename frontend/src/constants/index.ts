@@ -6,6 +6,7 @@ import union from "../assets/icons/Union.svg";
 import sample_company_1 from "../assets/images/sample-company-1.jpg";
 import sample_company_2 from "../assets/images/sample-company-2.jpg";
 import sample_company_3 from "../assets/images/sample-company-3.jpg";
+import company_logo from "../assets/images/company_logo.png";
 
 import apple from "../assets/icons/Apple.svg";
 import atnt from "../assets/icons/AT&T.svg";
@@ -23,6 +24,7 @@ export const images = {
     sample_company_1,
     sample_company_2,
     sample_company_3,
+    company_logo
 };
 
 export const logos = {

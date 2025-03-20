@@ -12,7 +12,7 @@ import { deleteJob } from "@/controllers/jobs/deleteJob";
 import { getRecentJobs } from "@/controllers/jobs/getRecentJobs";
 import { getJobPicks } from "@/controllers/jobs/getJobPicks";
 import { getApplicantByJobId } from "@/controllers/jobs/getApplicantsByJobId";
-
+import { checkIfApplied } from "@/controllers/jobs/checkIfApplied";
 import { applyJob } from "@/controllers/jobs/applyJob";
 
 const router = express.Router();
@@ -22,12 +22,13 @@ const router = express.Router();
  * @Format router.get("path", "middleware", "controller");
  */
 router.get("/company", protect, getJobByCompany);
-router.get("/:job_id", protect, getJobById);
+router.get("/:job_id", getJobById);
 
-router.get("/", protect, getAllJobs);
+router.get("/", getAllJobs);
 router.get("/all/recent", getRecentJobs);
 router.get("/all/picks", getJobPicks);
 router.get("/applicants/:job_posting_id", protect, getApplicantByJobId);
+router.get("/applied/:job_posting_id", applicantProtect, checkIfApplied);
 
 /**
  * @Reminder Place all POST requests here

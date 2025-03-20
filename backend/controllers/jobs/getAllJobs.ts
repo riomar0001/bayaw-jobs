@@ -13,11 +13,18 @@ export const getAllJobs = async (req: Request, res: Response) => {
       orderBy: {
         created_at: "desc", // Sort by the most recent jobs first
       },
+      include: {
+        companies: {
+          select: {
+            companies_information: true,
+          },
+        },
+      },
     });
     return res.status(200).json({
       success: true,
       message: "All jobs are retrieved",
-      data: { allJobs },
+      allJobs,
     });
   } catch (error: any) {
     return res.status(500).json({

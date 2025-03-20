@@ -10,7 +10,7 @@ declare interface JobsPickCardProps {
   companystatus: string;
   location: string;
   salary: string;
-  category: string[];
+  category: string;
   timestamp: string;
   image: any;
 }
@@ -55,7 +55,8 @@ declare interface JobDetailsCardProps {
     maxSalary: string;
     schedule: string;
     description: string;
-    image: any;
+    // image: any;
+    date: string
 }
 
 declare interface EditProfileProps {
