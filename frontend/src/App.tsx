@@ -26,6 +26,7 @@ import { AuthProvider } from "./contexts/authContext";
 import OnboardingApplicant from "./pages/applicant/ApplicantOnboarding";
 import OnboardingCompany from "./pages/employer/EmployerOnboarding";
 import CompanyPrivateRoute from "./components/customs/employer/PrivateRoute";
+import AppliedJobsList from "./pages/applicant/AppliedJobs";
 
 const router = createBrowserRouter(
     createRoutesFromElements(

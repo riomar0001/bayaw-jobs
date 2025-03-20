@@ -48,7 +48,7 @@ const JobDetails = () => {
         const data = response.data.job;
 
         console.log("Data", data);
-
+        
         setJobDetails(data);
         // if (data.success) {
         //     setExperiences(data.experiences || "");
