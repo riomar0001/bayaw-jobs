@@ -34,6 +34,7 @@ const router = createBrowserRouter(
             <Route path="/" element={<MainLayout />}>
                 <Route index element={<Landing />} />
                 <Route path="/applicant/profile" element={<Profile />} />
+                <Route path="/applicant/appliedJobs" element={<AppliedJobsList />} />
                 <Route path="/applicant/profile/edit" element={<EditProfile />} />
                 <Route path="/register" element={<Registration />} />
                 <Route path="/login" element={<Login />} />
