@@ -4,8 +4,39 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { images } from "@/constants";
 import { ArrowLeft } from "lucide-react";
 import { toast } from "sonner";
+import { Link, useParams, useNavigate } from "react-router-dom"
+import { useEffect, useState } from "react";
+import axios from "axios";
+
 
 const JobDetails = () => {
+
+  const { job_id } = useParams();
+
+  const [jobDetails, setJobDetails] = useState([]);
+
+  useEffect(() => {
+    const fetchAllJobs = async () => {
+      try {
+        const response = await axios.get(`/api/jobs/${job_id}`);
+        const data = response.data.allJobs;
+
+        console.log("Data", data);
+
+        setJobDetails(data);
+        // if (data.success) {
+        //     setExperiences(data.experiences || "");
+        // }
+      } catch (error: any) {
+        console.error(error.message);
+      }
+    };
+
+    fetchAllJobs()
+  }, [job_id])
+  
+
+
   return (
     <div className="bg-gradient-to-b from-sky-50 to-neutral-100 min-h-screen px-6 py-8 md:px-12 lg:px-24 xl:px-36">
       <Button

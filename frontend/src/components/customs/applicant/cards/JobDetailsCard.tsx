@@ -22,7 +22,6 @@ const JobDetailsCard = ({ position, status, company, category, location, minSala
                             <div className="flex items-center gap-2 text-neutral-500">
                                 <Building size={16} className="text-lochmara-400" />
                                 <span className="font-medium">{company} </span>
-                                <span className="text-xs text-neutral-400">• Posted yesterday</span>
                             </div>
                         </div>
                     </div>

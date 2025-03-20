@@ -10,7 +10,7 @@ declare interface JobsPickCardProps {
   companystatus: string;
   location: string;
   salary: string;
-  category: string[];
+  category: string;
   timestamp: string;
   image: any;
 }
