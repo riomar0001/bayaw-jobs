@@ -34,7 +34,7 @@ export const cancelJobApplication = async (req: Request, res: Response) => {
     const applicant_id = applicant_token_info.applicant.id;
 
     const { job_posting_id } = req.params;
-
+    
     const existingApplication = await prisma.job_applicants.findFirst({
       where: {
         job_id: job_posting_id,

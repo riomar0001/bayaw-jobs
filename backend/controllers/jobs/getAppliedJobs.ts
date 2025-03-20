@@ -2,16 +2,14 @@ import { Request, Response } from "express";
 import prisma from "@/configs/prismaConfig";
 import jwt from "jsonwebtoken";
 
-
 interface DecodedApplicantToken {
-    applicant: {
-      id: string;
-      username: string;
-      email: string;
-      done_onboarding: boolean;
-    };
-  }
-
+  applicant: {
+    id: string;
+    username: string;
+    email: string;
+    done_onboarding: boolean;
+  };
+}
 
 /**
  * @desc    Get all jobs an applicant has applied to
@@ -41,7 +39,25 @@ export const getAppliedJobs = async (req: Request, res: Response) => {
     const appliedJobs = await prisma.job_applicants.findMany({
       where: { applicants_account_id: applicant_id },
       include: {
-        job_offers: true,
+        job_offers: {
+            
+            select: {
+                id: true,
+                title: true,
+                companies: {
+                    select: {
+                        companies_information: {
+                            select: {
+                                name: true,
+                            },
+                        },
+                    }
+                }
+            }
+        },
+        // companies: {
+        //   select: { companies_information: true },
+        // },
       },
     });
 
@@ -52,7 +68,7 @@ export const getAppliedJobs = async (req: Request, res: Response) => {
         message: "No jobs found",
       });
     }
-        
+
     return res.status(200).json({
       success: true,
       message: "Applied jobs found",

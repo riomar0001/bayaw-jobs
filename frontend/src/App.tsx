@@ -26,6 +26,7 @@ import { AuthProvider } from "./contexts/authContext";
 import OnboardingApplicant from "./pages/applicant/ApplicantOnboarding";
 import OnboardingCompany from "./pages/employer/EmployerOnboarding";
 import CompanyPrivateRoute from "./components/customs/employer/PrivateRoute";
+import AppliedJobsList from "./pages/applicant/AppliedJobs";
 
 const router = createBrowserRouter(
     createRoutesFromElements(
@@ -33,6 +34,7 @@ const router = createBrowserRouter(
             <Route path="/" element={<MainLayout />}>
                 <Route index element={<Landing />} />
                 <Route path="/applicant/profile" element={<Profile />} />
+                <Route path="/applicant/appliedJobs" element={<AppliedJobsList />} />
                 <Route path="/applicant/profile/edit" element={
                     EditProfileSample.map((item, index) => (
                         <EditProfile

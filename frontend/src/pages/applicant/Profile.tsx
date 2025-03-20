@@ -9,7 +9,7 @@ import Resume from "@/components/customs/applicant/Resume"
 import ResumeSmall from "@/components/customs/applicant/ResumeSmall"
 import { useEffect, useState } from "react"
 import { useAuth } from "@/contexts/authContext"
-import { useNavigate } from "react-router-dom"
+import { useNavigate, Link } from "react-router-dom"
 import axios from "axios"
 
 const Profile = () => {
