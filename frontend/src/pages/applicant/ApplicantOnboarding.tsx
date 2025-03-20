@@ -152,7 +152,7 @@ const ApplicantOnboarding = () => {
   useEffect(() => {
     if (authStateApplicant?.user_type === "applicant") {
       authStateApplicant?.done_onboarding
-        ? navigate("/applicant/jobs")
+        ? navigate("/applicant/profile")
         : navigate("/applicant/onboarding");
     }
   }, [authStateApplicant, navigate]);
