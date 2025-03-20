@@ -129,7 +129,7 @@ const ApplicantOnboarding = () => {
           success: "bg-teal-100",
         },
       });
-      navigate("/applicant/profile");
+      window.location.reload();
     } catch (error: any) {
       setIsLoading(false);
       const errorMsg =

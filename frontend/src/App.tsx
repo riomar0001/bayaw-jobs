@@ -33,23 +33,7 @@ const router = createBrowserRouter(
             <Route path="/" element={<MainLayout />}>
                 <Route index element={<Landing />} />
                 <Route path="/applicant/profile" element={<Profile />} />
-                <Route path="/applicant/profile/edit" element={
-                    EditProfileSample.map((item, index) => (
-                        <EditProfile
-                            key={index}
-                            // firstName={item.firstName}
-                            // lastName={item.lastName}
-                            // email={item.email}
-                            // contactNumber={item.contactNumber}
-                            // linkedInURL={item.linkedInURL}
-                            // facebookURL={item.facebookURL}
-                            // twitterURL={item.twitterURL}
-                            // birthdate={item.birthdate}
-                            // location={item.location}
-                        />
-
-                    ))
-                } />
+                <Route path="/applicant/profile/edit" element={<EditProfile />} />
                 <Route path="/register" element={<Registration />} />
                 <Route path="/login" element={<Login />} />
                 <Route path="/find-jobs" element={<FindJobs />} />
@@ -66,7 +50,7 @@ const router = createBrowserRouter(
                     <Route path="/employer/add-job" element={<AddJob />} />
                     <Route path="/employer/profile" element={<ProfileEmployer />} />
                 </Route>
-                
+
             </Route>
             <Route path="/employer/onboarding" element={<OnboardingCompany />} />
         </>
