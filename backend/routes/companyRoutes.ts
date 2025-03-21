@@ -22,6 +22,7 @@ import getPostedJob from "@/controllers/company/getPostedJob";
 import updateCompanyIndustry from "@/controllers/company/updateCompanyIndustry";
 import deleteCompany from "@/controllers/company/deleteCompany";
 import addIndustry from "@/controllers/company/addIndustry";
+import getAllCompanyDetails from "@/controllers/company/getAllInformation";
 /**
  * @Reminder Place all GET requests here
  * @Format router.get("path", "middleware", "controller");
@@ -31,7 +32,7 @@ router.get("/", protect, getCompanyDetails);
 router.get("/industries", protect, getIndustries);
 router.get("/jobs", protect, getPostedJob);
 router.get("/all-jobs", protect, getIndustries);
-
+router.get("/company/", protect, getAllCompanyDetails);
 
 /**
  * @Reminder Place all POST requests here

@@ -16,6 +16,8 @@ import { checkIfApplied } from "@/controllers/jobs/checkIfApplied";
 import { applyJob } from "@/controllers/jobs/applyJob";
 import { cancelJobApplication } from "@/controllers/jobs/cancelJobApplication";
 import { getAppliedJobs } from "@/controllers/jobs/getAppliedJobs";
+import { rejectApplicant } from "@/controllers/jobs/rejectApplicant";
+import { hireApplicant } from "@/controllers/jobs/hireApplicant";
 
 const router = express.Router();
 
@@ -26,8 +28,6 @@ const router = express.Router();
 router.get("/appliedJobs", applicantProtect, getAppliedJobs);
 router.get("/company", protect, getJobByCompany);
 router.get("/:job_id", getJobById);
-
-
 router.get("/", getAllJobs);
 router.get("/all/recent", getRecentJobs);
 router.get("/all/picks", getJobPicks);
@@ -47,6 +47,8 @@ router.post("/apply/:job_posting_id", applicantProtect, applyJob);
  * @Format router.put("path", "middleware", "controller");
  */
 router.put("/:job_posting_id", protect, updateJob);
+router.put("/applicant/reject/:job_id/applicant/:applicant_id", protect, rejectApplicant);
+router.put("/applicant/hire/:job_id/applicant/:applicant_id", protect, hireApplicant)
 
 /**
  * @Reminder Place all DELETE requests here
