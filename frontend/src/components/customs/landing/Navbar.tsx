@@ -21,8 +21,6 @@ const Navbar = () => {
         <Link to={"/find-jobs"}>
           <h1 className="hover:underline cursor-pointer">Find Jobs</h1>
         </Link>
-
-        <h1 className="hover:underline cursor-pointer">Companies</h1>
         <Link to="/employer">
           <h1 className="hover:underline cursor-pointer">Company Login</h1>
         </Link>
