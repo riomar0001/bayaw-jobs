@@ -54,7 +54,7 @@ const RegistrationForm = () => {
 
     return (
         <div className="w-[650px] h-auto bg-white border border-neutral-300 rounded-xl px-12 py-8">
-            <h1 className="font-normal text-2xl mb-8">Create your Employer account</h1>
+            <h1 className="font-normal text-2xl mb-8">Create your Applicant account</h1>
 
             {error && (
                 <div className="mb-4 p-3 bg-red-100 text-red-700 rounded-md">
@@ -67,7 +67,7 @@ const RegistrationForm = () => {
                 <div className="relative mb-4">
                     <User color="black" size={20} className="absolute left-4 top-1/2 transform -translate-y-1/2" />
                     <Input
-                        placeholder="Enter your username"
+                        placeholder="Enter your applicant username"
                         className="bg-neutral-100 h-12 pl-12"
                         onChange={(e) => setUsername(e.target.value)}
                         value={username}
@@ -79,7 +79,7 @@ const RegistrationForm = () => {
                 <div className="relative mb-4">
                     <Mail color="black" size={20} className="absolute left-4 top-1/2 transform -translate-y-1/2" />
                     <Input
-                        placeholder="Enter your email"
+                        placeholder="Enter your applicant email"
                         className="bg-neutral-100 h-12 pl-12"
                         onChange={(e) => setEmail(e.target.value)}
                         value={email}

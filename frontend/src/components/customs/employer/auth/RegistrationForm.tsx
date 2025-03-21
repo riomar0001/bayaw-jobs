@@ -67,7 +67,7 @@ const RegistrationForm = () => {
                 <div className="relative mb-4">
                     <User color="black" size={20} className="absolute left-4 top-1/2 transform -translate-y-1/2" />
                     <Input
-                        placeholder="Enter your username"
+                        placeholder="Enter your employer username"
                         className="bg-neutral-100 h-12 pl-12"
                         onChange={(e) => setUsername(e.target.value)}
                         value={username}
@@ -79,7 +79,7 @@ const RegistrationForm = () => {
                 <div className="relative mb-4">
                     <Mail color="black" size={20} className="absolute left-4 top-1/2 transform -translate-y-1/2" />
                     <Input
-                        placeholder="Enter your email"
+                        placeholder="Enter your employer email"
                         className="bg-neutral-100 h-12 pl-12"
                         onChange={(e) => setEmail(e.target.value)}
                         value={email}
