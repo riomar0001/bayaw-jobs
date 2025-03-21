@@ -19,13 +19,6 @@ export const getIndustries = async (req: Request, res: Response) => {
       });
     }
 
-    // const company_token_info = jwt.verify(
-    //   company_token,
-    //   process.env.JWT_SECRET_COMPANY!
-    // ) as DecodedCompanyToken;
-
-    // const company_id = company_token_info.company.id;
-
     const industries = await prisma.company_industries.findMany();
   
       if (!industries) {

@@ -1,4 +1,3 @@
-import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import {
   Briefcase,
@@ -8,35 +7,12 @@ import {
   MapPin,
   UserRoundPen,
 } from "lucide-react";
-import ApplicantsCard from "./ApplicantsCard";
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from "@/components/ui/dialog";
-import { Button } from "@/components/ui/button";
 import axios from "axios";
 import { useState, useEffect } from "react";
 import Spinner from "../Spinner";
 
-interface JobData {
-  id: string;
-  company_account_id: string;
-  title: string;
-  description: string;
-  location: string;
-  category: string;
-  salary_from: number;
-  salary_to: number;
-  work_schedule: string;
-  years_exp: number;
-  is_closed: boolean;
-  created_at: string;
-  updated_at: string;
-}
+import JobApplicantsModal from "../modals/JobApplicantsModal";
+
 
 const JobDetailsCard = ({ jobId }: { jobId: string }) => {
   const [jobData, setJobData] = useState<any | null>(null);
@@ -165,119 +141,7 @@ const JobDetailsCard = ({ jobId }: { jobId: string }) => {
                   </div>
 
                   <div>
-                    <Dialog>
-                      <DialogTrigger className="w-full space-y-3 text-start">
-                        <ApplicantsCard
-                          name="Kyle Dellatan"
-                          email="kyledellatan@gmail.com"
-                          contactNumber="09987654321"
-                          applicantId="1"
-                        />
-                      </DialogTrigger>
-                      <DialogContent>
-                        <DialogHeader>
-                          <DialogTitle>
-                            <h1 className="text-2xl font-semibold">
-                              Applicant Details
-                            </h1>
-                            <h1 className="text-gray-500 font-light text-base">
-                              Review the applicant's information and access
-                              their CV
-                            </h1>
-                          </DialogTitle>
-                          <DialogDescription>
-                            <div className="">
-                              <h1 className="text-black text-lg">
-                                Basic Information
-                              </h1>
-                              <hr />
-                              <div className="space-y-1 my-3">
-                                <h1>
-                                  Full Name:
-                                  <span className="text-lochmara-400">
-                                    {" "}
-                                    Kyle Dellatan
-                                  </span>
-                                </h1>
-                                <h1>
-                                  Username:
-                                  <span className="text-lochmara-400">
-                                    {" "}
-                                    ykylejan
-                                  </span>
-                                </h1>
-                                <h1>
-                                  Email:{" "}
-                                  <span className="text-lochmara-400">
-                                    {" "}
-                                    kyledellatan@gmail.com
-                                  </span>
-                                </h1>
-                                <h1>
-                                  Contact No:
-                                  <span className="text-lochmara-400">
-                                    {" "}
-                                    09987654321
-                                  </span>
-                                </h1>
-                                <h1>Account Created: 3/17/2025</h1>
-                              </div>
-
-                              <h1 className="text-black text-lg">
-                                Work Experience
-                              </h1>
-                              <hr />
-
-                              <div className="space-y-1 my-3">
-                                <div className="bg-neutral-50 border border-neutral-300 rounded-md p-3">
-                                  <h1>
-                                    Company:
-                                    <span className="text-lochmara-400">
-                                      {" "}
-                                      KALMOT
-                                    </span>
-                                  </h1>
-                                  <h1>
-                                    Address:
-                                    <span className="text-lochmara-400">
-                                      {" "}
-                                      Davao City
-                                    </span>
-                                  </h1>
-                                  <h1>
-                                    Position:
-                                    <span className="text-lochmara-400">
-                                      {" "}
-                                      Frontend Developer, UI/UX
-                                    </span>
-                                  </h1>
-                                  <h1>
-                                    Years of Stay:
-                                    <span className="text-lochmara-400">
-                                      {" "}
-                                      6 years
-                                    </span>
-                                  </h1>
-                                </div>
-                              </div>
-
-                              <h1 className="text-black text-lg">
-                                CV Document
-                              </h1>
-                              <hr />
-
-                              <div className="my-3">
-                                <h1>
-                                  Click the button below to view the applicant's
-                                  CV.
-                                </h1>
-                                <Button>View CV</Button>
-                              </div>
-                            </div>
-                          </DialogDescription>
-                        </DialogHeader>
-                      </DialogContent>
-                    </Dialog>
+                    <JobApplicantsModal job_id={jobId} />
                   </div>
                 </div>
               </div>
