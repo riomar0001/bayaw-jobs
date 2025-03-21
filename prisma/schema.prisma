@@ -181,7 +181,6 @@ model job_applicants {
   applicants_account_id String
   applicants            applicants_account @relation(fields: [applicants_account_id], references: [id], onDelete: Cascade)
   job_offers            job_offers         @relation(fields: [job_id], references: [id], onDelete: Cascade)
-  
 }
 
 enum WorkType {

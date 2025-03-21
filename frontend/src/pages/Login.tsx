@@ -48,8 +48,8 @@ const Login = () => {
 
 
   return (
-    <div className="bg-neutral-100 w-full h-auto py-56">
-      <div className="flex justify-center">
+    <div className="bg-neutral-100 w-full h-screen">
+      <div className="flex justify-center pt-32">
         <div className="w-[650px] h-auto bg-white border border-neutral-300 rounded-xl px-12 py-8">
           <h1 className="font-normal text-3xl mb-10">Log in to your account</h1>
 
