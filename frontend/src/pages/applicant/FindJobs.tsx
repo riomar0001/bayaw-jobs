@@ -126,7 +126,7 @@ const FindJobs = () => {
         </Button>
       </form>
 
-      <div className="w-full h-auto px-16 pb-16">
+      <div className="w-full h-auto px-24 pb-16 justify-center">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-10 w-full">
           {filteredJobs.length > 0 ? (
             filteredJobs.map((item) => {

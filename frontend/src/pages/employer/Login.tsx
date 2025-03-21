@@ -80,10 +80,10 @@ const Login = () => {
             </div>
             <div className="relative mb-4">
               <div className="absolute left-4 top-1/2 transform -translate-y-1/2">
-                <User color="black" size={20} />
+                <Lock color="black" size={20} />
               </div>
               <Input
-                placeholder="Enter your username or email"
+                placeholder="Enter password"
                 type={showPassword ? "text" : "password"}
                 className="bg-neutral-100 h-12 pl-12"
                 onChange={(e) => setPassword(e.target.value)}
