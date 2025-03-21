@@ -31,8 +31,8 @@ const AppliedJobsList = () => {
         });
         const data = response.data.appliedJobs;
 
-        setAppliedJobs(data || []);
-        // console.log("Data", data);
+        setAppliedJobs(data);
+        console.log("Data", data);
       } catch (error: any) {
         console.error(error.message);
       } finally {
