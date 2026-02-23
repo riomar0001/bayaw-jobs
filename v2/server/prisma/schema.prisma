@@ -1,0 +1,117 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model user {
+  id         String     @id @default(cuid())
+  email      String     @unique
+  first_name String
+  last_name  String
+  password   String
+  role       String
+  status     UserStatus @default(PENDING_VERIFICATION)
+
+  // Authentication & Security
+  email_verified        Boolean   @default(false)
+  email_verified_at     DateTime?
+  password_changed_at   DateTime  @default(now())
+  failed_login_attempts Int       @default(0)
+  locked_until          DateTime?
+
+  // Activity tracking
+  last_login_at    DateTime?
+  last_activity_at DateTime?
+  login_count      Int       @default(0)
+
+  // Soft delete
+  deleted_at DateTime?
+
+  // Audit fields
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+
+  // Relationships
+  refresh_tokens refresh_token[]
+  auth_codes     auth_code[]
+
+  // Indexes for performance
+  @@index([email])
+  @@index([status])
+  @@index([role])
+  @@index([created_at])
+  @@index([last_login_at])
+  @@index([deleted_at])
+  // Table name
+  @@map("users")
+}
+
+model refresh_token {
+  id         String @id @default(cuid())
+  user_id    String
+  token_hash String @unique
+
+  // Device information
+  ip_address String?
+  user_agent String?
+  browser    String?
+  os         String?
+  device     String?
+  city       String?
+  region     String?
+  country    String?
+
+  // Token lifecycle
+  is_active  Boolean   @default(true)
+  revoked_at DateTime?
+  expires_at DateTime
+  last_used  DateTime?
+
+  // Audit fields
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+
+  // Foreign key relationship
+  user user @relation(fields: [user_id], references: [id], onDelete: Cascade)
+
+  // Indexes for performance
+  @@index([user_id])
+  @@index([expires_at])
+  @@index([is_active])
+  @@index([token_hash])
+  // Table name in database
+  @@map("refresh_tokens")
+}
+
+model auth_code {
+  id         String   @id @default(cuid())
+  user_id    String
+  code       String
+  expires_at DateTime
+  used       Boolean  @default(false)
+  created_at DateTime @default(now())
+
+  user user @relation(fields: [user_id], references: [id], onDelete: Cascade)
+
+  @@index([user_id])
+  @@index([expires_at])
+  @@map("auth_codes")
+}
+
+enum UserStatus {
+  ACTIVE
+  INACTIVE
+  SUSPENDED
+  PENDING_VERIFICATION
+  DELETED
+}
