@@ -70,7 +70,7 @@ export function validateFileSize(size: number): boolean {
  */
 export function validateImageUpload(_fieldName: string = 'image', required: boolean = true) {
   return (req: Request, _res: Response, next: NextFunction) => {
-    const file = req.file;
+    const file = req.body.file;
 
     // Check if file is required
     if (!file) {
