@@ -1,6 +1,7 @@
 import { Router } from 'express';
 import authRoutes from './auth.routes';
 import applicantRoutes from './applicant.routes';
+import companyRoutes from './company.routes';
 
 const router = Router();
 
@@ -25,5 +26,6 @@ router.get('/', (_req, res) => {
 // API routes
 router.use('/auth', authRoutes);
 router.use('/applicants', applicantRoutes);
+router.use('/business', companyRoutes);
 
 export default router;

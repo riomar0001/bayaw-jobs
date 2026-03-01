@@ -1,4 +1,4 @@
-import { supabase, PROFILE_PICTURE_BUCKET, RESUME_BUCKET } from '@/configs/supabase.config';
+import { supabase, PROFILE_PICTURE_BUCKET, RESUME_BUCKET, COMPANY_LOGO_BUCKET } from '@/configs/supabase.config';
 import { AppError } from '@/utils/errors.util';
 import { ErrorMessages } from '@/constants/errorMessages.constant';
 import { readFileSync } from 'fs';
@@ -139,6 +139,52 @@ export class StorageService {
 
   async deleteResumeFile(filename: string): Promise<void> {
     await this.deleteFile(RESUME_BUCKET, filename);
+  }
+
+  // ─── Company Logo ────────────────────────────────────────────────────────────
+
+  async uploadCompanyLogo(
+    buffer: Buffer,
+    userId: string,
+    originalFilename: string
+  ): Promise<string> {
+    if (!supabase) {
+      throw new AppError(500, 'Storage service not configured');
+    }
+
+    const extension = originalFilename.split('.').pop()?.toLowerCase() || 'jpg';
+    const filename = `logo_${userId}.${extension}`;
+
+    const { error } = await supabase.storage.from(COMPANY_LOGO_BUCKET).upload(filename, buffer, {
+      contentType: `image/${extension}`,
+      upsert: true,
+    });
+
+    if (error) {
+      logger.error('Storage upload error', { error });
+      throw new AppError(500, ErrorMessages.STORAGE.UPLOAD_FAILED);
+    }
+
+    return filename;
+  }
+
+  async downloadCompanyLogo(filename: string): Promise<{ buffer: Buffer; contentType: string }> {
+    if (!supabase) {
+      throw new AppError(500, 'Storage service not configured');
+    }
+
+    const { data, error } = await supabase.storage.from(COMPANY_LOGO_BUCKET).download(filename);
+
+    if (error || !data) {
+      logger.error('Storage download error', { error });
+      throw new AppError(500, ErrorMessages.STORAGE.UPLOAD_FAILED);
+    }
+
+    const extension = filename.split('.').pop()?.toLowerCase() || 'jpg';
+    const contentType =
+      extension === 'png' ? 'image/png' : extension === 'webp' ? 'image/webp' : 'image/jpeg';
+
+    return { buffer: Buffer.from(await data.arrayBuffer()), contentType };
   }
 
   // ─── Shared ──────────────────────────────────────────────────────────────────

@@ -1,5 +1,6 @@
 import { authDocs } from './auth.docs';
 import { applicantDocs } from './applicant.docs';
+import { companyDocs } from './company.docs';
 export const openApiSpec = {
   openapi: '3.0.3',
   info: {
@@ -33,6 +34,10 @@ export const openApiSpec = {
       name: 'Applicants',
       description: 'Applicant onboarding and profile management',
     },
+    {
+      name: 'Business',
+      description: 'Business onboarding and company management',
+    },
   ],
   components: {
     securitySchemes: {
@@ -53,6 +58,7 @@ export const openApiSpec = {
   paths: {
     ...authDocs,
     ...applicantDocs,
+    ...companyDocs,
   },
 };
 
