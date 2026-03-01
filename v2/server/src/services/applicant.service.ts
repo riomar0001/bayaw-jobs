@@ -5,6 +5,7 @@ import {
   OnboardingInput,
   UpdateProfileInput,
   UpdateEducationInput,
+  AddEducationInput,
 } from '@/validations/applicant.validation';
 import { storageService } from '@/services/storage.service';
 
@@ -149,6 +150,34 @@ export class ApplicantService {
       profile_picture: fileName,
       url: `${process.env.APP_URL}/api/applicants/profile/picture/${profile.id}`,
     };
+  }
+
+  async deleteEducation(userId: string, educationId: string) {
+    const profile = await applicantRepository.findProfileByUserId(userId);
+    if (!profile) {
+      throw new NotFoundError('Applicant profile');
+    }
+
+    const education = profile.applicantEducations.find((e) => e.id === educationId);
+    if (!education) {
+      throw new NotFoundError('Education entry');
+    }
+
+    return applicantRepository.deleteEducation(educationId);
+  }
+
+  async addEducation(userId: string, data: AddEducationInput) {
+    const profile = await applicantRepository.findProfileByUserId(userId);
+    if (!profile) {
+      throw new NotFoundError('Applicant profile');
+    }
+
+    return applicantRepository.addEducation(profile.id, {
+      institution_name: data.institution_name,
+      field_of_study: data.field_of_study,
+      start_year: data.start_year,
+      end_year: data.end_year ?? null,
+    });
   }
 
   async updateEducation(userId: string, educationId: string, data: UpdateEducationInput) {

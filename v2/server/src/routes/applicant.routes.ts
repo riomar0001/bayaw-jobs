@@ -7,6 +7,7 @@ import {
   onboardingSchema,
   updateProfileSchema,
   updateEducationSchema,
+  addEducationSchema,
 } from '@/validations/applicant.validation';
 import { BadRequestError } from '@/utils/errors.util';
 
@@ -65,6 +66,13 @@ router.patch(
   authenticate,
   validate(updateProfileSchema),
   applicantController.updateProfile.bind(applicantController)
+);
+
+router.post(
+  '/education',
+  authenticate,
+  validate(addEducationSchema),
+  applicantController.addEducation.bind(applicantController)
 );
 
 router.patch(

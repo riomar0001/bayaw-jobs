@@ -52,6 +52,29 @@ export class ApplicantRepository {
     });
   }
 
+  async deleteEducation(id: string) {
+    return prisma.applicant_education.delete({
+      where: { id },
+    });
+  }
+
+  async addEducation(
+    profileId: string,
+    data: Pick<ApplicantEducation, 'institution_name' | 'field_of_study' | 'start_year'> & {
+      end_year?: number | null;
+    }
+  ) {
+    return prisma.applicant_education.create({
+      data: {
+        applicant_profile_id: profileId,
+        institution_name: data.institution_name,
+        field_of_study: data.field_of_study,
+        start_year: data.start_year,
+        end_year: data.end_year ?? null,
+      },
+    });
+  }
+
   async updateEducation(
     id: string,
     data: Partial<Pick<ApplicantEducation, 'institution_name' | 'field_of_study' | 'start_year'>> & {

@@ -93,6 +93,22 @@ export const updateEducationSchema = z.object({
     }),
 });
 
+export const addEducationSchema = z.object({
+  body: z.object({
+    institution_name: z.string().min(1, 'Institution name is required'),
+    field_of_study: z.string().min(1, 'Field of study is required'),
+    start_year: z.number().int().min(1900).max(new Date().getFullYear()),
+    end_year: z
+      .number()
+      .int()
+      .min(1900)
+      .max(new Date().getFullYear() + 10)
+      .nullable()
+      .optional(),
+  }),
+});
+
 export type OnboardingInput = z.infer<typeof onboardingSchema>['body'];
 export type UpdateProfileInput = z.infer<typeof updateProfileSchema>['body'];
 export type UpdateEducationInput = z.infer<typeof updateEducationSchema>['body'];
+export type AddEducationInput = z.infer<typeof addEducationSchema>['body'];

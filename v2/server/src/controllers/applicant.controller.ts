@@ -38,6 +38,37 @@ export class ApplicantController {
     }
   }
 
+  async deleteEducation(req: Request, res: Response, next: NextFunction): Promise<void> {
+    try {
+      const userId = req.user?.user_id;
+      if (!userId) {
+        throw new Error('User ID missing in request');
+      }
+
+      const { id } = req.params as { id: string };
+      await applicantService.deleteEducation(userId, id);
+
+      successResponse(res, null, 'Education deleted successfully');
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  async addEducation(req: Request, res: Response, next: NextFunction): Promise<void> {
+    try {
+      const userId = req.user?.user_id;
+      if (!userId) {
+        throw new Error('User ID missing in request');
+      }
+
+      const created = await applicantService.addEducation(userId, req.body);
+
+      createdResponse(res, created, 'Education added successfully');
+    } catch (error) {
+      next(error);
+    }
+  }
+
   async updateEducation(req: Request, res: Response, next: NextFunction): Promise<void> {
     try {
       const userId = req.user?.user_id;

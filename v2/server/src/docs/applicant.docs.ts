@@ -546,6 +546,95 @@ const profile = {
   },
 };
 
+// ─── POST /applicants/education ───────────────────────────────────────────────
+
+const addEducation = {
+  '/applicants/education': {
+    post: {
+      tags: ['Applicants'],
+      summary: 'Add education entry',
+      description:
+        "Adds a new education entry to the authenticated applicant's profile. " +
+        'Requires a valid Bearer access token.',
+      security: [{ bearerAuth: [] }],
+      requestBody: {
+        required: true,
+        content: {
+          'application/json': {
+            schema: {
+              type: 'object',
+              required: ['institution_name', 'field_of_study', 'start_year'],
+              properties: {
+                institution_name: { type: 'string', example: 'State University' },
+                field_of_study: { type: 'string', example: 'Computer Science' },
+                start_year: { type: 'integer', example: 2018 },
+                end_year: { type: 'integer', nullable: true, example: 2022 },
+              },
+            },
+          },
+        },
+      },
+      responses: {
+        201: {
+          description: 'Education added successfully',
+          content: {
+            'application/json': {
+              schema: {
+                type: 'object',
+                properties: {
+                  success: { type: 'boolean', example: true },
+                  message: { type: 'string', example: 'Education added successfully' },
+                  data: {
+                    type: 'object',
+                    properties: {
+                      id: { type: 'string', example: 'e1b2c3d4-...' },
+                      applicant_profile_id: { type: 'string', example: 'a1b2c3d4-...' },
+                      institution_name: { type: 'string', example: 'State University' },
+                      field_of_study: { type: 'string', example: 'Computer Science' },
+                      start_year: { type: 'integer', example: 2018 },
+                      end_year: { type: 'integer', nullable: true, example: 2022 },
+                    },
+                  },
+                },
+              },
+            },
+          },
+        },
+        400: {
+          description: 'Validation error',
+          content: {
+            'application/json': {
+              schema: {
+                type: 'object',
+                properties: {
+                  success: { type: 'boolean', example: false },
+                  message: { type: 'string', example: 'Institution name is required' },
+                },
+              },
+            },
+          },
+        },
+        401: unauthorizedResponse,
+        404: {
+          description: 'Applicant profile not found',
+          content: {
+            'application/json': {
+              schema: {
+                type: 'object',
+                properties: {
+                  success: { type: 'boolean', example: false },
+                  message: { type: 'string', example: 'Applicant profile not found' },
+                },
+              },
+            },
+          },
+        },
+        500: internalErrorResponse,
+      },
+    },
+  },
+};
+
 // ─── PATCH /applicants/education/{id} ────────────────────────────────────────
 
 const updateEducation = {
@@ -967,6 +1056,7 @@ const updateProfilePicture = {
 export const applicantDocs = {
   ...onboarding,
   ...profile,
+  ...addEducation,
   ...updateEducation,
   ...getResume,
   ...updateResume,
