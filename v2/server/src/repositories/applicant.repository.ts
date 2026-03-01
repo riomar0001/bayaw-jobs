@@ -22,6 +22,7 @@ const PROFILE_INCLUDE = {
   applicantEducations: { omit: OMIT_TIMESTAMPS },
   applicantLanguages: { omit: OMIT_TIMESTAMPS },
   applicantResumes: { omit: OMIT_TIMESTAMPS },
+  applicantCareerStatuses: { omit: OMIT_TIMESTAMPS },
 } as const;
 
 export class ApplicantRepository {
@@ -100,6 +101,9 @@ export class ApplicantRepository {
             language_name: lang.language_name,
             proficiency_level: lang.proficiency_level,
           })),
+        },
+        applicantCareerStatuses: {
+          create: { status: data.career_status ?? 'ACTIVELY_LOOKING' },
         },
       },
       include: PROFILE_INCLUDE,

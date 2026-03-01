@@ -57,6 +57,9 @@ export class ApplicantController {
   async getProfilePicture(req: Request, res: Response, next: NextFunction): Promise<void> {
     try {
       const { id } = req.params;
+      if (!id || typeof id !== 'string') {
+        throw new BadRequestError('Profile ID is required');
+      }
       const { buffer, contentType, filename } = await applicantService.getProfilePicture(id);
 
       res.setHeader('Content-Type', contentType);
@@ -104,7 +107,6 @@ export class ApplicantController {
       next(error);
     }
   }
-
 }
 
 export const applicantController = new ApplicantController();

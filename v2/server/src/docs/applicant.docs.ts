@@ -32,12 +32,20 @@ const internalErrorResponse = {
 
 // ─── Shared profile data schema ───────────────────────────────────────────────
 
+const CAREER_STATUS_ENUM = ['ACTIVELY_LOOKING', 'OPEN_TO_OPPORTUNITIES', 'EMPLOYED_NOT_LOOKING', 'NOT_LOOKING'];
+
 const applicantProfileSchema = {
   type: 'object',
   properties: {
     age: { type: 'integer', example: 25 },
     gender: { type: 'string', example: 'Male' },
     desired_position: { type: 'string', example: 'Software Engineer' },
+    career_status: {
+      type: 'string',
+      enum: CAREER_STATUS_ENUM,
+      default: 'ACTIVELY_LOOKING',
+      description: 'Defaults to ACTIVELY_LOOKING if not provided.',
+    },
   },
   required: ['age', 'gender', 'desired_position'],
 };
@@ -123,6 +131,12 @@ const applicantProfileResponseData = {
           },
         },
       },
+    },
+    career_status: {
+      type: 'string',
+      enum: ['ACTIVELY_LOOKING', 'OPEN_TO_OPPORTUNITIES', 'EMPLOYED_NOT_LOOKING', 'NOT_LOOKING'],
+      nullable: true,
+      example: 'ACTIVELY_LOOKING',
     },
     resume_url: {
       type: 'string',

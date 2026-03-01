@@ -70,7 +70,10 @@ export class ApplicantService {
       console.warn('Could not upload resume during onboarding:', err);
     }
 
-    return { ...profile, resume_url: resumeUrl };
+    const { applicantCareerStatuses, ...profileRest } = profile;
+    const career_status = applicantCareerStatuses[0]?.status ?? null;
+
+    return { ...profileRest, career_status, resume_url: resumeUrl };
   }
 
   async getProfile(userId: string) {
@@ -79,15 +82,16 @@ export class ApplicantService {
       throw new NotFoundError('Applicant profile');
     }
 
-    const { applicantResumes, ...rest } = profile;
+    const { applicantResumes, applicantCareerStatuses, ...rest } = profile;
     const resume_url = applicantResumes.length > 0
       ? `${process.env.APP_URL}/api/applicants/resume/${profile.id}`
       : null;
     const profile_picture_url = profile.profile_picture
       ? `${process.env.APP_URL}/api/applicants/profile/picture/${profile.id}`
       : null;
+    const career_status = applicantCareerStatuses[0]?.status ?? null;
 
-    return { ...rest, resume_url, profile_picture_url };
+    return { ...rest, career_status, resume_url, profile_picture_url };
   }
 
   async getResume(profileId: string): Promise<{ buffer: Buffer; filename: string }> {

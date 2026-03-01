@@ -28,6 +28,12 @@ export interface ApplicantResume {
   file_name: string;
 }
 
+export type ApplicantCareerStatus =
+  | 'ACTIVELY_LOOKING'
+  | 'OPEN_TO_OPPORTUNITIES'
+  | 'EMPLOYED_NOT_LOOKING'
+  | 'NOT_LOOKING';
+
 export interface ApplicantProfile {
   user_id: string;
   first_name: string;
@@ -37,4 +43,5 @@ export interface ApplicantProfile {
   gender: string;
   desired_position: string;
   profile_picture?: string | null;
+  career_status?: ApplicantCareerStatus;
 }
