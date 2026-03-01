@@ -45,6 +45,19 @@ const profileSchema = z.object({
     .optional(),
 });
 
+export const updateProfileSchema = z.object({
+  body: z
+    .object({
+      desired_position: z.string().min(1, 'Desired position is required').optional(),
+      age: z.number().int().min(16, 'Must be at least 16 years old').max(100).optional(),
+      location: z.string().min(1, 'Location is required').optional(),
+      gender: z.string().min(1, 'Gender is required').optional(),
+    })
+    .refine((data) => Object.keys(data).length > 0, {
+      message: 'At least one field must be provided',
+    }),
+});
+
 export const onboardingSchema = z.object({
   body: z.object({
     profile: profileSchema,
@@ -58,4 +71,28 @@ export const onboardingSchema = z.object({
   }),
 });
 
+export const updateEducationSchema = z.object({
+  params: z.object({
+    id: z.string().min(1, 'Education ID is required'),
+  }),
+  body: z
+    .object({
+      institution_name: z.string().min(1, 'Institution name is required').optional(),
+      field_of_study: z.string().min(1, 'Field of study is required').optional(),
+      start_year: z.number().int().min(1900).max(new Date().getFullYear()).optional(),
+      end_year: z
+        .number()
+        .int()
+        .min(1900)
+        .max(new Date().getFullYear() + 10)
+        .nullable()
+        .optional(),
+    })
+    .refine((data) => Object.keys(data).length > 0, {
+      message: 'At least one field must be provided',
+    }),
+});
+
 export type OnboardingInput = z.infer<typeof onboardingSchema>['body'];
+export type UpdateProfileInput = z.infer<typeof updateProfileSchema>['body'];
+export type UpdateEducationInput = z.infer<typeof updateEducationSchema>['body'];

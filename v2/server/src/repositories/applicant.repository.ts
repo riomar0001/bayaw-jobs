@@ -46,6 +46,34 @@ export class ApplicantRepository {
     });
   }
 
+  async findEducationById(id: string) {
+    return prisma.applicant_education.findUnique({
+      where: { id },
+    });
+  }
+
+  async updateEducation(
+    id: string,
+    data: Partial<Pick<ApplicantEducation, 'institution_name' | 'field_of_study' | 'start_year'>> & {
+      end_year?: number | null;
+    }
+  ) {
+    return prisma.applicant_education.update({
+      where: { id },
+      data,
+    });
+  }
+
+  async updateProfile(
+    profileId: string,
+    data: Partial<Pick<ApplicantProfile, 'desired_position' | 'age' | 'location' | 'gender'>>
+  ) {
+    return prisma.applicant_profile.update({
+      where: { id: profileId },
+      data,
+    });
+  }
+
   async updateProfilePicture(profileId: string, filename: string) {
     return prisma.applicant_profile.update({
       where: { id: profileId },

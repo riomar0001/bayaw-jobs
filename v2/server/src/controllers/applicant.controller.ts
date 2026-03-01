@@ -38,6 +38,37 @@ export class ApplicantController {
     }
   }
 
+  async updateEducation(req: Request, res: Response, next: NextFunction): Promise<void> {
+    try {
+      const userId = req.user?.user_id;
+      if (!userId) {
+        throw new Error('User ID missing in request');
+      }
+
+      const { id } = req.params as { id: string };
+      const updated = await applicantService.updateEducation(userId, id, req.body);
+
+      successResponse(res, updated, 'Education updated successfully');
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  async updateProfile(req: Request, res: Response, next: NextFunction): Promise<void> {
+    try {
+      const userId = req.user?.user_id;
+      if (!userId) {
+        throw new Error('User ID missing in request');
+      }
+
+      const updated = await applicantService.updateProfile(userId, req.body);
+
+      successResponse(res, updated, 'Profile updated successfully');
+    } catch (error) {
+      next(error);
+    }
+  }
+
   async getResume(req: Request, res: Response, next: NextFunction): Promise<void> {
     try {
       const { id } = req.params;

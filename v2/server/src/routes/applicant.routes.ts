@@ -3,7 +3,11 @@ import multer from 'multer';
 import { applicantController } from '@/controllers/applicant.controller';
 import { validate } from '@/middlewares/validation.middleware';
 import { authenticate } from '@/middlewares/auth.middleware';
-import { onboardingSchema } from '@/validations/applicant.validation';
+import {
+  onboardingSchema,
+  updateProfileSchema,
+  updateEducationSchema,
+} from '@/validations/applicant.validation';
 import { BadRequestError } from '@/utils/errors.util';
 
 const router = Router();
@@ -55,6 +59,20 @@ router.post(
 );
 
 router.get('/profile', authenticate, applicantController.getProfile.bind(applicantController));
+
+router.patch(
+  '/profile',
+  authenticate,
+  validate(updateProfileSchema),
+  applicantController.updateProfile.bind(applicantController)
+);
+
+router.patch(
+  '/education/:id',
+  authenticate,
+  validate(updateEducationSchema),
+  applicantController.updateEducation.bind(applicantController)
+);
 
 router.get('/resume/:id', applicantController.getResume.bind(applicantController));
 

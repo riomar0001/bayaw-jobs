@@ -1,7 +1,11 @@
 import { applicantRepository } from '@/repositories/applicant.repository';
 import { userRepository } from '@/repositories/user.repository';
 import { ConflictError, NotFoundError, BadRequestError } from '@/utils/errors.util';
-import { OnboardingInput } from '@/validations/applicant.validation';
+import {
+  OnboardingInput,
+  UpdateProfileInput,
+  UpdateEducationInput,
+} from '@/validations/applicant.validation';
 import { storageService } from '@/services/storage.service';
 
 interface ResumeFile {
@@ -145,6 +149,39 @@ export class ApplicantService {
       profile_picture: fileName,
       url: `${process.env.APP_URL}/api/applicants/profile/picture/${profile.id}`,
     };
+  }
+
+  async updateEducation(userId: string, educationId: string, data: UpdateEducationInput) {
+    const profile = await applicantRepository.findProfileByUserId(userId);
+    if (!profile) {
+      throw new NotFoundError('Applicant profile');
+    }
+
+    const education = profile.applicantEducations.find((e) => e.id === educationId);
+    if (!education) {
+      throw new NotFoundError('Education entry');
+    }
+
+    const patch = Object.fromEntries(
+      Object.entries(data).filter(([, v]) => v !== undefined)
+    ) as Parameters<typeof applicantRepository.updateEducation>[1];
+
+    return applicantRepository.updateEducation(educationId, patch);
+  }
+
+  async updateProfile(userId: string, data: UpdateProfileInput) {
+    const profile = await applicantRepository.findProfileByUserId(userId);
+    if (!profile) {
+      throw new NotFoundError('Applicant profile');
+    }
+
+    const patch = Object.fromEntries(
+      Object.entries(data).filter(([, v]) => v !== undefined)
+    ) as Parameters<typeof applicantRepository.updateProfile>[1];
+
+    const updated = await applicantRepository.updateProfile(profile.id, patch);
+
+    return updated;
   }
 
   async uploadResume(userId: string, file: ResumeFile) {

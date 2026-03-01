@@ -475,16 +475,30 @@ const refresh = {
       tags: ['Authentication'],
       summary: 'Refresh access token',
       description:
-        'Refresh the access token using the refresh token from HTTP-only cookie. Returns a new access token and rotates the refresh token.',
+        'Issues a new access token using the `refreshToken` HTTP-only cookie automatically sent by the browser. ' +
+        'The old refresh token is revoked and a new one is issued (token rotation). ' +
+        'The new refresh token is set as an HTTP-only cookie (`refreshToken`, 7-day expiry, SameSite=Strict). ' +
+        'No request body or Authorization header is required — the cookie is sent automatically.',
+      parameters: [
+        {
+          name: 'refreshToken',
+          in: 'cookie',
+          required: true,
+          description: 'HTTP-only refresh token cookie set during login or a previous refresh.',
+          schema: { type: 'string' },
+        },
+      ],
       responses: {
         200: {
           description: 'Token refreshed successfully',
           headers: {
             'Set-Cookie': {
-              description: 'HTTP-only cookie containing new refresh token',
+              description:
+                'Rotated refresh token set as an HTTP-only cookie. ' +
+                'Name: `refreshToken`. Expires in 7 days. HttpOnly, SameSite=Strict.',
               schema: {
                 type: 'string',
-                example: 'refreshToken=newtoken123; HttpOnly; Secure; SameSite=Strict; Path=/',
+                example: 'refreshToken=eyJhbGci...; HttpOnly; Secure; SameSite=Strict; Path=/; Max-Age=604800',
               },
             },
           },
@@ -500,6 +514,7 @@ const refresh = {
                     properties: {
                       accessToken: {
                         type: 'string',
+                        description: 'New JWT access token. Valid for 3 hours.',
                         example: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...',
                       },
                       user: {
@@ -507,7 +522,7 @@ const refresh = {
                         properties: {
                           first_name: { type: 'string', nullable: true, example: 'John' },
                           last_name: { type: 'string', nullable: true, example: 'Doe' },
-                          role: { type: 'string', example: 'APPLICANT' },
+                          role: { type: 'string', example: 'USER' },
                           done_onboarding: { type: 'boolean', example: false },
                         },
                       },
@@ -519,7 +534,7 @@ const refresh = {
           },
         },
         401: {
-          description: 'Invalid or expired refresh token',
+          description: 'Missing, invalid, or expired refresh token cookie',
           content: {
             'application/json': {
               schema: {

@@ -406,9 +406,12 @@ const onboarding = {
   },
 };
 
+
 // ─── GET /applicants/profile ──────────────────────────────────────────────────
 
-const getProfile = {
+// ─── PATCH /applicants/profile ───────────────────────────────────────────────
+
+const profile = {
   '/applicants/profile': {
     get: {
       tags: ['Applicants'],
@@ -442,6 +445,198 @@ const getProfile = {
                 properties: {
                   success: { type: 'boolean', example: false },
                   message: { type: 'string', example: 'Applicant profile not found' },
+                },
+              },
+            },
+          },
+        },
+        500: internalErrorResponse,
+      },
+    },
+    patch: {
+      tags: ['Applicants'],
+      summary: 'Update applicant profile',
+      description:
+        "Updates the authenticated applicant's profile fields. " +
+        'All fields are optional — only provided fields will be updated. ' +
+        'At least one field must be provided. ' +
+        'Requires a valid Bearer access token.',
+      security: [{ bearerAuth: [] }],
+      requestBody: {
+        required: true,
+        content: {
+          'application/json': {
+            schema: {
+              type: 'object',
+              minProperties: 1,
+              properties: {
+                desired_position: { type: 'string', example: 'Software Engineer' },
+                age: { type: 'integer', minimum: 16, maximum: 100, example: 26 },
+                location: { type: 'string', example: 'Cebu City, Philippines' },
+                gender: { type: 'string', example: 'Male' },
+              },
+            },
+          },
+        },
+      },
+      responses: {
+        200: {
+          description: 'Profile updated successfully',
+          content: {
+            'application/json': {
+              schema: {
+                type: 'object',
+                properties: {
+                  success: { type: 'boolean', example: true },
+                  message: { type: 'string', example: 'Profile updated successfully' },
+                  data: {
+                    type: 'object',
+                    properties: {
+                      id: { type: 'string', example: 'a1b2c3d4-...' },
+                      user_id: { type: 'string', example: 'u1b2c3d4-...' },
+                      first_name: { type: 'string', example: 'John' },
+                      last_name: { type: 'string', example: 'Doe' },
+                      email: { type: 'string', example: 'john@example.com' },
+                      age: { type: 'integer', example: 26 },
+                      gender: { type: 'string', example: 'Male' },
+                      desired_position: { type: 'string', example: 'Software Engineer' },
+                      location: { type: 'string', example: 'Cebu City, Philippines' },
+                      profile_picture: { type: 'string', nullable: true },
+                      created_at: { type: 'string', format: 'date-time' },
+                      updated_at: { type: 'string', format: 'date-time' },
+                    },
+                  },
+                },
+              },
+            },
+          },
+        },
+        400: {
+          description: 'Validation error or no fields provided',
+          content: {
+            'application/json': {
+              schema: {
+                type: 'object',
+                properties: {
+                  success: { type: 'boolean', example: false },
+                  message: { type: 'string', example: 'At least one field must be provided' },
+                },
+              },
+            },
+          },
+        },
+        401: unauthorizedResponse,
+        404: {
+          description: 'Applicant profile not found',
+          content: {
+            'application/json': {
+              schema: {
+                type: 'object',
+                properties: {
+                  success: { type: 'boolean', example: false },
+                  message: { type: 'string', example: 'Applicant profile not found' },
+                },
+              },
+            },
+          },
+        },
+        500: internalErrorResponse,
+      },
+    },
+  },
+};
+
+// ─── PATCH /applicants/education/{id} ────────────────────────────────────────
+
+const updateEducation = {
+  '/applicants/education/{id}': {
+    patch: {
+      tags: ['Applicants'],
+      summary: 'Update education entry',
+      description:
+        "Updates a specific education entry belonging to the authenticated applicant's profile. " +
+        'All fields are optional — only provided fields will be updated. ' +
+        'At least one field must be provided. ' +
+        'Returns 404 if the entry does not exist or does not belong to the authenticated user. ' +
+        'Requires a valid Bearer access token.',
+      security: [{ bearerAuth: [] }],
+      parameters: [
+        {
+          name: 'id',
+          in: 'path',
+          required: true,
+          description: 'Education entry ID',
+          schema: { type: 'string' },
+        },
+      ],
+      requestBody: {
+        required: true,
+        content: {
+          'application/json': {
+            schema: {
+              type: 'object',
+              minProperties: 1,
+              properties: {
+                institution_name: { type: 'string', example: 'State University' },
+                field_of_study: { type: 'string', example: 'Computer Science' },
+                start_year: { type: 'integer', example: 2018 },
+                end_year: { type: 'integer', nullable: true, example: 2022 },
+              },
+            },
+          },
+        },
+      },
+      responses: {
+        200: {
+          description: 'Education updated successfully',
+          content: {
+            'application/json': {
+              schema: {
+                type: 'object',
+                properties: {
+                  success: { type: 'boolean', example: true },
+                  message: { type: 'string', example: 'Education updated successfully' },
+                  data: {
+                    type: 'object',
+                    properties: {
+                      id: { type: 'string', example: 'e1b2c3d4-...' },
+                      applicant_profile_id: { type: 'string', example: 'a1b2c3d4-...' },
+                      institution_name: { type: 'string', example: 'State University' },
+                      field_of_study: { type: 'string', example: 'Computer Science' },
+                      start_year: { type: 'integer', example: 2018 },
+                      end_year: { type: 'integer', nullable: true, example: 2022 },
+                    },
+                  },
+                },
+              },
+            },
+          },
+        },
+        400: {
+          description:
+            'Validation error, no fields provided, or entry does not belong to this profile',
+          content: {
+            'application/json': {
+              schema: {
+                type: 'object',
+                properties: {
+                  success: { type: 'boolean', example: false },
+                  message: { type: 'string', example: 'At least one field must be provided' },
+                },
+              },
+            },
+          },
+        },
+        401: unauthorizedResponse,
+        404: {
+          description: 'Applicant profile or education entry not found',
+          content: {
+            'application/json': {
+              schema: {
+                type: 'object',
+                properties: {
+                  success: { type: 'boolean', example: false },
+                  message: { type: 'string', example: 'Education entry not found' },
                 },
               },
             },
@@ -771,7 +966,8 @@ const updateProfilePicture = {
 
 export const applicantDocs = {
   ...onboarding,
-  ...getProfile,
+  ...profile,
+  ...updateEducation,
   ...getResume,
   ...updateResume,
   ...updateProfilePicture,
