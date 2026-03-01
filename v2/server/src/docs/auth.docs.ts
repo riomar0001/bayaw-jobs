@@ -498,9 +498,18 @@ const refresh = {
                   data: {
                     type: 'object',
                     properties: {
-                      access_token: {
+                      accessToken: {
                         type: 'string',
                         example: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...',
+                      },
+                      user: {
+                        type: 'object',
+                        properties: {
+                          first_name: { type: 'string', nullable: true, example: 'John' },
+                          last_name: { type: 'string', nullable: true, example: 'Doe' },
+                          role: { type: 'string', example: 'APPLICANT' },
+                          done_onboarding: { type: 'boolean', example: false },
+                        },
                       },
                     },
                   },

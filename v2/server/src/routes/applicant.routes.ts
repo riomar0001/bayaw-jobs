@@ -46,11 +46,4 @@ router.get('/profile', authenticate, applicantController.getProfile.bind(applica
 
 router.get('/resume/:id', applicantController.getResume.bind(applicantController));
 
-router.post(
-  '/resume',
-  authenticate,
-  upload.single('resume'),
-  applicantController.uploadResume.bind(applicantController)
-);
-
 export default router;

@@ -2,6 +2,9 @@ export interface AccessTokenPayload {
   user_id: string;
   email: string;
   role: string;
+  first_name: string | null;
+  last_name: string | null;
+  done_onboarding: boolean;
 }
 
 export interface RefreshTokenPayload {

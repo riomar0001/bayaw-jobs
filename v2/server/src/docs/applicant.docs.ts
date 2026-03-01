@@ -117,19 +117,12 @@ const applicantProfileResponseData = {
         },
       },
     },
-    applicantResumes: {
-      type: 'array',
-      items: {
-        type: 'object',
-        properties: {
-          id: { type: 'string', example: 'r1b2c3d4-...' },
-          applicant_profile_id: { type: 'string', example: 'a1b2c3d4-...' },
-          file_name: {
-            type: 'string',
-            example: 'resume_550e8400-e29b-41d4-a716-446655440000.pdf',
-          },
-        },
-      },
+    resume_url: {
+      type: 'string',
+      format: 'uri',
+      nullable: true,
+      example: 'http://localhost:4000/api/applicants/resume/a1b2c3d4-...',
+      description: 'API endpoint to retrieve the resume PDF. Null if no resume has been uploaded.',
     },
   },
 };
@@ -440,7 +433,7 @@ const getResume = {
           in: 'path',
           required: true,
           description: 'Applicant profile ID',
-          schema: { type: 'string', example: 'a1b2c3d4-e5f6-7890-abcd-ef1234567890' },
+          schema: { type: 'string'},
         },
       ],
       responses: {
@@ -472,101 +465,6 @@ const getResume = {
                 properties: {
                   success: { type: 'boolean', example: false },
                   message: { type: 'string', example: 'Resume not found' },
-                },
-              },
-            },
-          },
-        },
-        500: internalErrorResponse,
-      },
-    },
-  },
-  '/applicants/resume': {
-    // ─── POST /applicants/resume ──────────────────────────────────────────────
-
-    post: {
-      tags: ['Applicants'],
-      summary: 'Upload resume',
-      description:
-        'Uploads a PDF resume for the authenticated applicant. ' +
-        'The file is stored as `resume_<userId>.pdf` in the `resume` Supabase bucket. ' +
-        'Replaces any previously uploaded resume (one resume per applicant). ' +
-        'Requires the applicant to have completed onboarding first.',
-      security: [{ bearerAuth: [] }],
-      requestBody: {
-        required: true,
-        content: {
-          'multipart/form-data': {
-            schema: {
-              type: 'object',
-              required: ['resume'],
-              properties: {
-                resume: {
-                  type: 'string',
-                  format: 'binary',
-                  description: 'PDF file only. Maximum size: 10MB.',
-                },
-              },
-            },
-          },
-        },
-      },
-      responses: {
-        201: {
-          description: 'Resume uploaded successfully',
-          content: {
-            'application/json': {
-              schema: {
-                type: 'object',
-                properties: {
-                  success: { type: 'boolean', example: true },
-                  message: { type: 'string', example: 'Resume uploaded successfully' },
-                  data: {
-                    type: 'object',
-                    properties: {
-                      id: { type: 'string', example: 'r1b2c3d4-...' },
-                      applicant_profile_id: { type: 'string', example: 'a1b2c3d4-...' },
-                      file_name: {
-                        type: 'string',
-                        example: 'resume_550e8400-e29b-41d4-a716-446655440000.pdf',
-                      },
-                      url: {
-                        type: 'string',
-                        format: 'uri',
-                        example: 'http://localhost:4000/api/applicants/resume/a1b2c3d4-...',
-                        description: 'API endpoint to retrieve the uploaded resume PDF. No authentication required.',
-                      },
-                    },
-                  },
-                },
-              },
-            },
-          },
-        },
-        400: {
-          description: 'No file provided or invalid file type (only PDF accepted)',
-          content: {
-            'application/json': {
-              schema: {
-                type: 'object',
-                properties: {
-                  success: { type: 'boolean', example: false },
-                  message: { type: 'string', example: 'Only PDF files are allowed' },
-                },
-              },
-            },
-          },
-        },
-        401: unauthorizedResponse,
-        404: {
-          description: 'Applicant profile not found — complete onboarding first',
-          content: {
-            'application/json': {
-              schema: {
-                type: 'object',
-                properties: {
-                  success: { type: 'boolean', example: false },
-                  message: { type: 'string', example: 'Applicant profile not found' },
                 },
               },
             },

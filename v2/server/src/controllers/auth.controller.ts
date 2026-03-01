@@ -115,7 +115,11 @@ export class AuthController {
         maxAge: Config.COOKIES.REFRESH_TOKEN_MAX_AGE,
       });
 
-      successResponse(res, { accessToken: result.accessToken }, 'Token refreshed successfully');
+      successResponse(
+        res,
+        { accessToken: result.accessToken, user: result.user },
+        'Token refreshed successfully'
+      );
     } catch (error) {
       next(error);
     }

@@ -41,6 +41,9 @@ export class ApplicantController {
   async getResume(req: Request, res: Response, next: NextFunction): Promise<void> {
     try {
       const { id } = req.params;
+      if (!id || typeof id !== 'string') {
+        throw new BadRequestError('Profile ID is required');
+      }
       const { buffer, filename } = await applicantService.getResume(id);
 
       res.setHeader('Content-Type', 'application/pdf');
@@ -51,24 +54,6 @@ export class ApplicantController {
     }
   }
 
-  async uploadResume(req: Request, res: Response, next: NextFunction): Promise<void> {
-    try {
-      const userId = req.user?.user_id;
-      if (!userId) {
-        throw new Error('User ID missing in request');
-      }
-
-      if (!req.file) {
-        throw new BadRequestError('Resume file is required');
-      }
-
-      const resume = await applicantService.uploadResume(userId, req.file);
-
-      createdResponse(res, resume, 'Resume uploaded successfully');
-    } catch (error) {
-      next(error);
-    }
-  }
 }
 
 export const applicantController = new ApplicantController();

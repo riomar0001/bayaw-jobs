@@ -41,6 +41,12 @@ export interface LoginResponse {
   _code?: string | undefined;
 }
 
+export interface RefreshTokenResponse {
+  accessToken: string;
+  refreshToken: string;
+  user: Pick<UserData, 'first_name' | 'last_name' | 'role' | 'done_onboarding'>;
+}
+
 export interface RefreshTokenData {
   id: string;
   user_id: string;

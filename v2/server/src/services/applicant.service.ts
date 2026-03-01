@@ -78,7 +78,13 @@ export class ApplicantService {
     if (!profile) {
       throw new NotFoundError('Applicant profile');
     }
-    return profile;
+
+    const { applicantResumes, ...rest } = profile;
+    const resume_url = applicantResumes.length > 0
+      ? `${process.env.APP_URL}/api/applicants/resume/${profile.id}`
+      : null;
+
+    return { ...rest, resume_url };
   }
 
   async getResume(profileId: string): Promise<{ buffer: Buffer; filename: string }> {

@@ -27,6 +27,7 @@ import {
   UserData,
   AuthResponse,
   LoginResponse,
+  RefreshTokenResponse,
 } from '@/types/auth.types';
 import { Request } from 'express';
 
@@ -105,6 +106,9 @@ export class AuthService {
       user_id: user.id,
       email: user.email,
       role: user.role,
+      first_name: user.first_name,
+      last_name: user.last_name,
+      done_onboarding: user.done_onboarding,
     });
 
     const refreshToken = await generateRefreshToken(user.id, ip, userAgent);
@@ -210,6 +214,9 @@ export class AuthService {
       user_id: user.id,
       email: user.email,
       role: user.role,
+      first_name: user.first_name,
+      last_name: user.last_name,
+      done_onboarding: user.done_onboarding,
     });
 
     const refreshToken = await generateRefreshToken(user.id, ip, userAgent);
@@ -236,10 +243,7 @@ export class AuthService {
     } as AuthResponse;
   }
 
-  async refreshToken(
-    token: string,
-    req: Request
-  ): Promise<{ accessToken: string; refreshToken: string }> {
+  async refreshToken(token: string, req: Request): Promise<RefreshTokenResponse> {
     // Verify token
     const decoded = verifyRefreshToken(token);
 
@@ -281,6 +285,9 @@ export class AuthService {
       user_id: user.id,
       email: user.email,
       role: user.role,
+      first_name: user.first_name,
+      last_name: user.last_name,
+      done_onboarding: user.done_onboarding,
     });
 
     const newRefreshToken = await generateRefreshToken(user.id, ip, userAgent);
@@ -288,6 +295,12 @@ export class AuthService {
     return {
       accessToken: newAccessToken,
       refreshToken: newRefreshToken,
+      user: {
+        first_name: user.first_name,
+        last_name: user.last_name,
+        role: user.role,
+        done_onboarding: user.done_onboarding,
+      },
     };
   }
 
