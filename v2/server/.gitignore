@@ -81,6 +81,9 @@ uploads/
 # Optional prettier cache
 .prettiercache
 
+# Docker
+docker/.env
+
 # Secrets & Credentials
 *.pem
 *.key
@@ -93,3 +96,4 @@ service-account.json
 /generated/prisma
 /prisma/migrations 
 /src/generated/prisma
+/.claude

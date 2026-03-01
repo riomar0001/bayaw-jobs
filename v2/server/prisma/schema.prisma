@@ -4,23 +4,23 @@
 // Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
 // Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
 
+datasource db {
+  provider = "postgresql"
+}
+
 generator client {
   provider = "prisma-client"
   output   = "../src/generated/prisma"
 }
 
-datasource db {
-  provider = "postgresql"
-}
-
 model user {
-  id         String     @id @default(cuid())
-  email      String     @unique
+  id         String      @id @default(uuid())
+  email      String      @unique
   first_name String
   last_name  String
   password   String
   role       String
-  status     UserStatus @default(PENDING_VERIFICATION)
+  status     user_status @default(PENDING_VERIFICATION)
 
   // Authentication & Security
   email_verified        Boolean   @default(false)
@@ -42,9 +42,12 @@ model user {
   updated_at DateTime @updatedAt
 
   // Relationships
-  refresh_tokens refresh_token[]
-  auth_codes     auth_code[]
-  userRoles      user_role[]
+  refresh_tokens      refresh_token[]
+  auth_codes          auth_code[]
+  userRoles           user_role[]
+  applicationProfiles applicant_profile[]
+  companyInformations company_information[]
+  companyAdmins       company_admin[]
 
   // Indexes for performance
   @@index([email])
@@ -58,7 +61,7 @@ model user {
 }
 
 model refresh_token {
-  id         String @id @default(cuid())
+  id         String @id @default(uuid())
   user_id    String
   token_hash String @unique
 
@@ -95,7 +98,7 @@ model refresh_token {
 }
 
 model auth_code {
-  id         String   @id @default(cuid())
+  id         String   @id @default(uuid())
   user_id    String
   code       String
   expires_at DateTime
@@ -163,10 +166,253 @@ model user_role {
   @@map("user_roles")
 }
 
-enum UserStatus {
+model applicant_profile {
+  id               String @id @default(uuid())
+  first_name       String
+  last_name        String
+  email            String @unique
+  age              Int
+  gender           String
+  desired_position String
+
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+  user_id    String
+
+  user                 user                    @relation(fields: [user_id], references: [id], onDelete: Cascade)
+  applicantSkills      applicant_skill[]
+  applicantExperiences applicant_experience[]
+  applicantEducations  applicant_education[]
+  applicantLanguages   applicant_language[]
+  applicantAppliedJobs applicant_applied_job[]
+  applicantResumes     applicant_resume[]
+
+  @@index([email])
+  @@map("applicant_profiles")
+}
+
+model applicant_education {
+  id                   String    @id @default(uuid())
+  applicant_profile_id String
+  institution_name     String
+  field_of_study       String
+  start_date           DateTime
+  end_date             DateTime?
+  created_at           DateTime  @default(now())
+  updated_at           DateTime  @updatedAt
+
+  applicant_profile applicant_profile @relation(fields: [applicant_profile_id], references: [id], onDelete: Cascade)
+
+  @@index([applicant_profile_id])
+  @@map("applicant_education")
+}
+
+model applicant_experience {
+  id                   String    @id @default(uuid())
+  applicant_profile_id String
+  company_name         String
+  position             String
+  start_date           DateTime
+  is_current           Boolean   @default(false)
+  end_date             DateTime?
+  created_at           DateTime  @default(now())
+  updated_at           DateTime  @updatedAt
+
+  applicant_profile applicant_profile @relation(fields: [applicant_profile_id], references: [id], onDelete: Cascade)
+
+  @@index([applicant_profile_id])
+  @@map("applicant_experience")
+}
+
+model applicant_skill {
+  id                   String   @id @default(uuid())
+  applicant_profile_id String
+  skill_name           String
+  created_at           DateTime @default(now())
+  updated_at           DateTime @updatedAt
+
+  applicant_profile applicant_profile @relation(fields: [applicant_profile_id], references: [id], onDelete: Cascade)
+
+  @@index([applicant_profile_id])
+  @@map("applicant_skills")
+}
+
+model applicant_language {
+  id                   String   @id @default(uuid())
+  applicant_profile_id String
+  language_name        String
+  proficiency_level    String
+  created_at           DateTime @default(now())
+  updated_at           DateTime @updatedAt
+
+  applicant_profile applicant_profile @relation(fields: [applicant_profile_id], references: [id], onDelete: Cascade)
+
+  @@index([applicant_profile_id])
+  @@map("applicant_languages")
+}
+
+model applicant_resume {
+  id                   String   @id @default(uuid())
+  applicant_profile_id String
+  file_name            String
+  created_at           DateTime @default(now())
+  updated_at           DateTime @updatedAt
+
+  applicant_profile applicant_profile @relation(fields: [applicant_profile_id], references: [id], onDelete: Cascade)
+
+  @@index([applicant_profile_id])
+  @@map("applicant_resumes")
+}
+
+model company_information {
+  id              String            @id @default(uuid())
+  user_id         String
+  company_name    String
+  industry        String
+  about           String
+  company_size    String
+  foundation_year Int
+  website         String
+  created_at      DateTime          @default(now())
+  updated_at      DateTime          @updatedAt
+  companyContacts company_contact[]
+
+  user               user                  @relation(fields: [user_id], references: [id], onDelete: Cascade)
+  companySocialLinks company_social_link[]
+  companyLocations   company_location[]
+  companyAdmins      company_admin[]
+  jobs               job[]
+
+  @@index([user_id])
+  @@map("company_information")
+}
+
+model company_contact {
+  id         String   @id @default(uuid())
+  company_id String
+  email      String
+  phone      String
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+
+  company_information company_information @relation(fields: [company_id], references: [id], onDelete: Cascade)
+
+  @@index([company_id])
+  @@map("company_contacts")
+}
+
+model company_social_link {
+  id         String          @id @default(uuid())
+  company_id String
+  platform   social_platform
+  url        String
+  created_at DateTime        @default(now())
+  updated_at DateTime        @updatedAt
+
+  company_information company_information @relation(fields: [company_id], references: [id], onDelete: Cascade)
+
+  @@index([company_id])
+  @@map("company_social_links")
+}
+
+model company_location {
+  id          String   @id @default(uuid())
+  company_id  String
+  address     String
+  city        String
+  state       String
+  country     String
+  postal_code String
+  created_at  DateTime @default(now())
+  updated_at  DateTime @updatedAt
+
+  company_information company_information @relation(fields: [company_id], references: [id], onDelete: Cascade)
+
+  @@index([company_id])
+  @@map("company_locations")
+}
+
+model company_admin {
+  id         String   @id @default(uuid())
+  company_id String
+  user_id    String
+  role       String
+  can_update Boolean  @default(false)
+  can_delete Boolean  @default(false)
+  can_create Boolean  @default(false)
+  can_read   Boolean  @default(true)
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+
+  company_information company_information @relation(fields: [company_id], references: [id], onDelete: Cascade)
+  user                user                @relation(fields: [user_id], references: [id], onDelete: Cascade)
+
+  @@index([company_id])
+  @@index([user_id])
+  @@map("company_admins")
+}
+
+model job {
+  id               String   @id @default(uuid())
+  company_id       String
+  title            String
+  department       String
+  location         String
+  location_type    String
+  employment_type  String
+  minimum_salary   String
+  maximum_salary   String
+  currency         String
+  description      String
+  responsibilities String
+  qualifications   String
+  benefits         String
+  created_at       DateTime @default(now())
+  updated_at       DateTime @updatedAt
+
+  company_information   company_information     @relation(fields: [company_id], references: [id], onDelete: Cascade)
+  applicant_applied_job applicant_applied_job[]
+
+  @@index([company_id])
+  @@map("jobs")
+}
+
+model applicant_applied_job {
+  id                   String              @id @default(uuid())
+  applicant_profile_id String
+  job_id               String
+  application_date     DateTime            @default(now())
+  status               applicantion_status @default(PENDING)
+  created_at           DateTime            @default(now())
+  updated_at           DateTime            @updatedAt
+
+  applicant_profile applicant_profile @relation(fields: [applicant_profile_id], references: [id], onDelete: Cascade)
+  job               job?              @relation(fields: [jobId], references: [id])
+  jobId             String?
+
+  @@index([applicant_profile_id])
+  @@map("applicant_applied_jobs")
+}
+
+enum user_status {
   ACTIVE
   INACTIVE
   SUSPENDED
   PENDING_VERIFICATION
   DELETED
+}
+
+enum applicantion_status {
+  PENDING
+  ACCEPTED
+  UNDER_REVIEW
+  REJECTED
+  WITHDRAWN
+}
+
+enum social_platform {
+  FACEBOOK
+  TWITTER
+  LINKEDIN
+  INSTAGRAM
 }

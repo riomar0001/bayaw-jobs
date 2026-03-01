@@ -3,14 +3,11 @@
 import 'dotenv/config';
 import { defineConfig, env } from 'prisma/config';
 
-const url = env('DIRECT_URL');
+const url = env('DATABASE_URL');
 console.log('Database URL loaded:', url ? 'Yes' : 'No');
 
 export default defineConfig({
   schema: 'prisma/schema.prisma',
-  migrations: {
-    path: 'prisma/migrations',
-  },
   datasource: {
     url,
   },
