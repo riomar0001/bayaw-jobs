@@ -52,6 +52,50 @@ export class ApplicantRepository {
     });
   }
 
+  async addExperience(
+    profileId: string,
+    data: {
+      company_name: string;
+      position: string;
+      start_date: Date;
+      is_current: boolean;
+      end_date?: Date | null;
+    }
+  ) {
+    return prisma.applicant_experience.create({
+      data: {
+        applicant_profile_id: profileId,
+        company_name: data.company_name,
+        position: data.position,
+        start_date: data.start_date,
+        is_current: data.is_current,
+        end_date: data.end_date ?? null,
+      },
+    });
+  }
+
+  async updateExperience(
+    id: string,
+    data: {
+      company_name?: string;
+      position?: string;
+      start_date?: Date;
+      is_current?: boolean;
+      end_date?: Date | null;
+    }
+  ) {
+    return prisma.applicant_experience.update({
+      where: { id },
+      data,
+    });
+  }
+
+  async deleteExperience(id: string) {
+    return prisma.applicant_experience.delete({
+      where: { id },
+    });
+  }
+
   async deleteEducation(id: string) {
     return prisma.applicant_education.delete({
       where: { id },

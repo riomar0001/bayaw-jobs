@@ -93,6 +93,33 @@ export const updateEducationSchema = z.object({
     }),
 });
 
+export const addExperienceSchema = z.object({
+  body: z.object({
+    company_name: z.string().min(1, 'Company name is required'),
+    position: z.string().min(1, 'Position is required'),
+    start_date: z.string().min(1, 'Start date is required'),
+    is_current: z.boolean(),
+    end_date: z.string().nullable().optional(),
+  }),
+});
+
+export const updateExperienceSchema = z.object({
+  params: z.object({
+    id: z.string().min(1, 'Experience ID is required'),
+  }),
+  body: z
+    .object({
+      company_name: z.string().min(1, 'Company name is required').optional(),
+      position: z.string().min(1, 'Position is required').optional(),
+      start_date: z.string().min(1, 'Start date is required').optional(),
+      is_current: z.boolean().optional(),
+      end_date: z.string().nullable().optional(),
+    })
+    .refine((data) => Object.keys(data).length > 0, {
+      message: 'At least one field must be provided',
+    }),
+});
+
 export const addEducationSchema = z.object({
   body: z.object({
     institution_name: z.string().min(1, 'Institution name is required'),
@@ -112,3 +139,5 @@ export type OnboardingInput = z.infer<typeof onboardingSchema>['body'];
 export type UpdateProfileInput = z.infer<typeof updateProfileSchema>['body'];
 export type UpdateEducationInput = z.infer<typeof updateEducationSchema>['body'];
 export type AddEducationInput = z.infer<typeof addEducationSchema>['body'];
+export type AddExperienceInput = z.infer<typeof addExperienceSchema>['body'];
+export type UpdateExperienceInput = z.infer<typeof updateExperienceSchema>['body'];

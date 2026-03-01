@@ -38,6 +38,53 @@ export class ApplicantController {
     }
   }
 
+  async addExperience(req: Request, res: Response, next: NextFunction): Promise<void> {
+    try {
+      const userId = req.user?.user_id;
+      if (!userId) {
+        throw new Error('User ID missing in request');
+      }
+
+      const created = await applicantService.addExperience(userId, req.body);
+
+      createdResponse(res, created, 'Experience added successfully');
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  async updateExperience(req: Request, res: Response, next: NextFunction): Promise<void> {
+    try {
+      const userId = req.user?.user_id;
+      if (!userId) {
+        throw new Error('User ID missing in request');
+      }
+
+      const { id } = req.params as { id: string };
+      const updated = await applicantService.updateExperience(userId, id, req.body);
+
+      successResponse(res, updated, 'Experience updated successfully');
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  async deleteExperience(req: Request, res: Response, next: NextFunction): Promise<void> {
+    try {
+      const userId = req.user?.user_id;
+      if (!userId) {
+        throw new Error('User ID missing in request');
+      }
+
+      const { id } = req.params as { id: string };
+      await applicantService.deleteExperience(userId, id);
+
+      successResponse(res, null, 'Experience deleted successfully');
+    } catch (error) {
+      next(error);
+    }
+  }
+
   async deleteEducation(req: Request, res: Response, next: NextFunction): Promise<void> {
     try {
       const userId = req.user?.user_id;

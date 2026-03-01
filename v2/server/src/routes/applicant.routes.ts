@@ -8,6 +8,8 @@ import {
   updateProfileSchema,
   updateEducationSchema,
   addEducationSchema,
+  addExperienceSchema,
+  updateExperienceSchema,
 } from '@/validations/applicant.validation';
 import { BadRequestError } from '@/utils/errors.util';
 
@@ -86,6 +88,26 @@ router.delete(
   '/education/:id',
   authenticate,
   applicantController.deleteEducation.bind(applicantController)
+);
+
+router.post(
+  '/experience',
+  authenticate,
+  validate(addExperienceSchema),
+  applicantController.addExperience.bind(applicantController)
+);
+
+router.patch(
+  '/experience/:id',
+  authenticate,
+  validate(updateExperienceSchema),
+  applicantController.updateExperience.bind(applicantController)
+);
+
+router.delete(
+  '/experience/:id',
+  authenticate,
+  applicantController.deleteExperience.bind(applicantController)
 );
 
 router.get('/resume/:id', applicantController.getResume.bind(applicantController));

@@ -6,6 +6,8 @@ import {
   UpdateProfileInput,
   UpdateEducationInput,
   AddEducationInput,
+  AddExperienceInput,
+  UpdateExperienceInput,
 } from '@/validations/applicant.validation';
 import { storageService } from '@/services/storage.service';
 
@@ -150,6 +152,56 @@ export class ApplicantService {
       profile_picture: fileName,
       url: `${process.env.APP_URL}/api/applicants/profile/picture/${profile.id}`,
     };
+  }
+
+  async addExperience(userId: string, data: AddExperienceInput) {
+    const profile = await applicantRepository.findProfileByUserId(userId);
+    if (!profile) {
+      throw new NotFoundError('Applicant profile');
+    }
+
+    return applicantRepository.addExperience(profile.id, {
+      company_name: data.company_name,
+      position: data.position,
+      start_date: new Date(data.start_date),
+      is_current: data.is_current,
+      end_date: data.end_date ? new Date(data.end_date) : null,
+    });
+  }
+
+  async updateExperience(userId: string, experienceId: string, data: UpdateExperienceInput) {
+    const profile = await applicantRepository.findProfileByUserId(userId);
+    if (!profile) {
+      throw new NotFoundError('Applicant profile');
+    }
+
+    const experience = profile.applicantExperiences.find((e) => e.id === experienceId);
+    if (!experience) {
+      throw new NotFoundError('Experience entry');
+    }
+
+    const patch: Parameters<typeof applicantRepository.updateExperience>[1] = {};
+    if (data.company_name !== undefined) patch.company_name = data.company_name;
+    if (data.position !== undefined) patch.position = data.position;
+    if (data.start_date !== undefined) patch.start_date = new Date(data.start_date);
+    if (data.is_current !== undefined) patch.is_current = data.is_current;
+    if ('end_date' in data) patch.end_date = data.end_date ? new Date(data.end_date) : null;
+
+    return applicantRepository.updateExperience(experienceId, patch);
+  }
+
+  async deleteExperience(userId: string, experienceId: string) {
+    const profile = await applicantRepository.findProfileByUserId(userId);
+    if (!profile) {
+      throw new NotFoundError('Applicant profile');
+    }
+
+    const experience = profile.applicantExperiences.find((e) => e.id === experienceId);
+    if (!experience) {
+      throw new NotFoundError('Experience entry');
+    }
+
+    return applicantRepository.deleteExperience(experienceId);
   }
 
   async deleteEducation(userId: string, educationId: string) {

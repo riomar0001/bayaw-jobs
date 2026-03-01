@@ -788,6 +788,246 @@ const updateEducation = {
   },
 };
 
+// ─── POST /applicants/experience & PATCH+DELETE /applicants/experience/{id} ──
+
+const experience = {
+  '/applicants/experience': {
+    post: {
+      tags: ['Applicants'],
+      summary: 'Add experience entry',
+      description:
+        "Adds a new work experience entry to the authenticated applicant's profile. " +
+        'Requires a valid Bearer access token.',
+      security: [{ bearerAuth: [] }],
+      requestBody: {
+        required: true,
+        content: {
+          'application/json': {
+            schema: {
+              type: 'object',
+              required: ['company_name', 'position', 'start_date', 'is_current'],
+              properties: {
+                company_name: { type: 'string', example: 'Tech Corp' },
+                position: { type: 'string', example: 'Junior Developer' },
+                start_date: { type: 'string', format: 'date', example: '2022-01-01' },
+                is_current: { type: 'boolean', example: false },
+                end_date: { type: 'string', format: 'date', nullable: true, example: '2023-06-01' },
+              },
+            },
+          },
+        },
+      },
+      responses: {
+        201: {
+          description: 'Experience added successfully',
+          content: {
+            'application/json': {
+              schema: {
+                type: 'object',
+                properties: {
+                  success: { type: 'boolean', example: true },
+                  message: { type: 'string', example: 'Experience added successfully' },
+                  data: {
+                    type: 'object',
+                    properties: {
+                      id: { type: 'string', example: 'x1b2c3d4-...' },
+                      applicant_profile_id: { type: 'string', example: 'a1b2c3d4-...' },
+                      company_name: { type: 'string', example: 'Tech Corp' },
+                      position: { type: 'string', example: 'Junior Developer' },
+                      start_date: { type: 'string', format: 'date-time', example: '2022-01-01T00:00:00.000Z' },
+                      end_date: { type: 'string', format: 'date-time', nullable: true, example: '2023-06-01T00:00:00.000Z' },
+                      is_current: { type: 'boolean', example: false },
+                    },
+                  },
+                },
+              },
+            },
+          },
+        },
+        400: {
+          description: 'Validation error',
+          content: {
+            'application/json': {
+              schema: {
+                type: 'object',
+                properties: {
+                  success: { type: 'boolean', example: false },
+                  message: { type: 'string', example: 'Company name is required' },
+                },
+              },
+            },
+          },
+        },
+        401: unauthorizedResponse,
+        404: {
+          description: 'Applicant profile not found',
+          content: {
+            'application/json': {
+              schema: {
+                type: 'object',
+                properties: {
+                  success: { type: 'boolean', example: false },
+                  message: { type: 'string', example: 'Applicant profile not found' },
+                },
+              },
+            },
+          },
+        },
+        500: internalErrorResponse,
+      },
+    },
+  },
+  '/applicants/experience/{id}': {
+    patch: {
+      tags: ['Applicants'],
+      summary: 'Update experience entry',
+      description:
+        "Updates a specific work experience entry belonging to the authenticated applicant's profile. " +
+        'All fields are optional — only provided fields will be updated. ' +
+        'At least one field must be provided. ' +
+        'Returns 404 if the entry does not exist or does not belong to the authenticated user. ' +
+        'Requires a valid Bearer access token.',
+      security: [{ bearerAuth: [] }],
+      parameters: [
+        {
+          name: 'id',
+          in: 'path',
+          required: true,
+          description: 'Experience entry ID',
+          schema: { type: 'string' },
+        },
+      ],
+      requestBody: {
+        required: true,
+        content: {
+          'application/json': {
+            schema: {
+              type: 'object',
+              minProperties: 1,
+              properties: {
+                company_name: { type: 'string', example: 'Tech Corp' },
+                position: { type: 'string', example: 'Senior Developer' },
+                start_date: { type: 'string', format: 'date', example: '2022-01-01' },
+                is_current: { type: 'boolean', example: true },
+                end_date: { type: 'string', format: 'date', nullable: true, example: null },
+              },
+            },
+          },
+        },
+      },
+      responses: {
+        200: {
+          description: 'Experience updated successfully',
+          content: {
+            'application/json': {
+              schema: {
+                type: 'object',
+                properties: {
+                  success: { type: 'boolean', example: true },
+                  message: { type: 'string', example: 'Experience updated successfully' },
+                  data: {
+                    type: 'object',
+                    properties: {
+                      id: { type: 'string', example: 'x1b2c3d4-...' },
+                      applicant_profile_id: { type: 'string', example: 'a1b2c3d4-...' },
+                      company_name: { type: 'string', example: 'Tech Corp' },
+                      position: { type: 'string', example: 'Senior Developer' },
+                      start_date: { type: 'string', format: 'date-time', example: '2022-01-01T00:00:00.000Z' },
+                      end_date: { type: 'string', format: 'date-time', nullable: true, example: null },
+                      is_current: { type: 'boolean', example: true },
+                    },
+                  },
+                },
+              },
+            },
+          },
+        },
+        400: {
+          description: 'Validation error or no fields provided',
+          content: {
+            'application/json': {
+              schema: {
+                type: 'object',
+                properties: {
+                  success: { type: 'boolean', example: false },
+                  message: { type: 'string', example: 'At least one field must be provided' },
+                },
+              },
+            },
+          },
+        },
+        401: unauthorizedResponse,
+        404: {
+          description: 'Applicant profile or experience entry not found',
+          content: {
+            'application/json': {
+              schema: {
+                type: 'object',
+                properties: {
+                  success: { type: 'boolean', example: false },
+                  message: { type: 'string', example: 'Experience entry not found' },
+                },
+              },
+            },
+          },
+        },
+        500: internalErrorResponse,
+      },
+    },
+    delete: {
+      tags: ['Applicants'],
+      summary: 'Delete experience entry',
+      description:
+        "Deletes a specific work experience entry belonging to the authenticated applicant's profile. " +
+        'Returns 404 if the entry does not exist or does not belong to the authenticated user. ' +
+        'Requires a valid Bearer access token.',
+      security: [{ bearerAuth: [] }],
+      parameters: [
+        {
+          name: 'id',
+          in: 'path',
+          required: true,
+          description: 'Experience entry ID',
+          schema: { type: 'string' },
+        },
+      ],
+      responses: {
+        200: {
+          description: 'Experience deleted successfully',
+          content: {
+            'application/json': {
+              schema: {
+                type: 'object',
+                properties: {
+                  success: { type: 'boolean', example: true },
+                  message: { type: 'string', example: 'Experience deleted successfully' },
+                  data: { type: 'object', nullable: true, example: null },
+                },
+              },
+            },
+          },
+        },
+        401: unauthorizedResponse,
+        404: {
+          description: 'Applicant profile or experience entry not found',
+          content: {
+            'application/json': {
+              schema: {
+                type: 'object',
+                properties: {
+                  success: { type: 'boolean', example: false },
+                  message: { type: 'string', example: 'Experience entry not found' },
+                },
+              },
+            },
+          },
+        },
+        500: internalErrorResponse,
+      },
+    },
+  },
+};
+
 // ─── GET /applicants/resume/{id} ─────────────────────────────────────────────
 
 const getResume = {
@@ -1109,6 +1349,7 @@ export const applicantDocs = {
   ...profile,
   ...addEducation,
   ...updateEducation,
+  ...experience,
   ...getResume,
   ...updateResume,
   ...updateProfilePicture,
