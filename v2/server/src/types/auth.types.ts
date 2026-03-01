@@ -20,14 +20,13 @@ export interface VerifyAuthInput {
 export interface UserData {
   id: string;
   email: string;
-  first_name: string;
-  last_name: string;
+  first_name: string | null;
+  last_name: string | null;
   role: string;
   status: user_status;
   email_verified: boolean;
   done_onboarding: boolean;
   created_at: Date;
-  
 }
 
 export interface AuthResponse {
@@ -39,6 +38,7 @@ export interface AuthResponse {
 export interface LoginResponse {
   message: string;
   tempToken: string;
+  _code?: string | undefined;
 }
 
 export interface RefreshTokenData {

@@ -4,8 +4,6 @@ import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Label } from "@/components/ui/label";
 
 interface PersonalInfoData {
-  firstName: string;
-  lastName: string;
   age: string;
   gender: string;
   desiredPosition: string;
@@ -19,32 +17,6 @@ interface PersonalInfoStepProps {
 export function PersonalInfoStep({ data, onChange }: PersonalInfoStepProps) {
   return (
     <div className="space-y-6">
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <Field>
-          <FieldLabel htmlFor="firstName">First Name</FieldLabel>
-          <Input
-            id="firstName"
-            type="text"
-            placeholder="John"
-            value={data.firstName}
-            onChange={(e) => onChange({ ...data, firstName: e.target.value })}
-            required
-          />
-        </Field>
-
-        <Field>
-          <FieldLabel htmlFor="lastName">Last Name</FieldLabel>
-          <Input
-            id="lastName"
-            type="text"
-            placeholder="Doe"
-            value={data.lastName}
-            onChange={(e) => onChange({ ...data, lastName: e.target.value })}
-            required
-          />
-        </Field>
-      </div>
-
       <Field>
         <FieldLabel htmlFor="desiredPosition">Desired Position</FieldLabel>
         <Input

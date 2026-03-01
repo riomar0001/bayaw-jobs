@@ -25,8 +25,9 @@ export function ResumeUpload({ file, onFileChange }: ResumeUploadProps) {
     e.preventDefault();
     setIsDragging(false);
 
-    if (e.dataTransfer.files && e.dataTransfer.files[0]) {
-      onFileChange(e.dataTransfer.files[0]);
+    const dropped = e.dataTransfer.files[0];
+    if (dropped && dropped.type === 'application/pdf') {
+      onFileChange(dropped);
     }
   };
 
@@ -83,13 +84,13 @@ export function ResumeUpload({ file, onFileChange }: ResumeUploadProps) {
                   Drop your resume here or click to browse
                 </p>
                 <p className="text-sm text-muted-foreground">
-                  Supports PDF, DOC, DOCX (Max 10MB)
+                  PDF only (Max 10MB)
                 </p>
               </div>
               <Input
                 id="resume"
                 type="file"
-                accept=".pdf,.doc,.docx"
+                accept=".pdf"
                 className="hidden"
                 onChange={handleFileChange}
               />

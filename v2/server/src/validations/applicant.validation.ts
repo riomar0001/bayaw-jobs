@@ -27,9 +27,6 @@ const languageSchema = z.object({
 });
 
 const profileSchema = z.object({
-  first_name: z.string().min(1, 'First name is required').max(50),
-  last_name: z.string().min(1, 'Last name is required').max(50),
-  email: z.email('Invalid email format'),
   age: z.number().int().min(16, 'Must be at least 16 years old').max(100),
   gender: z.string().min(1, 'Gender is required'),
   desired_position: z.string().min(1, 'Desired position is required'),

@@ -55,7 +55,7 @@ export class AuthService {
     // Send verification email
     await emailService.sendVerificationEmail({
       to: user.email,
-      firstName: user.first_name,
+      firstName: user.first_name ?? '',
       verificationLink: emailService.getVerificationLink(verificationToken),
     });
 
@@ -168,7 +168,7 @@ export class AuthService {
     // Send auth code email
     await emailService.sendAuthCodeEmail({
       to: user.email,
-      firstName: user.first_name,
+      firstName: user.first_name ?? '',
       code,
     });
 
@@ -181,7 +181,7 @@ export class AuthService {
       // Note: In production, don't return the code. This is for development/testing only.
       // The code should be sent via email queue
       _code: process.env.NODE_ENV === 'development' ? code : undefined,
-    } as LoginResponse & { _code?: string };
+    };
   }
 
   async verifyAuth(userId: string, code: string, req: Request): Promise<AuthResponse> {

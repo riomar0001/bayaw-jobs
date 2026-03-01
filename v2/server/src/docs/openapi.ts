@@ -3,11 +3,11 @@ import { applicantDocs } from './applicant.docs';
 export const openApiSpec = {
   openapi: '3.0.3',
   info: {
-    title: 'Certificate Management API',
+    title: 'Bayaw Jobs API',
     version: '1.0.0',
     description: `
     ## Overview
-    API for managing digital certificates. Supports user authentication, certificate template management, and certificate generation/verification.
+    API for the Bayaw Jobs platform. Supports user authentication, applicant onboarding, profile management, and resume uploads.
 
     `,
     contact: {

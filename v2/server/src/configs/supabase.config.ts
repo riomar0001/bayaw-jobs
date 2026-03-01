@@ -18,6 +18,8 @@ export const supabase: SupabaseClient | null =
       })
     : null;
 
-export const STORAGE_BUCKET = 'certificates';
+export const PROFILE_PICTURE_BUCKET = 'profile-picture';
+export const RESUME_BUCKET = 'resume';
+export const COMPANY_LOGO_BUCKET = 'company-logo';
 
 export default supabase;

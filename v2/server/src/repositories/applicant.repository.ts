@@ -14,23 +14,51 @@ export interface CreateApplicantProfileData extends ApplicantProfile {
   languages: ApplicantLanguages[];
 }
 
+const OMIT_TIMESTAMPS = { created_at: true, updated_at: true } as const;
+
+const PROFILE_INCLUDE = {
+  applicantSkills: { omit: OMIT_TIMESTAMPS },
+  applicantExperiences: { omit: OMIT_TIMESTAMPS },
+  applicantEducations: { omit: OMIT_TIMESTAMPS },
+  applicantLanguages: { omit: OMIT_TIMESTAMPS },
+  applicantResumes: { omit: OMIT_TIMESTAMPS },
+} as const;
+
 export class ApplicantRepository {
+  async findProfileById(id: string) {
+    return prisma.applicant_profile.findUnique({
+      where: { id },
+      include: PROFILE_INCLUDE,
+    });
+  }
+
   async findProfileByUserId(user_id: string) {
     return prisma.applicant_profile.findFirst({
       where: { user_id },
-      include: {
-        applicantSkills: true,
-        applicantExperiences: true,
-        applicantEducations: true,
-        applicantLanguages: true,
-        applicantResumes: true,
-      },
+      include: PROFILE_INCLUDE,
     });
   }
 
   async findProfileByEmail(email: string) {
     return prisma.applicant_profile.findUnique({
       where: { email },
+    });
+  }
+
+  async updateProfilePicture(profileId: string, filename: string) {
+    return prisma.applicant_profile.update({
+      where: { id: profileId },
+      data: { profile_picture: filename },
+    });
+  }
+
+  async upsertResume(applicantProfileId: string, fileName: string) {
+    await prisma.applicant_resume.deleteMany({ where: { applicant_profile_id: applicantProfileId } });
+    return prisma.applicant_resume.create({
+      data: {
+        applicant_profile_id: applicantProfileId,
+        file_name: fileName,
+      },
     });
   }
 
@@ -44,6 +72,7 @@ export class ApplicantRepository {
         age: data.age,
         gender: data.gender,
         desired_position: data.desired_position,
+        profile_picture: data.profile_picture ?? null,
         applicantEducations: {
           create: data.education.map((edu) => ({
             institution_name: edu.institution_name,
@@ -73,13 +102,7 @@ export class ApplicantRepository {
           })),
         },
       },
-      include: {
-        applicantSkills: true,
-        applicantExperiences: true,
-        applicantEducations: true,
-        applicantLanguages: true,
-        applicantResumes: true,
-      },
+      include: PROFILE_INCLUDE,
     });
   }
 }

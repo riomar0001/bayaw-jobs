@@ -2,9 +2,20 @@ import { applicantRepository } from '@/repositories/applicant.repository';
 import { userRepository } from '@/repositories/user.repository';
 import { ConflictError, NotFoundError, BadRequestError } from '@/utils/errors.util';
 import { OnboardingInput } from '@/validations/applicant.validation';
+import { storageService } from '@/services/storage.service';
+
+interface ResumeFile {
+  buffer: Buffer;
+  mimetype: string;
+  size: number;
+}
 
 export class ApplicantService {
-  async onboard(userId: string, data: OnboardingInput) {
+  async onboard(userId: string, data: OnboardingInput, resumeFile: ResumeFile) {
+    if (!resumeFile) {
+      throw new BadRequestError('Resume is required');
+    }
+
     const user = await userRepository.findById(userId);
     if (!user) {
       throw new NotFoundError('User');
@@ -19,14 +30,21 @@ export class ApplicantService {
       throw new ConflictError('Applicant profile already exists');
     }
 
-    const emailTaken = await applicantRepository.findProfileByEmail(data.profile.email);
-    if (emailTaken) {
-      throw new ConflictError('This email is already associated with another applicant profile');
+    // Upload default profile picture to the profile-picture bucket
+    let profilePicture: string | null = null;
+    try {
+      profilePicture = await storageService.uploadDefaultProfilePicture(userId);
+    } catch (err) {
+      console.warn('Could not upload default profile picture:', err);
     }
 
     const profile = await applicantRepository.createProfile({
       user_id: userId,
+      first_name: user.first_name ?? '',
+      last_name: user.last_name ?? '',
+      email: user.email,
       ...data.profile,
+      profile_picture: profilePicture,
       education: (data.education || []).map((edu) => ({
         ...edu,
         end_year: edu.end_year ?? null,
@@ -39,13 +57,20 @@ export class ApplicantService {
       languages: data.languages || [],
     });
 
-    await userRepository.update(userId, {
-      first_name: data.profile.first_name,
-      last_name: data.profile.last_name,
-      done_onboarding: true,
-    });
+    await userRepository.update(userId, { done_onboarding: true });
 
-    return profile;
+    // Upload resume during onboarding
+    let resumeUrl: string | null = null;
+    try {
+      const fileName = await storageService.uploadResume(resumeFile.buffer, userId);
+      const resume = await applicantRepository.upsertResume(profile.id, fileName);
+      profile.applicantResumes = [resume];
+      resumeUrl = `${process.env.APP_URL}/api/applicants/resume/${profile.id}`;
+    } catch (err) {
+      console.warn('Could not upload resume during onboarding:', err);
+    }
+
+    return { ...profile, resume_url: resumeUrl };
   }
 
   async getProfile(userId: string) {
@@ -54,6 +79,37 @@ export class ApplicantService {
       throw new NotFoundError('Applicant profile');
     }
     return profile;
+  }
+
+  async getResume(profileId: string): Promise<{ buffer: Buffer; filename: string }> {
+    const profile = await applicantRepository.findProfileById(profileId);
+    if (!profile) {
+      throw new NotFoundError('Applicant profile');
+    }
+
+    const resume = profile.applicantResumes[0];
+    if (!resume) {
+      throw new NotFoundError('Resume');
+    }
+
+    const buffer = await storageService.downloadResume(resume.file_name);
+    return { buffer, filename: resume.file_name };
+  }
+
+  async uploadResume(userId: string, file: ResumeFile) {
+    const profile = await applicantRepository.findProfileByUserId(userId);
+    if (!profile) {
+      throw new NotFoundError('Applicant profile');
+    }
+
+    // File stored as resume_<userId>.pdf in the resume bucket
+    const fileName = await storageService.uploadResume(file.buffer, userId);
+    const resume = await applicantRepository.upsertResume(profile.id, fileName);
+
+    return {
+      ...resume,
+      url: `${process.env.APP_URL}/api/applicants/resume/${profile.id}`,
+    };
   }
 }
 

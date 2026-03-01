@@ -4,7 +4,9 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { CheckCircle, ArrowLeft, ArrowRight } from "lucide-react";
+import { CheckCircle, ArrowLeft, ArrowRight, Loader2 } from "lucide-react";
+
+const API_BASE = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:4000/api";
 import { ProgressStepper } from "@/components/applicants/onboarding/progress-stepper";
 import { PersonalInfoStep } from "@/components/applicants/onboarding/forms/personal-info-step";
 import {
@@ -24,8 +26,6 @@ import { ResumeUpload } from "@/components/applicants/onboarding/resume-upload";
 
 interface OnboardingData {
   // Step 1: Personal Info
-  firstName: string;
-  lastName: string;
   age: string;
   gender: string;
   desiredPosition: string;
@@ -48,10 +48,10 @@ const TOTAL_STEPS = 3;
 export default function OnboardingPage() {
   const router = useRouter();
   const [currentStep, setCurrentStep] = useState(1);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   const [formData, setFormData] = useState<OnboardingData>({
-    firstName: "",
-    lastName: "",
     age: "",
     gender: "",
     desiredPosition: "",
@@ -87,10 +87,70 @@ export default function OnboardingPage() {
     }
   };
 
-  const handleSubmit = () => {
-    console.log("Onboarding completed:", formData);
-    // TODO: Submit to backend
-    router.push("/");
+  const handleSubmit = async () => {
+    if (!formData.resume) {
+      setError("Please upload your resume (PDF) to continue.");
+      return;
+    }
+
+    setIsSubmitting(true);
+    setError(null);
+
+    try {
+      const payload = {
+        profile: {
+          age: Number(formData.age),
+          gender: formData.gender,
+          desired_position: formData.desiredPosition,
+        },
+        education: formData.education.school
+          ? [
+              {
+                institution_name: formData.education.school,
+                field_of_study: formData.education.field,
+                start_year: Number(formData.education.yearGraduated) - 4,
+                end_year: Number(formData.education.yearGraduated) || null,
+              },
+            ]
+          : [],
+        experience: formData.experiences
+          .filter((e) => e.companyName)
+          .map((e) => ({
+            company_name: e.companyName,
+            position: e.position,
+            start_date: `${e.fromYear}-01-01`,
+            is_current: e.currentlyWorking,
+            end_date: e.currentlyWorking ? null : `${e.toYear}-12-31`,
+          })),
+        skills: formData.skills.map((s) => ({ skill_name: s })),
+        languages: formData.languages.map((l) => ({
+          language_name: l.language,
+          proficiency_level: l.proficiency.toUpperCase(),
+        })),
+      };
+
+      // Always multipart/form-data so the resume can be included in one request
+      const fd = new FormData();
+      fd.append("data", JSON.stringify(payload));
+      fd.append("resume", formData.resume);
+
+      const res = await fetch(`${API_BASE}/applicants/onboarding`, {
+        method: "POST",
+        credentials: "include",
+        body: fd,
+      });
+
+      if (!res.ok) {
+        const body = await res.json();
+        throw new Error(body.message ?? "Onboarding failed");
+      }
+
+      router.push("/");
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Something went wrong");
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   const addExperience = () => {
@@ -192,8 +252,6 @@ export default function OnboardingPage() {
             {currentStep === 1 && (
               <PersonalInfoStep
                 data={{
-                  firstName: formData.firstName,
-                  lastName: formData.lastName,
                   age: formData.age,
                   gender: formData.gender,
                   desiredPosition: formData.desiredPosition,
@@ -241,13 +299,18 @@ export default function OnboardingPage() {
               />
             )}
 
+            {/* Error message */}
+            {error && (
+              <p className="text-sm text-destructive text-center">{error}</p>
+            )}
+
             {/* Navigation Buttons */}
             <div className="flex justify-between pt-6 border-t">
               <Button
                 type="button"
                 variant="outline"
                 onClick={handlePrevious}
-                disabled={currentStep === 1}
+                disabled={currentStep === 1 || isSubmitting}
               >
                 <ArrowLeft className="mr-2 h-4 w-4" />
                 Previous
@@ -259,9 +322,13 @@ export default function OnboardingPage() {
                   <ArrowRight className="ml-2 h-4 w-4" />
                 </Button>
               ) : (
-                <Button type="button" onClick={handleSubmit}>
-                  <CheckCircle className="mr-2 h-4 w-4" />
-                  Complete
+                <Button type="button" onClick={handleSubmit} disabled={isSubmitting}>
+                  {isSubmitting ? (
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  ) : (
+                    <CheckCircle className="mr-2 h-4 w-4" />
+                  )}
+                  {isSubmitting ? "Submitting..." : "Complete"}
                 </Button>
               )}
             </div>
