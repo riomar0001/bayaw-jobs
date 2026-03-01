@@ -67,6 +67,25 @@ export class ApplicantController {
     }
   }
 
+  async updateResume(req: Request, res: Response, next: NextFunction): Promise<void> {
+    try {
+      const userId = req.user?.user_id;
+      if (!userId) {
+        throw new Error('User ID missing in request');
+      }
+
+      if (!req.file) {
+        throw new BadRequestError('Resume file is required');
+      }
+
+      const result = await applicantService.uploadResume(userId, req.file);
+
+      successResponse(res, result, 'Resume updated successfully');
+    } catch (error) {
+      next(error);
+    }
+  }
+
   async updateProfilePicture(req: Request, res: Response, next: NextFunction): Promise<void> {
     try {
       const userId = req.user?.user_id;

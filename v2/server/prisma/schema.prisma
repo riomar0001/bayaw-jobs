@@ -181,13 +181,14 @@ model applicant_profile {
   updated_at DateTime @updatedAt
   user_id    String
 
-  user                 user                    @relation(fields: [user_id], references: [id], onDelete: Cascade)
-  applicantSkills      applicant_skill[]
-  applicantExperiences applicant_experience[]
-  applicantEducations  applicant_education[]
-  applicantLanguages   applicant_language[]
-  applicantAppliedJobs applicant_applied_job[]
-  applicantResumes     applicant_resume[]
+  user                    user                      @relation(fields: [user_id], references: [id], onDelete: Cascade)
+  applicantSkills         applicant_skill[]
+  applicantExperiences    applicant_experience[]
+  applicantEducations     applicant_education[]
+  applicantLanguages      applicant_language[]
+  applicantAppliedJobs    applicant_applied_job[]
+  applicantResumes        applicant_resume[]
+  applicantCareerStatuses applicant_career_status[]
 
   @@index([email])
   @@map("applicant_profiles")
@@ -251,6 +252,19 @@ model applicant_language {
 
   @@index([applicant_profile_id])
   @@map("applicant_languages")
+}
+
+model applicant_career_status {
+  id                   String                    @id @default(uuid())
+  applicant_profile_id String
+  status               applicant_career_statuses @default(ACTIVELY_LOOKING)
+  created_at           DateTime                  @default(now())
+  updated_at           DateTime                  @updatedAt
+
+  applicant_profile applicant_profile @relation(fields: [applicant_profile_id], references: [id], onDelete: Cascade)
+
+  @@index([applicant_profile_id])
+  @@map("applicant_career_status")
 }
 
 model applicant_resume {
@@ -380,13 +394,13 @@ model job {
 }
 
 model applicant_applied_job {
-  id                   String              @id @default(uuid())
+  id                   String             @id @default(uuid())
   applicant_profile_id String
   job_id               String
-  application_date     DateTime            @default(now())
-  status               applicantion_status @default(PENDING)
-  created_at           DateTime            @default(now())
-  updated_at           DateTime            @updatedAt
+  application_date     DateTime           @default(now())
+  status               application_status @default(PENDING)
+  created_at           DateTime           @default(now())
+  updated_at           DateTime           @updatedAt
 
   applicant_profile applicant_profile @relation(fields: [applicant_profile_id], references: [id], onDelete: Cascade)
   job               job?              @relation(fields: [jobId], references: [id])
@@ -404,7 +418,7 @@ enum user_status {
   DELETED
 }
 
-enum applicantion_status {
+enum application_status {
   PENDING
   ACCEPTED
   UNDER_REVIEW
@@ -424,4 +438,11 @@ enum language_proficiency {
   CONVERSATIONAL
   FLUENT
   NATIVE
+}
+
+enum applicant_career_statuses {
+  ACTIVELY_LOOKING
+  OPEN_TO_OPPORTUNITIES
+  EMPLOYED_NOT_LOOKING
+  NOT_LOOKING
 }

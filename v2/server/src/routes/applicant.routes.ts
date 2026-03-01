@@ -59,6 +59,13 @@ router.get('/profile', authenticate, applicantController.getProfile.bind(applica
 
 router.get('/resume/:id', applicantController.getResume.bind(applicantController));
 
+router.patch(
+  '/resume',
+  authenticate,
+  upload.single('resume'),
+  applicantController.updateResume.bind(applicantController)
+);
+
 router.get('/profile/picture/:id', applicantController.getProfilePicture.bind(applicantController));
 
 router.patch(
