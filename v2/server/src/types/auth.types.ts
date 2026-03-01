@@ -1,4 +1,4 @@
-import { UserStatus } from '@/generated/prisma/client';
+import { user_status } from '@/generated/prisma/client';
 
 export interface RegisterInput {
   email: string;
@@ -23,9 +23,11 @@ export interface UserData {
   first_name: string;
   last_name: string;
   role: string;
-  status: UserStatus;
+  status: user_status;
   email_verified: boolean;
+  done_onboarding: boolean;
   created_at: Date;
+  
 }
 
 export interface AuthResponse {

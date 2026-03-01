@@ -16,8 +16,8 @@ generator client {
 model user {
   id              String      @id @default(uuid())
   email           String      @unique
-  first_name      String
-  last_name       String
+  first_name      String?
+  last_name       String?
   password        String
   role            String
   status          user_status @default(PENDING_VERIFICATION)
@@ -193,14 +193,14 @@ model applicant_profile {
 }
 
 model applicant_education {
-  id                   String    @id @default(uuid())
+  id                   String   @id @default(uuid())
   applicant_profile_id String
   institution_name     String
   field_of_study       String
-  start_date           DateTime
-  end_date             DateTime?
-  created_at           DateTime  @default(now())
-  updated_at           DateTime  @updatedAt
+  start_year           Int
+  end_year             Int?
+  created_at           DateTime @default(now())
+  updated_at           DateTime @updatedAt
 
   applicant_profile applicant_profile @relation(fields: [applicant_profile_id], references: [id], onDelete: Cascade)
 
@@ -239,12 +239,12 @@ model applicant_skill {
 }
 
 model applicant_language {
-  id                   String   @id @default(uuid())
+  id                   String               @id @default(uuid())
   applicant_profile_id String
   language_name        String
-  proficiency_level    String
-  created_at           DateTime @default(now())
-  updated_at           DateTime @updatedAt
+  proficiency_level    language_proficiency
+  created_at           DateTime             @default(now())
+  updated_at           DateTime             @updatedAt
 
   applicant_profile applicant_profile @relation(fields: [applicant_profile_id], references: [id], onDelete: Cascade)
 
@@ -416,4 +416,11 @@ enum social_platform {
   TWITTER
   LINKEDIN
   INSTAGRAM
+}
+
+enum language_proficiency {
+  BASIC
+  CONVERSATIONAL
+  FLUENT
+  NATIVE
 }

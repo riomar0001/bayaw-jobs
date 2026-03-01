@@ -58,7 +58,7 @@ export const config = {
   // App
   app: {
     url: process.env.APP_URL || 'http://localhost:4000',
-    name: process.env.APP_NAME || 'CertManager',
+    name: process.env.APP_NAME || 'Node App',
   },
 
   // CORS

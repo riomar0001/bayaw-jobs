@@ -1,5 +1,5 @@
 import prisma from '@/configs/prisma.config';
-import { UserStatus, Prisma } from '@/generated/prisma/client';
+import { user_status, Prisma } from '@/generated/prisma/client';
 
 export interface CreateUserData {
   email: string;
@@ -14,7 +14,7 @@ export interface UpdateUserData {
   first_name?: string;
   last_name?: string;
   role?: string;
-  status?: UserStatus;
+  status?: user_status;
   email_verified?: boolean;
   email_verified_at?: Date | string | null;
   password_changed_at?: Date | string;
@@ -23,6 +23,7 @@ export interface UpdateUserData {
   last_login_at?: Date | string | null;
   last_activity_at?: Date | string | null;
   login_count?: number;
+  done_onboarding?: boolean;
 }
 
 export class UserRepository {
@@ -56,7 +57,8 @@ export class UserRepository {
         password: data.password,
         first_name: data.first_name,
         last_name: data.last_name,
-        status: UserStatus.PENDING_VERIFICATION,
+        status: user_status.PENDING_VERIFICATION,
+        done_onboarding: false,
         role: 'USER',
       },
     });
@@ -103,7 +105,7 @@ export class UserRepository {
       data: {
         email_verified: true,
         email_verified_at: new Date(),
-        status: UserStatus.ACTIVE,
+        status: user_status.ACTIVE,
       },
     });
   }
@@ -134,13 +136,13 @@ export class UserRepository {
     return prisma.user.update({
       where: { id },
       data: {
-        status: UserStatus.DELETED,
+        status: user_status.DELETED,
         deleted_at: new Date(),
       },
     });
   }
 
-  async findAll(params: { skip?: number; take?: number; status?: UserStatus }) {
+  async findAll(params: { skip?: number; take?: number; status?: user_status }) {
     const { skip = 0, take = 10, status } = params;
 
     const whereClause = status ? { status } : {};

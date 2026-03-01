@@ -29,7 +29,7 @@ export class EmailService {
   private appUrl: string;
 
   constructor() {
-    this.appName = process.env.APP_NAME || 'CertManager';
+    this.appName = process.env.APP_NAME || 'Node App';
     this.appUrl = process.env.APP_URL || 'http://localhost:4000';
   }
 

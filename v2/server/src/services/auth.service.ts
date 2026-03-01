@@ -1,4 +1,4 @@
-import { UserStatus } from '@/generated/prisma/client';
+import { user_status } from '@/generated/prisma/client';
 import { userRepository } from '@/repositories/user.repository';
 import { refreshTokenRepository } from '@/repositories/refreshToken.repository';
 import { authCodeRepository } from '@/repositories/authCode.repository';
@@ -31,7 +31,7 @@ import {
 import { Request } from 'express';
 
 export class AuthService {
-  async register(data: RegisterInput): Promise<{ user: UserData; verificationToken: string }> {
+  async register(data: RegisterInput): Promise<{ user: UserData; verificationToken: string }> {    
     // Check if user already exists
     const existingUser = await userRepository.findByEmail(data.email);
     if (existingUser) {
@@ -67,6 +67,7 @@ export class AuthService {
       role: user.role,
       status: user.status,
       email_verified: user.email_verified,
+      done_onboarding: user.done_onboarding,
       created_at: user.created_at,
     };
 
@@ -117,6 +118,7 @@ export class AuthService {
         role: updatedUser.role,
         status: updatedUser.status,
         email_verified: updatedUser.email_verified,
+        done_onboarding: updatedUser.done_onboarding,
         created_at: updatedUser.created_at,
       },
       accessToken,
@@ -223,6 +225,7 @@ export class AuthService {
       role: user.role,
       status: user.status,
       email_verified: user.email_verified,
+      done_onboarding: user.done_onboarding,
       created_at: user.created_at,
     };
 
@@ -301,13 +304,13 @@ export class AuthService {
     await refreshTokenRepository.revokeAllByUserId(userId);
   }
 
-  private checkAccountStatus(user: { status: UserStatus }): void {
+  private checkAccountStatus(user: { status: user_status }): void {
     switch (user.status) {
-      case UserStatus.SUSPENDED:
+      case user_status.SUSPENDED:
         throw new AuthenticationError(ErrorMessages.AUTH.ACCOUNT_SUSPENDED);
-      case UserStatus.DELETED:
+      case user_status.DELETED:
         throw new AuthenticationError(ErrorMessages.AUTH.ACCOUNT_DELETED);
-      case UserStatus.INACTIVE:
+      case user_status.INACTIVE:
         throw new AuthenticationError('Your account is inactive');
       default:
         break;
@@ -335,6 +338,7 @@ export class AuthService {
       role: user.role,
       status: user.status,
       email_verified: user.email_verified,
+      done_onboarding: user.done_onboarding,
       created_at: user.created_at,
     };
   }
