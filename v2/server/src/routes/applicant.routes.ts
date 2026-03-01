@@ -21,6 +21,19 @@ const upload = multer({
   },
 });
 
+const uploadImage = multer({
+  storage: multer.memoryStorage(),
+  limits: { fileSize: 5 * 1024 * 1024 }, // 5MB
+  fileFilter: (_req, file, cb) => {
+    const allowed = ['image/jpeg', 'image/png', 'image/webp'];
+    if (allowed.includes(file.mimetype)) {
+      cb(null, true);
+    } else {
+      cb(new Error('Only JPEG, PNG, and WebP images are allowed'));
+    }
+  },
+});
+
 /** Parses the stringified JSON in req.body.data into req.body for the validation middleware. */
 function parseOnboardingData(req: Request, _res: Response, next: NextFunction): void {
   try {
@@ -45,5 +58,14 @@ router.post(
 router.get('/profile', authenticate, applicantController.getProfile.bind(applicantController));
 
 router.get('/resume/:id', applicantController.getResume.bind(applicantController));
+
+router.get('/profile/picture/:id', applicantController.getProfilePicture.bind(applicantController));
+
+router.patch(
+  '/profile/picture',
+  authenticate,
+  uploadImage.single('picture'),
+  applicantController.updateProfilePicture.bind(applicantController)
+);
 
 export default router;

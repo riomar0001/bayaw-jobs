@@ -59,6 +59,13 @@ const applicantProfileResponseData = {
       example: 'profile_550e8400-e29b-41d4-a716-446655440000.jpg',
       description: 'Filename stored in the profile-picture Supabase bucket',
     },
+    profile_picture_url: {
+      type: 'string',
+      format: 'uri',
+      nullable: true,
+      example: 'http://localhost:4000/api/applicants/profile/picture/a1b2c3d4-...',
+      description: 'API endpoint to retrieve the profile picture. Null if no picture has been uploaded.',
+    },
     created_at: { type: 'string', format: 'date-time' },
     updated_at: { type: 'string', format: 'date-time' },
     applicantEducations: {
@@ -476,10 +483,163 @@ const getResume = {
   },
 };
 
+// ─── GET /applicants/profile/picture/{id} & PATCH /applicants/profile/picture ─
+
+const updateProfilePicture = {
+  '/applicants/profile/picture/{id}': {
+    get: {
+      tags: ['Applicants'],
+      summary: 'Get profile picture',
+      description:
+        "Streams an applicant's profile picture by their profile ID. " +
+        'The image is proxied through the API — the Supabase storage URL is never exposed. ' +
+        'No authentication required.',
+      parameters: [
+        {
+          name: 'id',
+          in: 'path',
+          required: true,
+          description: 'Applicant profile ID',
+          schema: { type: 'string', example: 'a1b2c3d4-e5f6-7890-abcd-ef1234567890' },
+        },
+      ],
+      responses: {
+        200: {
+          description: 'Profile picture streamed successfully',
+          headers: {
+            'Content-Type': {
+              schema: { type: 'string', example: 'image/jpeg' },
+            },
+            'Content-Disposition': {
+              schema: {
+                type: 'string',
+                example: 'inline; filename="profile_550e8400-e29b-41d4-a716-446655440000.jpg"',
+              },
+            },
+          },
+          content: {
+            'image/jpeg': { schema: { type: 'string', format: 'binary' } },
+            'image/png': { schema: { type: 'string', format: 'binary' } },
+            'image/webp': { schema: { type: 'string', format: 'binary' } },
+          },
+        },
+        404: {
+          description: 'Applicant profile or profile picture not found',
+          content: {
+            'application/json': {
+              schema: {
+                type: 'object',
+                properties: {
+                  success: { type: 'boolean', example: false },
+                  message: { type: 'string', example: 'Profile picture not found' },
+                },
+              },
+            },
+          },
+        },
+        500: internalErrorResponse,
+      },
+    },
+  },
+  '/applicants/profile/picture': {
+    patch: {
+      tags: ['Applicants'],
+      summary: 'Update profile picture',
+      description:
+        'Uploads a new profile picture for the authenticated applicant. ' +
+        'Accepts JPEG, PNG, or WebP images up to 5MB. ' +
+        'Replaces the existing profile picture in storage. ' +
+        'Requires the applicant to have completed onboarding.',
+      security: [{ bearerAuth: [] }],
+      requestBody: {
+        required: true,
+        content: {
+          'multipart/form-data': {
+            schema: {
+              type: 'object',
+              required: ['picture'],
+              properties: {
+                picture: {
+                  type: 'string',
+                  format: 'binary',
+                  description: 'Image file (JPEG, PNG, or WebP). Maximum size: 5MB.',
+                },
+              },
+            },
+          },
+        },
+      },
+      responses: {
+        200: {
+          description: 'Profile picture updated successfully',
+          content: {
+            'application/json': {
+              schema: {
+                type: 'object',
+                properties: {
+                  success: { type: 'boolean', example: true },
+                  message: { type: 'string', example: 'Profile picture updated successfully' },
+                  data: {
+                    type: 'object',
+                    properties: {
+                      profile_picture: {
+                        type: 'string',
+                        example: 'profile_550e8400-e29b-41d4-a716-446655440000.jpg',
+                        description: 'Filename stored in the profile-picture Supabase bucket.',
+                      },
+                      url: {
+                        type: 'string',
+                        format: 'uri',
+                        example: 'http://localhost:4000/api/applicants/profile/picture/a1b2c3d4-...',
+                        description: 'API endpoint to retrieve the profile picture. No authentication required.',
+                      },
+                    },
+                  },
+                },
+              },
+            },
+          },
+        },
+        400: {
+          description: 'No file provided or unsupported image format',
+          content: {
+            'application/json': {
+              schema: {
+                type: 'object',
+                properties: {
+                  success: { type: 'boolean', example: false },
+                  message: { type: 'string', example: 'Only JPEG, PNG, and WebP images are allowed' },
+                },
+              },
+            },
+          },
+        },
+        401: unauthorizedResponse,
+        404: {
+          description: 'Applicant profile not found — complete onboarding first',
+          content: {
+            'application/json': {
+              schema: {
+                type: 'object',
+                properties: {
+                  success: { type: 'boolean', example: false },
+                  message: { type: 'string', example: 'Applicant profile not found' },
+                },
+              },
+            },
+          },
+        },
+        500: internalErrorResponse,
+      },
+    },
+  },
+};
+
 // ─── Exports ──────────────────────────────────────────────────────────────────
 
 export const applicantDocs = {
   ...onboarding,
   ...getProfile,
   ...getResume,
+  ...updateProfilePicture,
 };

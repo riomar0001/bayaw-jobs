@@ -68,6 +68,24 @@ export class StorageService {
     return data.publicUrl;
   }
 
+  async downloadProfilePicture(filename: string): Promise<{ buffer: Buffer; contentType: string }> {
+    if (!supabase) {
+      throw new AppError(500, 'Storage service not configured');
+    }
+
+    const { data, error } = await supabase.storage.from(PROFILE_PICTURE_BUCKET).download(filename);
+
+    if (error || !data) {
+      console.error('Download error:', error);
+      throw new AppError(500, ErrorMessages.STORAGE.UPLOAD_FAILED);
+    }
+
+    const extension = filename.split('.').pop()?.toLowerCase() || 'jpg';
+    const contentType = extension === 'png' ? 'image/png' : extension === 'webp' ? 'image/webp' : 'image/jpeg';
+
+    return { buffer: Buffer.from(await data.arrayBuffer()), contentType };
+  }
+
   async deleteProfilePicture(filename: string): Promise<void> {
     await this.deleteFile(PROFILE_PICTURE_BUCKET, filename);
   }

@@ -54,6 +54,38 @@ export class ApplicantController {
     }
   }
 
+  async getProfilePicture(req: Request, res: Response, next: NextFunction): Promise<void> {
+    try {
+      const { id } = req.params;
+      const { buffer, contentType, filename } = await applicantService.getProfilePicture(id);
+
+      res.setHeader('Content-Type', contentType);
+      res.setHeader('Content-Disposition', `inline; filename="${filename}"`);
+      res.send(buffer);
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  async updateProfilePicture(req: Request, res: Response, next: NextFunction): Promise<void> {
+    try {
+      const userId = req.user?.user_id;
+      if (!userId) {
+        throw new Error('User ID missing in request');
+      }
+
+      if (!req.file) {
+        throw new BadRequestError('Image file is required');
+      }
+
+      const result = await applicantService.updateProfilePicture(userId, req.file);
+
+      successResponse(res, result, 'Profile picture updated successfully');
+    } catch (error) {
+      next(error);
+    }
+  }
+
 }
 
 export const applicantController = new ApplicantController();
