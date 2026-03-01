@@ -15,7 +15,7 @@ export interface RefreshTokenPayload {
 export interface VerificationTokenPayload {
   user_id: string;
   email: string;
-  purpose: 'email_verification' | 'auth_verification';
+  purpose: 'email_verification' | 'auth_verification' | 'password_reset';
 }
 
 export interface TokenPair {

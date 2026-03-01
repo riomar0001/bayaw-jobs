@@ -8,6 +8,9 @@ import {
   verifyEmailSchema,
   loginSchema,
   verifyAuthSchema,
+  updatePasswordSchema,
+  forgotPasswordSchema,
+  resetPasswordSchema,
 } from '@/validations/auth.validation';
 
 const router = Router();
@@ -27,6 +30,24 @@ router.post(
   authenticateTempToken,
   validate(verifyAuthSchema),
   authController.verifyAuth.bind(authController)
+);
+
+router.patch(
+  '/password',
+  authenticate,
+  validate(updatePasswordSchema),
+  authController.updatePassword.bind(authController)
+);
+
+router.post(
+  '/forgot-password',
+  validate(forgotPasswordSchema),
+  authController.forgotPassword.bind(authController)
+);
+router.post(
+  '/reset-password/:reset_password_token',
+  validate(resetPasswordSchema),
+  authController.resetPassword.bind(authController)
 );
 
 router.post('/refresh', authController.refresh.bind(authController));

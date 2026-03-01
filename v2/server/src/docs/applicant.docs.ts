@@ -45,6 +45,7 @@ const applicantProfileSchema = {
     age: { type: 'integer', example: 25 },
     gender: { type: 'string', example: 'Male' },
     desired_position: { type: 'string', example: 'Software Engineer' },
+    location: { type: 'string', example: 'Cebu City, Philippines' },
     career_status: {
       type: 'string',
       enum: CAREER_STATUS_ENUM,
@@ -52,7 +53,7 @@ const applicantProfileSchema = {
       description: 'Defaults to ACTIVELY_LOOKING if not provided.',
     },
   },
-  required: ['age', 'gender', 'desired_position'],
+  required: ['age', 'gender', 'desired_position', 'location'],
 };
 
 const applicantProfileResponseData = {
@@ -66,6 +67,7 @@ const applicantProfileResponseData = {
     age: { type: 'integer', example: 25 },
     gender: { type: 'string', example: 'Male' },
     desired_position: { type: 'string', example: 'Software Engineer' },
+    location: { type: 'string', example: 'Cebu City, Philippines' },
     profile_picture: {
       type: 'string',
       nullable: true,
@@ -192,6 +194,7 @@ const onboarding = {
                       age: 25,
                       gender: 'Male',
                       desired_position: 'Software Engineer',
+                      location: 'Cebu City, Philippines',
                     },
                     education: [
                       {
@@ -296,6 +299,7 @@ const onboarding = {
                 age: 25,
                 gender: 'Male',
                 desired_position: 'Software Engineer',
+                location: 'Cebu City, Philippines',
               },
               education: [
                 {

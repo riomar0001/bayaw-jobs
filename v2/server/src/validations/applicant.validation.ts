@@ -36,6 +36,7 @@ const profileSchema = z.object({
   age: z.number().int().min(16, 'Must be at least 16 years old').max(100),
   gender: z.string().min(1, 'Gender is required'),
   desired_position: z.string().min(1, 'Desired position is required'),
+  location: z.string().min(1, 'Location is required'),
   career_status: z
     .enum(['ACTIVELY_LOOKING', 'OPEN_TO_OPPORTUNITIES', 'EMPLOYED_NOT_LOOKING', 'NOT_LOOKING'], {
       error:

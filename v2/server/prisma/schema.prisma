@@ -175,6 +175,7 @@ model applicant_profile {
   age              Int
   gender           String
   desired_position String
+  location         String
   profile_picture  String?
 
   created_at DateTime @default(now())

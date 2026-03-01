@@ -673,6 +673,338 @@ const logoutAll = {
   },
 };
 
+// ─── POST /auth/forgot-password ──────────────────────────────────────────────
+
+const forgotPassword = {
+  '/auth/forgot-password': {
+    post: {
+      tags: ['Authentication'],
+      summary: 'Request a password reset',
+      description:
+        'Sends a password reset link to the provided email address if an account exists and is verified. ' +
+        'Always returns a generic success response to prevent email enumeration. ' +
+        'The reset link expires in 15 minutes. No authentication required.',
+      requestBody: {
+        required: true,
+        content: {
+          'application/json': {
+            schema: {
+              type: 'object',
+              required: ['email'],
+              properties: {
+                email: {
+                  type: 'string',
+                  format: 'email',
+                  example: 'user@example.com',
+                },
+              },
+            },
+          },
+        },
+      },
+      responses: {
+        200: {
+          description: 'Request processed — reset email sent if account exists',
+          content: {
+            'application/json': {
+              schema: {
+                type: 'object',
+                properties: {
+                  success: { type: 'boolean', example: true },
+                  message: {
+                    type: 'string',
+                    example:
+                      'If an account with that email exists, a password reset link has been sent.',
+                  },
+                  data: { type: 'null' },
+                },
+              },
+            },
+          },
+        },
+        400: {
+          description: 'Validation error',
+          content: {
+            'application/json': {
+              schema: {
+                type: 'object',
+                properties: {
+                  success: { type: 'boolean', example: false },
+                  message: { type: 'string', example: 'Invalid email format' },
+                },
+              },
+            },
+          },
+        },
+        500: {
+          description: 'Internal server error',
+          content: {
+            'application/json': {
+              schema: {
+                type: 'object',
+                properties: {
+                  success: { type: 'boolean', example: false },
+                  message: { type: 'string', example: 'Internal server error' },
+                },
+              },
+            },
+          },
+        },
+      },
+    },
+  },
+};
+
+// ─── POST /auth/reset-password ────────────────────────────────────────────────
+
+const resetPassword = {
+  '/auth/reset-password/{reset_password_token}': {
+    post: {
+      tags: ['Authentication'],
+      summary: 'Reset password using token',
+      description:
+        "Resets the user's password using the reset token received in the password reset email. " +
+        'The token is passed as a URL parameter. ' +
+        'The token is valid for 15 minutes. ' +
+        'All existing sessions are revoked after a successful reset — the user must log in again. ' +
+        'No authentication required.',
+      parameters: [
+        {
+          name: 'reset_password_token',
+          in: 'path',
+          required: true,
+          description: 'The password reset token received via email.',
+          schema: { type: 'string' },
+        },
+      ],
+      requestBody: {
+        required: true,
+        content: {
+          'application/json': {
+            schema: {
+              type: 'object',
+              required: ['new_password', 'confirm_password'],
+              properties: {
+                new_password: {
+                  type: 'string',
+                  minLength: 8,
+                  example: 'NewPass456@',
+                  description:
+                    'Must be at least 8 characters and contain uppercase, lowercase, number, and special character.',
+                },
+                confirm_password: {
+                  type: 'string',
+                  example: 'NewPass456@',
+                  description: 'Must match new_password.',
+                },
+              },
+            },
+          },
+        },
+      },
+      responses: {
+        200: {
+          description: 'Password reset successfully',
+          content: {
+            'application/json': {
+              schema: {
+                type: 'object',
+                properties: {
+                  success: { type: 'boolean', example: true },
+                  message: {
+                    type: 'string',
+                    example: 'Password reset successfully. Please log in again.',
+                  },
+                  data: { type: 'null' },
+                },
+              },
+            },
+          },
+        },
+        400: {
+          description: 'Validation error or passwords do not match',
+          content: {
+            'application/json': {
+              schema: {
+                type: 'object',
+                properties: {
+                  success: { type: 'boolean', example: false },
+                  message: { type: 'string', example: 'Passwords do not match' },
+                },
+              },
+            },
+          },
+        },
+        401: {
+          description: 'Invalid or expired reset token',
+          content: {
+            'application/json': {
+              schema: {
+                type: 'object',
+                properties: {
+                  success: { type: 'boolean', example: false },
+                  message: { type: 'string', example: 'Token has expired' },
+                },
+              },
+            },
+          },
+        },
+        404: {
+          description: 'User not found',
+          content: {
+            'application/json': {
+              schema: {
+                type: 'object',
+                properties: {
+                  success: { type: 'boolean', example: false },
+                  message: { type: 'string', example: 'User not found' },
+                },
+              },
+            },
+          },
+        },
+        500: {
+          description: 'Internal server error',
+          content: {
+            'application/json': {
+              schema: {
+                type: 'object',
+                properties: {
+                  success: { type: 'boolean', example: false },
+                  message: { type: 'string', example: 'Internal server error' },
+                },
+              },
+            },
+          },
+        },
+      },
+    },
+  },
+};
+
+// ─── PATCH /auth/password ─────────────────────────────────────────────────────
+
+const updatePassword = {
+  '/auth/password': {
+    patch: {
+      tags: ['Authentication'],
+      summary: 'Update password',
+      description:
+        "Updates the authenticated user's password. " +
+        'Requires the current password for verification. ' +
+        'All existing sessions (refresh tokens) are revoked after a successful update — the user must log in again. ' +
+        'Requires a valid Bearer access token.',
+      security: [{ bearerAuth: [] }],
+      requestBody: {
+        required: true,
+        content: {
+          'application/json': {
+            schema: {
+              type: 'object',
+              required: ['current_password', 'new_password', 'confirm_password'],
+              properties: {
+                current_password: {
+                  type: 'string',
+                  example: 'OldPass123!',
+                  description: "The user's current password.",
+                },
+                new_password: {
+                  type: 'string',
+                  minLength: 8,
+                  example: 'NewPass456@',
+                  description:
+                    'Must be at least 8 characters and contain uppercase, lowercase, number, and special character. Must differ from current password.',
+                },
+                confirm_password: {
+                  type: 'string',
+                  example: 'NewPass456@',
+                  description: 'Must match new_password.',
+                },
+              },
+            },
+          },
+        },
+      },
+      responses: {
+        200: {
+          description: 'Password updated successfully',
+          content: {
+            'application/json': {
+              schema: {
+                type: 'object',
+                properties: {
+                  success: { type: 'boolean', example: true },
+                  message: {
+                    type: 'string',
+                    example: 'Password updated successfully. Please log in again.',
+                  },
+                  data: { type: 'null' },
+                },
+              },
+            },
+          },
+        },
+        400: {
+          description: 'Validation error or incorrect current password',
+          content: {
+            'application/json': {
+              schema: {
+                type: 'object',
+                properties: {
+                  success: { type: 'boolean', example: false },
+                  message: { type: 'string', example: 'Current password is incorrect' },
+                },
+              },
+            },
+          },
+        },
+        401: {
+          description: 'Unauthorized — missing or invalid Bearer token',
+          content: {
+            'application/json': {
+              schema: {
+                type: 'object',
+                properties: {
+                  success: { type: 'boolean', example: false },
+                  message: { type: 'string', example: 'No token provided' },
+                },
+              },
+            },
+          },
+        },
+        404: {
+          description: 'User not found',
+          content: {
+            'application/json': {
+              schema: {
+                type: 'object',
+                properties: {
+                  success: { type: 'boolean', example: false },
+                  message: { type: 'string', example: 'User not found' },
+                },
+              },
+            },
+          },
+        },
+        500: {
+          description: 'Internal server error',
+          content: {
+            'application/json': {
+              schema: {
+                type: 'object',
+                properties: {
+                  success: { type: 'boolean', example: false },
+                  message: { type: 'string', example: 'Internal server error' },
+                },
+              },
+            },
+          },
+        },
+      },
+    },
+  },
+};
+
 export const authDocs = {
   ...register,
   ...verifyEmail,
@@ -681,4 +1013,7 @@ export const authDocs = {
   ...refresh,
   ...logout,
   ...logoutAll,
+  ...forgotPassword,
+  ...resetPassword,
+  ...updatePassword,
 };

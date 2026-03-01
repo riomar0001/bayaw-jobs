@@ -1,6 +1,7 @@
 import { addEmailJob, EmailJobData } from '@/queues/email.queue';
 import { emailVerificationTemplate } from '@/templates/emailVerification.template';
 import { authCodeTemplate } from '@/templates/authCode.template';
+import { passwordResetTemplate } from '@/templates/passwordReset.template';
 
 export interface VerificationEmailData {
   to: string;
@@ -12,6 +13,12 @@ export interface AuthCodeEmailData {
   to: string;
   firstName: string;
   code: string;
+}
+
+export interface PasswordResetEmailData {
+  to: string;
+  firstName: string;
+  resetLink: string;
 }
 
 export interface CertificateEmailData {
@@ -63,6 +70,20 @@ export class EmailService {
 
     await addEmailJob(jobData);
     console.log(`Auth code email queued for ${data.to}`);
+  }
+
+  async sendPasswordResetEmail(data: PasswordResetEmailData): Promise<void> {
+    const html = passwordResetTemplate(data.firstName, data.resetLink, this.appName);
+
+    const jobData: EmailJobData = {
+      type: 'verification',
+      to: data.to,
+      subject: `Reset your password - ${this.appName}`,
+      html,
+    };
+
+    await addEmailJob(jobData);
+    console.log(`Password reset email queued for ${data.to}`);
   }
 
   getVerificationLink(token: string): string {

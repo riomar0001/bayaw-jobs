@@ -66,7 +66,7 @@ export const generateRefreshToken = async (
 export const generateVerificationToken = (
   user_id: string,
   email: string,
-  purpose: 'email_verification' | 'auth_verification',
+  purpose: 'email_verification' | 'auth_verification' | 'password_reset',
   expiresIn = '24h'
 ): string => {
   const SECRET = process.env.JWT_VERIFICATION_SECRET || process.env.JWT_ACCESS_TOKEN_SECRET;

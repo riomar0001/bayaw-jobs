@@ -146,6 +146,47 @@ export class AuthController {
     }
   }
 
+  async forgotPassword(req: Request, res: Response, next: NextFunction): Promise<void> {
+    try {
+      const result = await authService.forgotPassword(req.body);
+      successResponse(
+        res,
+        result,
+        'If an account with that email exists, a password reset link has been sent.'
+      );
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  async resetPassword(req: Request, res: Response, next: NextFunction): Promise<void> {
+    try {
+      const { reset_password_token } = req.params;
+      if (!reset_password_token || typeof reset_password_token !== 'string') {
+        throw new Error('Reset password token is required');
+      }
+      await authService.resetPassword(reset_password_token, req.body);
+      successResponse(res, null, 'Password reset successfully. Please log in again.');
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  async updatePassword(req: Request, res: Response, next: NextFunction): Promise<void> {
+    try {
+      const userId = req.user?.user_id;
+      if (!userId) {
+        throw new Error('User ID missing in request');
+      }
+
+      await authService.updatePassword(userId, req.body);
+
+      successResponse(res, null, 'Password updated successfully. Please log in again.');
+    } catch (error) {
+      next(error);
+    }
+  }
+
   async logoutAll(req: Request, res: Response, next: NextFunction): Promise<void> {
     try {
       const userId = req.user?.user_id;

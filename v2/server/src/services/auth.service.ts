@@ -29,6 +29,11 @@ import {
   LoginResponse,
   RefreshTokenResponse,
 } from '@/types/auth.types';
+import {
+  UpdatePasswordInput,
+  ForgotPasswordInput,
+  ResetPasswordInput,
+} from '@/validations/auth.validation';
 import { Request } from 'express';
 
 export class AuthService {
@@ -337,6 +342,67 @@ export class AuthService {
       const lockUntil = new Date(Date.now() + Config.AUTH.LOCK_DURATION_MINUTES * 60 * 1000);
       await userRepository.lockAccount(userId, lockUntil);
     }
+  }
+
+  async forgotPassword(data: ForgotPasswordInput): Promise<string | undefined> {
+    const user = await userRepository.findByEmail(data.email);
+
+    // Always return silently — never reveal whether the email exists
+    if (!user || !user.email_verified) return;
+
+    const token = generateVerificationToken(user.id, user.email, 'password_reset', '15m');
+
+    const clientUrl = process.env.CORS_ORIGIN || 'http://localhost:3000';
+    const resetLink = `${clientUrl}/reset-password?token=${token}`;
+
+    await emailService.sendPasswordResetEmail({
+      to: user.email,
+      firstName: user.first_name ?? '',
+      resetLink,
+    });
+
+    return process.env.NODE_ENV === 'development' ? token : undefined;
+  }
+
+  async resetPassword(token: string, data: ResetPasswordInput): Promise<void> {
+    const decoded = verifyVerificationToken(token);
+
+    if (decoded.purpose !== 'password_reset') {
+      throw new BadRequestError(ErrorMessages.AUTH.TOKEN_INVALID);
+    }
+
+    const user = await userRepository.findById(decoded.user_id);
+    if (!user) {
+      throw new NotFoundError('User');
+    }
+
+    const hashedPassword = await hashPassword(data.new_password);
+    await userRepository.update(user.id, {
+      password: hashedPassword,
+      password_changed_at: new Date(),
+    });
+
+    await refreshTokenRepository.revokeAllByUserId(user.id);
+  }
+
+  async updatePassword(userId: string, data: UpdatePasswordInput): Promise<void> {
+    const user = await userRepository.findById(userId);
+    if (!user) {
+      throw new NotFoundError('User');
+    }
+
+    const isValid = await verifyPassword(data.current_password, user.password);
+    if (!isValid) {
+      throw new BadRequestError('Current password is incorrect');
+    }
+
+    const hashedPassword = await hashPassword(data.new_password);
+    await userRepository.update(userId, {
+      password: hashedPassword,
+      password_changed_at: new Date(),
+    });
+
+    await refreshTokenRepository.revokeAllByUserId(userId);
   }
 
   async getUserByEmail(email: string): Promise<UserData | null> {

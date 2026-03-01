@@ -42,6 +42,7 @@ export interface ApplicantProfile {
   age: number;
   gender: string;
   desired_position: string;
+  location: string;
   profile_picture?: string | null | undefined;
   career_status?: ApplicantCareerStatus | undefined;
 }

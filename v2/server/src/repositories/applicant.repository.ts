@@ -75,6 +75,7 @@ export class ApplicantRepository {
         age: data.age,
         gender: data.gender,
         desired_position: data.desired_position,
+        location: data.location,
         profile_picture: data.profile_picture ?? null,
         applicantEducations: {
           create: data.education.map((edu) => ({
