@@ -73,7 +73,6 @@ export class AuthService {
       role: user.role,
       status: user.status,
       email_verified: user.email_verified,
-      done_onboarding: user.done_onboarding,
       created_at: user.created_at,
     };
 
@@ -113,7 +112,6 @@ export class AuthService {
       role: user.role,
       first_name: user.first_name,
       last_name: user.last_name,
-      done_onboarding: user.done_onboarding,
     });
 
     const refreshToken = await generateRefreshToken(user.id, ip, userAgent);
@@ -127,7 +125,6 @@ export class AuthService {
         role: updatedUser.role,
         status: updatedUser.status,
         email_verified: updatedUser.email_verified,
-        done_onboarding: updatedUser.done_onboarding,
         created_at: updatedUser.created_at,
       },
       accessToken,
@@ -221,7 +218,6 @@ export class AuthService {
       role: user.role,
       first_name: user.first_name,
       last_name: user.last_name,
-      done_onboarding: user.done_onboarding,
     });
 
     const refreshToken = await generateRefreshToken(user.id, ip, userAgent);
@@ -237,7 +233,6 @@ export class AuthService {
       role: user.role,
       status: user.status,
       email_verified: user.email_verified,
-      done_onboarding: user.done_onboarding,
       created_at: user.created_at,
     };
 
@@ -292,7 +287,6 @@ export class AuthService {
       role: user.role,
       first_name: user.first_name,
       last_name: user.last_name,
-      done_onboarding: user.done_onboarding,
     });
 
     const newRefreshToken = await generateRefreshToken(user.id, ip, userAgent);
@@ -304,7 +298,6 @@ export class AuthService {
         first_name: user.first_name,
         last_name: user.last_name,
         role: user.role,
-        done_onboarding: user.done_onboarding,
       },
     };
   }
@@ -417,7 +410,6 @@ export class AuthService {
       role: user.role,
       status: user.status,
       email_verified: user.email_verified,
-      done_onboarding: user.done_onboarding,
       created_at: user.created_at,
     };
   }

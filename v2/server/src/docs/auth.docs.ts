@@ -523,7 +523,6 @@ const refresh = {
                           first_name: { type: 'string', nullable: true, example: 'John' },
                           last_name: { type: 'string', nullable: true, example: 'Doe' },
                           role: { type: 'string', example: 'USER' },
-                          done_onboarding: { type: 'boolean', example: false },
                         },
                       },
                     },

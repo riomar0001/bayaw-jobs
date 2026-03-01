@@ -23,7 +23,6 @@ export interface UpdateUserData {
   last_login_at?: Date | string | null;
   last_activity_at?: Date | string | null;
   login_count?: number;
-  done_onboarding?: boolean;
 }
 
 export class UserRepository {
@@ -58,7 +57,6 @@ export class UserRepository {
         first_name: data.first_name,
         last_name: data.last_name,
         status: user_status.PENDING_VERIFICATION,
-        done_onboarding: false,
         role: 'USER',
       },
     });

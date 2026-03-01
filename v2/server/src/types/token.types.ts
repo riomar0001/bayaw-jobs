@@ -4,7 +4,6 @@ export interface AccessTokenPayload {
   role: string;
   first_name: string | null;
   last_name: string | null;
-  done_onboarding: boolean;
 }
 
 export interface RefreshTokenPayload {

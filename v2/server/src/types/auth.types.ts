@@ -25,7 +25,6 @@ export interface UserData {
   role: string;
   status: user_status;
   email_verified: boolean;
-  done_onboarding: boolean;
   created_at: Date;
 }
 
@@ -44,7 +43,7 @@ export interface LoginResponse {
 export interface RefreshTokenResponse {
   accessToken: string;
   refreshToken: string;
-  user: Pick<UserData, 'first_name' | 'last_name' | 'role' | 'done_onboarding'>;
+  user: Pick<UserData, 'first_name' | 'last_name' | 'role'>;
 }
 
 export interface RefreshTokenData {

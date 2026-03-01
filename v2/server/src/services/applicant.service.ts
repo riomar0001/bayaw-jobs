@@ -32,10 +32,6 @@ export class ApplicantService {
       throw new NotFoundError('User');
     }
 
-    if (user.done_onboarding) {
-      throw new BadRequestError('Onboarding has already been completed');
-    }
-
     const existingProfile = await applicantRepository.findProfileByUserId(userId);
     if (existingProfile) {
       throw new ConflictError('Applicant profile already exists');
@@ -67,8 +63,6 @@ export class ApplicantService {
       skills: data.skills || [],
       languages: data.languages || [],
     });
-
-    await userRepository.update(userId, { done_onboarding: true });
 
     // Upload resume during onboarding
     let resumeUrl: string | null = null;
