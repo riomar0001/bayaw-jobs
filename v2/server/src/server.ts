@@ -1,5 +1,6 @@
 import '@/configs/dotenv.config';
 import app from './app';
+import logger from '@/configs/logger.config';
 import { createEmailWorker } from '@/queues/email.worker';
 import '@/jobs/tokenCleanup.job';
 
@@ -10,7 +11,7 @@ const emailWorker = createEmailWorker();
 
 // Graceful shutdown
 const shutdown = async () => {
-  console.log('Shutting down gracefully...');
+  logger.info('Shutting down gracefully...');
 
   // Close email worker
   await emailWorker.close();
@@ -23,10 +24,10 @@ process.on('SIGINT', shutdown);
 
 // Start server
 app.listen(PORT, () => {
-  console.log(`Server is running on port ${PORT}`);
-  console.log(`Environment: ${process.env.NODE_ENV || 'development'}`);
-  console.log(`API URL: http://localhost:${PORT}/api`);
-  console.log(`API DOCS URL: http://localhost:${PORT}/api/docs`);
-  console.log('Email worker started');
-  console.log('Token cleanup job scheduled (every 12 hours)');
+  logger.info(`Server is running on port ${PORT}`);
+  logger.info(`Environment: ${process.env.NODE_ENV ?? 'development'}`);
+  logger.info(`API URL: http://localhost:${PORT}/api`);
+  logger.info(`API DOCS URL: http://localhost:${PORT}/api/docs`);
+  logger.info('Email worker started');
+  logger.info('Token cleanup job scheduled (every 12 hours)');
 });

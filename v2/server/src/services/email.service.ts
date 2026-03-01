@@ -2,6 +2,7 @@ import { addEmailJob, EmailJobData } from '@/queues/email.queue';
 import { emailVerificationTemplate } from '@/templates/emailVerification.template';
 import { authCodeTemplate } from '@/templates/authCode.template';
 import { passwordResetTemplate } from '@/templates/passwordReset.template';
+import logger from '@/configs/logger.config';
 
 export interface VerificationEmailData {
   to: string;
@@ -55,7 +56,7 @@ export class EmailService {
     };
 
     await addEmailJob(jobData);
-    console.log(`Verification email queued for ${data.to}`);
+    logger.info('Verification email queued', { to: data.to });
   }
 
   async sendAuthCodeEmail(data: AuthCodeEmailData): Promise<void> {
@@ -69,7 +70,7 @@ export class EmailService {
     };
 
     await addEmailJob(jobData);
-    console.log(`Auth code email queued for ${data.to}`);
+    logger.info('Auth code email queued', { to: data.to });
   }
 
   async sendPasswordResetEmail(data: PasswordResetEmailData): Promise<void> {
@@ -83,7 +84,7 @@ export class EmailService {
     };
 
     await addEmailJob(jobData);
-    console.log(`Password reset email queued for ${data.to}`);
+    logger.info('Password reset email queued', { to: data.to });
   }
 
   getVerificationLink(token: string): string {

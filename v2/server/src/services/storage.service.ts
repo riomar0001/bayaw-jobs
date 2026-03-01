@@ -4,6 +4,7 @@ import { ErrorMessages } from '@/constants/errorMessages.constant';
 import { readFileSync } from 'fs';
 import { join, dirname } from 'path';
 import { fileURLToPath } from 'url';
+import logger from '@/configs/logger.config';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -26,7 +27,7 @@ export class StorageService {
     });
 
     if (error) {
-      console.error('Upload error:', error);
+      logger.error('Storage upload error', { error });
       throw new AppError(500, ErrorMessages.STORAGE.UPLOAD_FAILED);
     }
 
@@ -51,7 +52,7 @@ export class StorageService {
     });
 
     if (error) {
-      console.error('Upload error:', error);
+      logger.error('Storage upload error', { error });
       throw new AppError(500, ErrorMessages.STORAGE.UPLOAD_FAILED);
     }
 
@@ -75,7 +76,7 @@ export class StorageService {
     const { data, error } = await supabase.storage.from(PROFILE_PICTURE_BUCKET).download(filename);
 
     if (error || !data) {
-      console.error('Download error:', error);
+      logger.error('Storage download error', { error });
       throw new AppError(500, ErrorMessages.STORAGE.UPLOAD_FAILED);
     }
 
@@ -105,7 +106,7 @@ export class StorageService {
     });
 
     if (error) {
-      console.error('Upload error:', error);
+      logger.error('Storage upload error', { error });
       throw new AppError(500, ErrorMessages.STORAGE.UPLOAD_FAILED);
     }
 
@@ -129,7 +130,7 @@ export class StorageService {
     const { data, error } = await supabase.storage.from(RESUME_BUCKET).download(filename);
 
     if (error || !data) {
-      console.error('Download error:', error);
+      logger.error('Storage download error', { error });
       throw new AppError(500, ErrorMessages.STORAGE.UPLOAD_FAILED);
     }
 
@@ -150,7 +151,7 @@ export class StorageService {
     const { error } = await supabase.storage.from(bucket).remove([path]);
 
     if (error) {
-      console.error('Delete error:', error);
+      logger.error('Storage delete error', { error });
     }
   }
 }

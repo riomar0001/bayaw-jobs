@@ -13,6 +13,7 @@ import {
   UpdateLanguageInput,
 } from '@/validations/applicant.validation';
 import { storageService } from '@/services/storage.service';
+import logger from '@/configs/logger.config';
 
 interface ResumeFile {
   buffer: Buffer;
@@ -45,7 +46,7 @@ export class ApplicantService {
     try {
       profilePicture = await storageService.uploadDefaultProfilePicture(userId);
     } catch (err) {
-      console.warn('Could not upload default profile picture:', err);
+      logger.warn('Could not upload default profile picture', { error: err });
     }
 
     const profile = await applicantRepository.createProfile({
@@ -77,7 +78,7 @@ export class ApplicantService {
       profile.applicantResumes = [resume];
       resumeUrl = `${process.env.APP_URL}/api/applicants/resume/${profile.id}`;
     } catch (err) {
-      console.warn('Could not upload resume during onboarding:', err);
+      logger.warn('Could not upload resume during onboarding', { error: err });
     }
 
     const { applicantCareerStatuses, ...profileRest } = profile;

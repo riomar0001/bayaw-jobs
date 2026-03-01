@@ -1,5 +1,6 @@
 import nodemailer from 'nodemailer';
 import '@/configs/dotenv.config';
+import logger from '@/configs/logger.config';
 
 export const transporter = nodemailer.createTransport({
   host: process.env.MAIL_HOST || 'smtp.gmail.com',
@@ -14,9 +15,9 @@ export const transporter = nodemailer.createTransport({
 // Verify transporter configuration
 transporter.verify((error) => {
   if (error) {
-    console.warn('Email transporter verification failed:', error.message);
+    logger.warn('Email transporter verification failed', { message: error.message });
   } else {
-    console.log('Email transporter is ready');
+    logger.info('Email transporter is ready');
   }
 });
 

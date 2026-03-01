@@ -94,6 +94,9 @@ export const authenticateTempToken = async (
       user_id: decoded.user_id,
       email: decoded.email,
       role: '',
+      first_name: null,
+      last_name: null,
+      done_onboarding: false,
     };
     next();
   } catch (error) {

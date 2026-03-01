@@ -1,5 +1,6 @@
 import Redis from 'ioredis';
 import '@/configs/dotenv.config';
+import logger from '@/configs/logger.config';
 
 const redisHost = process.env.REDIS_HOST || 'localhost';
 const redisPort = parseInt(process.env.REDIS_PORT || '6379', 10);
@@ -15,7 +16,7 @@ export const redisConnection = new Redis({
   enableReadyCheck: false,
   retryStrategy: (times: number) => {
     if (times > 3) {
-      console.error('Redis connection failed after 3 retries');
+      logger.error('Redis connection failed after 3 retries');
       return null;
     }
     return Math.min(times * 200, 2000);
@@ -23,11 +24,11 @@ export const redisConnection = new Redis({
 });
 
 redisConnection.on('connect', () => {
-  console.log('Redis connected successfully');
+  logger.info('Redis connected successfully');
 });
 
 redisConnection.on('error', (err) => {
-  console.error('Redis connection error:', err.message);
+  logger.error('Redis connection error', { message: err.message });
 });
 
 export const createRedisConnection = () => {

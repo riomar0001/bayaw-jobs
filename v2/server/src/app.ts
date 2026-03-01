@@ -7,6 +7,7 @@ import { apiReference } from '@scalar/express-api-reference';
 import { helmetConfig } from '@/configs/helmet.config';
 import routes from '@/routes';
 import { errorMiddleware, notFoundMiddleware } from '@/middlewares/error.middleware';
+import { requestLogger } from '@/middlewares/requestLogger.middleware';
 import { generalRateLimiter } from '@/middlewares/rateLimit.middleware';
 import openApiSpec from '@/docs/openapi';
 
@@ -30,6 +31,9 @@ app.use(cookieParser());
 
 // Rate limiting
 app.use(generalRateLimiter);
+
+// HTTP request logging
+app.use(requestLogger);
 
 // Raw OpenAPI JSON endpoint (must be before Scalar middleware)
 app.get('/api/docs/openapi.json', (_req, res) => {

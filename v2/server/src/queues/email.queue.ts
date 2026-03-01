@@ -1,6 +1,7 @@
-import { Queue, QueueEvents, JobsOptions } from 'bullmq';
+import { Queue, QueueEvents, JobsOptions, ConnectionOptions } from 'bullmq';
 import { createRedisConnection } from '@/configs/bullmq.config';
 import { Config } from '@/constants/config.constant';
+import logger from '@/configs/logger.config';
 
 export interface EmailAttachment {
   filename: string;
@@ -33,26 +34,28 @@ const defaultJobOptions: JobsOptions = {
   },
 };
 
-export const emailQueue = new Queue<EmailJobData>(Config.EMAIL_QUEUE.NAME, {
-  connection: createRedisConnection(),
+type EmailJobName = EmailJobData['type'];
+
+export const emailQueue = new Queue<EmailJobData, void, EmailJobName>(Config.EMAIL_QUEUE.NAME, {
+  connection: createRedisConnection() as unknown as ConnectionOptions,
   defaultJobOptions,
 });
 
 export const emailQueueEvents = new QueueEvents(Config.EMAIL_QUEUE.NAME, {
-  connection: createRedisConnection(),
+  connection: createRedisConnection() as unknown as ConnectionOptions,
 });
 
 // Queue event listeners
 emailQueueEvents.on('completed', ({ jobId }) => {
-  console.log(`Email job ${jobId} completed`);
+  logger.info(`Email job ${jobId} completed`);
 });
 
 emailQueueEvents.on('failed', ({ jobId, failedReason }) => {
-  console.error(`Email job ${jobId} failed: ${failedReason}`);
+  logger.error(`Email job ${jobId} failed`, { jobId, reason: failedReason });
 });
 
 emailQueueEvents.on('stalled', ({ jobId }) => {
-  console.warn(`Email job ${jobId} stalled`);
+  logger.warn(`Email job ${jobId} stalled`);
 });
 
 export const addEmailJob = async (data: EmailJobData, options?: JobsOptions) => {

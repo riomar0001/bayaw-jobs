@@ -1,9 +1,10 @@
 import cron from 'node-cron';
 import prisma from '@/configs/prisma.config';
+import logger from '@/configs/logger.config';
 
 // Runs every 12 hours at minute 0
 cron.schedule('0 */12 * * *', async () => {
-  console.log('Running expired token cleanup...');
+  logger.info('Running expired token cleanup...');
 
   try {
     const revokeTokens = await prisma.refresh_token.updateMany({
@@ -18,9 +19,9 @@ cron.schedule('0 */12 * * *', async () => {
       },
     });
 
-    console.log(`Cleaned up ${revokeTokens.count} expired tokens.`);
+    logger.info(`Cleaned up ${revokeTokens.count} expired tokens.`);
   } catch (error) {
-    console.error('Error during expired token cleanup:', error);
+    logger.error('Error during expired token cleanup', { error });
   }
 });
 

@@ -3,6 +3,7 @@ import { Prisma } from '@/generated/prisma/client';
 import { AppError, ValidationError } from '@/utils/errors.util';
 import { errorResponse } from '@/utils/apiResponse.util';
 import { ErrorMessages } from '@/constants/errorMessages.constant';
+import logger from '@/configs/logger.config';
 
 export const errorMiddleware = (
   err: Error,
@@ -10,7 +11,7 @@ export const errorMiddleware = (
   res: Response,
   _next: NextFunction
 ): void => {
-  console.error('Error:', err);
+  logger.error(err.message, { stack: err.stack, name: err.name });
 
   // Handle ValidationError
   if (err instanceof ValidationError) {

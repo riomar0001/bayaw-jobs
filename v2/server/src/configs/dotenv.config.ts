@@ -1,4 +1,5 @@
 import dotenv from 'dotenv';
+import logger from '@/configs/logger.config';
 
 dotenv.config();
 
@@ -11,7 +12,7 @@ const requiredEnvVars = [
 
 for (const envVar of requiredEnvVars) {
   if (!process.env[envVar]) {
-    console.warn(`Warning: ${envVar} is not defined in environment variables`);
+    logger.warn(`${envVar} is not defined in environment variables`);
   }
 }
 

@@ -1,15 +1,16 @@
-import { Worker, Job } from 'bullmq';
+import { Worker, Job, ConnectionOptions } from 'bullmq';
 import { createRedisConnection } from '@/configs/bullmq.config';
 import { transporter } from '@/configs/nodemailer.config';
 import { Config } from '@/constants/config.constant';
 import { EmailJobData } from './email.queue';
+import logger from '@/configs/logger.config';
 
 const processEmailJob = async (
   job: Job<EmailJobData>
 ): Promise<{ success: boolean; sentAt: string }> => {
   const { to, subject, html, attachments } = job.data;
 
-  console.log(`Processing email job ${job.id}: ${job.data.type} to ${to}`);
+  logger.info(`Processing email job ${job.id}`, { type: job.data.type, to });
 
   try {
     const mailOptions = {
@@ -27,18 +28,18 @@ const processEmailJob = async (
     await transporter.sendMail(mailOptions);
 
     const sentAt = new Date().toISOString();
-    console.log(`Email job ${job.id} sent successfully at ${sentAt}`);
+    logger.info(`Email job ${job.id} sent successfully`, { sentAt });
 
     return { success: true, sentAt };
   } catch (error) {
-    console.error(`Email job ${job.id} failed:`, error);
+    logger.error(`Email job ${job.id} failed`, { error });
     throw error;
   }
 };
 
 export const createEmailWorker = () => {
   const worker = new Worker<EmailJobData>(Config.EMAIL_QUEUE.NAME, processEmailJob, {
-    connection: createRedisConnection(),
+    connection: createRedisConnection() as unknown as ConnectionOptions,
     concurrency: Config.EMAIL_QUEUE.CONCURRENCY,
     limiter: {
       max: 10,
@@ -47,19 +48,19 @@ export const createEmailWorker = () => {
   });
 
   worker.on('completed', (job, result) => {
-    console.log(`Worker: Email job ${job.id} completed with result:`, result);
+    logger.info(`Worker: Email job ${job.id} completed`, { result });
   });
 
   worker.on('failed', (job, error) => {
-    console.error(`Worker: Email job ${job?.id} failed with error:`, error.message);
+    logger.error(`Worker: Email job ${job?.id} failed`, { message: error.message });
   });
 
   worker.on('error', (error) => {
-    console.error('Worker error:', error);
+    logger.error('Worker error', { error });
   });
 
   worker.on('stalled', (jobId) => {
-    console.warn(`Worker: Job ${jobId} stalled`);
+    logger.warn(`Worker: Job ${jobId} stalled`);
   });
 
   return worker;
