@@ -8,7 +8,6 @@ import { fileURLToPath } from 'url';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
-
 export class StorageService {
   // ─── Profile Picture ────────────────────────────────────────────────────────
 
@@ -21,12 +20,10 @@ export class StorageService {
     const buffer = readFileSync(assetPath);
     const filename = `profile_${userId}.jpg`;
 
-    const { error } = await supabase.storage
-      .from(PROFILE_PICTURE_BUCKET)
-      .upload(filename, buffer, {
-        contentType: 'image/jpeg',
-        upsert: true,
-      });
+    const { error } = await supabase.storage.from(PROFILE_PICTURE_BUCKET).upload(filename, buffer, {
+      contentType: 'image/jpeg',
+      upsert: true,
+    });
 
     if (error) {
       console.error('Upload error:', error);
@@ -36,7 +33,11 @@ export class StorageService {
     return filename;
   }
 
-  async uploadProfilePicture(buffer: Buffer, userId: string, originalFilename: string): Promise<string> {
+  async uploadProfilePicture(
+    buffer: Buffer,
+    userId: string,
+    originalFilename: string
+  ): Promise<string> {
     if (!supabase) {
       throw new AppError(500, 'Storage service not configured');
     }
@@ -44,12 +45,10 @@ export class StorageService {
     const extension = originalFilename.split('.').pop()?.toLowerCase() || 'jpg';
     const filename = `profile_${userId}.${extension}`;
 
-    const { error } = await supabase.storage
-      .from(PROFILE_PICTURE_BUCKET)
-      .upload(filename, buffer, {
-        contentType: `image/${extension}`,
-        upsert: true,
-      });
+    const { error } = await supabase.storage.from(PROFILE_PICTURE_BUCKET).upload(filename, buffer, {
+      contentType: `image/${extension}`,
+      upsert: true,
+    });
 
     if (error) {
       console.error('Upload error:', error);
@@ -81,7 +80,8 @@ export class StorageService {
     }
 
     const extension = filename.split('.').pop()?.toLowerCase() || 'jpg';
-    const contentType = extension === 'png' ? 'image/png' : extension === 'webp' ? 'image/webp' : 'image/jpeg';
+    const contentType =
+      extension === 'png' ? 'image/png' : extension === 'webp' ? 'image/webp' : 'image/jpeg';
 
     return { buffer: Buffer.from(await data.arrayBuffer()), contentType };
   }
@@ -99,12 +99,10 @@ export class StorageService {
 
     const filename = `resume_${userId}.pdf`;
 
-    const { error } = await supabase.storage
-      .from(RESUME_BUCKET)
-      .upload(filename, buffer, {
-        contentType: 'application/pdf',
-        upsert: true,
-      });
+    const { error } = await supabase.storage.from(RESUME_BUCKET).upload(filename, buffer, {
+      contentType: 'application/pdf',
+      upsert: true,
+    });
 
     if (error) {
       console.error('Upload error:', error);

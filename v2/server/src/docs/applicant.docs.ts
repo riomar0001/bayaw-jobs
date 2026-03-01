@@ -32,7 +32,12 @@ const internalErrorResponse = {
 
 // ─── Shared profile data schema ───────────────────────────────────────────────
 
-const CAREER_STATUS_ENUM = ['ACTIVELY_LOOKING', 'OPEN_TO_OPPORTUNITIES', 'EMPLOYED_NOT_LOOKING', 'NOT_LOOKING'];
+const CAREER_STATUS_ENUM = [
+  'ACTIVELY_LOOKING',
+  'OPEN_TO_OPPORTUNITIES',
+  'EMPLOYED_NOT_LOOKING',
+  'NOT_LOOKING',
+];
 
 const applicantProfileSchema = {
   type: 'object',
@@ -72,7 +77,8 @@ const applicantProfileResponseData = {
       format: 'uri',
       nullable: true,
       example: 'http://localhost:4000/api/applicants/profile/picture/a1b2c3d4-...',
-      description: 'API endpoint to retrieve the profile picture. Null if no picture has been uploaded.',
+      description:
+        'API endpoint to retrieve the profile picture. Null if no picture has been uploaded.',
     },
     created_at: { type: 'string', format: 'date-time' },
     updated_at: { type: 'string', format: 'date-time' },
@@ -100,7 +106,12 @@ const applicantProfileResponseData = {
           company_name: { type: 'string', example: 'Tech Corp' },
           position: { type: 'string', example: 'Junior Developer' },
           start_date: { type: 'string', format: 'date-time', example: '2022-01-01T00:00:00.000Z' },
-          end_date: { type: 'string', format: 'date-time', nullable: true, example: '2023-06-01T00:00:00.000Z' },
+          end_date: {
+            type: 'string',
+            format: 'date-time',
+            nullable: true,
+            example: '2023-06-01T00:00:00.000Z',
+          },
           is_current: { type: 'boolean', example: false },
         },
       },
@@ -157,7 +168,7 @@ const onboarding = {
       summary: 'Complete applicant onboarding',
       description:
         'Submits the full applicant profile including education, experience, skills, and languages. ' +
-        'First name and last name are taken from the authenticated user\'s registration data — they do not need to be provided here. ' +
+        "First name and last name are taken from the authenticated user's registration data — they do not need to be provided here. " +
         'Accepts `multipart/form-data`: send all JSON fields as a stringified JSON string in the `data` field, ' +
         'and attach a PDF resume in the `resume` field (required). ' +
         'Automatically uploads the default profile picture to the `profile-picture` Supabase bucket. ' +
@@ -330,7 +341,8 @@ const onboarding = {
                             format: 'uri',
                             nullable: true,
                             example: 'http://localhost:4000/api/applicants/resume/a1b2c3d4-...',
-                            description: 'API endpoint to retrieve the uploaded resume PDF. No authentication required.',
+                            description:
+                              'API endpoint to retrieve the uploaded resume PDF. No authentication required.',
                           },
                         },
                       },
@@ -454,7 +466,7 @@ const getResume = {
           in: 'path',
           required: true,
           description: 'Applicant profile ID',
-          schema: { type: 'string'},
+          schema: { type: 'string' },
         },
       ],
       responses: {
@@ -701,8 +713,10 @@ const updateProfilePicture = {
                       url: {
                         type: 'string',
                         format: 'uri',
-                        example: 'http://localhost:4000/api/applicants/profile/picture/a1b2c3d4-...',
-                        description: 'API endpoint to retrieve the profile picture. No authentication required.',
+                        example:
+                          'http://localhost:4000/api/applicants/profile/picture/a1b2c3d4-...',
+                        description:
+                          'API endpoint to retrieve the profile picture. No authentication required.',
                       },
                     },
                   },
@@ -719,7 +733,10 @@ const updateProfilePicture = {
                 type: 'object',
                 properties: {
                   success: { type: 'boolean', example: false },
-                  message: { type: 'string', example: 'Only JPEG, PNG, and WebP images are allowed' },
+                  message: {
+                    type: 'string',
+                    example: 'Only JPEG, PNG, and WebP images are allowed',
+                  },
                 },
               },
             },

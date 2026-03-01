@@ -32,7 +32,7 @@ import {
 import { Request } from 'express';
 
 export class AuthService {
-  async register(data: RegisterInput): Promise<{ user: UserData; verificationToken: string }> {    
+  async register(data: RegisterInput): Promise<{ user: UserData; verificationToken: string }> {
     // Check if user already exists
     const existingUser = await userRepository.findByEmail(data.email);
     if (existingUser) {

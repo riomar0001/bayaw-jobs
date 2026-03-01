@@ -54,7 +54,9 @@ export class ApplicantRepository {
   }
 
   async upsertResume(applicantProfileId: string, fileName: string) {
-    await prisma.applicant_resume.deleteMany({ where: { applicant_profile_id: applicantProfileId } });
+    await prisma.applicant_resume.deleteMany({
+      where: { applicant_profile_id: applicantProfileId },
+    });
     return prisma.applicant_resume.create({
       data: {
         applicant_profile_id: applicantProfileId,

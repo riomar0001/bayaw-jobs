@@ -83,9 +83,10 @@ export class ApplicantService {
     }
 
     const { applicantResumes, applicantCareerStatuses, ...rest } = profile;
-    const resume_url = applicantResumes.length > 0
-      ? `${process.env.APP_URL}/api/applicants/resume/${profile.id}`
-      : null;
+    const resume_url =
+      applicantResumes.length > 0
+        ? `${process.env.APP_URL}/api/applicants/resume/${profile.id}`
+        : null;
     const profile_picture_url = profile.profile_picture
       ? `${process.env.APP_URL}/api/applicants/profile/picture/${profile.id}`
       : null;
@@ -109,7 +110,9 @@ export class ApplicantService {
     return { buffer, filename: resume.file_name };
   }
 
-  async getProfilePicture(profileId: string): Promise<{ buffer: Buffer; contentType: string; filename: string }> {
+  async getProfilePicture(
+    profileId: string
+  ): Promise<{ buffer: Buffer; contentType: string; filename: string }> {
     const profile = await applicantRepository.findProfileById(profileId);
     if (!profile) {
       throw new NotFoundError('Applicant profile');
@@ -119,7 +122,9 @@ export class ApplicantService {
       throw new NotFoundError('Profile picture');
     }
 
-    const { buffer, contentType } = await storageService.downloadProfilePicture(profile.profile_picture);
+    const { buffer, contentType } = await storageService.downloadProfilePicture(
+      profile.profile_picture
+    );
     return { buffer, contentType, filename: profile.profile_picture };
   }
 
@@ -129,7 +134,11 @@ export class ApplicantService {
       throw new NotFoundError('Applicant profile');
     }
 
-    const fileName = await storageService.uploadProfilePicture(file.buffer, userId, file.originalname);
+    const fileName = await storageService.uploadProfilePicture(
+      file.buffer,
+      userId,
+      file.originalname
+    );
     await applicantRepository.updateProfilePicture(profile.id, fileName);
 
     return {

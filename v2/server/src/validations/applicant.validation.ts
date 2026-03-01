@@ -4,7 +4,13 @@ const educationSchema = z.object({
   institution_name: z.string().min(1, 'Institution name is required'),
   field_of_study: z.string().min(1, 'Field of study is required'),
   start_year: z.number().int().min(1900).max(new Date().getFullYear()),
-  end_year: z.number().int().min(1900).max(new Date().getFullYear() + 10).nullable().optional(),
+  end_year: z
+    .number()
+    .int()
+    .min(1900)
+    .max(new Date().getFullYear() + 10)
+    .nullable()
+    .optional(),
 });
 
 const experienceSchema = z.object({
@@ -32,7 +38,8 @@ const profileSchema = z.object({
   desired_position: z.string().min(1, 'Desired position is required'),
   career_status: z
     .enum(['ACTIVELY_LOOKING', 'OPEN_TO_OPPORTUNITIES', 'EMPLOYED_NOT_LOOKING', 'NOT_LOOKING'], {
-      error: 'career_status must be one of: ACTIVELY_LOOKING, OPEN_TO_OPPORTUNITIES, EMPLOYED_NOT_LOOKING, NOT_LOOKING',
+      error:
+        'career_status must be one of: ACTIVELY_LOOKING, OPEN_TO_OPPORTUNITIES, EMPLOYED_NOT_LOOKING, NOT_LOOKING',
     })
     .optional(),
 });
@@ -40,7 +47,10 @@ const profileSchema = z.object({
 export const onboardingSchema = z.object({
   body: z.object({
     profile: profileSchema,
-    education: z.array(educationSchema).min(1, 'At least one education entry is required').optional(),
+    education: z
+      .array(educationSchema)
+      .min(1, 'At least one education entry is required')
+      .optional(),
     experience: z.array(experienceSchema).optional(),
     skills: z.array(skillSchema).min(1, 'At least one skill is required'),
     languages: z.array(languageSchema).min(1, 'At least one language is required'),
