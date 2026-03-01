@@ -3,7 +3,7 @@ name: bayaw-jobs-db
 services:
   postgres:
     image: postgres:16-alpine
-    container_name: postgres_instance
+    container_name: postgres_instance_bayaw_jobs
     restart: unless-stopped
     environment:
       POSTGRES_USER: postgres
@@ -31,7 +31,7 @@ services:
   
   pgadmin:
     image: dpage/pgadmin4:latest
-    container_name: pgadmin
+    container_name: pgadmin_bayaw_jobs
     networks:
       - bayaw_jobs_network
     ports:
@@ -48,7 +48,7 @@ services:
 
   redis:
     image: redis:7-alpine
-    container_name: redis_instance
+    container_name: redis_instance_bayaw_jobs
     restart: unless-stopped
     command: >
       redis-server
@@ -68,7 +68,7 @@ services:
 
   redisinsight:
     image: redis/redisinsight:latest
-    container_name: redisinsight
+    container_name: redis_insight_bayaw_jobs
     networks:
       - bayaw_jobs_network
     ports:
