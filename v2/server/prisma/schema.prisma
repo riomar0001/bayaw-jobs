@@ -14,13 +14,14 @@ generator client {
 }
 
 model user {
-  id         String      @id @default(uuid())
-  email      String      @unique
-  first_name String
-  last_name  String
-  password   String
-  role       String
-  status     user_status @default(PENDING_VERIFICATION)
+  id              String      @id @default(uuid())
+  email           String      @unique
+  first_name      String
+  last_name       String
+  password        String
+  role            String
+  status          user_status @default(PENDING_VERIFICATION)
+  done_onboarding Boolean     @default(false)
 
   // Authentication & Security
   email_verified        Boolean   @default(false)
