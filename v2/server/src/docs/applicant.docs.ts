@@ -639,6 +639,57 @@ const addEducation = {
 
 const updateEducation = {
   '/applicants/education/{id}': {
+    delete: {
+      tags: ['Applicants'],
+      summary: 'Delete education entry',
+      description:
+        "Deletes a specific education entry belonging to the authenticated applicant's profile. " +
+        'Returns 404 if the entry does not exist or does not belong to the authenticated user. ' +
+        'Requires a valid Bearer access token.',
+      security: [{ bearerAuth: [] }],
+      parameters: [
+        {
+          name: 'id',
+          in: 'path',
+          required: true,
+          description: 'Education entry ID',
+          schema: { type: 'string' },
+        },
+      ],
+      responses: {
+        200: {
+          description: 'Education deleted successfully',
+          content: {
+            'application/json': {
+              schema: {
+                type: 'object',
+                properties: {
+                  success: { type: 'boolean', example: true },
+                  message: { type: 'string', example: 'Education deleted successfully' },
+                  data: { type: 'object', nullable: true, example: null },
+                },
+              },
+            },
+          },
+        },
+        401: unauthorizedResponse,
+        404: {
+          description: 'Applicant profile or education entry not found',
+          content: {
+            'application/json': {
+              schema: {
+                type: 'object',
+                properties: {
+                  success: { type: 'boolean', example: false },
+                  message: { type: 'string', example: 'Education entry not found' },
+                },
+              },
+            },
+          },
+        },
+        500: internalErrorResponse,
+      },
+    },
     patch: {
       tags: ['Applicants'],
       summary: 'Update education entry',

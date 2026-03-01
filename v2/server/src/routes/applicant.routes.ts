@@ -82,6 +82,12 @@ router.patch(
   applicantController.updateEducation.bind(applicantController)
 );
 
+router.delete(
+  '/education/:id',
+  authenticate,
+  applicantController.deleteEducation.bind(applicantController)
+);
+
 router.get('/resume/:id', applicantController.getResume.bind(applicantController));
 
 router.patch(
