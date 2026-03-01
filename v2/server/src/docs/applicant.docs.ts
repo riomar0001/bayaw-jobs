@@ -788,6 +788,553 @@ const updateEducation = {
   },
 };
 
+// ─── GET /applicants/educations ──────────────────────────────────────────────
+
+const educations = {
+  '/applicants/educations': {
+    get: {
+      tags: ['Applicants'],
+      summary: 'Get educations',
+      description: "Returns all education entries for the authenticated applicant's profile.",
+      security: [{ bearerAuth: [] }],
+      responses: {
+        200: {
+          description: 'Educations retrieved successfully',
+          content: {
+            'application/json': {
+              schema: {
+                type: 'object',
+                properties: {
+                  success: { type: 'boolean', example: true },
+                  message: { type: 'string', example: 'Educations retrieved successfully' },
+                  data: {
+                    type: 'array',
+                    items: {
+                      type: 'object',
+                      properties: {
+                        id: { type: 'string', example: 'e1b2c3d4-...' },
+                        applicant_profile_id: { type: 'string', example: 'a1b2c3d4-...' },
+                        institution_name: { type: 'string', example: 'State University' },
+                        field_of_study: { type: 'string', example: 'Computer Science' },
+                        start_year: { type: 'integer', example: 2018 },
+                        end_year: { type: 'integer', nullable: true, example: 2022 },
+                      },
+                    },
+                  },
+                },
+              },
+            },
+          },
+        },
+        401: unauthorizedResponse,
+        404: {
+          description: 'Applicant profile not found',
+          content: {
+            'application/json': {
+              schema: {
+                type: 'object',
+                properties: {
+                  success: { type: 'boolean', example: false },
+                  message: { type: 'string', example: 'Applicant profile not found' },
+                },
+              },
+            },
+          },
+        },
+        500: internalErrorResponse,
+      },
+    },
+  },
+};
+
+// ─── GET /applicants/experiences ─────────────────────────────────────────────
+
+const experiences = {
+  '/applicants/experiences': {
+    get: {
+      tags: ['Applicants'],
+      summary: 'Get experiences',
+      description: "Returns all work experience entries for the authenticated applicant's profile.",
+      security: [{ bearerAuth: [] }],
+      responses: {
+        200: {
+          description: 'Experiences retrieved successfully',
+          content: {
+            'application/json': {
+              schema: {
+                type: 'object',
+                properties: {
+                  success: { type: 'boolean', example: true },
+                  message: { type: 'string', example: 'Experiences retrieved successfully' },
+                  data: {
+                    type: 'array',
+                    items: {
+                      type: 'object',
+                      properties: {
+                        id: { type: 'string', example: 'x1b2c3d4-...' },
+                        applicant_profile_id: { type: 'string', example: 'a1b2c3d4-...' },
+                        company_name: { type: 'string', example: 'Tech Corp' },
+                        position: { type: 'string', example: 'Junior Developer' },
+                        start_date: { type: 'string', format: 'date-time', example: '2022-01-01T00:00:00.000Z' },
+                        end_date: { type: 'string', format: 'date-time', nullable: true, example: '2023-06-01T00:00:00.000Z' },
+                        is_current: { type: 'boolean', example: false },
+                      },
+                    },
+                  },
+                },
+              },
+            },
+          },
+        },
+        401: unauthorizedResponse,
+        404: {
+          description: 'Applicant profile not found',
+          content: {
+            'application/json': {
+              schema: {
+                type: 'object',
+                properties: {
+                  success: { type: 'boolean', example: false },
+                  message: { type: 'string', example: 'Applicant profile not found' },
+                },
+              },
+            },
+          },
+        },
+        500: internalErrorResponse,
+      },
+    },
+  },
+};
+
+// ─── GET+PATCH /applicants/career-status ─────────────────────────────────────
+
+const careerStatus = {
+  '/applicants/career-status': {
+    get: {
+      tags: ['Applicants'],
+      summary: 'Get career status',
+      description: "Returns the authenticated applicant's current career status.",
+      security: [{ bearerAuth: [] }],
+      responses: {
+        200: {
+          description: 'Career status retrieved successfully',
+          content: {
+            'application/json': {
+              schema: {
+                type: 'object',
+                properties: {
+                  success: { type: 'boolean', example: true },
+                  message: { type: 'string', example: 'Career status retrieved successfully' },
+                  data: {
+                    type: 'object',
+                    properties: {
+                      career_status: {
+                        type: 'string',
+                        enum: CAREER_STATUS_ENUM,
+                        nullable: true,
+                        example: 'ACTIVELY_LOOKING',
+                      },
+                    },
+                  },
+                },
+              },
+            },
+          },
+        },
+        401: unauthorizedResponse,
+        404: {
+          description: 'Applicant profile not found',
+          content: {
+            'application/json': {
+              schema: {
+                type: 'object',
+                properties: {
+                  success: { type: 'boolean', example: false },
+                  message: { type: 'string', example: 'Applicant profile not found' },
+                },
+              },
+            },
+          },
+        },
+        500: internalErrorResponse,
+      },
+    },
+    patch: {
+      tags: ['Applicants'],
+      summary: 'Update career status',
+      description: "Updates the authenticated applicant's career status.",
+      security: [{ bearerAuth: [] }],
+      requestBody: {
+        required: true,
+        content: {
+          'application/json': {
+            schema: {
+              type: 'object',
+              required: ['career_status'],
+              properties: {
+                career_status: {
+                  type: 'string',
+                  enum: CAREER_STATUS_ENUM,
+                  example: 'OPEN_TO_OPPORTUNITIES',
+                },
+              },
+            },
+          },
+        },
+      },
+      responses: {
+        200: {
+          description: 'Career status updated successfully',
+          content: {
+            'application/json': {
+              schema: {
+                type: 'object',
+                properties: {
+                  success: { type: 'boolean', example: true },
+                  message: { type: 'string', example: 'Career status updated successfully' },
+                  data: {
+                    type: 'object',
+                    properties: {
+                      career_status: {
+                        type: 'string',
+                        enum: CAREER_STATUS_ENUM,
+                        example: 'OPEN_TO_OPPORTUNITIES',
+                      },
+                    },
+                  },
+                },
+              },
+            },
+          },
+        },
+        400: {
+          description: 'Validation error',
+          content: {
+            'application/json': {
+              schema: {
+                type: 'object',
+                properties: {
+                  success: { type: 'boolean', example: false },
+                  message: { type: 'string', example: 'career_status must be one of: ACTIVELY_LOOKING, OPEN_TO_OPPORTUNITIES, EMPLOYED_NOT_LOOKING, NOT_LOOKING' },
+                },
+              },
+            },
+          },
+        },
+        401: unauthorizedResponse,
+        404: {
+          description: 'Applicant profile not found',
+          content: {
+            'application/json': {
+              schema: {
+                type: 'object',
+                properties: {
+                  success: { type: 'boolean', example: false },
+                  message: { type: 'string', example: 'Applicant profile not found' },
+                },
+              },
+            },
+          },
+        },
+        500: internalErrorResponse,
+      },
+    },
+  },
+};
+
+// ─── GET+POST /applicants/languages & PATCH+DELETE /applicants/languages/{id} ─
+
+const languages = {
+  '/applicants/languages': {
+    get: {
+      tags: ['Applicants'],
+      summary: 'Get languages',
+      description: "Returns all language entries for the authenticated applicant's profile.",
+      security: [{ bearerAuth: [] }],
+      responses: {
+        200: {
+          description: 'Languages retrieved successfully',
+          content: {
+            'application/json': {
+              schema: {
+                type: 'object',
+                properties: {
+                  success: { type: 'boolean', example: true },
+                  message: { type: 'string', example: 'Languages retrieved successfully' },
+                  data: {
+                    type: 'array',
+                    items: {
+                      type: 'object',
+                      properties: {
+                        id: { type: 'string', example: 'l1b2c3d4-...' },
+                        applicant_profile_id: { type: 'string', example: 'a1b2c3d4-...' },
+                        language_name: { type: 'string', example: 'English' },
+                        proficiency_level: {
+                          type: 'string',
+                          enum: ['BASIC', 'CONVERSATIONAL', 'FLUENT', 'NATIVE'],
+                          example: 'FLUENT',
+                        },
+                      },
+                    },
+                  },
+                },
+              },
+            },
+          },
+        },
+        401: unauthorizedResponse,
+        404: {
+          description: 'Applicant profile not found',
+          content: {
+            'application/json': {
+              schema: {
+                type: 'object',
+                properties: {
+                  success: { type: 'boolean', example: false },
+                  message: { type: 'string', example: 'Applicant profile not found' },
+                },
+              },
+            },
+          },
+        },
+        500: internalErrorResponse,
+      },
+    },
+    post: {
+      tags: ['Applicants'],
+      summary: 'Add language',
+      description: "Adds a new language entry to the authenticated applicant's profile.",
+      security: [{ bearerAuth: [] }],
+      requestBody: {
+        required: true,
+        content: {
+          'application/json': {
+            schema: {
+              type: 'object',
+              required: ['language_name', 'proficiency_level'],
+              properties: {
+                language_name: { type: 'string', example: 'Spanish' },
+                proficiency_level: {
+                  type: 'string',
+                  enum: ['BASIC', 'CONVERSATIONAL', 'FLUENT', 'NATIVE'],
+                  example: 'CONVERSATIONAL',
+                },
+              },
+            },
+          },
+        },
+      },
+      responses: {
+        201: {
+          description: 'Language added successfully',
+          content: {
+            'application/json': {
+              schema: {
+                type: 'object',
+                properties: {
+                  success: { type: 'boolean', example: true },
+                  message: { type: 'string', example: 'Language added successfully' },
+                  data: {
+                    type: 'object',
+                    properties: {
+                      id: { type: 'string', example: 'l1b2c3d4-...' },
+                      applicant_profile_id: { type: 'string', example: 'a1b2c3d4-...' },
+                      language_name: { type: 'string', example: 'Spanish' },
+                      proficiency_level: {
+                        type: 'string',
+                        enum: ['BASIC', 'CONVERSATIONAL', 'FLUENT', 'NATIVE'],
+                        example: 'CONVERSATIONAL',
+                      },
+                    },
+                  },
+                },
+              },
+            },
+          },
+        },
+        400: {
+          description: 'Validation error',
+          content: {
+            'application/json': {
+              schema: {
+                type: 'object',
+                properties: {
+                  success: { type: 'boolean', example: false },
+                  message: { type: 'string', example: 'Language name is required' },
+                },
+              },
+            },
+          },
+        },
+        401: unauthorizedResponse,
+        404: {
+          description: 'Applicant profile not found',
+          content: {
+            'application/json': {
+              schema: {
+                type: 'object',
+                properties: {
+                  success: { type: 'boolean', example: false },
+                  message: { type: 'string', example: 'Applicant profile not found' },
+                },
+              },
+            },
+          },
+        },
+        500: internalErrorResponse,
+      },
+    },
+  },
+  '/applicants/languages/{id}': {
+    patch: {
+      tags: ['Applicants'],
+      summary: 'Update language',
+      description:
+        "Updates a specific language entry belonging to the authenticated applicant's profile. " +
+        'All fields are optional — only provided fields will be updated. ' +
+        'At least one field must be provided.',
+      security: [{ bearerAuth: [] }],
+      parameters: [
+        {
+          name: 'id',
+          in: 'path',
+          required: true,
+          description: 'Language entry ID',
+          schema: { type: 'string' },
+        },
+      ],
+      requestBody: {
+        required: true,
+        content: {
+          'application/json': {
+            schema: {
+              type: 'object',
+              minProperties: 1,
+              properties: {
+                language_name: { type: 'string', example: 'Spanish' },
+                proficiency_level: {
+                  type: 'string',
+                  enum: ['BASIC', 'CONVERSATIONAL', 'FLUENT', 'NATIVE'],
+                  example: 'FLUENT',
+                },
+              },
+            },
+          },
+        },
+      },
+      responses: {
+        200: {
+          description: 'Language updated successfully',
+          content: {
+            'application/json': {
+              schema: {
+                type: 'object',
+                properties: {
+                  success: { type: 'boolean', example: true },
+                  message: { type: 'string', example: 'Language updated successfully' },
+                  data: {
+                    type: 'object',
+                    properties: {
+                      id: { type: 'string', example: 'l1b2c3d4-...' },
+                      applicant_profile_id: { type: 'string', example: 'a1b2c3d4-...' },
+                      language_name: { type: 'string', example: 'Spanish' },
+                      proficiency_level: {
+                        type: 'string',
+                        enum: ['BASIC', 'CONVERSATIONAL', 'FLUENT', 'NATIVE'],
+                        example: 'FLUENT',
+                      },
+                    },
+                  },
+                },
+              },
+            },
+          },
+        },
+        400: {
+          description: 'Validation error or no fields provided',
+          content: {
+            'application/json': {
+              schema: {
+                type: 'object',
+                properties: {
+                  success: { type: 'boolean', example: false },
+                  message: { type: 'string', example: 'At least one field must be provided' },
+                },
+              },
+            },
+          },
+        },
+        401: unauthorizedResponse,
+        404: {
+          description: 'Applicant profile or language entry not found',
+          content: {
+            'application/json': {
+              schema: {
+                type: 'object',
+                properties: {
+                  success: { type: 'boolean', example: false },
+                  message: { type: 'string', example: 'Language entry not found' },
+                },
+              },
+            },
+          },
+        },
+        500: internalErrorResponse,
+      },
+    },
+    delete: {
+      tags: ['Applicants'],
+      summary: 'Delete language',
+      description:
+        "Deletes a specific language entry belonging to the authenticated applicant's profile.",
+      security: [{ bearerAuth: [] }],
+      parameters: [
+        {
+          name: 'id',
+          in: 'path',
+          required: true,
+          description: 'Language entry ID',
+          schema: { type: 'string' },
+        },
+      ],
+      responses: {
+        200: {
+          description: 'Language deleted successfully',
+          content: {
+            'application/json': {
+              schema: {
+                type: 'object',
+                properties: {
+                  success: { type: 'boolean', example: true },
+                  message: { type: 'string', example: 'Language deleted successfully' },
+                  data: { type: 'object', nullable: true, example: null },
+                },
+              },
+            },
+          },
+        },
+        401: unauthorizedResponse,
+        404: {
+          description: 'Applicant profile or language entry not found',
+          content: {
+            'application/json': {
+              schema: {
+                type: 'object',
+                properties: {
+                  success: { type: 'boolean', example: false },
+                  message: { type: 'string', example: 'Language entry not found' },
+                },
+              },
+            },
+          },
+        },
+        500: internalErrorResponse,
+      },
+    },
+  },
+};
+
 // ─── POST /applicants/experience & PATCH+DELETE /applicants/experience/{id} ──
 
 const experience = {
@@ -1347,9 +1894,13 @@ const updateProfilePicture = {
 export const applicantDocs = {
   ...onboarding,
   ...profile,
+  ...educations,
+  ...experiences,
+  ...careerStatus,
   ...addEducation,
   ...updateEducation,
   ...experience,
+  ...languages,
   ...getResume,
   ...updateResume,
   ...updateProfilePicture,

@@ -5,6 +5,8 @@ import {
   ApplicantExperience,
   ApplicantSkills,
   ApplicantLanguages,
+  ApplicantCareerStatus,
+  LanguageProficiency,
 } from '@/types/applicants.type';
 
 export interface CreateApplicantProfileData extends ApplicantProfile {
@@ -48,6 +50,43 @@ export class ApplicantRepository {
 
   async findEducationById(id: string) {
     return prisma.applicant_education.findUnique({
+      where: { id },
+    });
+  }
+
+  async updateCareerStatus(profileId: string, status: ApplicantCareerStatus) {
+    await prisma.applicant_career_status.updateMany({
+      where: { applicant_profile_id: profileId },
+      data: { status },
+    });
+    return { career_status: status };
+  }
+
+  async addLanguage(
+    profileId: string,
+    data: { language_name: string; proficiency_level: LanguageProficiency }
+  ) {
+    return prisma.applicant_language.create({
+      data: {
+        applicant_profile_id: profileId,
+        language_name: data.language_name,
+        proficiency_level: data.proficiency_level,
+      },
+    });
+  }
+
+  async updateLanguage(
+    id: string,
+    data: Partial<{ language_name: string; proficiency_level: LanguageProficiency }>
+  ) {
+    return prisma.applicant_language.update({
+      where: { id },
+      data,
+    });
+  }
+
+  async deleteLanguage(id: string) {
+    return prisma.applicant_language.delete({
       where: { id },
     });
   }

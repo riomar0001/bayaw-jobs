@@ -8,6 +8,9 @@ import {
   AddEducationInput,
   AddExperienceInput,
   UpdateExperienceInput,
+  UpdateCareerStatusInput,
+  AddLanguageInput,
+  UpdateLanguageInput,
 } from '@/validations/applicant.validation';
 import { storageService } from '@/services/storage.service';
 
@@ -152,6 +155,86 @@ export class ApplicantService {
       profile_picture: fileName,
       url: `${process.env.APP_URL}/api/applicants/profile/picture/${profile.id}`,
     };
+  }
+
+  async getEducations(userId: string) {
+    const profile = await applicantRepository.findProfileByUserId(userId);
+    if (!profile) {
+      throw new NotFoundError('Applicant profile');
+    }
+    return profile.applicantEducations;
+  }
+
+  async getExperiences(userId: string) {
+    const profile = await applicantRepository.findProfileByUserId(userId);
+    if (!profile) {
+      throw new NotFoundError('Applicant profile');
+    }
+    return profile.applicantExperiences;
+  }
+
+  async getCareerStatus(userId: string) {
+    const profile = await applicantRepository.findProfileByUserId(userId);
+    if (!profile) {
+      throw new NotFoundError('Applicant profile');
+    }
+    return { career_status: profile.applicantCareerStatuses[0]?.status ?? null };
+  }
+
+  async updateCareerStatus(userId: string, data: UpdateCareerStatusInput) {
+    const profile = await applicantRepository.findProfileByUserId(userId);
+    if (!profile) {
+      throw new NotFoundError('Applicant profile');
+    }
+    return applicantRepository.updateCareerStatus(profile.id, data.career_status);
+  }
+
+  async getLanguages(userId: string) {
+    const profile = await applicantRepository.findProfileByUserId(userId);
+    if (!profile) {
+      throw new NotFoundError('Applicant profile');
+    }
+    return profile.applicantLanguages;
+  }
+
+  async addLanguage(userId: string, data: AddLanguageInput) {
+    const profile = await applicantRepository.findProfileByUserId(userId);
+    if (!profile) {
+      throw new NotFoundError('Applicant profile');
+    }
+    return applicantRepository.addLanguage(profile.id, data);
+  }
+
+  async updateLanguage(userId: string, languageId: string, data: UpdateLanguageInput) {
+    const profile = await applicantRepository.findProfileByUserId(userId);
+    if (!profile) {
+      throw new NotFoundError('Applicant profile');
+    }
+
+    const language = profile.applicantLanguages.find((l) => l.id === languageId);
+    if (!language) {
+      throw new NotFoundError('Language entry');
+    }
+
+    const patch: Parameters<typeof applicantRepository.updateLanguage>[1] = {};
+    if (data.language_name !== undefined) patch.language_name = data.language_name;
+    if (data.proficiency_level !== undefined) patch.proficiency_level = data.proficiency_level;
+
+    return applicantRepository.updateLanguage(languageId, patch);
+  }
+
+  async deleteLanguage(userId: string, languageId: string) {
+    const profile = await applicantRepository.findProfileByUserId(userId);
+    if (!profile) {
+      throw new NotFoundError('Applicant profile');
+    }
+
+    const language = profile.applicantLanguages.find((l) => l.id === languageId);
+    if (!language) {
+      throw new NotFoundError('Language entry');
+    }
+
+    return applicantRepository.deleteLanguage(languageId);
   }
 
   async addExperience(userId: string, data: AddExperienceInput) {

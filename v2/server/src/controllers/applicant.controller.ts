@@ -38,6 +38,104 @@ export class ApplicantController {
     }
   }
 
+  async getEducations(req: Request, res: Response, next: NextFunction): Promise<void> {
+    try {
+      const userId = req.user?.user_id;
+      if (!userId) throw new Error('User ID missing in request');
+
+      const educations = await applicantService.getEducations(userId);
+      successResponse(res, educations, 'Educations retrieved successfully');
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  async getExperiences(req: Request, res: Response, next: NextFunction): Promise<void> {
+    try {
+      const userId = req.user?.user_id;
+      if (!userId) throw new Error('User ID missing in request');
+
+      const experiences = await applicantService.getExperiences(userId);
+      successResponse(res, experiences, 'Experiences retrieved successfully');
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  async getCareerStatus(req: Request, res: Response, next: NextFunction): Promise<void> {
+    try {
+      const userId = req.user?.user_id;
+      if (!userId) throw new Error('User ID missing in request');
+
+      const result = await applicantService.getCareerStatus(userId);
+      successResponse(res, result, 'Career status retrieved successfully');
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  async updateCareerStatus(req: Request, res: Response, next: NextFunction): Promise<void> {
+    try {
+      const userId = req.user?.user_id;
+      if (!userId) throw new Error('User ID missing in request');
+
+      const result = await applicantService.updateCareerStatus(userId, req.body);
+      successResponse(res, result, 'Career status updated successfully');
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  async getLanguages(req: Request, res: Response, next: NextFunction): Promise<void> {
+    try {
+      const userId = req.user?.user_id;
+      if (!userId) throw new Error('User ID missing in request');
+
+      const languages = await applicantService.getLanguages(userId);
+      successResponse(res, languages, 'Languages retrieved successfully');
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  async addLanguage(req: Request, res: Response, next: NextFunction): Promise<void> {
+    try {
+      const userId = req.user?.user_id;
+      if (!userId) throw new Error('User ID missing in request');
+
+      const created = await applicantService.addLanguage(userId, req.body);
+      createdResponse(res, created, 'Language added successfully');
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  async updateLanguage(req: Request, res: Response, next: NextFunction): Promise<void> {
+    try {
+      const userId = req.user?.user_id;
+      if (!userId) throw new Error('User ID missing in request');
+
+      const { id } = req.params as { id: string };
+      const updated = await applicantService.updateLanguage(userId, id, req.body);
+      successResponse(res, updated, 'Language updated successfully');
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  async deleteLanguage(req: Request, res: Response, next: NextFunction): Promise<void> {
+    try {
+      const userId = req.user?.user_id;
+      if (!userId) throw new Error('User ID missing in request');
+
+      const { id } = req.params as { id: string };
+      await applicantService.deleteLanguage(userId, id);
+      successResponse(res, null, 'Language deleted successfully');
+    } catch (error) {
+      next(error);
+    }
+  }
+
   async addExperience(req: Request, res: Response, next: NextFunction): Promise<void> {
     try {
       const userId = req.user?.user_id;

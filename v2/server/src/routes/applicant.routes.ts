@@ -10,6 +10,9 @@ import {
   addEducationSchema,
   addExperienceSchema,
   updateExperienceSchema,
+  updateCareerStatusSchema,
+  addLanguageSchema,
+  updateLanguageSchema,
 } from '@/validations/applicant.validation';
 import { BadRequestError } from '@/utils/errors.util';
 
@@ -62,6 +65,41 @@ router.post(
 );
 
 router.get('/profile', authenticate, applicantController.getProfile.bind(applicantController));
+
+router.get('/educations', authenticate, applicantController.getEducations.bind(applicantController));
+
+router.get('/experiences', authenticate, applicantController.getExperiences.bind(applicantController));
+
+router.get('/career-status', authenticate, applicantController.getCareerStatus.bind(applicantController));
+
+router.patch(
+  '/career-status',
+  authenticate,
+  validate(updateCareerStatusSchema),
+  applicantController.updateCareerStatus.bind(applicantController)
+);
+
+router.get('/languages', authenticate, applicantController.getLanguages.bind(applicantController));
+
+router.post(
+  '/languages',
+  authenticate,
+  validate(addLanguageSchema),
+  applicantController.addLanguage.bind(applicantController)
+);
+
+router.patch(
+  '/languages/:id',
+  authenticate,
+  validate(updateLanguageSchema),
+  applicantController.updateLanguage.bind(applicantController)
+);
+
+router.delete(
+  '/languages/:id',
+  authenticate,
+  applicantController.deleteLanguage.bind(applicantController)
+);
 
 router.patch(
   '/profile',

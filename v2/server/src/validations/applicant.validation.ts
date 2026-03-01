@@ -135,9 +135,51 @@ export const addEducationSchema = z.object({
   }),
 });
 
+export const updateCareerStatusSchema = z.object({
+  body: z.object({
+    career_status: z.enum(
+      ['ACTIVELY_LOOKING', 'OPEN_TO_OPPORTUNITIES', 'EMPLOYED_NOT_LOOKING', 'NOT_LOOKING'],
+      {
+        error:
+          'career_status must be one of: ACTIVELY_LOOKING, OPEN_TO_OPPORTUNITIES, EMPLOYED_NOT_LOOKING, NOT_LOOKING',
+      }
+    ),
+  }),
+});
+
+export const addLanguageSchema = z.object({
+  body: z.object({
+    language_name: z.string().min(1, 'Language name is required'),
+    proficiency_level: z.enum(['BASIC', 'CONVERSATIONAL', 'FLUENT', 'NATIVE'], {
+      error: 'Proficiency level must be one of: BASIC, CONVERSATIONAL, FLUENT, NATIVE',
+    }),
+  }),
+});
+
+export const updateLanguageSchema = z.object({
+  params: z.object({
+    id: z.string().min(1, 'Language ID is required'),
+  }),
+  body: z
+    .object({
+      language_name: z.string().min(1, 'Language name is required').optional(),
+      proficiency_level: z
+        .enum(['BASIC', 'CONVERSATIONAL', 'FLUENT', 'NATIVE'], {
+          error: 'Proficiency level must be one of: BASIC, CONVERSATIONAL, FLUENT, NATIVE',
+        })
+        .optional(),
+    })
+    .refine((data) => Object.keys(data).length > 0, {
+      message: 'At least one field must be provided',
+    }),
+});
+
 export type OnboardingInput = z.infer<typeof onboardingSchema>['body'];
 export type UpdateProfileInput = z.infer<typeof updateProfileSchema>['body'];
 export type UpdateEducationInput = z.infer<typeof updateEducationSchema>['body'];
 export type AddEducationInput = z.infer<typeof addEducationSchema>['body'];
 export type AddExperienceInput = z.infer<typeof addExperienceSchema>['body'];
 export type UpdateExperienceInput = z.infer<typeof updateExperienceSchema>['body'];
+export type UpdateCareerStatusInput = z.infer<typeof updateCareerStatusSchema>['body'];
+export type AddLanguageInput = z.infer<typeof addLanguageSchema>['body'];
+export type UpdateLanguageInput = z.infer<typeof updateLanguageSchema>['body'];
