@@ -44,14 +44,10 @@ export async function submitOnboarding(formData) {
     fd.append("resume", formData.resume);
   }
 
-  const { data } = await axios.post(
-    `${API_BASE}/applicants/onboarding`,
-    fd,
-    {
-      withCredentials: true,
-      // axios sets Content-Type: multipart/form-data with the boundary automatically
-    }
-  );
+  const { data } = await axios.post(`${API_BASE}/applicants/onboarding`, fd, {
+    withCredentials: true,
+    // axios sets Content-Type: multipart/form-data with the boundary automatically
+  });
 
   return data;
 }

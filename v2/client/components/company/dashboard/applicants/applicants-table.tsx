@@ -19,7 +19,7 @@ import {
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { MoreHorizontal, Eye, Mail, Star } from "lucide-react";
+import { MoreHorizontal, Eye, Mail } from "lucide-react";
 import { JobApplication, ApplicationStatus } from "@/types/job";
 import { Candidate } from "@/types/candidate";
 import { Job } from "@/types/job";

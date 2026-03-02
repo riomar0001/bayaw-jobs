@@ -4,13 +4,7 @@ import { ColumnDef } from "@tanstack/react-table";
 import { Job } from "@/types/job";
 import { JobStatusBadge } from "./job-status-badge";
 import { formatDistanceToNow } from "@/lib/formatters";
-import {
-  Users,
-  MoreHorizontal,
-  Eye,
-  Trash2,
-  ArrowUpDown,
-} from "lucide-react";
+import { Users, MoreHorizontal, Eye, Trash2, ArrowUpDown } from "lucide-react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import {

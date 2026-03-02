@@ -96,10 +96,7 @@ export function LocationDialog({
                     <FieldInfo hint="Street address including building number and floor" />
                   </FormLabel>
                   <FormControl>
-                    <Input
-                      placeholder="123 Main Street, Floor 5"
-                      {...field}
-                    />
+                    <Input placeholder="123 Main Street, Floor 5" {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>

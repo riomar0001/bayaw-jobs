@@ -26,7 +26,7 @@ export function ResumeUpload({ file, onFileChange }: ResumeUploadProps) {
     setIsDragging(false);
 
     const dropped = e.dataTransfer.files[0];
-    if (dropped && dropped.type === 'application/pdf') {
+    if (dropped && dropped.type === "application/pdf") {
       onFileChange(dropped);
     }
   };

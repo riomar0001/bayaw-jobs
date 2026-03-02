@@ -127,9 +127,9 @@ export function CompanyInfoForm({ business }: CompanyInfoFormProps) {
               render={({ field }) => (
                 <FormItem>
                   <FormLabel className="flex items-center gap-1.5">
-                      About
-                      <FieldInfo hint="A brief overview of your company, mission, and what you do" />
-                    </FormLabel>
+                    About
+                    <FieldInfo hint="A brief overview of your company, mission, and what you do" />
+                  </FormLabel>
                   <FormControl>
                     <Textarea
                       placeholder="Describe your company..."

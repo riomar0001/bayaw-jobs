@@ -118,8 +118,11 @@ export default function EditJobPage({ params }: EditJobPageProps) {
                   <DropdownMenuLabel>Change Status</DropdownMenuLabel>
                   <DropdownMenuSeparator />
                   {otherStatuses.map((status) => {
-                    const { label, icon: Icon, className } =
-                      STATUS_ACTIONS[status];
+                    const {
+                      label,
+                      icon: Icon,
+                      className,
+                    } = STATUS_ACTIONS[status];
                     return (
                       <DropdownMenuItem
                         key={status}

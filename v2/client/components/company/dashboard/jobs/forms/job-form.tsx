@@ -68,7 +68,9 @@ interface JobFormProps {
 export function JobForm({ job, mode }: JobFormProps) {
   const router = useRouter();
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [pendingAction, setPendingAction] = useState<"publish" | "draft">("publish");
+  const [pendingAction, setPendingAction] = useState<"publish" | "draft">(
+    "publish",
+  );
 
   const form = useForm<JobFormValues>({
     resolver: zodResolver(jobFormSchema),
