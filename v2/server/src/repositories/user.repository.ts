@@ -26,7 +26,7 @@ export interface UpdateUserData {
 }
 
 export class UserRepository {
-  async findById(id: string) {
+  async findById(id: string, include?: Prisma.userInclude) {
     return prisma.user.findUnique({
       where: { id },
       include: {
@@ -35,7 +35,7 @@ export class UserRepository {
             role: true,
           },
         },
-        companyAdmins: true,
+        ...include,
       },
     });
   }

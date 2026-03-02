@@ -1,7 +1,9 @@
 import { location_type } from '@/generated/prisma/enums';
 import { jobRepository } from '@/repositories/job.repository';
 import { userRepository } from '@/repositories/user.repository';
+import { CompanyAdmin } from '@/types/company.type';
 import { CreateJobData } from '@/types/job.type';
+
 import { AuthorizationError, NotFoundError } from '@/utils/errors.util';
 
 export class JobService {
@@ -18,14 +20,15 @@ export class JobService {
   }
 
   async createJob(data: CreateJobData) {
-    const user = await userRepository.findById(data.user_id);
+    const user = await userRepository.findById(data.user_id, { companyAdmins: true });
     if (!user) {
       throw new NotFoundError('User not found');
     }
 
     const isAuthorized =
-      user.companyAdmins.some((admin) => admin.role === 'COMPANY_OWNER' || admin.can_create) ||
-      user.role === 'ADMIN';
+      user.companyAdmins.some(
+        (admin: CompanyAdmin) => admin.role === 'COMPANY_OWNER' || admin.can_create
+      ) || user.role === 'ADMIN';
 
     if (!isAuthorized) {
       throw new AuthorizationError('Only authorized company users can create job postings');
@@ -59,14 +62,15 @@ export class JobService {
       throw new Error('User ID is required to update job');
     }
 
-    const user = await userRepository.findById(data.user_id);
+    const user = await userRepository.findById(data.user_id, { companyAdmins: true });
     if (!user) {
       throw new NotFoundError('User not found');
     }
 
     const isAuthorized =
-      user.companyAdmins.some((admin) => admin.role === 'COMPANY_OWNER' || admin.can_update) ||
-      user.role === 'ADMIN';
+      user.companyAdmins.some(
+        (admin: CompanyAdmin) => admin.role === 'COMPANY_OWNER' || admin.can_update
+      ) || user.role === 'ADMIN';
 
     if (!isAuthorized) {
       throw new AuthorizationError('Only authorized company users can update job postings');
