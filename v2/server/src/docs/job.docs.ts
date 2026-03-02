@@ -201,6 +201,7 @@ const updateJob = {
             schema: {
               type: 'object',
               properties: {
+                user_id: { type: 'string' },
                 title: { type: 'string' },
                 department: { type: 'string' },
                 location: { type: 'string' },
