@@ -1,43 +1,48 @@
 import winston from 'winston';
 
-const { combine, timestamp, colorize, printf, json, errors } = winston.format;
+const { combine, timestamp, colorize, printf, errors } = winston.format;
 
 const isProduction = process.env.NODE_ENV === 'production';
 
-const devFormat = combine(
-  colorize({ all: true }),
+/**
+ * Pretty Console Format (NO JSON)
+ */
+const consoleFormat = combine(
   timestamp({ format: 'YYYY-MM-DD HH:mm:ss' }),
   errors({ stack: true }),
-  printf((info) => {
-    const { level, message, timestamp: ts, stack, ...meta } = info as {
-      level: string;
-      message: string;
-      timestamp: string;
-      stack?: string;
-      [key: string]: unknown;
-    };
-
-    let log = `${ts} [${level}]: ${message}`;
+  printf(({ level, message, timestamp, stack }) => {
+    let log = `${timestamp} [${level}]: ${message}`;
     if (stack) log += `\n${stack}`;
-
-    const metaKeys = Object.keys(meta);
-    if (metaKeys.length > 0) log += `\n${JSON.stringify(meta, null, 2)}`;
-
     return log;
   })
 );
 
-const prodFormat = combine(timestamp(), errors({ stack: true }), json());
+/**
+ * Colored version only for dev console
+ */
+const coloredConsoleFormat = combine(colorize({ all: true }), consoleFormat);
 
 export const logger = winston.createLogger({
   level: process.env.LOG_LEVEL ?? (isProduction ? 'info' : 'debug'),
-  format: isProduction ? prodFormat : devFormat,
-  transports: [new winston.transports.Console()],
-});
+  transports: [
+    // Console (colored in dev, plain in prod)
+    new winston.transports.Console({
+      format: isProduction ? consoleFormat : coloredConsoleFormat,
+    }),
 
-if (isProduction) {
-  logger.add(new winston.transports.File({ filename: 'logs/error.log', level: 'error' }));
-  logger.add(new winston.transports.File({ filename: 'logs/combined.log' }));
-}
+    // Error file (NO COLOR, NO JSON duplication in console)
+    new winston.transports.File({
+      filename: 'logs/error.log',
+      level: 'error',
+      format: combine(timestamp(), errors({ stack: true }), winston.format.json()),
+    }),
+
+    // Combined file
+    new winston.transports.File({
+      filename: 'logs/combined.log',
+      format: combine(timestamp(), errors({ stack: true }), winston.format.json()),
+    }),
+  ],
+});
 
 export default logger;
