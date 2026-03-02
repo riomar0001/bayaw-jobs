@@ -1,5 +1,4 @@
 export interface CreateJobData {
-  user_id: string;
   title: string;
   department: string;
   location: string;
@@ -9,8 +8,8 @@ export interface CreateJobData {
   maximum_salary: string;
   currency: string;
   description: string;
-  responsibilities: string;
-  qualifications: string;
-  benefits: string;
+  responsibilities: string[];
+  qualifications: string[];
+  benefits: string[];
   company_id: string;
 }

@@ -40,6 +40,10 @@ export const openApiSpec = {
       name: 'Business',
       description: 'Business onboarding and company management',
     },
+    {
+      name: 'Jobs',
+      description: 'Job posting management',
+    },
   ],
   components: {
     securitySchemes: {

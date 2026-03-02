@@ -19,8 +19,8 @@ export class JobService {
     return jobRepository.findAll(page, limit);
   }
 
-  async createJob(data: CreateJobData) {
-    const user = await userRepository.findById(data.user_id, { companyAdmins: true });
+  async createJob(data: CreateJobData, userId: string) {
+    const user = await userRepository.findById(userId, { companyAdmins: true });
     if (!user) {
       throw new NotFoundError('User not found');
     }
@@ -53,16 +53,13 @@ export class JobService {
     });
   }
 
-  async updateJob(id: string, data: Partial<CreateJobData>) {
+  async updateJob(id: string, data: Partial<CreateJobData>, userId: string) {
     const existingJob = await jobRepository.findById(id);
     if (!existingJob) {
       throw new NotFoundError('Job not found');
     }
-    if (!data.user_id) {
-      throw new Error('User ID is required to update job');
-    }
 
-    const user = await userRepository.findById(data.user_id, { companyAdmins: true });
+    const user = await userRepository.findById(userId, { companyAdmins: true });
     if (!user) {
       throw new NotFoundError('User not found');
     }

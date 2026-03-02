@@ -36,7 +36,8 @@ export class JobController {
 
   async createJob(req: Request, res: Response, next: NextFunction): Promise<void> {
     try {
-      const result = await jobService.createJob(req.body);
+      const userId = req.user?.user_id;
+      const result = await jobService.createJob({ ...req.body, user_id: userId });
       createdResponse(res, result, 'Job created successfully');
     } catch (error) {
       next(error);
@@ -46,8 +47,9 @@ export class JobController {
   async updateJob(req: Request<{ id: string }>, res: Response, next: NextFunction): Promise<void> {
     try {
       const id = req.params.id;
+      const userId = req.user?.user_id;
 
-      const result = await jobService.updateJob(id, req.body);
+      const result = await jobService.updateJob(id, req.body, userId);
       successResponse(res, result, 'Job updated successfully');
     } catch (error) {
       next(error);
