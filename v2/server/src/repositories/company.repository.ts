@@ -36,6 +36,13 @@ export class CompanyRepository {
     });
   }
 
+  async findCompanyIdByAdminUserId(userId: string) {
+    return prisma.company_admin.findFirst({
+      where: { user_id: userId },
+      select: { company_id: true },
+    });
+  }
+
   async findById(id: string) {
     return prisma.company_information.findUnique({
       where: { id },

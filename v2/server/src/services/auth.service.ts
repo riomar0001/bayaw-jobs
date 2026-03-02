@@ -1,6 +1,8 @@
 import { user_status } from '@/generated/prisma/client';
 import { userRepository } from '@/repositories/user.repository';
 import { refreshTokenRepository } from '@/repositories/refreshToken.repository';
+import { applicantRepository } from '@/repositories/applicant.repository';
+import { companyRepository } from '@/repositories/company.repository';
 import { authCodeRepository } from '@/repositories/authCode.repository';
 import { emailService } from '@/services/email.service';
 import { hashPassword, verifyPassword, verifyHashedRefreshToken } from '@/utils/tokenHashing.util';
@@ -106,12 +108,14 @@ export class AuthService {
     const userAgent = req.headers['user-agent'] || 'Unknown';
 
     // Generate tokens
+    const profileIds = await this.getProfileIds(user.id);
     const accessToken = generateAccessToken({
       user_id: user.id,
       email: user.email,
       role: user.role,
       first_name: user.first_name,
       last_name: user.last_name,
+      ...profileIds,
     });
 
     const refreshToken = await generateRefreshToken(user.id, ip, userAgent);
@@ -212,12 +216,14 @@ export class AuthService {
     const userAgent = req.headers['user-agent'] || 'Unknown';
 
     // Generate tokens
+    const profileIds = await this.getProfileIds(user.id);
     const accessToken = generateAccessToken({
       user_id: user.id,
       email: user.email,
       role: user.role,
       first_name: user.first_name,
       last_name: user.last_name,
+      ...profileIds,
     });
 
     const refreshToken = await generateRefreshToken(user.id, ip, userAgent);
@@ -281,12 +287,14 @@ export class AuthService {
     const userAgent = req.headers['user-agent'] || 'Unknown';
 
     // Generate new tokens
+    const profileIds = await this.getProfileIds(user.id);
     const newAccessToken = generateAccessToken({
       user_id: user.id,
       email: user.email,
       role: user.role,
       first_name: user.first_name,
       last_name: user.last_name,
+      ...profileIds,
     });
 
     const newRefreshToken = await generateRefreshToken(user.id, ip, userAgent);
@@ -313,6 +321,19 @@ export class AuthService {
 
   async logoutAll(userId: string): Promise<void> {
     await refreshTokenRepository.revokeAllByUserId(userId);
+  }
+
+  private async getProfileIds(
+    userId: string
+  ): Promise<{ applicant_profile_id?: string; company_id?: string }> {
+    const [applicantProfile, companyAdmin] = await Promise.all([
+      applicantRepository.findProfileIdByUserId(userId),
+      companyRepository.findCompanyIdByAdminUserId(userId),
+    ]);
+    return {
+      ...(applicantProfile ? { applicant_profile_id: applicantProfile.id } : {}),
+      ...(companyAdmin ? { company_id: companyAdmin.company_id } : {}),
+    };
   }
 
   private checkAccountStatus(user: { status: user_status }): void {

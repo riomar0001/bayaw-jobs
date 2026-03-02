@@ -16,13 +16,18 @@ export const generateAccessToken = (tokenPayload: AccessTokenPayload): string =>
     throw new Error('JWT Access Token Secret is not defined.');
   }
 
-  const { user_id, email, role, first_name, last_name } = tokenPayload;
+  const { user_id, email, role, first_name, last_name, applicant_profile_id, company_id } =
+    tokenPayload;
 
   if (!user_id || !email || !role) {
     throw new Error('Invalid token payload for access token generation.');
   }
 
-  return jwt.sign({ user_id, email, role, first_name, last_name }, SECRET, {
+  const payload: AccessTokenPayload = { user_id, email, role, first_name, last_name };
+  if (applicant_profile_id) payload.applicant_profile_id = applicant_profile_id;
+  if (company_id) payload.company_id = company_id;
+
+  return jwt.sign(payload, SECRET, {
     expiresIn: process.env.JWT_ACCESS_TOKEN_TTL || '3h',
   } as jwt.SignOptions);
 };

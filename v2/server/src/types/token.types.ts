@@ -4,6 +4,8 @@ export interface AccessTokenPayload {
   role: string;
   first_name: string | null;
   last_name: string | null;
+  applicant_profile_id?: string;
+  company_id?: string;
 }
 
 export interface RefreshTokenPayload {

@@ -390,6 +390,10 @@ const verifyAuth = {
                       access_token: {
                         type: 'string',
                         example: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...',
+                        description:
+                          'JWT access token. Payload includes: user_id, email, role, first_name, last_name. ' +
+                          'Also includes applicant_profile_id if the user has an applicant profile, ' +
+                          'and company_id if the user is a member of a company.',
                       },
                       user: {
                         type: 'object',
@@ -514,8 +518,12 @@ const refresh = {
                     properties: {
                       accessToken: {
                         type: 'string',
-                        description: 'New JWT access token. Valid for 3 hours.',
                         example: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...',
+                        description:
+                          'New JWT access token. Valid for 3 hours. ' +
+                          'Payload includes: user_id, email, role, first_name, last_name. ' +
+                          'Also includes applicant_profile_id if the user has an applicant profile, ' +
+                          'and company_id if the user is a member of a company.',
                       },
                       user: {
                         type: 'object',
