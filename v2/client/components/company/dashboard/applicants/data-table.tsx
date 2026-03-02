@@ -169,7 +169,7 @@ export function DataTable<TData extends ApplicantWithDetails, TValue>({
 
       {/* Table */}
       <div className="rounded-md border bg-card overflow-hidden">
-        <div className="h-[520px] overflow-y-auto">
+        <div className="h-130 overflow-y-auto">
           <Table>
             <TableHeader>
               {table.getHeaderGroups().map((headerGroup) => (

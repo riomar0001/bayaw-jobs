@@ -114,29 +114,6 @@ export const columns: ColumnDef<ApplicantWithDetails>[] = [
     },
   },
   {
-    accessorKey: "rating",
-    header: "Rating",
-    cell: ({ row }) => {
-      const rating = row.getValue<number | undefined>("rating");
-      if (!rating) return <span className="text-muted-foreground">—</span>;
-      return (
-        <div className="flex items-center gap-0.5">
-          {Array.from({ length: 5 }).map((_, i) => (
-            <Star
-              key={i}
-              className={cn(
-                "size-3.5",
-                i < rating
-                  ? "fill-yellow-400 text-yellow-400"
-                  : "text-muted-foreground",
-              )}
-            />
-          ))}
-        </div>
-      );
-    },
-  },
-  {
     accessorKey: "appliedAt",
     header: ({ column }) => (
       <Button
