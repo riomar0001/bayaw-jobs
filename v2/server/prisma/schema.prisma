@@ -401,7 +401,7 @@ model applicant_applied_job {
   applicant_profile_id String
   job_id               String
   application_date     DateTime           @default(now())
-  status               application_status @default(PENDING)
+  status               application_status @default(NEW)
   created_at           DateTime           @default(now())
   updated_at           DateTime           @updatedAt
 
@@ -422,11 +422,12 @@ enum user_status {
 }
 
 enum application_status {
-  PENDING
-  ACCEPTED
-  UNDER_REVIEW
+  NEW
+  SCREENING
+  INTERVIEW
+  OFFER
   REJECTED
-  WITHDRAWN
+  HIRED
 }
 
 enum social_platform {

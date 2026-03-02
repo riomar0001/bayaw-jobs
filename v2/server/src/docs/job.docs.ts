@@ -348,8 +348,8 @@ const getCompanyJobById = {
                             application_date: { type: 'string', format: 'date-time' },
                             status: {
                               type: 'string',
-                              enum: ['PENDING', 'ACCEPTED', 'UNDER_REVIEW', 'REJECTED', 'WITHDRAWN'],
-                              example: 'PENDING',
+                              enum: ['NEW', 'SCREENING', 'INTERVIEW', 'OFFER', 'REJECTED', 'HIRED'],
+                              example: 'NEW',
                             },
                             applicant_profile: {
                               type: 'object',
