@@ -41,6 +41,13 @@ router.post(
   companyController.onboard.bind(companyController)
 );
 
+router.patch(
+  '/logo',
+  authenticate,
+  uploadImage.single('logo'),
+  companyController.updateLogo.bind(companyController)
+);
+
 router.get('/logo/:id', companyController.getLogo.bind(companyController));
 
 export default router;

@@ -149,6 +149,61 @@ const onboarding = {
 };
 
 const logo = {
+  '/business/logo': {
+    patch: {
+      tags: ['Business'],
+      summary: 'Update company logo',
+      description: 'Upload a new logo for the authenticated user\'s company.',
+      security: [{ bearerAuth: [] }],
+      requestBody: {
+        required: true,
+        content: {
+          'multipart/form-data': {
+            schema: {
+              type: 'object',
+              required: ['logo'],
+              properties: {
+                logo: {
+                  type: 'string',
+                  format: 'binary',
+                  description: 'New company logo (JPEG, PNG, or WebP, max 5MB)',
+                },
+              },
+            },
+          },
+        },
+      },
+      responses: {
+        '200': {
+          description: 'Company logo updated successfully',
+          content: {
+            'application/json': {
+              schema: {
+                type: 'object',
+                properties: {
+                  success: { type: 'boolean', example: true },
+                  message: { type: 'string', example: 'Company logo updated successfully' },
+                  data: {
+                    type: 'object',
+                    properties: {
+                      logo: { type: 'string', example: 'logo_userId.jpg' },
+                      url: {
+                        type: 'string',
+                        example: 'https://api.example.com/api/business/logo/companyId',
+                      },
+                    },
+                  },
+                },
+              },
+            },
+          },
+        },
+        '400': { description: 'Logo image is required' },
+        '401': { description: 'Unauthorized' },
+        '404': { description: 'Company not found' },
+      },
+    },
+  },
   '/business/logo/{id}': {
     get: {
       tags: ['Business'],

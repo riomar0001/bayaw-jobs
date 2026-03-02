@@ -1,6 +1,6 @@
 import { Request, Response, NextFunction } from 'express';
 import { companyService } from '@/services/company.service';
-import { createdResponse } from '@/utils/apiResponse.util';
+import { createdResponse, successResponse } from '@/utils/apiResponse.util';
 import { BadRequestError } from '@/utils/errors.util';
 
 export class CompanyController {
@@ -14,6 +14,25 @@ export class CompanyController {
       const company = await companyService.onboard(userId, req.body, req.file);
 
       createdResponse(res, company, 'Business onboarding completed successfully');
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  async updateLogo(req: Request, res: Response, next: NextFunction): Promise<void> {
+    try {
+      const userId = req.user?.user_id;
+      if (!userId) {
+        throw new Error('User ID missing in request');
+      }
+
+      if (!req.file) {
+        throw new BadRequestError('Logo image is required');
+      }
+
+      const result = await companyService.updateLogo(userId, req.file);
+
+      successResponse(res, result, 'Company logo updated successfully');
     } catch (error) {
       next(error);
     }

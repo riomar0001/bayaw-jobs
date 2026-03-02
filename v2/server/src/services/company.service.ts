@@ -61,6 +61,21 @@ export class CompanyService {
     return { ...company, logo_url };
   }
 
+  async updateLogo(userId: string, file: LogoFile) {
+    const company = await companyRepository.findByUserId(userId);
+    if (!company) {
+      throw new NotFoundError('Company');
+    }
+
+    const fileName = await storageService.uploadCompanyLogo(file.buffer, userId, file.originalname);
+    await companyRepository.updateLogo(company.id, fileName);
+
+    return {
+      logo: fileName,
+      url: `${process.env.APP_URL}/api/business/logo/${company.id}`,
+    };
+  }
+
   async getLogo(
     companyId: string
   ): Promise<{ buffer: Buffer; contentType: string; filename: string }> {

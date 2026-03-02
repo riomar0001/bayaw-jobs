@@ -43,6 +43,13 @@ export class CompanyRepository {
     });
   }
 
+  async updateLogo(id: string, logo: string) {
+    return prisma.company_information.update({
+      where: { id },
+      data: { logo },
+    });
+  }
+
   async createCompany(data: CreateCompanyData) {
     return prisma.company_information.create({
       data: {
