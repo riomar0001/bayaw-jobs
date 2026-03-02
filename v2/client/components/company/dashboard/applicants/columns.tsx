@@ -12,7 +12,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { MoreHorizontal, Eye, Mail, Star, ArrowUpDown } from "lucide-react";
+import { MoreHorizontal, Eye, Mail, ArrowUpDown } from "lucide-react";
 import { JobApplication, ApplicationStatus } from "@/types/job";
 import { Candidate } from "@/types/candidate";
 import { Job } from "@/types/job";

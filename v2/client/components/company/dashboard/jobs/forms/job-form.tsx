@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef, useState } from "react";
+import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
@@ -68,7 +68,7 @@ interface JobFormProps {
 export function JobForm({ job, mode }: JobFormProps) {
   const router = useRouter();
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const pendingAction = useRef<"publish" | "draft">("publish");
+  const [pendingAction, setPendingAction] = useState<"publish" | "draft">("publish");
 
   const form = useForm<JobFormValues>({
     resolver: zodResolver(jobFormSchema),
@@ -291,7 +291,7 @@ export function JobForm({ job, mode }: JobFormProps) {
                   <FormControl>
                     <Textarea
                       placeholder="Describe the role, responsibilities, and what you're looking for..."
-                      className="min-h-[150px]"
+                      className="min-h-37.5"
                       {...field}
                     />
                   </FormControl>
@@ -309,7 +309,7 @@ export function JobForm({ job, mode }: JobFormProps) {
                   <FormControl>
                     <Textarea
                       placeholder="Enter each responsibility on a new line..."
-                      className="min-h-[100px]"
+                      className="min-h-25"
                       {...field}
                     />
                   </FormControl>
@@ -328,7 +328,7 @@ export function JobForm({ job, mode }: JobFormProps) {
                   <FormControl>
                     <Textarea
                       placeholder="Enter each requirement on a new line..."
-                      className="min-h-[100px]"
+                      className="min-h-25"
                       {...field}
                     />
                   </FormControl>
@@ -347,7 +347,7 @@ export function JobForm({ job, mode }: JobFormProps) {
                   <FormControl>
                     <Textarea
                       placeholder="Enter each benefit on a new line..."
-                      className="min-h-[100px]"
+                      className="min-h-25"
                       {...field}
                     />
                   </FormControl>
@@ -371,11 +371,11 @@ export function JobForm({ job, mode }: JobFormProps) {
                 className="rounded-r-none"
                 disabled={isSubmitting}
                 onClick={() => {
-                  pendingAction.current = "publish";
+                  setPendingAction("publish");
                   form.setValue("status", "Active");
                 }}
               >
-                {isSubmitting && pendingAction.current === "publish" && (
+                {isSubmitting && pendingAction === "publish" && (
                   <Loader2 className="mr-2 size-4 animate-spin" />
                 )}
                 Publish Job
@@ -387,7 +387,7 @@ export function JobForm({ job, mode }: JobFormProps) {
                     className="rounded-l-none border-l border-l-primary-foreground/25 px-2"
                     disabled={isSubmitting}
                   >
-                    {isSubmitting && pendingAction.current === "draft" ? (
+                    {isSubmitting && pendingAction === "draft" ? (
                       <Loader2 className="size-4 animate-spin" />
                     ) : (
                       <ChevronDown className="size-4" />
@@ -399,7 +399,7 @@ export function JobForm({ job, mode }: JobFormProps) {
                   <DropdownMenuSeparator />
                   <DropdownMenuItem
                     onClick={() => {
-                      pendingAction.current = "draft";
+                      setPendingAction("draft");
                       form.setValue("status", "Draft");
                       form.handleSubmit(onSubmit)();
                     }}

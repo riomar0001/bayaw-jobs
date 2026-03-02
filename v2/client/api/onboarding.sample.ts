@@ -2,7 +2,7 @@ import axios from "axios";
 
 const API_BASE = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:4000/api";
 
-async function submitOnboarding(formData: OnboardingData) {
+export async function submitOnboarding(formData) {
   const payload = {
     profile: {
       first_name: formData.firstName,

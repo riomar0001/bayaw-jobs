@@ -22,7 +22,7 @@ import { MoreHorizontal } from "lucide-react";
 import { AdminUser } from "@/data/mock-admins";
 import { formatDate } from "@/lib/formatters";
 import { cn } from "@/lib/utils";
-import { roleConfig, statusColors } from "./admin-config";
+import { roleConfig } from "./admin-config";
 import { EditMemberDialog } from "./edit-member-dialog";
 import { RemoveDialog } from "./remove-dialog";
 
@@ -82,16 +82,6 @@ export function AdminsTable({ admins, onEdit, onRemove }: AdminsTableProps) {
                   >
                     <RoleIcon className="size-3" />
                     {role.label}
-                  </Badge>
-                </TableCell>
-
-                {/* Status */}
-                <TableCell>
-                  <Badge
-                    variant="secondary"
-                    className={cn(statusColors[admin.status])}
-                  >
-                    {admin.status}
                   </Badge>
                 </TableCell>
 
