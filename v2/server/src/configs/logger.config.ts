@@ -45,4 +45,26 @@ export const logger = winston.createLogger({
   ],
 });
 
+const jsonFileFormat = combine(timestamp(), winston.format.json());
+
+export const requestFileLogger = winston.createLogger({
+  level: 'info',
+  transports: [
+    new winston.transports.File({
+      filename: 'logs/request.log',
+      format: jsonFileFormat,
+    }),
+  ],
+});
+
+export const responseFileLogger = winston.createLogger({
+  level: 'info',
+  transports: [
+    new winston.transports.File({
+      filename: 'logs/response.log',
+      format: jsonFileFormat,
+    }),
+  ],
+});
+
 export default logger;
