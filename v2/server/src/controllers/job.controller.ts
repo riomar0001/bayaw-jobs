@@ -37,7 +37,16 @@ export class JobController {
   async createJob(req: Request, res: Response, next: NextFunction): Promise<void> {
     try {
       const userId = req.user?.user_id;
-      const result = await jobService.createJob({ ...req.body, user_id: userId });
+
+      if (!userId) {
+        throw new Error('User ID is required to create a job');
+      }
+
+      const companyId = req.user?.company_id;
+      if (!companyId) {
+        throw new Error('Company ID is required to create a job');
+      }
+      const result = await jobService.createJob(req.body, userId, companyId);
       createdResponse(res, result, 'Job created successfully');
     } catch (error) {
       next(error);
@@ -47,9 +56,18 @@ export class JobController {
   async updateJob(req: Request<{ id: string }>, res: Response, next: NextFunction): Promise<void> {
     try {
       const id = req.params.id;
-      const userId = req.user?.user_id;
 
-      const result = await jobService.updateJob(id, req.body, userId);
+      const userId = req.user?.user_id;
+      if (!userId) {
+        throw new Error('User ID is required to update a job');
+      }
+
+      const companyId = req.user?.company_id;
+      if (!companyId) {
+        throw new Error('Company ID is required to update a job');
+      }
+
+      const result = await jobService.updateJob(id, req.body, userId, companyId);
       successResponse(res, result, 'Job updated successfully');
     } catch (error) {
       next(error);

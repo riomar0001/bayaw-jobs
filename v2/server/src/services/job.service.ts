@@ -19,7 +19,7 @@ export class JobService {
     return jobRepository.findAll(page, limit);
   }
 
-  async createJob(data: CreateJobData, userId: string) {
+  async createJob(data: CreateJobData, userId: string, companyId: string) {
     const user = await userRepository.findById(userId, { companyAdmins: true });
     if (!user) {
       throw new NotFoundError('User not found');
@@ -47,13 +47,14 @@ export class JobService {
 
     return jobRepository.create({
       ...data,
+      company_id: companyId,
       location_type: data.location_type as location_type,
       minimum_salary: data.minimum_salary.toString(),
       maximum_salary: data.maximum_salary.toString(),
     });
   }
 
-  async updateJob(id: string, data: Partial<CreateJobData>, userId: string) {
+  async updateJob(id: string, data: Partial<CreateJobData>, userId: string, companyId: string) {
     const existingJob = await jobRepository.findById(id);
     if (!existingJob) {
       throw new NotFoundError('Job not found');
@@ -84,7 +85,7 @@ export class JobService {
       }
     }
 
-    return jobRepository.update(id, {
+    return jobRepository.update(id, companyId, {
       ...data,
       location_type: (data.location_type as location_type) || existingJob.location_type,
       minimum_salary: data.minimum_salary?.toString() || existingJob.minimum_salary,

@@ -21,7 +21,6 @@ const jobBodyFields = {
   benefits: z
     .array(z.string().min(1, 'Benefit is required'))
     .min(1, 'At least one benefit is required'),
-  company_id: z.uuid('company_id must be a valid UUID'),
 };
 
 export const getAllJobsSchema = z.object({
@@ -69,7 +68,6 @@ export const updateJobSchema = z.object({
       responsibilities: jobBodyFields.responsibilities.optional(),
       qualifications: jobBodyFields.qualifications.optional(),
       benefits: jobBodyFields.benefits.optional(),
-      company_id: jobBodyFields.company_id.optional(),
     })
     .refine((data) => Object.keys(data).length > 0, {
       message: 'At least one field must be provided',

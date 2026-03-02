@@ -75,9 +75,9 @@ export class JobRepository {
     });
   }
 
-  async update(id: string, data: Prisma.jobUpdateInput) {
+  async update(id: string, company_id: string, data: Prisma.jobUpdateInput) {
     return prisma.job.update({
-      where: { id },
+      where: { id, company_id },
       data,
     });
   }

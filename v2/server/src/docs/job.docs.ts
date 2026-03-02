@@ -107,7 +107,6 @@ const jobRequestBody = {
     items: { type: 'string' },
     example: ['HMO', '13th month', 'Remote work'],
   },
-  company_id: { type: 'string', format: 'uuid' },
 };
 
 // ─── GET /jobs ────────────────────────────────────────────────────────────────
@@ -301,7 +300,6 @@ const createJob = {
                 'responsibilities',
                 'qualifications',
                 'benefits',
-                'company_id',
               ],
               properties: jobRequestBody,
             },
