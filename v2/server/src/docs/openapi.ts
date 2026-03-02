@@ -1,6 +1,8 @@
 import { authDocs } from './auth.docs';
 import { applicantDocs } from './applicant.docs';
 import { companyDocs } from './company.docs';
+import { jobDocs } from './job.docs';
+
 export const openApiSpec = {
   openapi: '3.0.3',
   info: {
@@ -59,6 +61,7 @@ export const openApiSpec = {
     ...authDocs,
     ...applicantDocs,
     ...companyDocs,
+    ...jobDocs,
   },
 };
 

@@ -376,7 +376,7 @@ model job {
   title            String
   department       String
   location         String
-  location_type    String
+  location_type    location_type
   employment_type  String
   minimum_salary   String
   maximum_salary   String
@@ -447,4 +447,10 @@ enum applicant_career_statuses {
   OPEN_TO_OPPORTUNITIES
   EMPLOYED_NOT_LOOKING
   NOT_LOOKING
+}
+
+enum location_type {
+  ONSITE
+  REMOTE
+  HYBRID
 }
