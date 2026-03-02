@@ -68,6 +68,29 @@ export class JobService {
     });
   }
 
+  async updateJobStatus(jobId: string, status: string, userId: string, companyId: string) {
+    const existingJob = await jobRepository.findById(jobId);
+    if (!existingJob) {
+      throw new NotFoundError('Job not found');
+    }
+
+    const user = await userRepository.findById(userId, { companyAdmins: true });
+    if (!user) {
+      throw new NotFoundError('User not found');
+    }
+
+    const isAuthorized =
+      user.companyAdmins.some(
+        (admin: CompanyAdmin) => admin.role === 'COMPANY_OWNER' || admin.can_update
+      ) || user.role === 'ADMIN';
+
+    if (!isAuthorized) {
+      throw new AuthorizationError('Only authorized company users can update job postings');
+    }
+
+    return jobRepository.updateStatus(jobId, companyId, status as job_status);
+  }
+
   async updateJob(id: string, data: Partial<CreateJobData>, userId: string, companyId: string) {
     const existingJob = await jobRepository.findById(id);
     if (!existingJob) {
