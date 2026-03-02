@@ -48,14 +48,6 @@ export default function JobDetailPage({ params }: JobDetailPageProps) {
           { label: "Jobs", href: "/company/jobs" },
           { label: job.title },
         ]}
-        actions={
-          <Button asChild>
-            <Link href={`/company/jobs/${id}/edit`}>
-              <Pencil className="mr-2 size-4" />
-              Edit Job
-            </Link>
-          </Button>
-        }
       />
       <div className="flex flex-1 flex-col gap-6 p-6">
         {/* Job Overview */}
@@ -64,10 +56,16 @@ export default function JobDetailPage({ params }: JobDetailPageProps) {
             <Card>
               <CardHeader>
                 <div className="flex items-center justify-between">
-                  <div>
+                  <div className="flex items-center gap-2.5">
                     <CardTitle>{job.title}</CardTitle>
+                    <JobStatusBadge status={job.status} />
                   </div>
-                  <JobStatusBadge status={job.status} />
+                  <Button asChild size="sm" variant="outline">
+                    <Link href={`/company/jobs/${id}/edit`}>
+                      <Pencil className="mr-2 size-4" />
+                      Edit Job
+                    </Link>
+                  </Button>
                 </div>
               </CardHeader>
               <CardContent className="space-y-6">

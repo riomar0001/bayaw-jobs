@@ -18,7 +18,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Button } from "@/components/ui/button";
 import { JobStatusBadge } from "./job-status-badge";
-import { MoreHorizontal, Eye, Pencil, Trash2, Users } from "lucide-react";
+import { MoreHorizontal, Eye, Trash2, Users } from "lucide-react";
 import { Job } from "@/types/job";
 import { formatDistanceToNow } from "@/lib/formatters";
 
@@ -94,12 +94,6 @@ export function JobsTable({ jobs }: JobsTableProps) {
                         <Link href={`/company/jobs/${job.id}`}>
                           <Eye className="mr-2 size-4" />
                           View Details
-                        </Link>
-                      </DropdownMenuItem>
-                      <DropdownMenuItem asChild>
-                        <Link href={`/company/jobs/${job.id}/edit`}>
-                          <Pencil className="mr-2 size-4" />
-                          Edit Job
                         </Link>
                       </DropdownMenuItem>
                       <DropdownMenuSeparator />

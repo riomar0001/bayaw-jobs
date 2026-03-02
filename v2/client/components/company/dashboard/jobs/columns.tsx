@@ -8,7 +8,6 @@ import {
   Users,
   MoreHorizontal,
   Eye,
-  Pencil,
   Trash2,
   ArrowUpDown,
 } from "lucide-react";
@@ -138,12 +137,6 @@ export const columns: ColumnDef<Job>[] = [
               <Link href={`/company/jobs/${job.id}`}>
                 <Eye className="mr-2 size-4" />
                 View Details
-              </Link>
-            </DropdownMenuItem>
-            <DropdownMenuItem asChild>
-              <Link href={`/company/jobs/${job.id}/edit`}>
-                <Pencil className="mr-2 size-4" />
-                Edit Job
               </Link>
             </DropdownMenuItem>
             <DropdownMenuSeparator />
