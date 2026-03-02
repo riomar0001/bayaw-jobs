@@ -213,6 +213,10 @@ const jobById = {
     put: {
       tags: ['Jobs'],
       summary: 'Update an existing job posting',
+      description:
+        'Updates a job posting. Both the user and company are resolved from the JWT token. ' +
+        'The update is scoped to the authenticated user\'s company — the job must belong to their company or the request will fail. ' +
+        'All body fields are optional; at least one must be provided.',
       security: [{ bearerAuth: [] }],
       parameters: [
         {
@@ -266,7 +270,21 @@ const jobById = {
         },
         401: unauthorizedResponse,
         403: forbiddenResponse,
-        404: { description: 'Job not found' },
+        404: { description: 'Job not found or does not belong to the authenticated company' },
+        422: {
+          description: 'User has no company — company_id missing from JWT token',
+          content: {
+            'application/json': {
+              schema: {
+                type: 'object',
+                properties: {
+                  success: { type: 'boolean', example: false },
+                  message: { type: 'string', example: 'Company ID is required to update a job' },
+                },
+              },
+            },
+          },
+        },
         500: internalErrorResponse,
       },
     },
@@ -280,6 +298,10 @@ const createJob = {
     post: {
       tags: ['Jobs'],
       summary: 'Create a new job posting',
+      description:
+        'Creates a job posting under the authenticated user\'s company. ' +
+        'The company is resolved automatically from the JWT token — no company_id is required in the request body. ' +
+        'The token must include a company_id (i.e. the user must have completed company onboarding).',
       security: [{ bearerAuth: [] }],
       requestBody: {
         required: true,
@@ -338,6 +360,20 @@ const createJob = {
         },
         401: unauthorizedResponse,
         403: forbiddenResponse,
+        422: {
+          description: 'User has no company — company_id missing from JWT token',
+          content: {
+            'application/json': {
+              schema: {
+                type: 'object',
+                properties: {
+                  success: { type: 'boolean', example: false },
+                  message: { type: 'string', example: 'Company ID is required to create a job' },
+                },
+              },
+            },
+          },
+        },
         500: internalErrorResponse,
       },
     },
