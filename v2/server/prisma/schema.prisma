@@ -385,7 +385,7 @@ model job {
   responsibilities String[]
   qualifications   String[]
   benefits         String[]
-  status           job_status @default(PAUSED)
+  status           job_status
   created_at       DateTime      @default(now())
   updated_at       DateTime      @updatedAt
 
@@ -457,6 +457,7 @@ enum location_type {
 }
 
 enum job_status {
+  DRAFT
   OPEN
   CLOSED
   PAUSED

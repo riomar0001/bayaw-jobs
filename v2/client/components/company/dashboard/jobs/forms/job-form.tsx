@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
@@ -26,8 +26,16 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Card, CardContent } from "@/components/ui/card";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import { Job, EmploymentType, LocationType, JobStatus } from "@/types/job";
-import { Loader2 } from "lucide-react";
+import { ChevronDown, Loader2 } from "lucide-react";
 export const jobFormSchema = z.object({
   title: z.string(),
   department: z.string(),
@@ -60,6 +68,7 @@ interface JobFormProps {
 export function JobForm({ job, mode }: JobFormProps) {
   const router = useRouter();
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const pendingAction = useRef<"publish" | "draft">("publish");
 
   const form = useForm<JobFormValues>({
     resolver: zodResolver(jobFormSchema),
@@ -354,10 +363,58 @@ export function JobForm({ job, mode }: JobFormProps) {
           <Button type="button" variant="outline" onClick={() => router.back()}>
             Cancel
           </Button>
-          <Button type="submit" disabled={isSubmitting}>
-            {isSubmitting && <Loader2 className="mr-2 size-4 animate-spin" />}
-            {mode === "create" ? "Create Job" : "Save Changes"}
-          </Button>
+
+          {mode === "create" ? (
+            <div className="flex">
+              <Button
+                type="submit"
+                className="rounded-r-none"
+                disabled={isSubmitting}
+                onClick={() => {
+                  pendingAction.current = "publish";
+                  form.setValue("status", "Active");
+                }}
+              >
+                {isSubmitting && pendingAction.current === "publish" && (
+                  <Loader2 className="mr-2 size-4 animate-spin" />
+                )}
+                Publish Job
+              </Button>
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button
+                    type="button"
+                    className="rounded-l-none border-l border-l-primary-foreground/25 px-2"
+                    disabled={isSubmitting}
+                  >
+                    {isSubmitting && pendingAction.current === "draft" ? (
+                      <Loader2 className="size-4 animate-spin" />
+                    ) : (
+                      <ChevronDown className="size-4" />
+                    )}
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end">
+                  <DropdownMenuLabel>Publishing Options</DropdownMenuLabel>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem
+                    onClick={() => {
+                      pendingAction.current = "draft";
+                      form.setValue("status", "Draft");
+                      form.handleSubmit(onSubmit)();
+                    }}
+                  >
+                    Save as Draft
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            </div>
+          ) : (
+            <Button type="submit" disabled={isSubmitting}>
+              {isSubmitting && <Loader2 className="mr-2 size-4 animate-spin" />}
+              Save Changes
+            </Button>
+          )}
         </div>
       </form>
     </Form>

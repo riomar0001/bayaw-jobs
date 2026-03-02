@@ -1,7 +1,10 @@
 "use client";
 
 import { PageHeader } from "@/components/company/dashboard/layout/page-header";
-import { BusinessProfileForm } from "@/components/company/dashboard/business/forms/business-profile-form";
+import { CompanyLogo } from "@/components/company/dashboard/business/company-logo";
+import { CompanyInfoForm } from "@/components/company/dashboard/business/forms/company-info-form";
+import { ContactInfoForm } from "@/components/company/dashboard/business/forms/contact-info-form";
+import { SocialLinksForm } from "@/components/company/dashboard/business/forms/social-links-form";
 import { LocationManager } from "@/components/company/dashboard/business/location-manager";
 import { getBusinessProfile } from "@/data";
 
@@ -19,7 +22,10 @@ export default function BusinessPage() {
         ]}
       />
       <div className="flex flex-1 flex-col gap-6 p-6">
-        <BusinessProfileForm business={business} />
+        <CompanyLogo name={business.name} logo={business.logo} />
+        <CompanyInfoForm business={business} />
+        <ContactInfoForm business={business} />
+        <SocialLinksForm business={business} />
         <LocationManager locations={business.locations} />
       </div>
     </>
