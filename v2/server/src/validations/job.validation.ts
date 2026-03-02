@@ -21,6 +21,9 @@ const jobBodyFields = {
   benefits: z
     .array(z.string().min(1, 'Benefit is required'))
     .min(1, 'At least one benefit is required'),
+  status: z.enum(['OPEN', 'CLOSED', 'PAUSED'], {
+    error: 'status must be one of: OPEN, CLOSED, PAUSED',
+  }),
 };
 
 export const getAllJobsSchema = z.object({
@@ -47,7 +50,10 @@ export const getJobByIdSchema = z.object({
 });
 
 export const createJobSchema = z.object({
-  body: z.object(jobBodyFields),
+  body: z.object({
+    ...jobBodyFields,
+    status: jobBodyFields.status.optional(),
+  }),
 });
 
 export const updateJobSchema = z.object({
@@ -68,11 +74,22 @@ export const updateJobSchema = z.object({
       responsibilities: jobBodyFields.responsibilities.optional(),
       qualifications: jobBodyFields.qualifications.optional(),
       benefits: jobBodyFields.benefits.optional(),
+      status: jobBodyFields.status.optional(),
     })
     .refine((data) => Object.keys(data).length > 0, {
       message: 'At least one field must be provided',
     }),
 });
 
+export const updateJobStatusSchema = z.object({
+  params: z.object({
+    id: z.uuid('Job ID must be a valid UUID'),
+  }),
+  body: z.object({
+    status: jobBodyFields.status,
+  }),
+});
+
 export type CreateJobInput = z.infer<typeof createJobSchema>['body'];
 export type UpdateJobInput = z.infer<typeof updateJobSchema>['body'];
+export type UpdateJobStatusInput = z.infer<typeof updateJobStatusSchema>['body'];

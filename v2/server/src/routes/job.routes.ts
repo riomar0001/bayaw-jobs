@@ -7,13 +7,18 @@ import {
   getJobByIdSchema,
   createJobSchema,
   updateJobSchema,
+  updateJobStatusSchema,
 } from '@/validations/job.validation';
+
 
 const router = Router();
 
 router.get('/', validate(getAllJobsSchema), jobController.getAllJobs.bind(jobController));
+router.get('/company', authenticate, validate(getAllJobsSchema), jobController.getCompanyJobs.bind(jobController));
+router.get('/company/:id', authenticate, validate(getJobByIdSchema), jobController.getCompanyJobById.bind(jobController));
 router.get('/:id', validate(getJobByIdSchema), jobController.getJobById.bind(jobController));
 router.post('/create', authenticate, validate(createJobSchema), jobController.createJob.bind(jobController));
 router.put('/:id', authenticate, validate(updateJobSchema), jobController.updateJob.bind(jobController));
+router.patch('/:id/status', authenticate, validate(updateJobStatusSchema), jobController.updateJobStatus.bind(jobController));
 
 export default router;

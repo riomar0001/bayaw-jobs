@@ -11,4 +11,5 @@ export interface CreateJobData {
   responsibilities: string[];
   qualifications: string[];
   benefits: string[];
+  status?: string;
 }

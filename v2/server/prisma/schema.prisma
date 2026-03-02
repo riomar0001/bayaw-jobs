@@ -385,6 +385,7 @@ model job {
   responsibilities String[]
   qualifications   String[]
   benefits         String[]
+  status           job_status @default(OPEN)
   created_at       DateTime      @default(now())
   updated_at       DateTime      @updatedAt
 
@@ -453,4 +454,10 @@ enum location_type {
   ONSITE
   REMOTE
   HYBRID
+}
+
+enum job_status {
+  OPEN
+  CLOSED
+  PAUSED
 }

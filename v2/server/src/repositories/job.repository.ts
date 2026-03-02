@@ -1,5 +1,5 @@
 import prisma from '@/configs/prisma.config';
-import { Prisma, location_type } from '@/generated/prisma/client';
+import { Prisma, location_type, job_status } from '@/generated/prisma/client';
 
 export interface CreateJobData {
   title: string;
@@ -15,6 +15,7 @@ export interface CreateJobData {
   qualifications: string[];
   benefits: string[];
   company_id: string;
+  status?: job_status | undefined;
 }
 
 export class JobRepository {
@@ -55,6 +56,60 @@ export class JobRepository {
     };
   }
 
+  async findByIdWithApplicants(id: string, company_id: string) {
+    return prisma.job.findUnique({
+      where: { id, company_id },
+      include: {
+        applicant_applied_job: {
+          include: {
+            applicant_profile: true,
+          },
+          orderBy: { application_date: 'desc' },
+        },
+      },
+    });
+  }
+
+  async findAllByCompany(company_id: string, page: number = 1, limit: number = 10) {
+    const skip = (page - 1) * limit;
+
+    const [jobs, total] = await Promise.all([
+      prisma.job.findMany({
+        where: { company_id },
+        skip,
+        take: limit,
+        orderBy: { created_at: 'desc' },
+        select: {
+          id: true,
+          title: true,
+          department: true,
+          location: true,
+          employment_type: true,
+          location_type: true,
+          status: true,
+          created_at: true,
+          _count: { select: { applicant_applied_job: true } },
+        },
+      }),
+      prisma.job.count({ where: { company_id } }),
+    ]);
+
+    return {
+      data: jobs.map(({ _count, ...job }) => ({
+        ...job,
+        applicant_count: _count.applicant_applied_job,
+      })),
+      meta: {
+        total,
+        page,
+        limit,
+        totalPages: Math.ceil(total / limit),
+        hasNextPage: page < Math.ceil(total / limit),
+        hasPreviousPage: page > 1,
+      },
+    };
+  }
+
   async create(data: CreateJobData) {
     return prisma.job.create({
       data: {
@@ -71,7 +126,15 @@ export class JobRepository {
         qualifications: data.qualifications,
         benefits: data.benefits,
         company_id: data.company_id,
+        ...(data.status ? { status: data.status } : {}),
       },
+    });
+  }
+
+  async updateStatus(id: string, company_id: string, status: job_status) {
+    return prisma.job.update({
+      where: { id, company_id },
+      data: { status },
     });
   }
 

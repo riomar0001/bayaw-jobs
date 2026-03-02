@@ -1,4 +1,4 @@
-import { location_type } from '@/generated/prisma/enums';
+import { location_type, job_status } from '@/generated/prisma/enums';
 import { jobRepository } from '@/repositories/job.repository';
 import { userRepository } from '@/repositories/user.repository';
 import { CompanyAdmin } from '@/types/company.type';
@@ -17,6 +17,18 @@ export class JobService {
 
   async getAllJobs(page: number = 1, limit: number = 10) {
     return jobRepository.findAll(page, limit);
+  }
+
+  async getCompanyJobs(companyId: string, page: number = 1, limit: number = 10) {
+    return jobRepository.findAllByCompany(companyId, page, limit);
+  }
+
+  async getCompanyJobWithApplicants(jobId: string, companyId: string) {
+    const job = await jobRepository.findByIdWithApplicants(jobId, companyId);
+    if (!job) {
+      throw new NotFoundError('Job not found');
+    }
+    return job;
   }
 
   async createJob(data: CreateJobData, userId: string, companyId: string) {
@@ -45,12 +57,14 @@ export class JobService {
       }
     }
 
+    const { status, ...rest } = data;
     return jobRepository.create({
-      ...data,
+      ...rest,
       company_id: companyId,
       location_type: data.location_type as location_type,
       minimum_salary: data.minimum_salary.toString(),
       maximum_salary: data.maximum_salary.toString(),
+      ...(status ? { status: status as job_status } : {}),
     });
   }
 
@@ -85,11 +99,13 @@ export class JobService {
       }
     }
 
+    const { status: updateStatus, ...updateRest } = data;
     return jobRepository.update(id, companyId, {
-      ...data,
+      ...updateRest,
       location_type: (data.location_type as location_type) || existingJob.location_type,
       minimum_salary: data.minimum_salary?.toString() || existingJob.minimum_salary,
       maximum_salary: data.maximum_salary?.toString() || existingJob.maximum_salary,
+      ...(updateStatus ? { status: updateStatus as job_status } : {}),
     });
   }
 }
