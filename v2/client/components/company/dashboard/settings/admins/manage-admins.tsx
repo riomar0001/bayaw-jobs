@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { AdminUser, mockAdmins } from "@/data/mock-admins";
+import { AdminPermissions, AdminUser, mockAdmins } from "@/data/mock-admins";
 import { InviteDialog } from "./invite-dialog";
 import { AdminsTable } from "./admins-table";
 
@@ -11,12 +11,34 @@ export function ManageAdmins() {
   const activeCount = admins.filter((a) => a.status === "Active").length;
   const pendingCount = admins.filter((a) => a.status === "Pending").length;
 
-  const handleRemove = (id: string) => {
-    setAdmins((prev) => prev.filter((a) => a.id !== id));
+  const handleAdd = (data: {
+    email: string;
+    position: string;
+    permissions: AdminPermissions;
+  }) => {
+    const newAdmin: AdminUser = {
+      id: Date.now().toString(),
+      name: data.email.split("@")[0].replace(/[._]/g, " "),
+      email: data.email,
+      position: data.position,
+      role: "Admin",
+      permissions: data.permissions,
+      joinedAt: new Date().toISOString().split("T")[0],
+      lastActive: new Date().toISOString().split("T")[0],
+      status: "Pending",
+    };
+    setAdmins((prev) => [...prev, newAdmin]);
   };
 
-  const handleEdit = (id: string, data: Pick<AdminUser, "role" | "status">) => {
+  const handleEdit = (
+    id: string,
+    data: { position: string; permissions: AdminPermissions },
+  ) => {
     setAdmins((prev) => prev.map((a) => (a.id === id ? { ...a, ...data } : a)));
+  };
+
+  const handleRemove = (id: string) => {
+    setAdmins((prev) => prev.filter((a) => a.id !== id));
   };
 
   return (
@@ -52,7 +74,7 @@ export function ManageAdmins() {
               Manage who has access to your company dashboard.
             </p>
           </div>
-          <InviteDialog />
+          <InviteDialog onAdd={handleAdd} />
         </div>
         <div className="px-6 pb-6">
           <AdminsTable
