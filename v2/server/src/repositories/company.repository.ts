@@ -57,6 +57,52 @@ export class CompanyRepository {
     });
   }
 
+  async findAllAdminsByCompany(companyId: string) {
+    return prisma.company_admin.findMany({
+      where: { company_id: companyId },
+      include: {
+        user: {
+          select: {
+            id: true,
+            email: true,
+            first_name: true,
+            last_name: true,
+          },
+        },
+      },
+      orderBy: { created_at: 'asc' },
+    });
+  }
+
+  async findAdminByUserAndCompany(userId: string, companyId: string) {
+    return prisma.company_admin.findFirst({
+      where: { user_id: userId, company_id: companyId },
+    });
+  }
+
+  async findAdminById(adminId: string) {
+    return prisma.company_admin.findUnique({
+      where: { id: adminId },
+    });
+  }
+
+  async addAdmin(data: {
+    company_id: string;
+    user_id: string;
+    role: string;
+    position?: string;
+    can_create: boolean;
+    can_read: boolean;
+    can_update: boolean;
+    can_delete: boolean;
+  }) {
+    return prisma.company_admin.create({ data });
+  }
+
+  async removeAdmin(adminId: string) {
+    return prisma.company_admin.delete({ where: { id: adminId } });
+  }
+
   async createCompany(data: CreateCompanyData) {
     return prisma.company_information.create({
       data: {

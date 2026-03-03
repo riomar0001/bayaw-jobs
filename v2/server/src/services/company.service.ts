@@ -1,7 +1,7 @@
 import { companyRepository } from '@/repositories/company.repository';
 import { userRepository } from '@/repositories/user.repository';
-import { ConflictError, NotFoundError } from '@/utils/errors.util';
-import { BusinessOnboardingInput } from '@/validations/company.validation';
+import { AuthorizationError, ConflictError, NotFoundError } from '@/utils/errors.util';
+import { AddAdminInput, BusinessOnboardingInput } from '@/validations/company.validation';
 import { storageService } from '@/services/storage.service';
 import logger from '@/configs/logger.config';
 
@@ -74,6 +74,70 @@ export class CompanyService {
       logo: fileName,
       url: `${process.env.APP_URL}/api/business/logo/${company.id}`,
     };
+  }
+
+  async getAdmins(requesterId: string, companyId: string) {
+    const admins = await companyRepository.findAllAdminsByCompany(companyId);
+    const myRecord = admins.find((a) => a.user_id === requesterId) ?? null;
+    return { admins, my_rights: myRecord };
+  }
+
+  async addAdmin(requesterId: string, companyId: string, data: AddAdminInput) {
+    const requester = await companyRepository.findAdminByUserAndCompany(requesterId, companyId);
+    if (
+      !requester ||
+      !requester.can_create ||
+      !requester.can_read ||
+      !requester.can_update ||
+      !requester.can_delete
+    ) {
+      throw new AuthorizationError('Only admins with full rights can add new admins');
+    }
+
+    const targetUser = await userRepository.findById(data.user_id);
+    if (!targetUser) {
+      throw new NotFoundError('User not found');
+    }
+
+    const existing = await companyRepository.findAdminByUserAndCompany(data.user_id, companyId);
+    if (existing) {
+      throw new ConflictError('User is already an admin of this company');
+    }
+
+    return companyRepository.addAdmin({
+      company_id: companyId,
+      user_id: data.user_id,
+      role: data.role,
+      ...(data.position !== undefined ? { position: data.position } : {}),
+      can_create: data.can_create,
+      can_read: data.can_read,
+      can_update: data.can_update,
+      can_delete: data.can_delete,
+    });
+  }
+
+  async removeAdmin(requesterId: string, companyId: string, adminId: string) {
+    const requester = await companyRepository.findAdminByUserAndCompany(requesterId, companyId);
+    if (
+      !requester ||
+      !requester.can_create ||
+      !requester.can_read ||
+      !requester.can_update ||
+      !requester.can_delete
+    ) {
+      throw new AuthorizationError('Only admins with full rights can remove admins');
+    }
+
+    const target = await companyRepository.findAdminById(adminId);
+    if (!target || target.company_id !== companyId) {
+      throw new NotFoundError('Admin not found');
+    }
+
+    if (target.user_id === requesterId) {
+      throw new AuthorizationError('You cannot remove yourself as an admin');
+    }
+
+    return companyRepository.removeAdmin(adminId);
   }
 
   async getLogo(

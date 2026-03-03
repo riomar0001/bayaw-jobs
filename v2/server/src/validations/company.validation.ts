@@ -40,3 +40,23 @@ export const businessOnboardingSchema = z.object({
 });
 
 export type BusinessOnboardingInput = z.infer<typeof businessOnboardingSchema>['body'];
+
+export const addAdminSchema = z.object({
+  body: z.object({
+    user_id: z.string().uuid('User ID must be a valid UUID'),
+    role: z.string().min(1, 'Role is required'),
+    position: z.string().optional(),
+    can_create: z.boolean().default(false),
+    can_read: z.boolean().default(true),
+    can_update: z.boolean().default(false),
+    can_delete: z.boolean().default(false),
+  }),
+});
+
+export const deleteAdminSchema = z.object({
+  params: z.object({
+    id: z.string().uuid('Admin ID must be a valid UUID'),
+  }),
+});
+
+export type AddAdminInput = z.infer<typeof addAdminSchema>['body'];

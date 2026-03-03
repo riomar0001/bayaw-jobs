@@ -38,6 +38,56 @@ export class CompanyController {
     }
   }
 
+  async getAdmins(req: Request, res: Response, next: NextFunction): Promise<void> {
+    try {
+      const userId = req.user?.user_id;
+      const companyId = req.user?.company_id;
+      if (!userId || !companyId) {
+        throw new Error('User ID or Company ID missing in request');
+      }
+
+      const result = await companyService.getAdmins(userId, companyId);
+      successResponse(res, result, 'Company admins retrieved successfully');
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  async addAdmin(req: Request, res: Response, next: NextFunction): Promise<void> {
+    try {
+      const userId = req.user?.user_id;
+      const companyId = req.user?.company_id;
+      if (!userId || !companyId) {
+        throw new Error('User ID or Company ID missing in request');
+      }
+
+      const admin = await companyService.addAdmin(userId, companyId, req.body);
+      createdResponse(res, admin, 'Admin added successfully');
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  async removeAdmin(req: Request, res: Response, next: NextFunction): Promise<void> {
+    try {
+      const userId = req.user?.user_id;
+      const companyId = req.user?.company_id;
+      if (!userId || !companyId) {
+        throw new Error('User ID or Company ID missing in request');
+      }
+
+      const { id } = req.params;
+      if (!id || typeof id !== 'string') {
+        throw new BadRequestError('Admin ID is required');
+      }
+
+      await companyService.removeAdmin(userId, companyId, id);
+      successResponse(res, null, 'Admin removed successfully');
+    } catch (error) {
+      next(error);
+    }
+  }
+
   async getLogo(req: Request, res: Response, next: NextFunction): Promise<void> {
     try {
       const { id } = req.params;

@@ -3,7 +3,7 @@ import multer from 'multer';
 import { companyController } from '@/controllers/company.controller';
 import { validate } from '@/middlewares/validation.middleware';
 import { authenticate } from '@/middlewares/auth.middleware';
-import { businessOnboardingSchema } from '@/validations/company.validation';
+import { addAdminSchema, businessOnboardingSchema, deleteAdminSchema } from '@/validations/company.validation';
 import { BadRequestError } from '@/utils/errors.util';
 
 const router = Router();
@@ -49,5 +49,21 @@ router.patch(
 );
 
 router.get('/logo/:id', companyController.getLogo.bind(companyController));
+
+router.get('/admins', authenticate, companyController.getAdmins.bind(companyController));
+
+router.post(
+  '/admins',
+  authenticate,
+  validate(addAdminSchema),
+  companyController.addAdmin.bind(companyController)
+);
+
+router.delete(
+  '/admins/:id',
+  authenticate,
+  validate(deleteAdminSchema),
+  companyController.removeAdmin.bind(companyController)
+);
 
 export default router;
