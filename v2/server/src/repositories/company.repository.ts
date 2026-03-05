@@ -121,6 +121,128 @@ export class CompanyRepository {
     });
   }
 
+  async getCompanyDashboard(companyId: string) {
+    const now = new Date();
+    const dayOfWeek = now.getDay();
+    const daysToMonday = dayOfWeek === 0 ? 6 : dayOfWeek - 1;
+    const startOfThisWeek = new Date(now);
+    startOfThisWeek.setHours(0, 0, 0, 0);
+    startOfThisWeek.setDate(now.getDate() - daysToMonday);
+
+    const eightWeeksAgo = new Date(startOfThisWeek);
+    eightWeeksAgo.setDate(startOfThisWeek.getDate() - 49);
+
+    const [
+      total_jobs,
+      total_applicants,
+      new_applicants_this_week,
+      interviewed_applicants,
+      pipelineGroups,
+      recentApplications,
+      recentJobs,
+      trendApplications,
+    ] = await Promise.all([
+      prisma.job.count({ where: { company_id: companyId } }),
+      prisma.applicant_applied_job.count({ where: { job: { company_id: companyId } } }),
+      prisma.applicant_applied_job.count({
+        where: { job: { company_id: companyId }, application_date: { gte: startOfThisWeek } },
+      }),
+      prisma.applicant_applied_job.count({
+        where: { job: { company_id: companyId }, status: 'INTERVIEW' },
+      }),
+      prisma.applicant_applied_job.groupBy({
+        by: ['status'],
+        where: { job: { company_id: companyId } },
+        _count: { status: true },
+      }),
+      prisma.applicant_applied_job.findMany({
+        where: { job: { company_id: companyId } },
+        take: 5,
+        orderBy: { application_date: 'desc' },
+        select: {
+          id: true,
+          status: true,
+          application_date: true,
+          applicant_profile: {
+            select: {
+              first_name: true,
+              last_name: true,
+              desired_position: true,
+              profile_picture: true,
+            },
+          },
+          job: {
+            select: { id: true, title: true, department: true },
+          },
+        },
+      }),
+      prisma.job.findMany({
+        where: { company_id: companyId },
+        take: 5,
+        orderBy: { created_at: 'desc' },
+        select: {
+          id: true,
+          title: true,
+          department: true,
+          location: true,
+          employment_type: true,
+          location_type: true,
+          status: true,
+          created_at: true,
+          _count: { select: { applicant_applied_job: true } },
+        },
+      }),
+      prisma.applicant_applied_job.findMany({
+        where: {
+          job: { company_id: companyId },
+          application_date: { gte: eightWeeksAgo },
+        },
+        select: { application_date: true },
+      }),
+    ]);
+
+    // Build 8-week trend buckets (oldest → newest)
+    const weeks = Array.from({ length: 8 }, (_, i) => {
+      const weekStart = new Date(startOfThisWeek);
+      weekStart.setDate(startOfThisWeek.getDate() - (7 - i) * 7);
+      return { week_start: new Date(weekStart), count: 0 };
+    });
+
+    for (const app of trendApplications) {
+      const appDate = new Date(app.application_date);
+      for (let i = weeks.length - 1; i >= 0; i--) {
+        const weekEnd = new Date(weeks[i].week_start);
+        weekEnd.setDate(weeks[i].week_start.getDate() + 7);
+        if (appDate >= weeks[i].week_start && appDate < weekEnd) {
+          weeks[i].count++;
+          break;
+        }
+      }
+    }
+
+    const ALL_STATUSES = ['NEW', 'SCREENING', 'INTERVIEW', 'OFFER', 'HIRED', 'REJECTED'] as const;
+    const pipelineMap = new Map(pipelineGroups.map((g) => [g.status, g._count.status]));
+    const application_pipeline = ALL_STATUSES.map((status) => {
+      const count = pipelineMap.get(status) ?? 0;
+      const percentage = total_applicants > 0 ? Math.round((count / total_applicants) * 100) : 0;
+      return { status, count, percentage };
+    });
+
+    return {
+      summary: { total_jobs, total_applicants, new_applicants_this_week, interviewed_applicants },
+      application_pipeline,
+      applicant_trends: weeks.map((w) => ({
+        week_start: w.week_start.toISOString().split('T')[0],
+        count: w.count,
+      })),
+      recent_applicants: recentApplications,
+      recent_jobs: recentJobs.map(({ _count, ...job }) => ({
+        ...job,
+        applicant_count: _count.applicant_applied_job,
+      })),
+    };
+  }
+
   async getJobPostingStats(companyId: string) {
     const [total_jobs, active_jobs, closed_jobs, total_applicants] = await prisma.$transaction([
       prisma.job.count({ where: { company_id: companyId } }),

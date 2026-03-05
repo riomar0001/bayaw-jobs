@@ -148,6 +148,10 @@ export class CompanyService {
     return companyRepository.removeAdmin(adminId);
   }
 
+  async getDashboard(companyId: string) {
+    return companyRepository.getCompanyDashboard(companyId);
+  }
+
   async getJobPostingStats(companyId: string) {
     return companyRepository.getJobPostingStats(companyId);
   }

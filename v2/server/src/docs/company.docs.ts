@@ -505,6 +505,140 @@ const admins = {
   },
 };
 
+const dashboard = {
+  '/business/dashboard': {
+    get: {
+      tags: ['Business'],
+      summary: 'Get company dashboard',
+      description:
+        "Returns a full dashboard snapshot for the authenticated user's company: summary counts, 8-week applicant trends, recent 5 applicants, and recent 5 job postings.",
+      security: [{ bearerAuth: [] }],
+      responses: {
+        '200': {
+          description: 'Dashboard data retrieved successfully',
+          content: {
+            'application/json': {
+              schema: {
+                type: 'object',
+                properties: {
+                  success: { type: 'boolean', example: true },
+                  message: { type: 'string', example: 'Dashboard data retrieved successfully' },
+                  data: {
+                    type: 'object',
+                    properties: {
+                      summary: {
+                        type: 'object',
+                        properties: {
+                          total_jobs: { type: 'integer', example: 20 },
+                          total_applicants: { type: 'integer', example: 150 },
+                          new_applicants_this_week: { type: 'integer', example: 8 },
+                          interviewed_applicants: { type: 'integer', example: 30 },
+                        },
+                      },
+                      application_pipeline: {
+                        type: 'array',
+                        description: 'Count and percentage of applicants for each status',
+                        items: {
+                          type: 'object',
+                          properties: {
+                            status: {
+                              type: 'string',
+                              enum: ['NEW', 'SCREENING', 'INTERVIEW', 'OFFER', 'HIRED', 'REJECTED'],
+                              example: 'NEW',
+                            },
+                            count: { type: 'integer', example: 40 },
+                            percentage: { type: 'integer', example: 27, description: 'Rounded percentage of total applicants' },
+                          },
+                        },
+                      },
+                      applicant_trends: {
+                        type: 'array',
+                        description: 'Weekly applicant counts for the past 8 weeks (oldest to newest)',
+                        items: {
+                          type: 'object',
+                          properties: {
+                            week_start: {
+                              type: 'string',
+                              format: 'date',
+                              example: '2026-01-12',
+                            },
+                            count: { type: 'integer', example: 12 },
+                          },
+                        },
+                      },
+                      recent_applicants: {
+                        type: 'array',
+                        description: 'Most recent 5 applicants across all company jobs',
+                        items: {
+                          type: 'object',
+                          properties: {
+                            id: { type: 'string', format: 'uuid' },
+                            status: {
+                              type: 'string',
+                              enum: ['NEW', 'SCREENING', 'INTERVIEW', 'OFFER', 'HIRED', 'REJECTED'],
+                              example: 'NEW',
+                            },
+                            application_date: { type: 'string', format: 'date-time' },
+                            applicant_profile: {
+                              type: 'object',
+                              properties: {
+                                first_name: { type: 'string', example: 'Jane' },
+                                last_name: { type: 'string', example: 'Doe' },
+                                desired_position: { type: 'string', example: 'Frontend Developer' },
+                                profile_picture: { type: 'string', nullable: true },
+                              },
+                            },
+                            job: {
+                              type: 'object',
+                              properties: {
+                                id: { type: 'string', format: 'uuid' },
+                                title: { type: 'string', example: 'Senior Engineer' },
+                                department: { type: 'string', example: 'Engineering' },
+                              },
+                            },
+                          },
+                        },
+                      },
+                      recent_jobs: {
+                        type: 'array',
+                        description: 'Most recent 5 job postings',
+                        items: {
+                          type: 'object',
+                          properties: {
+                            id: { type: 'string', format: 'uuid' },
+                            title: { type: 'string', example: 'Senior Engineer' },
+                            department: { type: 'string', example: 'Engineering' },
+                            location: { type: 'string', example: 'Manila' },
+                            employment_type: { type: 'string', example: 'FULL_TIME' },
+                            location_type: {
+                              type: 'string',
+                              enum: ['ONSITE', 'REMOTE', 'HYBRID'],
+                              example: 'HYBRID',
+                            },
+                            status: {
+                              type: 'string',
+                              enum: ['DRAFT', 'OPEN', 'CLOSED', 'PAUSED'],
+                              example: 'OPEN',
+                            },
+                            created_at: { type: 'string', format: 'date-time' },
+                            applicant_count: { type: 'integer', example: 14 },
+                          },
+                        },
+                      },
+                    },
+                  },
+                },
+              },
+            },
+          },
+        },
+        '401': { description: 'Unauthorized' },
+        '422': { description: 'Company ID missing from token — user has no company' },
+      },
+    },
+  },
+};
+
 const stats = {
   '/business/stats/jobs': {
     get: {
@@ -583,5 +717,6 @@ export const companyDocs = {
   ...onboarding,
   ...logo,
   ...admins,
+  ...dashboard,
   ...stats,
 };

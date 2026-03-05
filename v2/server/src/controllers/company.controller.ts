@@ -97,6 +97,20 @@ export class CompanyController {
     }
   }
 
+  async getDashboard(req: Request, res: Response, next: NextFunction): Promise<void> {
+    try {
+      const companyId = req.user?.company_id;
+      if (!companyId) {
+        throw new Error('Company ID missing in request');
+      }
+
+      const result = await companyService.getDashboard(companyId);
+      successResponse(res, result, 'Dashboard data retrieved successfully');
+    } catch (error) {
+      next(error);
+    }
+  }
+
   async getJobPostingStats(req: Request, res: Response, next: NextFunction): Promise<void> {
     try {
       const companyId = req.user?.company_id;
