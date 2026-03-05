@@ -34,6 +34,9 @@ function parseOnboardingData(req: Request, _res: Response, next: NextFunction): 
 
 router.get('/top', companyController.getTopCompanies.bind(companyController));
 
+router.get('/stats/jobs', authenticate, companyController.getJobPostingStats.bind(companyController));
+router.get('/stats/applicants', authenticate, companyController.getApplicantStats.bind(companyController));
+
 router.post(
   '/onboarding',
   authenticate,

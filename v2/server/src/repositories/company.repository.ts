@@ -121,6 +121,34 @@ export class CompanyRepository {
     });
   }
 
+  async getJobPostingStats(companyId: string) {
+    const [total_jobs, active_jobs, closed_jobs, total_applicants] = await prisma.$transaction([
+      prisma.job.count({ where: { company_id: companyId } }),
+      prisma.job.count({ where: { company_id: companyId, status: 'OPEN' } }),
+      prisma.job.count({ where: { company_id: companyId, status: 'CLOSED' } }),
+      prisma.applicant_applied_job.count({ where: { job: { company_id: companyId } } }),
+    ]);
+
+    return { total_jobs, active_jobs, closed_jobs, total_applicants };
+  }
+
+  async getApplicantStats(companyId: string) {
+    const [total_applicants, in_interview, hired, rejected] = await prisma.$transaction([
+      prisma.applicant_applied_job.count({ where: { job: { company_id: companyId } } }),
+      prisma.applicant_applied_job.count({
+        where: { job: { company_id: companyId }, status: 'INTERVIEW' },
+      }),
+      prisma.applicant_applied_job.count({
+        where: { job: { company_id: companyId }, status: 'HIRED' },
+      }),
+      prisma.applicant_applied_job.count({
+        where: { job: { company_id: companyId }, status: 'REJECTED' },
+      }),
+    ]);
+
+    return { total_applicants, in_interview, hired, rejected };
+  }
+
   async createCompany(data: CreateCompanyData) {
     return prisma.company_information.create({
       data: {

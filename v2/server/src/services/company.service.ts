@@ -148,6 +148,14 @@ export class CompanyService {
     return companyRepository.removeAdmin(adminId);
   }
 
+  async getJobPostingStats(companyId: string) {
+    return companyRepository.getJobPostingStats(companyId);
+  }
+
+  async getApplicantStats(companyId: string) {
+    return companyRepository.getApplicantStats(companyId);
+  }
+
   async getLogo(
     companyId: string
   ): Promise<{ buffer: Buffer; contentType: string; filename: string }> {

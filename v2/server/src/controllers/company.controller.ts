@@ -97,6 +97,34 @@ export class CompanyController {
     }
   }
 
+  async getJobPostingStats(req: Request, res: Response, next: NextFunction): Promise<void> {
+    try {
+      const companyId = req.user?.company_id;
+      if (!companyId) {
+        throw new Error('Company ID missing in request');
+      }
+
+      const result = await companyService.getJobPostingStats(companyId);
+      successResponse(res, result, 'Job posting stats retrieved successfully');
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  async getApplicantStats(req: Request, res: Response, next: NextFunction): Promise<void> {
+    try {
+      const companyId = req.user?.company_id;
+      if (!companyId) {
+        throw new Error('Company ID missing in request');
+      }
+
+      const result = await companyService.getApplicantStats(companyId);
+      successResponse(res, result, 'Applicant stats retrieved successfully');
+    } catch (error) {
+      next(error);
+    }
+  }
+
   async getLogo(req: Request, res: Response, next: NextFunction): Promise<void> {
     try {
       const { id } = req.params;

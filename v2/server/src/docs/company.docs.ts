@@ -505,9 +505,83 @@ const admins = {
   },
 };
 
+const stats = {
+  '/business/stats/jobs': {
+    get: {
+      tags: ['Business'],
+      summary: 'Get job posting stats',
+      description: "Returns job posting statistics for the authenticated user's company.",
+      security: [{ bearerAuth: [] }],
+      responses: {
+        '200': {
+          description: 'Job posting stats retrieved successfully',
+          content: {
+            'application/json': {
+              schema: {
+                type: 'object',
+                properties: {
+                  success: { type: 'boolean', example: true },
+                  message: { type: 'string', example: 'Job posting stats retrieved successfully' },
+                  data: {
+                    type: 'object',
+                    properties: {
+                      total_jobs: { type: 'integer', example: 20 },
+                      active_jobs: { type: 'integer', example: 12 },
+                      closed_jobs: { type: 'integer', example: 5 },
+                      total_applicants: { type: 'integer', example: 150 },
+                    },
+                  },
+                },
+              },
+            },
+          },
+        },
+        '401': { description: 'Unauthorized' },
+        '422': { description: 'Company ID missing from token — user has no company' },
+      },
+    },
+  },
+  '/business/stats/applicants': {
+    get: {
+      tags: ['Business'],
+      summary: 'Get applicant stats',
+      description: "Returns applicant statistics for the authenticated user's company.",
+      security: [{ bearerAuth: [] }],
+      responses: {
+        '200': {
+          description: 'Applicant stats retrieved successfully',
+          content: {
+            'application/json': {
+              schema: {
+                type: 'object',
+                properties: {
+                  success: { type: 'boolean', example: true },
+                  message: { type: 'string', example: 'Applicant stats retrieved successfully' },
+                  data: {
+                    type: 'object',
+                    properties: {
+                      total_applicants: { type: 'integer', example: 150 },
+                      in_interview: { type: 'integer', example: 30 },
+                      hired: { type: 'integer', example: 10 },
+                      rejected: { type: 'integer', example: 40 },
+                    },
+                  },
+                },
+              },
+            },
+          },
+        },
+        '401': { description: 'Unauthorized' },
+        '422': { description: 'Company ID missing from token — user has no company' },
+      },
+    },
+  },
+};
+
 export const companyDocs = {
   ...getTopCompanies,
   ...onboarding,
   ...logo,
   ...admins,
+  ...stats,
 };
