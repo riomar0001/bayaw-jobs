@@ -148,6 +148,31 @@ export class CompanyService {
     return companyRepository.removeAdmin(adminId);
   }
 
+  async getApplicantInfo(applicationId: string, companyId: string) {
+    const data = await companyRepository.findApplicantInfoByApplicationId(applicationId, companyId);
+    if (!data) {
+      throw new NotFoundError('Application not found');
+    }
+
+    const { applicant_profile, ...applicationMeta } = data.application;
+    const { applicantResumes, profile_picture, ...profileRest } = applicant_profile;
+
+    const resume_url =
+      applicantResumes.length > 0
+        ? `${process.env.APP_URL}/api/applicants/resume/${applicant_profile.id}`
+        : null;
+
+    const profile_picture_url = profile_picture
+      ? `${process.env.APP_URL}/api/applicants/profile/picture/${applicant_profile.id}`
+      : null;
+
+    return {
+      application: applicationMeta,
+      applicant: { ...profileRest, profile_picture_url, resume_url },
+      other_applications: data.other_applications,
+    };
+  }
+
   async getDashboard(companyId: string) {
     return companyRepository.getCompanyDashboard(companyId);
   }

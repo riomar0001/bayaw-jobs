@@ -94,6 +94,7 @@ const onboarding = {
                         state: 'CA',
                         country: 'USA',
                         postal_code: '94105',
+                        is_headquarter: true,
                       },
                     ],
                   }),
@@ -169,6 +170,7 @@ const onboarding = {
                             state: { type: 'string' },
                             country: { type: 'string' },
                             postal_code: { type: 'string' },
+                            is_headquarter: { type: 'boolean', example: true },
                           },
                         },
                       },
@@ -505,6 +507,164 @@ const admins = {
   },
 };
 
+const applicantInfo = {
+  '/business/applicants/{id}': {
+    get: {
+      tags: ['Business'],
+      summary: 'Get applicant info by application ID',
+      description:
+        "Returns the full profile of an applicant who applied to one of the company's jobs, including skills, languages, experiences, education, resume link, and other positions they applied for within the same company. The `id` parameter is the `applicant_applied_job` record ID.",
+      security: [{ bearerAuth: [] }],
+      parameters: [
+        {
+          name: 'id',
+          in: 'path',
+          required: true,
+          schema: { type: 'string', format: 'uuid' },
+          description: 'Application ID (applicant_applied_job record ID)',
+        },
+      ],
+      responses: {
+        '200': {
+          description: 'Applicant info retrieved successfully',
+          content: {
+            'application/json': {
+              schema: {
+                type: 'object',
+                properties: {
+                  success: { type: 'boolean', example: true },
+                  message: { type: 'string', example: 'Applicant info retrieved successfully' },
+                  data: {
+                    type: 'object',
+                    properties: {
+                      application: {
+                        type: 'object',
+                        description: 'The specific application the company is viewing',
+                        properties: {
+                          id: { type: 'string', format: 'uuid' },
+                          status: {
+                            type: 'string',
+                            enum: ['NEW', 'SCREENING', 'INTERVIEW', 'OFFER', 'HIRED', 'REJECTED'],
+                            example: 'SCREENING',
+                          },
+                          application_date: { type: 'string', format: 'date-time' },
+                          job: {
+                            type: 'object',
+                            properties: {
+                              id: { type: 'string', format: 'uuid' },
+                              title: { type: 'string', example: 'Senior Engineer' },
+                              department: { type: 'string', example: 'Engineering' },
+                            },
+                          },
+                        },
+                      },
+                      applicant: {
+                        type: 'object',
+                        properties: {
+                          id: { type: 'string', format: 'uuid' },
+                          first_name: { type: 'string', example: 'Jane' },
+                          last_name: { type: 'string', example: 'Doe' },
+                          email: { type: 'string', example: 'jane@example.com' },
+                          desired_position: { type: 'string', example: 'Frontend Developer' },
+                          location: { type: 'string', example: 'Manila, PH' },
+                          gender: { type: 'string', example: 'Female' },
+                          age: { type: 'integer', example: 27 },
+                          profile_picture_url: { type: 'string', nullable: true },
+                          resume_url: { type: 'string', nullable: true },
+                          applicantSkills: {
+                            type: 'array',
+                            items: {
+                              type: 'object',
+                              properties: {
+                                id: { type: 'string', format: 'uuid' },
+                                skill_name: { type: 'string', example: 'React' },
+                              },
+                            },
+                          },
+                          applicantLanguages: {
+                            type: 'array',
+                            items: {
+                              type: 'object',
+                              properties: {
+                                id: { type: 'string', format: 'uuid' },
+                                language_name: { type: 'string', example: 'English' },
+                                proficiency_level: {
+                                  type: 'string',
+                                  enum: ['BASIC', 'CONVERSATIONAL', 'FLUENT', 'NATIVE'],
+                                  example: 'FLUENT',
+                                },
+                              },
+                            },
+                          },
+                          applicantExperiences: {
+                            type: 'array',
+                            items: {
+                              type: 'object',
+                              properties: {
+                                id: { type: 'string', format: 'uuid' },
+                                company_name: { type: 'string', example: 'Acme Corp' },
+                                position: { type: 'string', example: 'Software Engineer' },
+                                start_date: { type: 'string', format: 'date-time' },
+                                end_date: { type: 'string', format: 'date-time', nullable: true },
+                                is_current: { type: 'boolean', example: false },
+                              },
+                            },
+                          },
+                          applicantEducations: {
+                            type: 'array',
+                            items: {
+                              type: 'object',
+                              properties: {
+                                id: { type: 'string', format: 'uuid' },
+                                institution_name: { type: 'string', example: 'University of Manila' },
+                                field_of_study: { type: 'string', example: 'Computer Science' },
+                                start_year: { type: 'integer', example: 2016 },
+                                end_year: { type: 'integer', nullable: true, example: 2020 },
+                              },
+                            },
+                          },
+                        },
+                      },
+                      other_applications: {
+                        type: 'array',
+                        description: 'Other positions this applicant applied for within the same company',
+                        items: {
+                          type: 'object',
+                          properties: {
+                            id: { type: 'string', format: 'uuid' },
+                            status: {
+                              type: 'string',
+                              enum: ['NEW', 'SCREENING', 'INTERVIEW', 'OFFER', 'HIRED', 'REJECTED'],
+                              example: 'NEW',
+                            },
+                            application_date: { type: 'string', format: 'date-time' },
+                            job: {
+                              type: 'object',
+                              properties: {
+                                id: { type: 'string', format: 'uuid' },
+                                title: { type: 'string', example: 'Product Designer' },
+                                department: { type: 'string', example: 'Design' },
+                              },
+                            },
+                          },
+                        },
+                      },
+                    },
+                  },
+                },
+              },
+            },
+          },
+        },
+        '400': { description: 'Application ID is required' },
+        '401': { description: 'Unauthorized' },
+        '404': { description: 'Application not found' },
+        '422': { description: 'Company ID missing from token — user has no company' },
+      },
+    },
+  },
+};
+
 const dashboard = {
   '/business/dashboard': {
     get: {
@@ -718,5 +878,6 @@ export const companyDocs = {
   ...logo,
   ...admins,
   ...dashboard,
+  ...applicantInfo,
   ...stats,
 };

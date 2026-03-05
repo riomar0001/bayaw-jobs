@@ -25,6 +25,7 @@ export interface CreateCompanyData {
     state: string;
     country: string;
     postal_code: string;
+    is_headquarter?: boolean;
   }[];
 }
 
@@ -241,6 +242,76 @@ export class CompanyRepository {
         applicant_count: _count.applicant_applied_job,
       })),
     };
+  }
+
+  async findApplicantInfoByApplicationId(applicationId: string, companyId: string) {
+    const application = await prisma.applicant_applied_job.findFirst({
+      where: { id: applicationId, job: { company_id: companyId } },
+      select: {
+        id: true,
+        status: true,
+        application_date: true,
+        job: { select: { id: true, title: true, department: true } },
+        applicant_profile: {
+          select: {
+            id: true,
+            first_name: true,
+            last_name: true,
+            email: true,
+            desired_position: true,
+            location: true,
+            gender: true,
+            age: true,
+            profile_picture: true,
+            applicantSkills: { select: { id: true, skill_name: true } },
+            applicantLanguages: {
+              select: { id: true, language_name: true, proficiency_level: true },
+            },
+            applicantExperiences: {
+              select: {
+                id: true,
+                company_name: true,
+                position: true,
+                start_date: true,
+                end_date: true,
+                is_current: true,
+              },
+              orderBy: { start_date: 'desc' },
+            },
+            applicantEducations: {
+              select: {
+                id: true,
+                institution_name: true,
+                field_of_study: true,
+                start_year: true,
+                end_year: true,
+              },
+              orderBy: { start_year: 'desc' },
+            },
+            applicantResumes: { select: { id: true, file_name: true } },
+          },
+        },
+      },
+    });
+
+    if (!application) return null;
+
+    const other_applications = await prisma.applicant_applied_job.findMany({
+      where: {
+        applicant_profile_id: application.applicant_profile.id,
+        job: { company_id: companyId },
+        id: { not: applicationId },
+      },
+      select: {
+        id: true,
+        status: true,
+        application_date: true,
+        job: { select: { id: true, title: true, department: true } },
+      },
+      orderBy: { application_date: 'desc' },
+    });
+
+    return { application, other_applications };
   }
 
   async getJobPostingStats(companyId: string) {

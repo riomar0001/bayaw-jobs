@@ -36,6 +36,8 @@ router.get('/top', companyController.getTopCompanies.bind(companyController));
 
 router.get('/dashboard', authenticate, companyController.getDashboard.bind(companyController));
 
+router.get('/applicants/:id', authenticate, companyController.getApplicantInfo.bind(companyController));
+
 router.get('/stats/jobs', authenticate, companyController.getJobPostingStats.bind(companyController));
 router.get('/stats/applicants', authenticate, companyController.getApplicantStats.bind(companyController));
 

@@ -97,6 +97,25 @@ export class CompanyController {
     }
   }
 
+  async getApplicantInfo(req: Request, res: Response, next: NextFunction): Promise<void> {
+    try {
+      const companyId = req.user?.company_id;
+      if (!companyId) {
+        throw new Error('Company ID missing in request');
+      }
+
+      const { id } = req.params;
+      if (!id || typeof id !== 'string') {
+        throw new BadRequestError('Application ID is required');
+      }
+
+      const result = await companyService.getApplicantInfo(id, companyId);
+      successResponse(res, result, 'Applicant info retrieved successfully');
+    } catch (error) {
+      next(error);
+    }
+  }
+
   async getDashboard(req: Request, res: Response, next: NextFunction): Promise<void> {
     try {
       const companyId = req.user?.company_id;

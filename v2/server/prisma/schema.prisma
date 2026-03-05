@@ -335,6 +335,7 @@ model company_social_link {
 model company_location {
   id          String   @id @default(uuid())
   company_id  String
+  is_headquarter Boolean  @default(false)
   address     String
   city        String
   state       String

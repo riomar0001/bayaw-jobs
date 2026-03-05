@@ -18,6 +18,7 @@ const locationSchema = z.object({
   state: z.string().min(1, 'State is required'),
   country: z.string().min(1, 'Country is required'),
   postal_code: z.string().min(1, 'Postal code is required'),
+  is_headquarter: z.boolean().optional().default(false),
 });
 
 export const businessOnboardingSchema = z.object({
