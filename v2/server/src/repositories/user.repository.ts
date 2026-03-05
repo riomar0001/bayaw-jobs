@@ -148,6 +148,47 @@ export class UserRepository {
     });
   }
 
+  async findLoginHistory(userId: string, page: number = 1, limit: number = 10) {
+    const skip = (page - 1) * limit;
+
+    const [sessions, total] = await Promise.all([
+      prisma.refresh_token.findMany({
+        where: { user_id: userId },
+        skip,
+        take: limit,
+        orderBy: { created_at: 'desc' },
+        select: {
+          id: true,
+          ip_address: true,
+          browser: true,
+          os: true,
+          device: true,
+          city: true,
+          region: true,
+          country: true,
+          is_active: true,
+          created_at: true,
+          last_used: true,
+          revoked_at: true,
+          expires_at: true,
+        },
+      }),
+      prisma.refresh_token.count({ where: { user_id: userId } }),
+    ]);
+
+    return {
+      data: sessions,
+      meta: {
+        total,
+        page,
+        limit,
+        totalPages: Math.ceil(total / limit),
+        hasNextPage: page < Math.ceil(total / limit),
+        hasPreviousPage: page > 1,
+      },
+    };
+  }
+
   async findAll(params: { skip?: number; take?: number; status?: user_status }) {
     const { skip = 0, take = 10, status } = params;
 

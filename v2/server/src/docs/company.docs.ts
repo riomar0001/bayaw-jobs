@@ -507,6 +507,377 @@ const admins = {
   },
 };
 
+const locationSchema = {
+  type: 'object',
+  properties: {
+    id: { type: 'string', format: 'uuid' },
+    address: { type: 'string', example: '123 Main St' },
+    city: { type: 'string', example: 'San Francisco' },
+    state: { type: 'string', example: 'CA' },
+    country: { type: 'string', example: 'USA' },
+    postal_code: { type: 'string', example: '94105' },
+    is_headquarter: { type: 'boolean', example: true },
+    created_at: { type: 'string', format: 'date-time' },
+    updated_at: { type: 'string', format: 'date-time' },
+  },
+};
+
+const companyInfo = {
+  '/business/info': {
+    get: {
+      tags: ['Business'],
+      summary: 'Get company info',
+      description: "Returns the authenticated user's full company profile including contact, socials, and locations.",
+      security: [{ bearerAuth: [] }],
+      responses: {
+        '200': {
+          description: 'Company info retrieved successfully',
+          content: {
+            'application/json': {
+              schema: {
+                type: 'object',
+                properties: {
+                  success: { type: 'boolean', example: true },
+                  message: { type: 'string', example: 'Company info retrieved successfully' },
+                  data: {
+                    type: 'object',
+                    properties: {
+                      id: { type: 'string', format: 'uuid' },
+                      company_name: { type: 'string', example: 'Acme Corp' },
+                      industry: { type: 'string', example: 'Technology' },
+                      about: { type: 'string', example: 'We build awesome products.' },
+                      company_size: { type: 'string', example: '11-50' },
+                      foundation_year: { type: 'integer', example: 2010 },
+                      website: { type: 'string', example: 'https://acme.com' },
+                      logo: { type: 'string', nullable: true },
+                      logo_url: { type: 'string', nullable: true },
+                      contact: {
+                        nullable: true,
+                        type: 'object',
+                        properties: {
+                          email: { type: 'string', example: 'hr@acme.com' },
+                          phone: { type: 'string', example: '+1234567890' },
+                        },
+                      },
+                      social_links: {
+                        type: 'object',
+                        properties: {
+                          facebook: { type: 'string', nullable: true, example: 'https://facebook.com/acme' },
+                          linkedin: { type: 'string', nullable: true, example: 'https://linkedin.com/company/acme' },
+                          twitter: { type: 'string', nullable: true, example: null },
+                          instagram: { type: 'string', nullable: true, example: null },
+                        },
+                      },
+                      locations: { type: 'array', items: locationSchema },
+                    },
+                  },
+                },
+              },
+            },
+          },
+        },
+        '401': { description: 'Unauthorized' },
+        '404': { description: 'Company not found' },
+        '422': { description: 'Company ID missing from token' },
+      },
+    },
+    patch: {
+      tags: ['Business'],
+      summary: 'Update company information',
+      description: 'Update basic company details. All fields are optional — only provided fields are updated.',
+      security: [{ bearerAuth: [] }],
+      requestBody: {
+        required: true,
+        content: {
+          'application/json': {
+            schema: {
+              type: 'object',
+              properties: {
+                company_name: { type: 'string', example: 'Acme Corp' },
+                industry: { type: 'string', example: 'Technology' },
+                about: { type: 'string', example: 'We build awesome products.' },
+                company_size: { type: 'string', example: '51-200' },
+                foundation_year: { type: 'integer', example: 2010 },
+                website: { type: 'string', example: 'https://acme.com' },
+              },
+            },
+          },
+        },
+      },
+      responses: {
+        '200': {
+          description: 'Company info updated successfully',
+          content: {
+            'application/json': {
+              schema: {
+                type: 'object',
+                properties: {
+                  success: { type: 'boolean', example: true },
+                  message: { type: 'string', example: 'Company info updated successfully' },
+                  data: {
+                    type: 'object',
+                    properties: {
+                      id: { type: 'string', format: 'uuid' },
+                      company_name: { type: 'string' },
+                      industry: { type: 'string' },
+                      about: { type: 'string' },
+                      company_size: { type: 'string' },
+                      foundation_year: { type: 'integer' },
+                      website: { type: 'string' },
+                      updated_at: { type: 'string', format: 'date-time' },
+                    },
+                  },
+                },
+              },
+            },
+          },
+        },
+        '400': { description: 'Validation error — at least one field required' },
+        '401': { description: 'Unauthorized' },
+        '404': { description: 'Company not found' },
+        '422': { description: 'Company ID missing from token' },
+      },
+    },
+  },
+};
+
+const socials = {
+  '/business/socials': {
+    patch: {
+      tags: ['Business'],
+      summary: 'Update social links',
+      description: 'Upsert social links for the company. Passing `null` for a platform removes that link. Only provided fields are processed.',
+      security: [{ bearerAuth: [] }],
+      requestBody: {
+        required: true,
+        content: {
+          'application/json': {
+            schema: {
+              type: 'object',
+              properties: {
+                facebook: { type: 'string', nullable: true, example: 'https://facebook.com/acme' },
+                linkedin: { type: 'string', nullable: true, example: 'https://linkedin.com/company/acme' },
+                twitter: { type: 'string', nullable: true, example: null },
+                instagram: { type: 'string', nullable: true, example: null },
+              },
+            },
+          },
+        },
+      },
+      responses: {
+        '200': {
+          description: 'Social links updated successfully',
+          content: {
+            'application/json': {
+              schema: {
+                type: 'object',
+                properties: {
+                  success: { type: 'boolean', example: true },
+                  message: { type: 'string', example: 'Social links updated successfully' },
+                  data: {
+                    type: 'array',
+                    items: {
+                      type: 'object',
+                      properties: {
+                        id: { type: 'string', format: 'uuid' },
+                        platform: { type: 'string', enum: ['FACEBOOK', 'TWITTER', 'LINKEDIN', 'INSTAGRAM'] },
+                        url: { type: 'string' },
+                      },
+                    },
+                  },
+                },
+              },
+            },
+          },
+        },
+        '400': { description: 'Validation error' },
+        '401': { description: 'Unauthorized' },
+        '404': { description: 'Company not found' },
+        '422': { description: 'Company ID missing from token' },
+      },
+    },
+  },
+};
+
+const contact = {
+  '/business/contact': {
+    patch: {
+      tags: ['Business'],
+      summary: 'Update contact info',
+      description: 'Update company email and/or phone. At least one field is required.',
+      security: [{ bearerAuth: [] }],
+      requestBody: {
+        required: true,
+        content: {
+          'application/json': {
+            schema: {
+              type: 'object',
+              properties: {
+                email: { type: 'string', format: 'email', example: 'hr@acme.com' },
+                phone: { type: 'string', example: '+1234567890' },
+              },
+            },
+          },
+        },
+      },
+      responses: {
+        '200': {
+          description: 'Contact info updated successfully',
+          content: {
+            'application/json': {
+              schema: {
+                type: 'object',
+                properties: {
+                  success: { type: 'boolean', example: true },
+                  message: { type: 'string', example: 'Contact info updated successfully' },
+                  data: {
+                    type: 'object',
+                    properties: {
+                      id: { type: 'string', format: 'uuid' },
+                      email: { type: 'string', example: 'hr@acme.com' },
+                      phone: { type: 'string', example: '+1234567890' },
+                    },
+                  },
+                },
+              },
+            },
+          },
+        },
+        '400': { description: 'Validation error — at least one field required' },
+        '401': { description: 'Unauthorized' },
+        '404': { description: 'Company not found' },
+        '422': { description: 'Company ID missing from token' },
+      },
+    },
+  },
+};
+
+const locations = {
+  '/business/locations': {
+    post: {
+      tags: ['Business'],
+      summary: 'Add a company location',
+      security: [{ bearerAuth: [] }],
+      requestBody: {
+        required: true,
+        content: {
+          'application/json': {
+            schema: {
+              type: 'object',
+              required: ['address', 'city', 'state', 'country', 'postal_code'],
+              properties: {
+                address: { type: 'string', example: '123 Main St' },
+                city: { type: 'string', example: 'San Francisco' },
+                state: { type: 'string', example: 'CA' },
+                country: { type: 'string', example: 'USA' },
+                postal_code: { type: 'string', example: '94105' },
+                is_headquarter: { type: 'boolean', default: false, example: false },
+              },
+            },
+          },
+        },
+      },
+      responses: {
+        '201': {
+          description: 'Location added successfully',
+          content: {
+            'application/json': {
+              schema: {
+                type: 'object',
+                properties: {
+                  success: { type: 'boolean', example: true },
+                  message: { type: 'string', example: 'Location added successfully' },
+                  data: locationSchema,
+                },
+              },
+            },
+          },
+        },
+        '400': { description: 'Validation error' },
+        '401': { description: 'Unauthorized' },
+        '404': { description: 'Company not found' },
+        '422': { description: 'Company ID missing from token' },
+      },
+    },
+  },
+  '/business/locations/{id}': {
+    patch: {
+      tags: ['Business'],
+      summary: 'Update a company location',
+      security: [{ bearerAuth: [] }],
+      parameters: [
+        { name: 'id', in: 'path', required: true, schema: { type: 'string', format: 'uuid' }, description: 'Location ID' },
+      ],
+      requestBody: {
+        required: true,
+        content: {
+          'application/json': {
+            schema: {
+              type: 'object',
+              properties: {
+                address: { type: 'string', example: '456 New St' },
+                city: { type: 'string', example: 'Los Angeles' },
+                state: { type: 'string', example: 'CA' },
+                country: { type: 'string', example: 'USA' },
+                postal_code: { type: 'string', example: '90001' },
+                is_headquarter: { type: 'boolean', example: true },
+              },
+            },
+          },
+        },
+      },
+      responses: {
+        '200': {
+          description: 'Location updated successfully',
+          content: {
+            'application/json': {
+              schema: {
+                type: 'object',
+                properties: {
+                  success: { type: 'boolean', example: true },
+                  message: { type: 'string', example: 'Location updated successfully' },
+                  data: locationSchema,
+                },
+              },
+            },
+          },
+        },
+        '401': { description: 'Unauthorized' },
+        '404': { description: 'Location not found' },
+        '422': { description: 'Company ID missing from token' },
+      },
+    },
+    delete: {
+      tags: ['Business'],
+      summary: 'Delete a company location',
+      security: [{ bearerAuth: [] }],
+      parameters: [
+        { name: 'id', in: 'path', required: true, schema: { type: 'string', format: 'uuid' }, description: 'Location ID' },
+      ],
+      responses: {
+        '200': {
+          description: 'Location deleted successfully',
+          content: {
+            'application/json': {
+              schema: {
+                type: 'object',
+                properties: {
+                  success: { type: 'boolean', example: true },
+                  message: { type: 'string', example: 'Location deleted successfully' },
+                  data: { type: 'null' },
+                },
+              },
+            },
+          },
+        },
+        '401': { description: 'Unauthorized' },
+        '404': { description: 'Location not found' },
+        '422': { description: 'Company ID missing from token' },
+      },
+    },
+  },
+};
+
 const applicantInfo = {
   '/business/applicants/{id}': {
     get: {
@@ -877,6 +1248,10 @@ export const companyDocs = {
   ...onboarding,
   ...logo,
   ...admins,
+  ...companyInfo,
+  ...socials,
+  ...contact,
+  ...locations,
   ...dashboard,
   ...applicantInfo,
   ...stats,

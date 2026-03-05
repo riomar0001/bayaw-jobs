@@ -54,4 +54,6 @@ router.post('/refresh', authController.refresh.bind(authController));
 router.post('/logout', authController.logout.bind(authController));
 router.post('/logout-all', authenticate, authController.logoutAll.bind(authController));
 
+router.get('/login-history', authenticate, authController.getLoginHistory.bind(authController));
+
 export default router;

@@ -1,7 +1,15 @@
 import { companyRepository } from '@/repositories/company.repository';
 import { userRepository } from '@/repositories/user.repository';
 import { AuthorizationError, ConflictError, NotFoundError } from '@/utils/errors.util';
-import { AddAdminInput, BusinessOnboardingInput } from '@/validations/company.validation';
+import {
+  AddAdminInput,
+  AddLocationInput,
+  BusinessOnboardingInput,
+  UpdateCompanyInfoInput,
+  UpdateContactInput,
+  UpdateLocationInput,
+  UpdateSocialLinksInput,
+} from '@/validations/company.validation';
 import { storageService } from '@/services/storage.service';
 import logger from '@/configs/logger.config';
 
@@ -146,6 +154,90 @@ export class CompanyService {
     }
 
     return companyRepository.removeAdmin(adminId);
+  }
+
+  async getCompanyInfo(companyId: string) {
+    const company = await companyRepository.findById(companyId);
+    if (!company) {
+      throw new NotFoundError('Company');
+    }
+
+    const { companyContacts, companySocialLinks, companyLocations, companyAdmins, logo, ...info } = company;
+
+    const PLATFORM_MAP: Record<string, string | null> = {
+      FACEBOOK: null, LINKEDIN: null, TWITTER: null, INSTAGRAM: null,
+    };
+    for (const link of companySocialLinks) {
+      PLATFORM_MAP[link.platform] = link.url;
+    }
+
+    const contact = companyContacts[0] ?? null;
+    const logo_url = logo ? `${process.env.APP_URL}/api/business/logo/${companyId}` : null;
+
+    return {
+      ...info,
+      logo_url,
+      contact: contact ? { email: contact.email, phone: contact.phone } : null,
+      social_links: {
+        facebook: PLATFORM_MAP['FACEBOOK'],
+        linkedin: PLATFORM_MAP['LINKEDIN'],
+        twitter: PLATFORM_MAP['TWITTER'],
+        instagram: PLATFORM_MAP['INSTAGRAM'],
+      },
+      locations: companyLocations,
+    };
+  }
+
+  async updateCompanyInfo(companyId: string, data: UpdateCompanyInfoInput) {
+    const company = await companyRepository.findById(companyId);
+    if (!company) throw new NotFoundError('Company');
+    return companyRepository.updateCompanyInfo(companyId, data);
+  }
+
+  async updateSocialLinks(companyId: string, data: UpdateSocialLinksInput) {
+    const company = await companyRepository.findById(companyId);
+    if (!company) throw new NotFoundError('Company');
+
+    const PLATFORM_KEY_MAP = {
+      facebook: 'FACEBOOK',
+      linkedin: 'LINKEDIN',
+      twitter: 'TWITTER',
+      instagram: 'INSTAGRAM',
+    } as const;
+
+    const links = (Object.entries(data) as [keyof typeof PLATFORM_KEY_MAP, string | null | undefined][])
+      .filter(([, url]) => url !== undefined)
+      .map(([key, url]) => ({ platform: PLATFORM_KEY_MAP[key], url: url ?? null }));
+
+    return companyRepository.upsertSocialLinks(companyId, links);
+  }
+
+  async updateContact(companyId: string, data: UpdateContactInput) {
+    const company = await companyRepository.findById(companyId);
+    if (!company) throw new NotFoundError('Company');
+    return companyRepository.updateContact(companyId, data);
+  }
+
+  async addLocation(companyId: string, data: AddLocationInput) {
+    const company = await companyRepository.findById(companyId);
+    if (!company) throw new NotFoundError('Company');
+    return companyRepository.addLocation(companyId, data);
+  }
+
+  async updateLocation(companyId: string, locationId: string, data: UpdateLocationInput) {
+    const company = await companyRepository.findById(companyId);
+    if (!company) throw new NotFoundError('Company');
+    const location = await companyRepository.updateLocation(locationId, companyId, data);
+    if (!location) throw new NotFoundError('Location');
+    return location;
+  }
+
+  async deleteLocation(companyId: string, locationId: string) {
+    const company = await companyRepository.findById(companyId);
+    if (!company) throw new NotFoundError('Company');
+    const deleted = await companyRepository.deleteLocation(locationId, companyId);
+    if (!deleted) throw new NotFoundError('Location');
+    return deleted;
   }
 
   async getApplicantInfo(applicationId: string, companyId: string) {

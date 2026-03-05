@@ -3,7 +3,17 @@ import multer from 'multer';
 import { companyController } from '@/controllers/company.controller';
 import { validate } from '@/middlewares/validation.middleware';
 import { authenticate } from '@/middlewares/auth.middleware';
-import { addAdminSchema, businessOnboardingSchema, deleteAdminSchema } from '@/validations/company.validation';
+import {
+  addAdminSchema,
+  addLocationSchema,
+  businessOnboardingSchema,
+  deleteAdminSchema,
+  deleteLocationSchema,
+  updateCompanyInfoSchema,
+  updateContactSchema,
+  updateLocationSchema,
+  updateSocialLinksSchema,
+} from '@/validations/company.validation';
 import { BadRequestError } from '@/utils/errors.util';
 
 const router = Router();
@@ -33,6 +43,15 @@ function parseOnboardingData(req: Request, _res: Response, next: NextFunction): 
 }
 
 router.get('/top', companyController.getTopCompanies.bind(companyController));
+
+router.get('/info', authenticate, companyController.getCompanyInfo.bind(companyController));
+router.patch('/info', authenticate, validate(updateCompanyInfoSchema), companyController.updateCompanyInfo.bind(companyController));
+router.patch('/socials', authenticate, validate(updateSocialLinksSchema), companyController.updateSocialLinks.bind(companyController));
+router.patch('/contact', authenticate, validate(updateContactSchema), companyController.updateContact.bind(companyController));
+
+router.post('/locations', authenticate, validate(addLocationSchema), companyController.addLocation.bind(companyController));
+router.patch('/locations/:id', authenticate, validate(updateLocationSchema), companyController.updateLocation.bind(companyController));
+router.delete('/locations/:id', authenticate, validate(deleteLocationSchema), companyController.deleteLocation.bind(companyController));
 
 router.get('/dashboard', authenticate, companyController.getDashboard.bind(companyController));
 

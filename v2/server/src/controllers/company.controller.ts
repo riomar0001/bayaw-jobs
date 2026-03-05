@@ -97,6 +97,83 @@ export class CompanyController {
     }
   }
 
+  async getCompanyInfo(req: Request, res: Response, next: NextFunction): Promise<void> {
+    try {
+      const companyId = req.user?.company_id;
+      if (!companyId) throw new Error('Company ID missing in request');
+      const result = await companyService.getCompanyInfo(companyId);
+      successResponse(res, result, 'Company info retrieved successfully');
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  async updateCompanyInfo(req: Request, res: Response, next: NextFunction): Promise<void> {
+    try {
+      const companyId = req.user?.company_id;
+      if (!companyId) throw new Error('Company ID missing in request');
+      const result = await companyService.updateCompanyInfo(companyId, req.body);
+      successResponse(res, result, 'Company info updated successfully');
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  async updateSocialLinks(req: Request, res: Response, next: NextFunction): Promise<void> {
+    try {
+      const companyId = req.user?.company_id;
+      if (!companyId) throw new Error('Company ID missing in request');
+      const result = await companyService.updateSocialLinks(companyId, req.body);
+      successResponse(res, result, 'Social links updated successfully');
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  async updateContact(req: Request, res: Response, next: NextFunction): Promise<void> {
+    try {
+      const companyId = req.user?.company_id;
+      if (!companyId) throw new Error('Company ID missing in request');
+      const result = await companyService.updateContact(companyId, req.body);
+      successResponse(res, result, 'Contact info updated successfully');
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  async addLocation(req: Request, res: Response, next: NextFunction): Promise<void> {
+    try {
+      const companyId = req.user?.company_id;
+      if (!companyId) throw new Error('Company ID missing in request');
+      const result = await companyService.addLocation(companyId, req.body);
+      createdResponse(res, result, 'Location added successfully');
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  async updateLocation(req: Request, res: Response, next: NextFunction): Promise<void> {
+    try {
+      const companyId = req.user?.company_id;
+      if (!companyId) throw new Error('Company ID missing in request');
+      const result = await companyService.updateLocation(companyId, req.params.id, req.body);
+      successResponse(res, result, 'Location updated successfully');
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  async deleteLocation(req: Request, res: Response, next: NextFunction): Promise<void> {
+    try {
+      const companyId = req.user?.company_id;
+      if (!companyId) throw new Error('Company ID missing in request');
+      await companyService.deleteLocation(companyId, req.params.id);
+      successResponse(res, null, 'Location deleted successfully');
+    } catch (error) {
+      next(error);
+    }
+  }
+
   async getApplicantInfo(req: Request, res: Response, next: NextFunction): Promise<void> {
     try {
       const companyId = req.user?.company_id;

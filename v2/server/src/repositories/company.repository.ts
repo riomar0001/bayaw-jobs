@@ -208,14 +208,17 @@ export class CompanyRepository {
       weekStart.setDate(startOfThisWeek.getDate() - (7 - i) * 7);
       return { week_start: new Date(weekStart), count: 0 };
     });
+    
 
     for (const app of trendApplications) {
       const appDate = new Date(app.application_date);
       for (let i = weeks.length - 1; i >= 0; i--) {
-        const weekEnd = new Date(weeks[i].week_start);
-        weekEnd.setDate(weeks[i].week_start.getDate() + 7);
-        if (appDate >= weeks[i].week_start && appDate < weekEnd) {
-          weeks[i].count++;
+        const week = weeks[i];
+        if (!week) continue;
+        const weekEnd = new Date(week.week_start);
+        weekEnd.setDate(week.week_start.getDate() + 7);
+        if (appDate >= week.week_start && appDate < weekEnd) {
+          week.count++;
           break;
         }
       }
@@ -242,6 +245,70 @@ export class CompanyRepository {
         applicant_count: _count.applicant_applied_job,
       })),
     };
+  }
+
+  async updateCompanyInfo(
+    companyId: string,
+    data: Partial<Pick<CreateCompanyData, 'company_name' | 'industry' | 'about' | 'company_size' | 'foundation_year' | 'website'>>
+  ) {
+    return prisma.company_information.update({
+      where: { id: companyId },
+      data,
+      select: {
+        id: true,
+        company_name: true,
+        industry: true,
+        about: true,
+        company_size: true,
+        foundation_year: true,
+        website: true,
+        logo: true,
+        updated_at: true,
+      },
+    });
+  }
+
+  async upsertSocialLinks(companyId: string, links: { platform: string; url: string | null }[]) {
+    const ops = links.flatMap(({ platform, url }) => {
+      const del = prisma.company_social_link.deleteMany({
+        where: { company_id: companyId, platform: platform as 'FACEBOOK' | 'TWITTER' | 'LINKEDIN' | 'INSTAGRAM' },
+      });
+      if (!url) return [del];
+      const create = prisma.company_social_link.create({
+        data: { company_id: companyId, platform: platform as 'FACEBOOK' | 'TWITTER' | 'LINKEDIN' | 'INSTAGRAM', url },
+      });
+      return [del, create];
+    });
+    await prisma.$transaction(ops);
+    return prisma.company_social_link.findMany({ where: { company_id: companyId } });
+  }
+
+  async updateContact(companyId: string, data: { email?: string; phone?: string }) {
+    await prisma.company_contact.updateMany({ where: { company_id: companyId }, data });
+    return prisma.company_contact.findFirst({ where: { company_id: companyId } });
+  }
+
+  async addLocation(
+    companyId: string,
+    data: { address: string; city: string; state: string; country: string; postal_code: string; is_headquarter?: boolean }
+  ) {
+    return prisma.company_location.create({ data: { company_id: companyId, ...data } });
+  }
+
+  async updateLocation(
+    locationId: string,
+    companyId: string,
+    data: { address?: string; city?: string; state?: string; country?: string; postal_code?: string; is_headquarter?: boolean }
+  ) {
+    const existing = await prisma.company_location.findFirst({ where: { id: locationId, company_id: companyId } });
+    if (!existing) return null;
+    return prisma.company_location.update({ where: { id: locationId }, data });
+  }
+
+  async deleteLocation(locationId: string, companyId: string) {
+    const existing = await prisma.company_location.findFirst({ where: { id: locationId, company_id: companyId } });
+    if (!existing) return null;
+    return prisma.company_location.delete({ where: { id: locationId } });
   }
 
   async findApplicantInfoByApplicationId(applicationId: string, companyId: string) {

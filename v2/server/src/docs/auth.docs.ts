@@ -1027,6 +1027,88 @@ const updatePassword = {
   },
 };
 
+const loginHistory = {
+  '/auth/login-history': {
+    get: {
+      tags: ['Authentication'],
+      summary: 'Get login history',
+      description:
+        'Returns a paginated list of the authenticated user\'s login sessions (refresh tokens), ordered by most recent. Each entry includes device info, location, and session status.',
+      security: [{ bearerAuth: [] }],
+      parameters: [
+        {
+          name: 'page',
+          in: 'query',
+          required: false,
+          schema: { type: 'integer', default: 1, minimum: 1 },
+          description: 'Page number',
+        },
+        {
+          name: 'limit',
+          in: 'query',
+          required: false,
+          schema: { type: 'integer', default: 10, minimum: 1, maximum: 50 },
+          description: 'Items per page (max 50)',
+        },
+      ],
+      responses: {
+        '200': {
+          description: 'Login history retrieved successfully',
+          content: {
+            'application/json': {
+              schema: {
+                type: 'object',
+                properties: {
+                  success: { type: 'boolean', example: true },
+                  message: { type: 'string', example: 'Login history retrieved successfully' },
+                  data: {
+                    type: 'object',
+                    properties: {
+                      data: {
+                        type: 'array',
+                        items: {
+                          type: 'object',
+                          properties: {
+                            id: { type: 'string', format: 'uuid' },
+                            ip_address: { type: 'string', nullable: true, example: '192.168.1.1' },
+                            browser: { type: 'string', nullable: true, example: 'Chrome' },
+                            os: { type: 'string', nullable: true, example: 'Windows' },
+                            device: { type: 'string', nullable: true, example: 'Desktop' },
+                            city: { type: 'string', nullable: true, example: 'Manila' },
+                            region: { type: 'string', nullable: true, example: 'NCR' },
+                            country: { type: 'string', nullable: true, example: 'Philippines' },
+                            is_active: { type: 'boolean', example: true },
+                            created_at: { type: 'string', format: 'date-time', description: 'Login time' },
+                            last_used: { type: 'string', format: 'date-time', nullable: true },
+                            revoked_at: { type: 'string', format: 'date-time', nullable: true },
+                            expires_at: { type: 'string', format: 'date-time' },
+                          },
+                        },
+                      },
+                      meta: {
+                        type: 'object',
+                        properties: {
+                          total: { type: 'integer', example: 42 },
+                          page: { type: 'integer', example: 1 },
+                          limit: { type: 'integer', example: 10 },
+                          totalPages: { type: 'integer', example: 5 },
+                          hasNextPage: { type: 'boolean', example: true },
+                          hasPreviousPage: { type: 'boolean', example: false },
+                        },
+                      },
+                    },
+                  },
+                },
+              },
+            },
+          },
+        },
+        '401': { description: 'Unauthorized' },
+      },
+    },
+  },
+};
+
 export const authDocs = {
   ...register,
   ...verifyEmail,
@@ -1038,4 +1120,5 @@ export const authDocs = {
   ...forgotPassword,
   ...resetPassword,
   ...updatePassword,
+  ...loginHistory,
 };

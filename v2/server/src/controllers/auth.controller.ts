@@ -209,6 +209,24 @@ export class AuthController {
       next(error);
     }
   }
+
+  async getLoginHistory(req: Request, res: Response, next: NextFunction): Promise<void> {
+    try {
+      const userId = req.user?.user_id;
+      if (!userId) throw new Error('User ID missing in request');
+
+      const parsedPage = parseInt(req.query.page as string, 10);
+      const page = Math.max(Number.isNaN(parsedPage) ? 1 : parsedPage, 1);
+
+      const parsedLimit = parseInt(req.query.limit as string, 10);
+      const limit = Math.min(Math.max(Number.isNaN(parsedLimit) ? 10 : parsedLimit, 1), 50);
+
+      const result = await authService.getLoginHistory(userId, page, limit);
+      successResponse(res, result, 'Login history retrieved successfully');
+    } catch (error) {
+      next(error);
+    }
+  }
 }
 
 export const authController = new AuthController();

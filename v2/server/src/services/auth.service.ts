@@ -434,6 +434,10 @@ export class AuthService {
       created_at: user.created_at,
     };
   }
+
+  async getLoginHistory(userId: string, page: number, limit: number) {
+    return userRepository.findLoginHistory(userId, page, limit);
+  }
 }
 
 export const authService = new AuthService();
