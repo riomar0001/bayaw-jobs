@@ -206,6 +206,24 @@ export class ApplicantRepository {
     });
   }
 
+  async findApplicationByProfileAndJob(profileId: string, jobId: string) {
+    return prisma.applicant_applied_job.findFirst({
+      where: { applicant_profile_id: profileId, jobId },
+    });
+  }
+
+  async createApplication(profileId: string, jobId: string) {
+    return prisma.applicant_applied_job.create({
+      data: { applicant_profile_id: profileId, jobId },
+      select: {
+        id: true,
+        status: true,
+        application_date: true,
+        job: { select: { id: true, title: true, department: true, company_id: true } },
+      },
+    });
+  }
+
   async findAllApplicantsByCompany(companyId: string, page: number = 1, limit: number = 10) {
     const skip = (page - 1) * limit;
 

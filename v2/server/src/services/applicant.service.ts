@@ -1,4 +1,5 @@
 import { applicantRepository } from '@/repositories/applicant.repository';
+import { jobRepository } from '@/repositories/job.repository';
 import { userRepository } from '@/repositories/user.repository';
 import { ConflictError, NotFoundError, BadRequestError } from '@/utils/errors.util';
 import {
@@ -22,6 +23,29 @@ interface ResumeFile {
 }
 
 export class ApplicantService {
+  async applyToJob(userId: string, jobId: string) {
+    const profile = await applicantRepository.findProfileByUserId(userId);
+    if (!profile) {
+      throw new NotFoundError('Applicant profile not found. Please complete onboarding first.');
+    }
+
+    const job = await jobRepository.findById(jobId);
+    if (!job) {
+      throw new NotFoundError('Job not found');
+    }
+
+    if (job.status !== 'OPEN') {
+      throw new BadRequestError('This job is no longer accepting applications');
+    }
+
+    const existing = await applicantRepository.findApplicationByProfileAndJob(profile.id, jobId);
+    if (existing) {
+      throw new ConflictError('You have already applied to this job');
+    }
+
+    return applicantRepository.createApplication(profile.id, jobId);
+  }
+
   async getCompanyApplicants(companyId: string, page: number = 1, limit: number = 10) {
     return applicantRepository.findAllApplicantsByCompany(companyId, page, limit);
   }

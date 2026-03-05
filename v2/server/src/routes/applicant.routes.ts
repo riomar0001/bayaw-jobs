@@ -148,6 +148,8 @@ router.delete(
   applicantController.deleteExperience.bind(applicantController)
 );
 
+router.post('/jobs/:jobId/apply', authenticate, applicantController.applyToJob.bind(applicantController));
+
 router.get('/resume/:id', applicantController.getResume.bind(applicantController));
 
 router.patch(

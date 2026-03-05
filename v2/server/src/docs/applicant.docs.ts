@@ -1889,6 +1889,64 @@ const updateProfilePicture = {
   },
 };
 
+const applyJob = {
+  '/applicants/jobs/{jobId}/apply': {
+    post: {
+      tags: ['Applicants'],
+      summary: 'Apply to a job',
+      description:
+        'Submit an application for a job posting. The applicant must have completed onboarding. Duplicate applications to the same job are rejected. Only jobs with status `OPEN` accept applications.',
+      security: [{ bearerAuth: [] }],
+      parameters: [
+        {
+          name: 'jobId',
+          in: 'path',
+          required: true,
+          schema: { type: 'string', format: 'uuid' },
+          description: 'ID of the job to apply for',
+        },
+      ],
+      responses: {
+        '201': {
+          description: 'Application submitted successfully',
+          content: {
+            'application/json': {
+              schema: {
+                type: 'object',
+                properties: {
+                  success: { type: 'boolean', example: true },
+                  message: { type: 'string', example: 'Application submitted successfully' },
+                  data: {
+                    type: 'object',
+                    properties: {
+                      id: { type: 'string', format: 'uuid' },
+                      status: { type: 'string', enum: ['NEW'], example: 'NEW' },
+                      application_date: { type: 'string', format: 'date-time' },
+                      job: {
+                        type: 'object',
+                        properties: {
+                          id: { type: 'string', format: 'uuid' },
+                          title: { type: 'string', example: 'Senior Engineer' },
+                          department: { type: 'string', example: 'Engineering' },
+                          company_id: { type: 'string', format: 'uuid' },
+                        },
+                      },
+                    },
+                  },
+                },
+              },
+            },
+          },
+        },
+        '400': { description: 'Job is no longer accepting applications (not OPEN)' },
+        '401': { description: 'Unauthorized' },
+        '404': { description: 'Job not found or applicant profile not found (onboarding not completed)' },
+        '409': { description: 'You have already applied to this job' },
+      },
+    },
+  },
+};
+
 // ─── Exports ──────────────────────────────────────────────────────────────────
 
 export const applicantDocs = {
@@ -1904,4 +1962,5 @@ export const applicantDocs = {
   ...getResume,
   ...updateResume,
   ...updateProfilePicture,
+  ...applyJob,
 };

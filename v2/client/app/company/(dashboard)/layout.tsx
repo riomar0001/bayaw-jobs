@@ -19,7 +19,7 @@ export default function DashboardLayout({
 }: {
   children: React.ReactNode;
 }) {
-  const [isAuthenticated] = React.useState(false);
+  const [isAuthenticated] = React.useState(true);
 
   return (
     <>

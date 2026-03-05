@@ -314,6 +314,21 @@ export class ApplicantController {
       next(error);
     }
   }
+
+  async applyToJob(req: Request, res: Response, next: NextFunction): Promise<void> {
+    try {
+      const userId = req.user?.user_id;
+      if (!userId) throw new Error('User ID missing in request');
+
+      const { jobId } = req.params;
+      if (!jobId) throw new BadRequestError('Job ID is required');
+
+      const result = await applicantService.applyToJob(userId, jobId);
+      createdResponse(res, result, 'Application submitted successfully');
+    } catch (error) {
+      next(error);
+    }
+  }
 }
 
 export const applicantController = new ApplicantController();
