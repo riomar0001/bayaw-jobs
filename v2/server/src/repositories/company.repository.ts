@@ -103,6 +103,24 @@ export class CompanyRepository {
     return prisma.company_admin.delete({ where: { id: adminId } });
   }
 
+  async findTopCompanies(limit: number = 6) {
+    return prisma.company_information.findMany({
+      take: limit,
+      orderBy: {
+        jobs: { _count: 'desc' },
+      },
+      select: {
+        id: true,
+        company_name: true,
+        industry: true,
+        company_size: true,
+        logo: true,
+        website: true,
+        _count: { select: { jobs: { where: { status: 'OPEN' } } } },
+      },
+    });
+  }
+
   async createCompany(data: CreateCompanyData) {
     return prisma.company_information.create({
       data: {

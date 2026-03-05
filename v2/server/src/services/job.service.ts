@@ -15,6 +15,10 @@ export class JobService {
     return job;
   }
 
+  async getTopJobs() {
+    return jobRepository.findTopJobs(8);
+  }
+
   async getAllJobs(page: number = 1, limit: number = 10) {
     return jobRepository.findAll(page, limit);
   }

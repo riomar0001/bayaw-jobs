@@ -4,6 +4,15 @@ import { createdResponse, successResponse } from '@/utils/apiResponse.util';
 import { BadRequestError } from '@/utils/errors.util';
 
 export class CompanyController {
+  async getTopCompanies(_req: Request, res: Response, next: NextFunction): Promise<void> {
+    try {
+      const result = await companyService.getTopCompanies();
+      successResponse(res, result, 'Top companies retrieved successfully');
+    } catch (error) {
+      next(error);
+    }
+  }
+
   async onboard(req: Request, res: Response, next: NextFunction): Promise<void> {
     try {
       const userId = req.user?.user_id;

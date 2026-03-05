@@ -1,9 +1,19 @@
 import { Request, Response, NextFunction } from 'express';
 import { jobService } from '@/services/job.service';
+import { applicantService } from '@/services/applicant.service';
 import { successResponse, createdResponse } from '@/utils/apiResponse.util';
 import { Config } from '@/constants/config.constant';
 
 export class JobController {
+  async getTopJobs(_req: Request, res: Response, next: NextFunction): Promise<void> {
+    try {
+      const result = await jobService.getTopJobs();
+      successResponse(res, result, 'Top jobs retrieved successfully');
+    } catch (error) {
+      next(error);
+    }
+  }
+
   async getJobById(req: Request<{ id: string }>, res: Response, next: NextFunction): Promise<void> {
     try {
       const id = req.params.id;
@@ -72,6 +82,30 @@ export class JobController {
       }
       const result = await jobService.getCompanyJobWithApplicants(req.params.id, companyId);
       successResponse(res, result, 'Job retrieved successfully');
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  async getCompanyApplicants(req: Request, res: Response, next: NextFunction): Promise<void> {
+    try {
+      const companyId = req.user?.company_id;
+      if (!companyId) throw new Error('Company ID is required');
+
+      const parsedPage = parseInt(req.query.page as string, 10);
+      const page = Math.max(
+        Number.isNaN(parsedPage) ? Config.PAGINATION.DEFAULT_PAGE : parsedPage,
+        1
+      );
+
+      const parsedLimit = parseInt(req.query.limit as string, 10);
+      const limit = Math.min(
+        Math.max(Number.isNaN(parsedLimit) ? Config.PAGINATION.DEFAULT_LIMIT : parsedLimit, 1),
+        Config.PAGINATION.MAX_LIMIT
+      );
+
+      const result = await applicantService.getCompanyApplicants(companyId, page, limit);
+      successResponse(res, result, 'Company applicants retrieved successfully');
     } catch (error) {
       next(error);
     }

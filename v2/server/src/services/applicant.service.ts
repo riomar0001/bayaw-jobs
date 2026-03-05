@@ -22,6 +22,10 @@ interface ResumeFile {
 }
 
 export class ApplicantService {
+  async getCompanyApplicants(companyId: string, page: number = 1, limit: number = 10) {
+    return applicantRepository.findAllApplicantsByCompany(companyId, page, limit);
+  }
+
   async onboard(userId: string, data: OnboardingInput, resumeFile: ResumeFile) {
     if (!resumeFile) {
       throw new BadRequestError('Resume is required');

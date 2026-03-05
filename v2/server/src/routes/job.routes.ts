@@ -13,8 +13,10 @@ import {
 
 const router = Router();
 
+router.get('/top', jobController.getTopJobs.bind(jobController));
 router.get('/', validate(getAllJobsSchema), jobController.getAllJobs.bind(jobController));
 router.get('/company', authenticate, validate(getAllJobsSchema), jobController.getCompanyJobs.bind(jobController));
+router.get('/company/applicants', authenticate, validate(getAllJobsSchema), jobController.getCompanyApplicants.bind(jobController));
 router.get('/company/:id', authenticate, validate(getJobByIdSchema), jobController.getCompanyJobById.bind(jobController));
 router.get('/:id', validate(getJobByIdSchema), jobController.getJobById.bind(jobController));
 router.post('/create', authenticate, validate(createJobSchema), jobController.createJob.bind(jobController));

@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { Plus, Briefcase, Users, Eye, TrendingUp } from "lucide-react";
+import { Plus, Briefcase, Users, XCircle, TrendingUp } from "lucide-react";
 import { PageHeader } from "@/components/company/dashboard/layout/page-header";
 import { Button } from "@/components/ui/button";
 import { StatsCard } from "@/components/company/dashboard/dashboard/stats-card";
@@ -16,7 +16,7 @@ export default function JobsPage() {
     (sum, j) => sum + j.applicantCount,
     0,
   );
-  const totalViews = mockJobs.reduce((sum, j) => sum + j.viewCount, 0);
+  const closedJobs = mockJobs.filter((j) => j.status === "Closed").length;
 
   return (
     <>
@@ -38,7 +38,7 @@ export default function JobsPage() {
             value={totalApplicants}
             icon={Users}
           />
-          <StatsCard title="Total Views" value={totalViews} icon={Eye} />
+          <StatsCard title="Closed Jobs" value={closedJobs} icon={XCircle} />
         </div>
 
         {/* Jobs Table */}

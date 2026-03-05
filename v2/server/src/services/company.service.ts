@@ -12,6 +12,14 @@ interface LogoFile {
 }
 
 export class CompanyService {
+  async getTopCompanies() {
+    const companies = await companyRepository.findTopCompanies(6);
+    return companies.map(({ _count, ...company }) => ({
+      ...company,
+      open_jobs_count: _count.jobs,
+    }));
+  }
+
   async onboard(userId: string, data: BusinessOnboardingInput, logoFile?: LogoFile) {
     const user = await userRepository.findById(userId);
     if (!user) {

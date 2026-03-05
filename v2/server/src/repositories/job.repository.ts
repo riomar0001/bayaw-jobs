@@ -126,7 +126,7 @@ export class JobRepository {
         qualifications: data.qualifications,
         benefits: data.benefits,
         company_id: data.company_id,
-        ...(data.status ? { status: data.status } : {}),
+        status: data.status || 'OPEN',
       },
     });
   }
@@ -142,6 +142,28 @@ export class JobRepository {
     return prisma.job.update({
       where: { id, company_id },
       data,
+    });
+  }
+
+  async findTopJobs(limit: number = 8) {
+    return prisma.job.findMany({
+      where: { status: 'OPEN' },
+      take: limit,
+      orderBy: { created_at: 'desc' },
+      select: {
+        id: true,
+        title: true,
+        department: true,
+        location: true,
+        location_type: true,
+        employment_type: true,
+        minimum_salary: true,
+        maximum_salary: true,
+        currency: true,
+        status: true,
+        created_at: true,
+        company_id: true,
+      },
     });
   }
 }

@@ -1,3 +1,58 @@
+const getTopCompanies = {
+  '/business/top': {
+    get: {
+      tags: ['Business'],
+      summary: 'Get top 6 companies by open job count',
+      description: 'Returns the 6 companies with the most open job postings. No authentication required.',
+      responses: {
+        200: {
+          description: 'Top companies retrieved successfully',
+          content: {
+            'application/json': {
+              schema: {
+                type: 'object',
+                properties: {
+                  success: { type: 'boolean', example: true },
+                  message: { type: 'string', example: 'Top companies retrieved successfully' },
+                  data: {
+                    type: 'array',
+                    items: {
+                      type: 'object',
+                      properties: {
+                        id: { type: 'string', format: 'uuid' },
+                        company_name: { type: 'string', example: 'Acme Corp' },
+                        industry: { type: 'string', example: 'Technology' },
+                        company_size: { type: 'string', example: '11-50' },
+                        logo: { type: 'string', nullable: true, example: 'logo_userId.jpg' },
+                        website: { type: 'string', example: 'https://acme.com' },
+                        open_jobs_count: { type: 'integer', example: 12 },
+                      },
+                    },
+                  },
+                },
+              },
+            },
+          },
+        },
+        500: {
+          description: 'Internal server error',
+          content: {
+            'application/json': {
+              schema: {
+                type: 'object',
+                properties: {
+                  success: { type: 'boolean', example: false },
+                  message: { type: 'string', example: 'Internal server error' },
+                },
+              },
+            },
+          },
+        },
+      },
+    },
+  },
+};
+
 const onboarding = {
   '/business/onboarding': {
     post: {
@@ -451,6 +506,7 @@ const admins = {
 };
 
 export const companyDocs = {
+  ...getTopCompanies,
   ...onboarding,
   ...logo,
   ...admins,

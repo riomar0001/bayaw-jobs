@@ -32,6 +32,8 @@ function parseOnboardingData(req: Request, _res: Response, next: NextFunction): 
   }
 }
 
+router.get('/top', companyController.getTopCompanies.bind(companyController));
+
 router.post(
   '/onboarding',
   authenticate,

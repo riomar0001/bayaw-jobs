@@ -206,6 +206,53 @@ export class ApplicantRepository {
     });
   }
 
+  async findAllApplicantsByCompany(companyId: string, page: number = 1, limit: number = 10) {
+    const skip = (page - 1) * limit;
+
+    const [applications, total] = await Promise.all([
+      prisma.applicant_applied_job.findMany({
+        where: { job: { company_id: companyId } },
+        skip,
+        take: limit,
+        orderBy: { application_date: 'desc' },
+        select: {
+          id: true,
+          status: true,
+          application_date: true,
+          applicant_profile: {
+            select: {
+              first_name: true,
+              last_name: true,
+              desired_position: true,
+              profile_picture: true,
+            },
+          },
+          job: {
+            select: {
+              title: true,
+              department: true,
+            },
+          },
+        },
+      }),
+      prisma.applicant_applied_job.count({
+        where: { job: { company_id: companyId } },
+      }),
+    ]);
+
+    return {
+      data: applications,
+      meta: {
+        total,
+        page,
+        limit,
+        totalPages: Math.ceil(total / limit),
+        hasNextPage: page < Math.ceil(total / limit),
+        hasPreviousPage: page > 1,
+      },
+    };
+  }
+
   async createProfile(data: CreateApplicantProfileData) {
     return prisma.applicant_profile.create({
       data: {

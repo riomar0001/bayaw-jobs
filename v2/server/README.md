@@ -1,14 +1,15 @@
-# CertManager API
+# Bayaw Jobs API
 
-A RESTful API for certificate generation and management built with Express.js and TypeScript.
+A RESTful API for a job board platform built with Express.js and TypeScript.
 
 ## Features
 
 - 🔐 **Authentication** - JWT-based authentication with access/refresh tokens and email verification
-- 📜 **Certificate Generation** - Generate customizable certificates with text overlays
-- 📧 **Email Notifications** - Automated certificate delivery via email with PDF attachments
-- 🗄️ **Template Management** - Create and manage certificate templates
-- 🔒 **Security** - Rate limiting, helmet security headers, image upload validation
+- 💼 **Job Postings** - Create, manage, and browse job listings
+- 🏢 **Company Management** - Company onboarding, admin roles, and permissions
+- 👤 **Applicant Profiles** - Full applicant profile management with resume and portfolio
+- 📋 **Job Applications** - Apply to jobs and track application status
+- 🔒 **Security** - Rate limiting, helmet security headers, file upload validation
 - ✅ **Validation** - Request validation with Zod schemas
 - 🧪 **Testing** - Comprehensive unit tests with Jest
 
@@ -19,10 +20,7 @@ A RESTful API for certificate generation and management built with Express.js an
 - **Language**: TypeScript
 - **Database**: PostgreSQL with Prisma ORM
 - **Storage**: Supabase Storage
-- **Queue**: BullMQ with Redis
 - **Email**: Nodemailer
-- **Image Processing**: Sharp
-- **PDF Generation**: pdf-lib
 - **Testing**: Jest
 
 ## Prerequisites
@@ -114,24 +112,40 @@ See [.env.example](.env.example) for all available configuration options.
 | `POST` | `/api/auth/logout` | Logout current session |
 | `POST` | `/api/auth/logout-all` | Logout all sessions |
 
-### Certificates
+### Jobs
 
-| Method | Endpoint | Description |
-|--------|----------|-------------|
-| `POST` | `/api/certificates` | Generate and send certificate |
-| `GET` | `/api/certificates` | List certificates (paginated) |
-| `GET` | `/api/certificates/:id` | Get certificate by ID |
-| `GET` | `/api/certificates/verify/:controlNumber` | Verify certificate |
+| Method | Endpoint | Auth | Description |
+|--------|----------|------|-------------|
+| `GET` | `/api/jobs/top` | No | Get top 8 most recent open jobs |
+| `GET` | `/api/jobs` | No | List all jobs (paginated) |
+| `GET` | `/api/jobs/:id` | No | Get job by ID |
+| `GET` | `/api/jobs/company` | Yes | List jobs for authenticated company |
+| `GET` | `/api/jobs/company/applicants` | Yes | Get all applicants across all company jobs (paginated) |
+| `GET` | `/api/jobs/company/:id` | Yes | Get company job with applicants |
+| `POST` | `/api/jobs/create` | Yes | Create a new job posting |
+| `PUT` | `/api/jobs/:id` | Yes | Update a job posting |
+| `PATCH` | `/api/jobs/:id/status` | Yes | Update job status |
 
-### Templates
+### Business (Companies)
 
-| Method | Endpoint | Description |
-|--------|----------|-------------|
-| `POST` | `/api/templates` | Create template (Admin) |
-| `GET` | `/api/templates` | List templates |
-| `GET` | `/api/templates/:id` | Get template by ID |
-| `PUT` | `/api/templates/:id` | Update template (Admin) |
-| `DELETE` | `/api/templates/:id` | Delete template (Admin) |
+| Method | Endpoint | Auth | Description |
+|--------|----------|------|-------------|
+| `GET` | `/api/business/top` | No | Get top 6 companies by open job count |
+| `POST` | `/api/business/onboarding` | Yes | Onboard a new company |
+| `PATCH` | `/api/business/logo` | Yes | Update company logo |
+| `GET` | `/api/business/logo/:id` | No | Get company logo |
+| `GET` | `/api/business/admins` | Yes | List company admins |
+| `POST` | `/api/business/admins` | Yes | Add a company admin |
+| `DELETE` | `/api/business/admins/:id` | Yes | Remove a company admin |
+
+### Applicants
+
+| Method | Endpoint | Auth | Description |
+|--------|----------|------|-------------|
+| `POST` | `/api/applicants/onboard` | Yes | Onboard applicant profile |
+| `GET` | `/api/applicants/profile` | Yes | Get own applicant profile |
+| `PUT` | `/api/applicants/profile` | Yes | Update applicant profile |
+| `POST` | `/api/applicants/apply/:jobId` | Yes | Apply for a job |
 
 ## Project Structure
 

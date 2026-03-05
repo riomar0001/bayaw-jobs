@@ -120,6 +120,55 @@ const jobRequestBody = {
   },
 };
 
+// ─── GET /jobs/top ────────────────────────────────────────────────────────────
+
+const getTopJobs = {
+  '/jobs/top': {
+    get: {
+      tags: ['Jobs'],
+      summary: 'Get top 8 open job postings',
+      description: 'Returns the 8 most recently posted open jobs. No authentication required.',
+      responses: {
+        200: {
+          description: 'Top jobs retrieved successfully',
+          content: {
+            'application/json': {
+              schema: {
+                type: 'object',
+                properties: {
+                  success: { type: 'boolean', example: true },
+                  message: { type: 'string', example: 'Top jobs retrieved successfully' },
+                  data: {
+                    type: 'array',
+                    items: {
+                      type: 'object',
+                      properties: {
+                        id: { type: 'string', format: 'uuid' },
+                        company_id: { type: 'string', format: 'uuid' },
+                        title: { type: 'string', example: 'Senior Software Engineer' },
+                        department: { type: 'string', example: 'Engineering' },
+                        location: { type: 'string', example: 'Cebu City, Philippines' },
+                        location_type: { type: 'string', enum: ['ONSITE', 'REMOTE', 'HYBRID'], example: 'HYBRID' },
+                        employment_type: { type: 'string', example: 'Full-time' },
+                        minimum_salary: { type: 'string', example: '50000' },
+                        maximum_salary: { type: 'string', example: '80000' },
+                        currency: { type: 'string', example: 'PHP' },
+                        status: { type: 'string', enum: ['OPEN'], example: 'OPEN' },
+                        created_at: { type: 'string', format: 'date-time' },
+                      },
+                    },
+                  },
+                },
+              },
+            },
+          },
+        },
+        500: internalErrorResponse,
+      },
+    },
+  },
+};
+
 // ─── GET /jobs ────────────────────────────────────────────────────────────────
 
 const getAllJobs = {
@@ -282,6 +331,116 @@ const getCompanyJobs = {
             },
           },
         },
+        422: {
+          description: 'User has no company — company_id missing from JWT token',
+          content: {
+            'application/json': {
+              schema: {
+                type: 'object',
+                properties: {
+                  success: { type: 'boolean', example: false },
+                  message: { type: 'string', example: 'Company ID is required' },
+                },
+              },
+            },
+          },
+        },
+        500: internalErrorResponse,
+      },
+    },
+  },
+};
+
+// ─── GET /jobs/company/applicants ────────────────────────────────────────────
+
+const getCompanyApplicants = {
+  '/jobs/company/applicants': {
+    get: {
+      tags: ['Jobs'],
+      summary: "Get all applicants across the company's job postings",
+      description:
+        "Returns a paginated list of all job applications submitted to any of the authenticated company's jobs. " +
+        'Each record includes basic applicant profile info and the job they applied to.',
+      security: [{ bearerAuth: [] }],
+      parameters: [
+        {
+          name: 'page',
+          in: 'query',
+          description: 'Page number (default: 1)',
+          required: false,
+          schema: { type: 'integer', default: 1, minimum: 1 },
+        },
+        {
+          name: 'limit',
+          in: 'query',
+          description: 'Items per page (default: 10, max: 100)',
+          required: false,
+          schema: { type: 'integer', default: 10, minimum: 1, maximum: 100 },
+        },
+      ],
+      responses: {
+        200: {
+          description: 'Company applicants retrieved successfully',
+          content: {
+            'application/json': {
+              schema: {
+                type: 'object',
+                properties: {
+                  success: { type: 'boolean', example: true },
+                  message: { type: 'string', example: 'Company applicants retrieved successfully' },
+                  data: {
+                    type: 'object',
+                    properties: {
+                      data: {
+                        type: 'array',
+                        items: {
+                          type: 'object',
+                          properties: {
+                            id: { type: 'string', format: 'uuid' },
+                            status: {
+                              type: 'string',
+                              enum: ['NEW', 'SCREENING', 'INTERVIEW', 'OFFER', 'REJECTED', 'HIRED'],
+                              example: 'NEW',
+                            },
+                            application_date: { type: 'string', format: 'date-time' },
+                            applicant_profile: {
+                              type: 'object',
+                              properties: {
+                                first_name: { type: 'string', example: 'Jane' },
+                                last_name: { type: 'string', example: 'Doe' },
+                                desired_position: { type: 'string', example: 'Software Engineer' },
+                                profile_picture: { type: 'string', nullable: true },
+                              },
+                            },
+                            job: {
+                              type: 'object',
+                              properties: {
+                                title: { type: 'string', example: 'Senior Software Engineer' },
+                                department: { type: 'string', example: 'Engineering' },
+                              },
+                            },
+                          },
+                        },
+                      },
+                      meta: {
+                        type: 'object',
+                        properties: {
+                          total: { type: 'integer', example: 50 },
+                          page: { type: 'integer', example: 1 },
+                          limit: { type: 'integer', example: 10 },
+                          totalPages: { type: 'integer', example: 5 },
+                          hasNextPage: { type: 'boolean', example: true },
+                          hasPreviousPage: { type: 'boolean', example: false },
+                        },
+                      },
+                    },
+                  },
+                },
+              },
+            },
+          },
+        },
+        401: unauthorizedResponse,
         422: {
           description: 'User has no company — company_id missing from JWT token',
           content: {
@@ -697,8 +856,10 @@ const updateJobStatus = {
 // ─── Exports ──────────────────────────────────────────────────────────────────
 
 export const jobDocs = {
+  ...getTopJobs,
   ...getAllJobs,
   ...getCompanyJobs,
+  ...getCompanyApplicants,
   ...getCompanyJobById,
   ...jobById,
   ...createJob,
