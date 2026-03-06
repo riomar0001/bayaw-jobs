@@ -23,6 +23,10 @@ export function SearchBar({ onSearch, defaultJobTitle = "", defaultLocation = ""
     }
   };
 
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === "Enter") handleSearch();
+  };
+
   return (
     <div className="relative">
       {/* Glow Effect */}
@@ -37,6 +41,7 @@ export function SearchBar({ onSearch, defaultJobTitle = "", defaultLocation = ""
               placeholder="Job title or keyword"
               value={jobTitle}
               onChange={(e) => setJobTitle(e.target.value)}
+              onKeyDown={handleKeyDown}
               className="pl-11 h-12 border focus:border-primary transition-colors text-base"
             />
           </div>
@@ -48,6 +53,7 @@ export function SearchBar({ onSearch, defaultJobTitle = "", defaultLocation = ""
               placeholder="Location"
               value={location}
               onChange={(e) => setLocation(e.target.value)}
+              onKeyDown={handleKeyDown}
               className="pl-11 h-12 border focus:border-primary transition-colors text-base"
             />
           </div>
