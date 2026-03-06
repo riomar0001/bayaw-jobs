@@ -91,8 +91,7 @@ export interface UpdatePasswordInput {
 }
 
 export interface LoginStep1Response {
-  temp_token: string;
-  expires_in: number;
+  tempToken: string;
 }
 
 export interface LoginStep2Response {
@@ -314,7 +313,12 @@ export interface Application {
 
 export type LocationType = "ONSITE" | "REMOTE" | "HYBRID";
 export type JobStatus = "OPEN" | "CLOSED" | "PAUSED";
-export type EmploymentType = "FULL_TIME" | "PART_TIME" | "CONTRACT" | "FREELANCE" | "INTERN";
+export type EmploymentType =
+  | "FULL_TIME"
+  | "PART_TIME"
+  | "CONTRACT"
+  | "FREELANCE"
+  | "INTERN";
 
 export interface Job {
   id: string;

@@ -1,29 +1,82 @@
 "use client";
 
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { AuthFormLayout } from "@/components/shared/auth-form-layout";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Field, FieldGroup, FieldLabel } from "@/components/ui/field";
+import { OtpInput } from "@/components/auth/otp-input";
+import { AuthError } from "@/components/auth/auth-error";
+import { useAuthStore } from "@/stores/auth.store";
+import { Loader2, ArrowLeft } from "lucide-react";
 
 export default function LoginPage() {
-  const [formData, setFormData] = useState({
-    email: "",
-    password: "",
-  });
+  const router = useRouter();
+  const { login, verifyOtp, resetLoginStep, isLoading, error, _loginStep, clearError } =
+    useAuthStore();
 
-  const handleSubmit = (e: React.SubmitEvent<HTMLFormElement>) => {
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [otp, setOtp] = useState("");
+
+  const handleCredentials = async (e: React.FormEvent) => {
     e.preventDefault();
-    console.log("Login form submitted:", formData);
+    clearError();
+    await login(email, password);
   };
+
+  const handleOtp = async (e: React.FormEvent) => {
+    e.preventDefault();
+    clearError();
+    await verifyOtp(otp);
+    // If no error after verifyOtp, store sets isAuthenticated — redirect
+    const { isAuthenticated } = useAuthStore.getState();
+    if (isAuthenticated) router.push("/jobs");
+  };
+
+  if (_loginStep === "otp") {
+    return (
+      <AuthFormLayout
+        title="Verify Your Identity"
+        description="Enter the 6-digit code sent to your email"
+      >
+        <form onSubmit={handleOtp} className="space-y-6">
+          <OtpInput value={otp} onChange={setOtp} disabled={isLoading} />
+
+          <AuthError message={error} />
+
+          <Button
+            type="submit"
+            className="w-full"
+            disabled={isLoading || otp.length < 6 || otp.includes(" ")}
+          >
+            {isLoading ? (
+              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+            ) : null}
+            Verify Code
+          </Button>
+
+          <button
+            type="button"
+            onClick={() => { resetLoginStep(); setOtp(""); }}
+            className="flex items-center gap-1 text-sm text-muted-foreground hover:text-primary transition-colors mx-auto "
+          >
+            <ArrowLeft className="h-3 w-3" />
+            Back to login
+          </button>
+        </form>
+      </AuthFormLayout>
+    );
+  }
 
   return (
     <AuthFormLayout
       title="Welcome Back"
       description="Sign in to your account to continue your job search"
     >
-      <form onSubmit={handleSubmit} className="space-y-6">
+      <form onSubmit={handleCredentials} className="space-y-6">
         <FieldGroup>
           <Field>
             <FieldLabel htmlFor="email">Email</FieldLabel>
@@ -32,10 +85,8 @@ export default function LoginPage() {
               type="email"
               placeholder="you@example.com"
               required
-              value={formData.email}
-              onChange={(e) =>
-                setFormData({ ...formData, email: e.target.value })
-              }
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
             />
           </Field>
 
@@ -54,24 +105,22 @@ export default function LoginPage() {
               type="password"
               placeholder="••••••••"
               required
-              value={formData.password}
-              onChange={(e) =>
-                setFormData({ ...formData, password: e.target.value })
-              }
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
             />
           </Field>
         </FieldGroup>
 
-        <Button type="submit" className="w-full">
+        <AuthError message={error} />
+
+        <Button type="submit" className="w-full" disabled={isLoading}>
+          {isLoading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
           Sign In
         </Button>
 
         <p className="text-center text-sm text-muted-foreground">
           Don&apos;t have an account?{" "}
-          <Link
-            href="/signup"
-            className="text-primary hover:underline font-medium"
-          >
+          <Link href="/signup" className="text-primary hover:underline font-medium">
             Sign up
           </Link>
         </p>

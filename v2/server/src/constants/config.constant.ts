@@ -49,6 +49,9 @@ export const Config = {
     SECURE: process.env.NODE_ENV === 'production',
     SAME_SITE: 'strict' as const,
   },
+
+  // Frontend
+  FRONTEND_URL: process.env.FRONTEND_URL ?? 'http://localhost:3000',
 } as const;
 
 export default Config;

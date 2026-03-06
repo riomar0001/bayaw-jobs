@@ -6,19 +6,21 @@ import { AuthFormLayout } from "@/components/shared/auth-form-layout";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Field, FieldGroup, FieldLabel } from "@/components/ui/field";
-import { ArrowLeft, Mail } from "lucide-react";
+import { AuthError } from "@/components/auth/auth-error";
+import { useAuthStore } from "@/stores/auth.store";
+import { ArrowLeft, Mail, Loader2 } from "lucide-react";
 
 export default function ForgotPasswordPage() {
+  const { forgotPassword, isLoading, error, clearError } = useAuthStore();
   const [email, setEmail] = useState("");
   const [isSubmitted, setIsSubmitted] = useState(false);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    console.log("Password reset requested for:", email);
-    // Simulate API call
-    setTimeout(() => {
-      setIsSubmitted(true);
-    }, 500);
+    clearError();
+    await forgotPassword(email);
+    const { error: storeError } = useAuthStore.getState();
+    if (!storeError) setIsSubmitted(true);
   };
 
   if (isSubmitted) {
@@ -84,7 +86,10 @@ export default function ForgotPasswordPage() {
           </Field>
         </FieldGroup>
 
-        <Button type="submit" className="w-full">
+        <AuthError message={error} />
+
+        <Button type="submit" className="w-full" disabled={isLoading}>
+          {isLoading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
           Send Reset Link
         </Button>
 
@@ -97,10 +102,7 @@ export default function ForgotPasswordPage() {
 
         <p className="text-center text-xs text-muted-foreground">
           Are you a company?{" "}
-          <Link
-            href="/company/forgot-password"
-            className="text-primary hover:underline"
-          >
+          <Link href="/company/forgot-password" className="text-primary hover:underline">
             Reset company password
           </Link>
         </p>

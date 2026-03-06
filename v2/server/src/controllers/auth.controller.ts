@@ -39,13 +39,19 @@ export class AuthController {
         maxAge: Config.COOKIES.ACCESS_TOKEN_MAX_AGE,
       });
 
-      successResponse(
-        res,
-        { user: result.user, accessToken: result.accessToken, refreshToken: result.refreshToken },
-        'Email verified successfully'
-      );
+      // Old JSON response (kept for reference):
+      // successResponse(
+      //   res,
+      //   { user: result.user, accessToken: result.accessToken, refreshToken: result.refreshToken },
+      //   'Email verified successfully'
+      // );
+
+      // Redirect to frontend login page with a verified flag
+      res.redirect(`${Config.FRONTEND_URL}/login?verified=true`);
     } catch (error) {
-      next(error);
+      // Redirect to frontend with an error flag instead of returning a JSON error
+      res.redirect(`${Config.FRONTEND_URL}/login?error=verification_failed`);
+      void next(error); // prevent double-calling next after redirect
     }
   }
 
