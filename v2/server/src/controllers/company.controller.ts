@@ -97,9 +97,30 @@ export class CompanyController {
     }
   }
 
+  async getAllCompanies(req: Request, res: Response, next: NextFunction): Promise<void> {
+    try {
+      const page = Math.max(Number(req.query.page) || 1, 1);
+      const limit = Math.min(Math.max(Number(req.query.limit) || 10, 1), 50);
+      const industry = req.query.industry ? String(req.query.industry) : undefined;
+      const company_size = req.query.company_size ? String(req.query.company_size) : undefined;
+      const search = req.query.search ? String(req.query.search) : undefined;
+
+      const result = await companyService.getAllCompanies({
+        page,
+        limit,
+        ...(industry !== undefined && { industry }),
+        ...(company_size !== undefined && { company_size }),
+        ...(search !== undefined && { search }),
+      });
+      successResponse(res, result, 'Companies retrieved successfully');
+    } catch (error) {
+      next(error);
+    }
+  }
+
   async getPublicCompanyInfo(req: Request, res: Response, next: NextFunction): Promise<void> {
     try {
-      const { id } = req.params;
+      const id = req.params.id as string;
       if (!id) throw new BadRequestError('Company ID is required');
       const result = await companyService.getPublicCompanyInfo(id);
       successResponse(res, result, 'Company info retrieved successfully');
@@ -167,7 +188,7 @@ export class CompanyController {
     try {
       const companyId = req.user?.company_id;
       if (!companyId) throw new Error('Company ID missing in request');
-      const result = await companyService.updateLocation(companyId, req.params.id, req.body);
+      const result = await companyService.updateLocation(companyId, req.params.id as string, req.body);
       successResponse(res, result, 'Location updated successfully');
     } catch (error) {
       next(error);
@@ -178,7 +199,7 @@ export class CompanyController {
     try {
       const companyId = req.user?.company_id;
       if (!companyId) throw new Error('Company ID missing in request');
-      await companyService.deleteLocation(companyId, req.params.id);
+      await companyService.deleteLocation(companyId, req.params.id as string);
       successResponse(res, null, 'Location deleted successfully');
     } catch (error) {
       next(error);

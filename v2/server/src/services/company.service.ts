@@ -156,6 +156,17 @@ export class CompanyService {
     return companyRepository.removeAdmin(adminId);
   }
 
+  async getAllCompanies(query: { page: number; limit: number; industry?: string; company_size?: string; search?: string }) {
+    const result = await companyRepository.findAllCompanies(query);
+    return {
+      ...result,
+      companies: result.companies.map(({ logo, ...company }) => ({
+        ...company,
+        logo_url: logo ? `${process.env.APP_URL}/api/business/logo/${company.id}` : null,
+      })),
+    };
+  }
+
   async getPublicCompanyInfo(companyId: string) {
     const company = await companyRepository.findPublicById(companyId);
     if (!company) throw new NotFoundError('Company');
@@ -174,7 +185,7 @@ export class CompanyService {
       throw new NotFoundError('Company');
     }
 
-    const { companyContacts, companySocialLinks, companyLocations, companyAdmins, logo, ...info } = company;
+    const { companyContacts, companySocialLinks, companyLocations, companyAdmins: _companyAdmins, logo, ...info } = company;
 
     const PLATFORM_MAP: Record<string, string | null> = {
       FACEBOOK: null, LINKEDIN: null, TWITTER: null, INSTAGRAM: null,
@@ -203,7 +214,10 @@ export class CompanyService {
   async updateCompanyInfo(companyId: string, data: UpdateCompanyInfoInput) {
     const company = await companyRepository.findById(companyId);
     if (!company) throw new NotFoundError('Company');
-    return companyRepository.updateCompanyInfo(companyId, data);
+    const clean = Object.fromEntries(
+      Object.entries(data).filter(([, v]) => v !== undefined)
+    ) as Parameters<typeof companyRepository.updateCompanyInfo>[1];
+    return companyRepository.updateCompanyInfo(companyId, clean);
   }
 
   async updateSocialLinks(companyId: string, data: UpdateSocialLinksInput) {
@@ -227,7 +241,10 @@ export class CompanyService {
   async updateContact(companyId: string, data: UpdateContactInput) {
     const company = await companyRepository.findById(companyId);
     if (!company) throw new NotFoundError('Company');
-    return companyRepository.updateContact(companyId, data);
+    const clean = Object.fromEntries(
+      Object.entries(data).filter(([, v]) => v !== undefined)
+    ) as Parameters<typeof companyRepository.updateContact>[1];
+    return companyRepository.updateContact(companyId, clean);
   }
 
   async addLocation(companyId: string, data: AddLocationInput) {
@@ -239,7 +256,10 @@ export class CompanyService {
   async updateLocation(companyId: string, locationId: string, data: UpdateLocationInput) {
     const company = await companyRepository.findById(companyId);
     if (!company) throw new NotFoundError('Company');
-    const location = await companyRepository.updateLocation(locationId, companyId, data);
+    const clean = Object.fromEntries(
+      Object.entries(data).filter(([, v]) => v !== undefined)
+    ) as Parameters<typeof companyRepository.updateLocation>[2];
+    const location = await companyRepository.updateLocation(locationId, companyId, clean);
     if (!location) throw new NotFoundError('Location');
     return location;
   }

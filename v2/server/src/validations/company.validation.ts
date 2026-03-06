@@ -42,6 +42,18 @@ export const businessOnboardingSchema = z.object({
 
 export type BusinessOnboardingInput = z.infer<typeof businessOnboardingSchema>['body'];
 
+export const getAllCompaniesSchema = z.object({
+  query: z.object({
+    page: z.coerce.number().int().min(1).optional().default(1),
+    limit: z.coerce.number().int().min(1).max(50).optional().default(10),
+    industry: z.string().optional(),
+    company_size: z.string().optional(),
+    search: z.string().optional(),
+  }),
+});
+
+export type GetAllCompaniesQuery = z.infer<typeof getAllCompaniesSchema>['query'];
+
 export const updateCompanyInfoSchema = z.object({
   body: z
     .object({

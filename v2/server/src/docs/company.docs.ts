@@ -522,6 +522,90 @@ const locationSchema = {
   },
 };
 
+const getAllCompanies = {
+  '/business': {
+    get: {
+      tags: ['Business'],
+      summary: 'Get all companies with jobs',
+      description:
+        'Returns a paginated list of companies that have posted at least one job. Includes available industries for filter UI. No authentication required.',
+      parameters: [
+        { name: 'page', in: 'query', schema: { type: 'integer', default: 1, minimum: 1 } },
+        { name: 'limit', in: 'query', schema: { type: 'integer', default: 10, minimum: 1, maximum: 50 } },
+        { name: 'industry', in: 'query', schema: { type: 'string' }, description: 'Filter by industry (exact match)', example: 'Technology' },
+        { name: 'company_size', in: 'query', schema: { type: 'string' }, description: 'Filter by company size', example: '11-50' },
+        { name: 'search', in: 'query', schema: { type: 'string' }, description: 'Search by company name (case-insensitive)', example: 'acme' },
+      ],
+      responses: {
+        '200': {
+          description: 'Companies retrieved successfully',
+          content: {
+            'application/json': {
+              schema: {
+                type: 'object',
+                properties: {
+                  success: { type: 'boolean', example: true },
+                  message: { type: 'string', example: 'Companies retrieved successfully' },
+                  data: {
+                    type: 'object',
+                    properties: {
+                      companies: {
+                        type: 'array',
+                        items: {
+                          type: 'object',
+                          properties: {
+                            id: { type: 'string', format: 'uuid' },
+                            company_name: { type: 'string', example: 'Acme Corp' },
+                            industry: { type: 'string', example: 'Technology' },
+                            company_size: { type: 'string', example: '11-50' },
+                            about: { type: 'string', example: 'We build awesome products.' },
+                            website: { type: 'string', example: 'https://acme.com' },
+                            logo_url: { type: 'string', nullable: true },
+                            open_positions: { type: 'integer', example: 8 },
+                            companyLocations: {
+                              type: 'array',
+                              items: {
+                                type: 'object',
+                                properties: {
+                                  id: { type: 'string', format: 'uuid' },
+                                  city: { type: 'string', example: 'San Francisco' },
+                                  country: { type: 'string', example: 'USA' },
+                                  is_headquarter: { type: 'boolean', example: true },
+                                },
+                              },
+                            },
+                          },
+                        },
+                      },
+                      industries: {
+                        type: 'array',
+                        description: 'All distinct industries across companies with jobs — use for filter dropdown',
+                        items: { type: 'string', example: 'Technology' },
+                        example: ['Finance', 'Healthcare', 'Technology'],
+                      },
+                      meta: {
+                        type: 'object',
+                        properties: {
+                          total: { type: 'integer', example: 42 },
+                          page: { type: 'integer', example: 1 },
+                          limit: { type: 'integer', example: 10 },
+                          totalPages: { type: 'integer', example: 5 },
+                          hasNextPage: { type: 'boolean', example: true },
+                          hasPreviousPage: { type: 'boolean', example: false },
+                        },
+                      },
+                    },
+                  },
+                },
+              },
+            },
+          },
+        },
+      },
+    },
+  },
+};
+
 const publicCompanyInfo = {
   '/business/{id}/public': {
     get: {
@@ -1310,6 +1394,7 @@ const stats = {
 
 export const companyDocs = {
   ...getTopCompanies,
+  ...getAllCompanies,
   ...onboarding,
   ...logo,
   ...admins,

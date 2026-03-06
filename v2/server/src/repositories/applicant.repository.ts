@@ -239,7 +239,7 @@ export class ApplicantRepository {
 
   async createApplication(profileId: string, jobId: string) {
     return prisma.applicant_applied_job.create({
-      data: { applicant_profile_id: profileId, jobId },
+      data: { applicant_profile_id: profileId, job_id: jobId, jobId },
       select: {
         id: true,
         status: true,

@@ -247,6 +247,70 @@ export class CompanyRepository {
     };
   }
 
+  async findAllCompanies(params: {
+    page: number;
+    limit: number;
+    industry?: string;
+    company_size?: string;
+    search?: string;
+  }) {
+    const skip = (params.page - 1) * params.limit;
+
+    const where = {
+      jobs: { some: {} },
+      ...(params.industry ? { industry: params.industry } : {}),
+      ...(params.company_size ? { company_size: params.company_size } : {}),
+      ...(params.search
+        ? { company_name: { contains: params.search, mode: 'insensitive' as const } }
+        : {}),
+    };
+
+    const [companies, total, industryRows] = await Promise.all([
+      prisma.company_information.findMany({
+        where,
+        skip,
+        take: params.limit,
+        orderBy: { company_name: 'asc' },
+        select: {
+          id: true,
+          company_name: true,
+          industry: true,
+          company_size: true,
+          about: true,
+          website: true,
+          logo: true,
+          companyLocations: {
+            select: { id: true, city: true, country: true, is_headquarter: true },
+          },
+          _count: { select: { jobs: { where: { status: 'OPEN' } } } },
+        },
+      }),
+      prisma.company_information.count({ where }),
+      prisma.company_information.findMany({
+        where: { jobs: { some: {} } },
+        select: { industry: true },
+        distinct: ['industry'],
+        orderBy: { industry: 'asc' },
+      }),
+    ]);
+
+    return {
+      companies: companies.map(({ _count, ...company }) => ({
+        ...company,
+        open_positions: _count.jobs,
+      })),
+      industries: industryRows.map((r) => r.industry),
+      meta: {
+        total,
+        page: params.page,
+        limit: params.limit,
+        totalPages: Math.ceil(total / params.limit),
+        hasNextPage: params.page < Math.ceil(total / params.limit),
+        hasPreviousPage: params.page > 1,
+      },
+    };
+  }
+
   async findPublicById(companyId: string) {
     return prisma.company_information.findUnique({
       where: { id: companyId },

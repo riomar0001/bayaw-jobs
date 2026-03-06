@@ -43,6 +43,7 @@ function parseOnboardingData(req: Request, _res: Response, next: NextFunction): 
 }
 
 router.get('/top', companyController.getTopCompanies.bind(companyController));
+router.get('/', companyController.getAllCompanies.bind(companyController));
 
 router.get('/:id/public', companyController.getPublicCompanyInfo.bind(companyController));
 

@@ -341,7 +341,7 @@ export class ApplicantController {
     try {
       const userId = req.user?.user_id;
       if (!userId) throw new Error('User ID missing in request');
-      await applicantService.deleteSkill(userId, req.params.id);
+      await applicantService.deleteSkill(userId, req.params.id as string);
       successResponse(res, null, 'Skill deleted successfully');
     } catch (error) {
       next(error);
@@ -353,7 +353,7 @@ export class ApplicantController {
       const userId = req.user?.user_id;
       if (!userId) throw new Error('User ID missing in request');
 
-      const { jobId } = req.params;
+      const jobId = req.params.jobId as string;
       if (!jobId) throw new BadRequestError('Job ID is required');
 
       const result = await applicantService.applyToJob(userId, jobId);
