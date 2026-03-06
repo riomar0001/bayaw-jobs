@@ -175,22 +175,17 @@ const getAllJobs = {
   '/jobs': {
     get: {
       tags: ['Jobs'],
-      summary: 'Get all job postings with pagination',
+      summary: 'Get all job postings with pagination and filters',
+      description: 'Returns all OPEN job postings. Supports pagination, keyword search, and filters by job type, location, location type, and salary range.',
       parameters: [
-        {
-          name: 'page',
-          in: 'query',
-          description: 'Page number (default: 1)',
-          required: false,
-          schema: { type: 'integer', default: 1, minimum: 1 },
-        },
-        {
-          name: 'limit',
-          in: 'query',
-          description: 'Items per page (default: 10, max: 100)',
-          required: false,
-          schema: { type: 'integer', default: 10, minimum: 1, maximum: 100 },
-        },
+        { name: 'page', in: 'query', required: false, schema: { type: 'integer', default: 1, minimum: 1 } },
+        { name: 'limit', in: 'query', required: false, schema: { type: 'integer', default: 10, minimum: 1, maximum: 100 } },
+        { name: 'search', in: 'query', required: false, schema: { type: 'string' }, description: 'Search by job title or department (case-insensitive)', example: 'engineer' },
+        { name: 'employment_type', in: 'query', required: false, schema: { type: 'string' }, description: 'Filter by job type', example: 'Full-time' },
+        { name: 'location_type', in: 'query', required: false, schema: { type: 'string', enum: ['ONSITE', 'REMOTE', 'HYBRID'] }, description: 'Filter by work arrangement' },
+        { name: 'location', in: 'query', required: false, schema: { type: 'string' }, description: 'Filter by location (partial match)', example: 'Manila' },
+        { name: 'min_salary', in: 'query', required: false, schema: { type: 'number' }, description: 'Minimum salary range filter — excludes jobs whose maximum salary is below this value', example: 30000 },
+        { name: 'max_salary', in: 'query', required: false, schema: { type: 'number' }, description: 'Maximum salary range filter — excludes jobs whose minimum salary exceeds this value', example: 100000 },
       ],
       responses: {
         200: {
@@ -853,11 +848,64 @@ const updateJobStatus = {
   },
 };
 
+// ─── GET /jobs/popular ────────────────────────────────────────────────────────
+
+const getPopularJobs = {
+  '/jobs/popular': {
+    get: {
+      tags: ['Jobs'],
+      summary: 'Get the 4 most popular open job postings',
+      description:
+        'Returns the 4 open job postings with the highest number of applicants. ' +
+        'No authentication required.',
+      responses: {
+        200: {
+          description: 'Popular jobs retrieved successfully',
+          content: {
+            'application/json': {
+              schema: {
+                type: 'object',
+                properties: {
+                  success: { type: 'boolean', example: true },
+                  message: { type: 'string', example: 'Popular jobs retrieved successfully' },
+                  data: {
+                    type: 'array',
+                    items: {
+                      type: 'object',
+                      properties: {
+                        id: { type: 'string', format: 'uuid' },
+                        company_id: { type: 'string', format: 'uuid' },
+                        title: { type: 'string', example: 'Senior Software Engineer' },
+                        department: { type: 'string', example: 'Engineering' },
+                        location: { type: 'string', example: 'Cebu City, Philippines' },
+                        location_type: { type: 'string', enum: ['ONSITE', 'REMOTE', 'HYBRID'], example: 'HYBRID' },
+                        employment_type: { type: 'string', example: 'Full-time' },
+                        minimum_salary: { type: 'string', example: '50000' },
+                        maximum_salary: { type: 'string', example: '80000' },
+                        currency: { type: 'string', example: 'PHP' },
+                        status: { type: 'string', enum: ['OPEN'], example: 'OPEN' },
+                        created_at: { type: 'string', format: 'date-time' },
+                        applicant_count: { type: 'integer', example: 34, description: 'Number of applicants for this job' },
+                      },
+                    },
+                  },
+                },
+              },
+            },
+          },
+        },
+        500: internalErrorResponse,
+      },
+    },
+  },
+};
+
 // ─── Exports ──────────────────────────────────────────────────────────────────
 
 export const jobDocs = {
   ...getTopJobs,
   ...getAllJobs,
+  ...getPopularJobs,
   ...getCompanyJobs,
   ...getCompanyApplicants,
   ...getCompanyJobById,

@@ -26,19 +26,17 @@ export class JobController {
 
   async getAllJobs(req: Request, res: Response, next: NextFunction): Promise<void> {
     try {
-      const parsedPage = parseInt(req.query.page as string, 10);
-      const page = Math.max(
-        Number.isNaN(parsedPage) ? Config.PAGINATION.DEFAULT_PAGE : parsedPage,
-        1
-      );
-
-      const parsedLimit = parseInt(req.query.limit as string, 10);
-      const limit = Math.min(
-        Math.max(Number.isNaN(parsedLimit) ? Config.PAGINATION.DEFAULT_LIMIT : parsedLimit, 1),
-        Config.PAGINATION.MAX_LIMIT
-      );
-      const result = await jobService.getAllJobs(page, limit);
+      const result = await jobService.getAllJobs(req.query as Record<string, string>);
       successResponse(res, result, 'Jobs retrieved successfully');
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  async getPopularJobs(_req: Request, res: Response, next: NextFunction): Promise<void> {
+    try {
+      const result = await jobService.getPopularJobs();
+      successResponse(res, result, 'Popular jobs retrieved successfully');
     } catch (error) {
       next(error);
     }

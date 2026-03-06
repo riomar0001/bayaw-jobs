@@ -14,6 +14,7 @@ import {
 const router = Router();
 
 router.get('/top', jobController.getTopJobs.bind(jobController));
+router.get('/popular', jobController.getPopularJobs.bind(jobController));
 router.get('/', validate(getAllJobsSchema), jobController.getAllJobs.bind(jobController));
 router.get('/company', authenticate, validate(getAllJobsSchema), jobController.getCompanyJobs.bind(jobController));
 router.get('/company/applicants', authenticate, validate(getAllJobsSchema), jobController.getCompanyApplicants.bind(jobController));

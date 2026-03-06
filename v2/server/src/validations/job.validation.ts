@@ -40,8 +40,16 @@ export const getAllJobsSchema = z.object({
       .refine((val) => val === undefined || /^\d+$/.test(val), {
         message: 'limit must be a positive integer',
       }),
+    employment_type: z.string().optional(),
+    location_type: z.enum(['ONSITE', 'REMOTE', 'HYBRID']).optional(),
+    location: z.string().optional(),
+    min_salary: z.coerce.number().positive().optional(),
+    max_salary: z.coerce.number().positive().optional(),
+    search: z.string().optional(),
   }),
 });
+
+export type GetAllJobsQuery = z.infer<typeof getAllJobsSchema>['query'];
 
 export const getJobByIdSchema = z.object({
   params: z.object({

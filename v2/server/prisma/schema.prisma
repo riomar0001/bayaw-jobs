@@ -429,6 +429,7 @@ enum application_status {
   OFFER
   REJECTED
   HIRED
+  CANCELLED
 }
 
 enum social_platform {

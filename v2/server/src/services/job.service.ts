@@ -1,4 +1,5 @@
 import { location_type, job_status } from '@/generated/prisma/enums';
+import { GetAllJobsQuery } from '@/validations/job.validation';
 import { jobRepository } from '@/repositories/job.repository';
 import { userRepository } from '@/repositories/user.repository';
 import { CompanyAdmin } from '@/types/company.type';
@@ -19,8 +20,27 @@ export class JobService {
     return jobRepository.findTopJobs(8);
   }
 
-  async getAllJobs(page: number = 1, limit: number = 10) {
-    return jobRepository.findAll(page, limit);
+  async getAllJobs(query: GetAllJobsQuery) {
+    const page = Math.max(Number(query.page) || 1, 1);
+    const limit = Math.min(Math.max(Number(query.limit) || 10, 1), 100);
+    return jobRepository.findAll({
+      page,
+      limit,
+      ...(query.employment_type && { employment_type: query.employment_type }),
+      ...(query.location_type && { location_type: query.location_type as location_type }),
+      ...(query.location && { location: query.location }),
+      ...(query.min_salary !== undefined && { min_salary: query.min_salary }),
+      ...(query.max_salary !== undefined && { max_salary: query.max_salary }),
+      ...(query.search && { search: query.search }),
+    });
+  }
+
+  async getPopularJobs() {
+    const jobs = await jobRepository.findPopularJobs();
+    return jobs.map(({ _count, ...job }) => ({
+      ...job,
+      applicant_count: _count.applicant_applied_job,
+    }));
   }
 
   async getCompanyJobs(companyId: string, page: number = 1, limit: number = 10) {
