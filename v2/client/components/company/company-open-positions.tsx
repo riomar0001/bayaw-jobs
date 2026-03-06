@@ -2,11 +2,17 @@ import Link from "next/link";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
 import { ArrowLeft, MapPin, DollarSign } from "lucide-react";
-import type { Job } from "@/data";
+import type { PublicCompanyJobOpening } from "@/api/types";
 
 interface CompanyOpenPositionsProps {
-  jobs: Job[];
+  jobs: PublicCompanyJobOpening[];
 }
+
+const LOCATION_TYPE_LABEL: Record<string, string> = {
+  REMOTE: "Remote",
+  ONSITE: "On-site",
+  HYBRID: "Hybrid",
+};
 
 export function CompanyOpenPositions({ jobs }: CompanyOpenPositionsProps) {
   return (
@@ -36,14 +42,16 @@ export function CompanyOpenPositions({ jobs }: CompanyOpenPositionsProps) {
                       <MapPin className="h-3 w-3" />
                       {job.location}
                     </span>
-                    {job.salary && (
+                    {(job.minimum_salary || job.maximum_salary) && (
                       <span className="flex items-center gap-1 text-primary font-medium">
                         <DollarSign className="h-3 w-3" />
-                        {job.salary}
+                        {job.minimum_salary && job.maximum_salary
+                          ? `${job.minimum_salary} – ${job.maximum_salary}`
+                          : job.minimum_salary ?? job.maximum_salary}
                       </span>
                     )}
                     <Badge variant="secondary" className="text-xs py-0">
-                      {job.type}
+                      {LOCATION_TYPE_LABEL[job.location_type] ?? job.location_type}
                     </Badge>
                   </div>
                 </div>

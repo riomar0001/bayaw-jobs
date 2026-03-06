@@ -508,6 +508,15 @@ export interface CompanyInfo {
   companySocials: CompanySocial[];
 }
 
+export interface PublicCompanyJobOpening {
+  id: string;
+  title: string;
+  location: string;
+  location_type: 'REMOTE' | 'ONSITE' | 'HYBRID';
+  minimum_salary: string;
+  maximum_salary: string;
+}
+
 export interface PublicCompany {
   id: string;
   company_name: string;
@@ -517,6 +526,7 @@ export interface PublicCompany {
   website: string;
   logo_url: string | null;
   open_positions: number;
+  job_openings: PublicCompanyJobOpening[];
   companyLocations: CompanyLocation[];
   companySocials: CompanySocial[];
 }

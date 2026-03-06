@@ -199,11 +199,12 @@ export class CompanyService {
     const company = await companyRepository.findPublicById(companyId);
     if (!company) throw new NotFoundError('Company');
 
-    const { _count, logo, ...rest } = company;
+    const { logo, jobs, ...rest } = company;
     return {
       ...rest,
       logo_url: logo ? `${process.env.APP_URL}/api/business/logo/${companyId}` : null,
-      open_positions: _count.jobs,
+      open_positions: jobs.length,
+      job_openings: jobs,
     };
   }
 

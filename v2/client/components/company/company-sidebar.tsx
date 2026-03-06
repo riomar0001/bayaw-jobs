@@ -8,13 +8,18 @@ import {
   ExternalLink,
   Globe,
 } from "lucide-react";
-import type { Company } from "@/data";
+import type { PublicCompany } from "@/api/types";
 
 interface CompanySidebarProps {
-  company: Company;
+  company: PublicCompany;
 }
 
 export function CompanySidebar({ company }: CompanySidebarProps) {
+  const hq =
+    company.companyLocations.find((l) => l.is_headquarter) ??
+    company.companyLocations[0];
+  const location = hq ? `${hq.city}, ${hq.country}` : null;
+
   return (
     <div className="space-y-6">
       {/* Company Overview */}
@@ -32,17 +37,19 @@ export function CompanySidebar({ company }: CompanySidebarProps) {
               </div>
             </div>
 
-            <div className="flex items-start gap-3">
-              <div className="w-9 h-9 rounded-lg bg-primary/10 flex items-center justify-center flex-shrink-0">
-                <MapPin className="h-4 w-4 text-primary" />
+            {location && (
+              <div className="flex items-start gap-3">
+                <div className="w-9 h-9 rounded-lg bg-primary/10 flex items-center justify-center flex-shrink-0">
+                  <MapPin className="h-4 w-4 text-primary" />
+                </div>
+                <div>
+                  <p className="text-xs text-muted-foreground">Location</p>
+                  <p className="text-sm font-medium">{location}</p>
+                </div>
               </div>
-              <div>
-                <p className="text-xs text-muted-foreground">Location</p>
-                <p className="text-sm font-medium">{company.location}</p>
-              </div>
-            </div>
+            )}
 
-            {company.employeeCount && (
+            {company.company_size && (
               <div className="flex items-start gap-3">
                 <div className="w-9 h-9 rounded-lg bg-primary/10 flex items-center justify-center flex-shrink-0">
                   <Users className="h-4 w-4 text-primary" />
@@ -50,7 +57,7 @@ export function CompanySidebar({ company }: CompanySidebarProps) {
                 <div>
                   <p className="text-xs text-muted-foreground">Company Size</p>
                   <p className="text-sm font-medium">
-                    {company.employeeCount} employees
+                    {company.company_size} employees
                   </p>
                 </div>
               </div>
@@ -63,7 +70,7 @@ export function CompanySidebar({ company }: CompanySidebarProps) {
               <div>
                 <p className="text-xs text-muted-foreground">Open Positions</p>
                 <p className="text-sm font-medium">
-                  {company.openPositions} jobs
+                  {company.open_positions} jobs
                 </p>
               </div>
             </div>
@@ -92,7 +99,7 @@ export function CompanySidebar({ company }: CompanySidebarProps) {
       </Card>
 
       {/* CTA */}
-      <Card className="bg-primary/5 border-primary/20">
+      {/* <Card className="bg-primary/5 border-primary/20">
         <CardContent className="p-6 text-center space-y-3">
           <Briefcase className="h-8 w-8 text-primary mx-auto" />
           <p className="font-semibold">Interested in working here?</p>
@@ -106,7 +113,7 @@ export function CompanySidebar({ company }: CompanySidebarProps) {
             </Button>
           </a>
         </CardContent>
-      </Card>
+      </Card> */}
     </div>
   );
 }

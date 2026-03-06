@@ -21,21 +21,13 @@ import {
   Briefcase,
   Building2,
 } from "lucide-react";
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useAuthStore } from "@/stores/auth.store";
 
 export function Navbar() {
   const router = useRouter();
   const pathname = usePathname();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const [mounted, setMounted] = useState(false);
-
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      setMounted(true);
-    }, 0);
-    return () => clearTimeout(timer);
-  }, []);
 
   const { isAuthenticated, user, logout } = useAuthStore();
 
@@ -60,7 +52,7 @@ export function Navbar() {
         <div className="flex items-center justify-between h-16">
           {/* Logo */}
           <Link
-            href={isAuthenticated ? "/jobs" : "/"}
+            href="/"
             className="flex items-center space-x-2 font-bold text-xl"
           >
             <span className="bg-gradient-to-r from-primary to-primary/70 bg-clip-text text-transparent">
@@ -69,68 +61,46 @@ export function Navbar() {
           </Link>
 
           {/* Desktop Navigation */}
-          {!mounted ? (
-            <div className="hidden md:flex items-center space-x-8" />
-          ) : isAuthenticated ? (
-            <div className="hidden md:flex items-center space-x-8">
-              <Link
-                href="/jobs"
-                className={`text-foreground/80 hover:text-primary transition-colors font-medium ${isActivePath("/jobs") ? "text-primary" : ""}`}
-              >
-                Find Jobs
-              </Link>
-              <Link
-                href="/companies"
-                className={`text-foreground/80 hover:text-primary transition-colors font-medium ${isActivePath("/companies") ? "text-primary" : ""}`}
-              >
-                Companies
-              </Link>
-              <Link
-                href="/profile"
-                className={`text-foreground/80 hover:text-primary transition-colors font-medium ${isActivePath("/profile") ? "text-primary" : ""}`}
-              >
-                Profile
-              </Link>
-              <Link
-                href="/contact"
-                className={`text-foreground/80 hover:text-primary transition-colors font-medium ${isActivePath("/contact") ? "text-primary" : ""}`}
-              >
-                Contact
-              </Link>
-            </div>
-          ) : (
-            <div className="hidden md:flex items-center space-x-8">
-              <Link
-                href="/"
-                className="text-foreground/80 hover:text-primary transition-colors"
-              >
-                Find Jobs
-              </Link>
-              <Link
-                href="/company"
-                className="text-foreground/80 hover:text-primary transition-colors"
-              >
-                For Companies
-              </Link>
-              <Link
-                href="/about"
-                className="text-foreground/80 hover:text-primary transition-colors"
-              >
-                About
-              </Link>
-              <Link
-                href="/contact"
-                className="text-foreground/80 hover:text-primary transition-colors"
-              >
-                Contact
-              </Link>
-            </div>
-          )}
+          <div className="hidden md:flex items-center space-x-8">
+            <Link
+              href="/"
+              className={`text-foreground/80 hover:text-primary transition-colors font-medium ${isActivePath("/") ? "text-primary" : ""}`}
+            >
+              Home
+            </Link>
+            <Link
+              href="/jobs"
+              className={`text-foreground/80 hover:text-primary transition-colors font-medium ${isActivePath("/jobs") ? "text-primary" : ""}`}
+            >
+              Jobs
+            </Link>
+            <Link
+              href="/companies"
+              className={`text-foreground/80 hover:text-primary transition-colors font-medium ${isActivePath("/companies") ? "text-primary" : ""}`}
+            >
+              Companies
+            </Link>
+            <Link
+              href="/hire"
+              className={`text-foreground/80 hover:text-primary transition-colors font-medium ${isActivePath("/hire") ? "text-primary" : ""}`}
+            >
+              For Employers
+            </Link>
+            <Link
+              href="/about"
+              className={`text-foreground/80 hover:text-primary transition-colors font-medium ${isActivePath("/about") ? "text-primary" : ""}`}
+            >
+              About
+            </Link>
+            <Link
+              href="/contact"
+              className={`text-foreground/80 hover:text-primary transition-colors font-medium ${isActivePath("/contact") ? "text-primary" : ""}`}
+            >
+              Contact
+            </Link>
+          </div>
 
-          {/* Desktop Actions */}
-          {!mounted ? (
-            <div className="hidden md:flex items-center space-x-4 w-[172px]" />
-          ) : isAuthenticated ? (
+          {isAuthenticated ? (
             <div className="hidden md:flex items-center space-x-4">
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
@@ -210,41 +180,53 @@ export function Navbar() {
         {/* Mobile Menu */}
         {mobileMenuOpen && (
           <div className="md:hidden py-4 space-y-4 border-t border-border">
-            {!mounted ? null : isAuthenticated ? (
-              <>
-                <Link
-                  href="/profile"
-                  className={`block py-2 text-foreground/80 hover:text-primary transition-colors ${isActivePath("/profile") ? "text-primary font-medium" : ""}`}
-                  onClick={() => setMobileMenuOpen(false)}
-                >
-                  Profile
-                </Link>
-                <Link
-                  href="/jobs"
-                  className={`block py-2 text-foreground/80 hover:text-primary transition-colors ${isActivePath("/jobs") ? "text-primary font-medium" : ""}`}
-                  onClick={() => setMobileMenuOpen(false)}
-                >
-                  Find Jobs
-                </Link>
-                <Link
-                  href="/companies"
-                  className={`block py-2 text-foreground/80 hover:text-primary transition-colors ${isActivePath("/companies") ? "text-primary font-medium" : ""}`}
-                  onClick={() => setMobileMenuOpen(false)}
-                >
-                  Companies
-                </Link>
-                <Link
-                  href="/contact"
-                  className={`block py-2 text-foreground/80 hover:text-primary transition-colors ${isActivePath("/contact") ? "text-primary font-medium" : ""}`}
-                  onClick={() => setMobileMenuOpen(false)}
-                >
-                  Contact
-                </Link>
-                <div className="flex flex-col space-y-2 pt-4 border-t border-border">
-                  <Link
-                    href="/settings"
-                    onClick={() => setMobileMenuOpen(false)}
-                  >
+            <Link
+              href="/"
+              className={`block py-2 text-foreground/80 hover:text-primary transition-colors ${isActivePath("/") ? "text-primary font-medium" : ""}`}
+              onClick={() => setMobileMenuOpen(false)}
+            >
+              Home
+            </Link>
+            <Link
+              href="/jobs"
+              className={`block py-2 text-foreground/80 hover:text-primary transition-colors ${isActivePath("/jobs") ? "text-primary font-medium" : ""}`}
+              onClick={() => setMobileMenuOpen(false)}
+            >
+              Jobs
+            </Link>
+            <Link
+              href="/companies"
+              className={`block py-2 text-foreground/80 hover:text-primary transition-colors ${isActivePath("/companies") ? "text-primary font-medium" : ""}`}
+              onClick={() => setMobileMenuOpen(false)}
+            >
+              Companies
+            </Link>
+            <Link
+              href="/hire"
+              className={`block py-2 text-foreground/80 hover:text-primary transition-colors ${isActivePath("/hire") ? "text-primary font-medium" : ""}`}
+              onClick={() => setMobileMenuOpen(false)}
+            >
+              For Employers
+            </Link>
+
+            <Link
+              href="/about"
+              className={`block py-2 text-foreground/80 hover:text-primary transition-colors ${isActivePath("/about") ? "text-primary font-medium" : ""}`}
+              onClick={() => setMobileMenuOpen(false)}
+            >
+              About
+            </Link>
+            <Link
+              href="/contact"
+              className={`block py-2 text-foreground/80 hover:text-primary transition-colors ${isActivePath("/contact") ? "text-primary font-medium" : ""}`}
+              onClick={() => setMobileMenuOpen(false)}
+            >
+              Contact
+            </Link>
+            <div className="flex flex-col space-y-2 pt-4 border-t border-border">
+              {isAuthenticated ? (
+                <>
+                  <Link href="/settings" onClick={() => setMobileMenuOpen(false)}>
                     <Button variant="ghost" className="w-full justify-start">
                       <Settings className="mr-2 h-4 w-4" />
                       Settings
@@ -261,50 +243,20 @@ export function Navbar() {
                     <LogOut className="mr-2 h-4 w-4" />
                     Log out
                   </Button>
-                </div>
-              </>
-            ) : (
-              <>
-                <Link
-                  href="/"
-                  className="block py-2 text-foreground/80 hover:text-primary transition-colors"
-                  onClick={() => setMobileMenuOpen(false)}
-                >
-                  Find Jobs
-                </Link>
-                <Link
-                  href="/company"
-                  className="block py-2 text-foreground/80 hover:text-primary transition-colors"
-                  onClick={() => setMobileMenuOpen(false)}
-                >
-                  For Companies
-                </Link>
-                <Link
-                  href="/about"
-                  className="block py-2 text-foreground/80 hover:text-primary transition-colors"
-                  onClick={() => setMobileMenuOpen(false)}
-                >
-                  About
-                </Link>
-                <Link
-                  href="/contact"
-                  className="block py-2 text-foreground/80 hover:text-primary transition-colors"
-                  onClick={() => setMobileMenuOpen(false)}
-                >
-                  Contact
-                </Link>
-                <div className="flex flex-col space-y-2 pt-4 border-t border-border">
+                </>
+              ) : (
+                <>
                   <Link href="/login" onClick={() => setMobileMenuOpen(false)}>
-                    <Button variant="ghost" className="w-full">
+                    <Button variant="ghost" className="w-full justify-start">
                       Sign In
                     </Button>
                   </Link>
                   <Link href="/signup" onClick={() => setMobileMenuOpen(false)}>
-                    <Button className="w-full">Get Started</Button>
+                    <Button className="w-full justify-start">Get Started</Button>
                   </Link>
-                </div>
-              </>
-            )}
+                </>
+              )}
+            </div>
           </div>
         )}
       </div>

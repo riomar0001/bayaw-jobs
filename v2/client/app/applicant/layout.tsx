@@ -1,6 +1,6 @@
 "use client";
 
-import { Navbar } from "@/components/shared/navbar";
+import { Navbar } from "@/components/applicants/navbar";
 
 export default function ApplicantLayout({
   children,

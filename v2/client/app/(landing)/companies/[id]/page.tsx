@@ -1,15 +1,16 @@
 "use client";
 
-import { notFound } from "next/navigation";
-import { use } from "react";
+import { use, useState, useEffect } from "react";
 import Link from "next/link";
-import { companies, jobs } from "@/data";
+import { notFound } from "next/navigation";
 import { Footer } from "@/components/shared/footer";
-import { ArrowLeft } from "lucide-react";
+import { ArrowLeft, Loader2 } from "lucide-react";
 import { CompanyHeader } from "@/components/company/company-header";
 import { CompanyAbout } from "@/components/company/company-about";
 import { CompanyOpenPositions } from "@/components/company/company-open-positions";
 import { CompanySidebar } from "@/components/company/company-sidebar";
+import { businessService } from "@/api/services/business.service";
+import type { PublicCompany } from "@/api/types";
 
 export default function CompanyDetailPage({
   params,
@@ -17,13 +18,27 @@ export default function CompanyDetailPage({
   params: Promise<{ id: string }>;
 }) {
   const { id } = use(params);
-  const company = companies.find((c) => c.id === id);
+  const [company, setCompany] = useState<PublicCompany | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [notFoundError, setNotFoundError] = useState(false);
 
-  if (!company) notFound();
+  useEffect(() => {
+    businessService
+      .getPublicCompany(id)
+      .then(setCompany)
+      .catch(() => setNotFoundError(true))
+      .finally(() => setLoading(false));
+  }, [id]);
 
-  const companyJobs = jobs.filter(
-    (j) => j.company.toLowerCase() === company.name.toLowerCase(),
-  );
+  if (loading) {
+    return (
+      <main className="min-h-screen flex items-center justify-center">
+        <Loader2 className="h-8 w-8 animate-spin text-primary" />
+      </main>
+    );
+  }
+
+  if (notFoundError || !company) return notFound();
 
   return (
     <main className="min-h-screen bg-gradient-to-b from-muted/30 to-background">
@@ -43,7 +58,7 @@ export default function CompanyDetailPage({
           <div className="lg:col-span-2 space-y-6">
             <CompanyHeader company={company} />
             <CompanyAbout company={company} />
-            <CompanyOpenPositions jobs={companyJobs} />
+            <CompanyOpenPositions jobs={company.job_openings} />
           </div>
 
           <div className="lg:col-span-1">

@@ -353,7 +353,17 @@ export class CompanyRepository {
             is_headquarter: true,
           },
         },
-        _count: { select: { jobs: { where: { status: job_status.OPEN } } } },
+        jobs: {
+          where: { status: job_status.OPEN },
+          select: {
+            id: true,
+            title: true,
+            location: true,
+            location_type: true,
+            minimum_salary: true,
+            maximum_salary: true,
+          },
+        },
       },
     });
   }

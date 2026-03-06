@@ -724,6 +724,20 @@ const publicCompanyInfo = {
                       website: { type: 'string', example: 'https://acme.com' },
                       logo_url: { type: 'string', nullable: true, example: 'https://api.example.com/api/business/logo/companyId' },
                       open_positions: { type: 'integer', example: 8 },
+                      job_openings: {
+                        type: 'array',
+                        items: {
+                          type: 'object',
+                          properties: {
+                            id: { type: 'string', format: 'uuid' },
+                            title: { type: 'string', example: 'Frontend Engineer' },
+                            location: { type: 'string', example: 'San Francisco, CA' },
+                            location_type: { type: 'string', enum: ['REMOTE', 'ONSITE', 'HYBRID'], example: 'HYBRID' },
+                            minimum_salary: { type: 'string', example: '80000' },
+                            maximum_salary: { type: 'string', example: '120000' },
+                          },
+                        },
+                      },
                       companyLocations: {
                         type: 'array',
                         items: {
