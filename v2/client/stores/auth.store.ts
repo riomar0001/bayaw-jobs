@@ -1,4 +1,5 @@
 import { create } from "zustand";
+import { persist } from "zustand/middleware";
 import { authService } from "@/api/services/auth.service";
 import { apiClient } from "@/api/client";
 import type { User, RegisterInput, ResetPasswordInput } from "@/api/types";
@@ -26,119 +27,130 @@ interface AuthState {
   resetLoginStep: () => void;
 }
 
-export const useAuthStore = create<AuthState>((set, get) => {
-  // Wire apiClient to call logout when refresh fails
-  apiClient.setAuthErrorCallback(async () => {
-    await get().logout();
-  });
+export const useAuthStore = create<AuthState>()(
+  persist(
+    (set, get) => {
+      // Wire apiClient to call logout when refresh fails
+      apiClient.setAuthErrorCallback(async () => {
+        await get().logout();
+      });
 
-  return {
-    user: null,
-    isAuthenticated: false,
-    isLoading: false,
-    error: null,
-    _tempToken: null,
-    _loginStep: "idle",
-
-    login: async (email, password) => {
-      set({ isLoading: true, error: null });
-      try {
-        const { tempToken } = await authService.login({ email, password });
-        set({ _tempToken: tempToken, _loginStep: "otp", isLoading: false });
-      } catch (err) {
-        set({ error: (err as Error).message, isLoading: false });
-      }
-    },
-
-    verifyOtp: async (code) => {
-      const { _tempToken } = get();
-      if (!_tempToken) return;
-      set({ isLoading: true, error: null });
-      try {
-        const { user } = await authService.verifyAuth(code, _tempToken);
-        set({
-          user,
-          isAuthenticated: true,
-          _tempToken: null,
-          _loginStep: "idle",
-          isLoading: false,
-        });
-      } catch (err) {
-        set({ error: (err as Error).message, isLoading: false });
-      }
-    },
-
-    register: async (data) => {
-      set({ isLoading: true, error: null });
-      try {
-        await authService.register(data);
-        set({ isLoading: false });
-      } catch (err) {
-        set({ error: (err as Error).message, isLoading: false });
-      }
-    },
-
-    logout: async () => {
-      try {
-        await authService.logout();
-      } catch {
-        // Ignore errors — clear state regardless
-      }
-      set({
+      return {
         user: null,
         isAuthenticated: false,
+        isLoading: false,
+        error: null,
         _tempToken: null,
         _loginStep: "idle",
-        error: null,
-      });
-    },
 
-    refresh: async () => {
-      set({ isLoading: true });
-      try {
-        const data = await authService.refresh();
-        // Build a minimal User from the refresh response
-        set({
-          user: {
-            id: "",
-            email: "",
-            first_name: data.user.first_name ?? "",
-            last_name: data.user.last_name ?? "",
-            role: data.user.role,
-          },
-          isAuthenticated: true,
-          isLoading: false,
-        });
-      } catch {
-        set({ isAuthenticated: false, user: null, isLoading: false });
-      }
-    },
+        login: async (email, password) => {
+          set({ isLoading: true, error: null });
+          try {
+            const { tempToken } = await authService.login({ email, password });
+            set({ _tempToken: tempToken, _loginStep: "otp", isLoading: false });
+          } catch (err) {
+            set({ error: (err as Error).message, isLoading: false });
+          }
+        },
 
-    forgotPassword: async (email) => {
-      set({ isLoading: true, error: null });
-      try {
-        await authService.forgotPassword({ email });
-        set({ isLoading: false });
-      } catch (err) {
-        set({ error: (err as Error).message, isLoading: false });
-      }
-    },
+        verifyOtp: async (code) => {
+          const { _tempToken } = get();
+          if (!_tempToken) return;
+          set({ isLoading: true, error: null });
+          try {
+            const { user } = await authService.verifyAuth(code, _tempToken);
+            set({
+              user,
+              isAuthenticated: true,
+              _tempToken: null,
+              _loginStep: "idle",
+              isLoading: false,
+            });
+          } catch (err) {
+            set({ error: (err as Error).message, isLoading: false });
+          }
+        },
 
-    resetPassword: async (token, data) => {
-      set({ isLoading: true, error: null });
-      try {
-        await authService.resetPassword(token, data);
-        set({ isLoading: false });
-      } catch (err) {
-        set({ error: (err as Error).message, isLoading: false });
-      }
-    },
+        register: async (data) => {
+          set({ isLoading: true, error: null });
+          try {
+            await authService.register(data);
+            set({ isLoading: false });
+          } catch (err) {
+            set({ error: (err as Error).message, isLoading: false });
+          }
+        },
 
-    clearError: () => set({ error: null }),
-    resetLoginStep: () =>
-      set({ _loginStep: "idle", _tempToken: null, error: null }),
-  };
-});
+        logout: async () => {
+          try {
+            await authService.logout();
+          } catch {
+            // Ignore errors — clear state regardless
+          }
+          set({
+            user: null,
+            isAuthenticated: false,
+            _tempToken: null,
+            _loginStep: "idle",
+            error: null,
+          });
+        },
+
+        refresh: async () => {
+          set({ isLoading: true });
+          try {
+            const data = await authService.refresh();
+            // Build a minimal User from the refresh response
+            set({
+              user: {
+                id: "",
+                email: "",
+                first_name: data.user.first_name ?? "",
+                last_name: data.user.last_name ?? "",
+                role: data.user.role,
+              },
+              isAuthenticated: true,
+              isLoading: false,
+            });
+          } catch {
+            set({ isAuthenticated: false, user: null, isLoading: false });
+          }
+        },
+
+        forgotPassword: async (email) => {
+          set({ isLoading: true, error: null });
+          try {
+            await authService.forgotPassword({ email });
+            set({ isLoading: false });
+          } catch (err) {
+            set({ error: (err as Error).message, isLoading: false });
+          }
+        },
+
+        resetPassword: async (token, data) => {
+          set({ isLoading: true, error: null });
+          try {
+            await authService.resetPassword(token, data);
+            set({ isLoading: false });
+          } catch (err) {
+            set({ error: (err as Error).message, isLoading: false });
+          }
+        },
+
+        clearError: () => set({ error: null }),
+        resetLoginStep: () =>
+          set({ _loginStep: "idle", _tempToken: null, error: null }),
+      };
+    },
+    {
+      name: "auth-storage",
+      partialize: (state) => ({
+        user: state.user,
+        isAuthenticated: state.isAuthenticated,
+      }),
+    },
+  ),
+);
 
 // Convenience selectors
 export const selectUser = (s: AuthState) => s.user;
