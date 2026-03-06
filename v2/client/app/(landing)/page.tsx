@@ -1,6 +1,7 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
+import { useRouter } from "next/navigation";
 import { HeroSection } from "@/components/shared/hero-section";
 import { SearchBar } from "@/components/home/search-bar";
 import { JobCard } from "@/components/home/job-card";
@@ -12,6 +13,7 @@ import type { JobSummary, CompanySummary } from "@/api/types";
 import { TrendingUp, Loader2 } from "lucide-react";
 
 export default function Home() {
+  const router = useRouter();
   const [jobs, setJobs] = useState<JobSummary[]>([]);
   const [companies, setCompanies] = useState<CompanySummary[]>([]);
   const [loadingJobs, setLoadingJobs] = useState(true);
@@ -30,13 +32,24 @@ export default function Home() {
       .catch(() => setCompanies([]))
       .finally(() => setLoadingCompanies(false));
   }, []);
+
+  const handleSearch = useCallback(
+    (query: string, location: string) => {
+      const params = new URLSearchParams();
+      if (query) params.set("search", query);
+      if (location) params.set("location", location);
+      router.push(`/jobs${params.size > 0 ? `?${params}` : ""}`);
+    },
+    [router],
+  );
+
   return (
     <main className="overflow-hidden">
       <HeroSection
         title="Find Your Dream Job Today"
         subtitle="Connect with top companies and discover opportunities that match your skills and career goals"
       >
-        <SearchBar />
+        <SearchBar onSearch={handleSearch} />
       </HeroSection>
 
       {/* Featured Jobs Section */}

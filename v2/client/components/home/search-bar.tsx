@@ -7,11 +7,13 @@ import { Search, MapPin } from "lucide-react";
 
 interface SearchBarProps {
   onSearch?: (jobTitle: string, location: string) => void;
+  defaultJobTitle?: string;
+  defaultLocation?: string;
 }
 
-export function SearchBar({ onSearch }: SearchBarProps) {
-  const [jobTitle, setJobTitle] = useState("");
-  const [location, setLocation] = useState("");
+export function SearchBar({ onSearch, defaultJobTitle = "", defaultLocation = "" }: SearchBarProps) {
+  const [jobTitle, setJobTitle] = useState(defaultJobTitle);
+  const [location, setLocation] = useState(defaultLocation);
 
   const handleSearch = () => {
     if (onSearch) {

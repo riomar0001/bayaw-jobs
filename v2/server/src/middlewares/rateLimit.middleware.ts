@@ -2,11 +2,15 @@ import rateLimit from 'express-rate-limit';
 import { Config } from '@/constants/config.constant';
 import { TooManyRequestsError } from '@/utils/errors.util';
 
+const PUBLIC_GET_SKIP_PATHS = ['/api/jobs', '/api/companies'];
+
 export const generalRateLimiter = rateLimit({
   windowMs: Config.RATE_LIMIT.WINDOW_MS,
   max: Config.RATE_LIMIT.MAX_REQUESTS,
   standardHeaders: true,
   legacyHeaders: false,
+  skip: (req) =>
+    req.method === 'GET' && PUBLIC_GET_SKIP_PATHS.some((path) => req.path.startsWith(path)),
   handler: (_req, _res, next) => {
     next(new TooManyRequestsError('Too many requests, please try again later'));
   },

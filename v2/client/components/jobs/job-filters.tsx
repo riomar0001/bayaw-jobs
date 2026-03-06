@@ -85,7 +85,7 @@ export function JobFilters({ filters, onFilterChange }: JobFiltersProps) {
         {/* Salary Range */}
         <div className="space-y-3">
           <Label className="text-sm font-semibold">
-            Salary Range: ${filters.salaryRange[0]}k - ${filters.salaryRange[1]}
+            Salary Range: PHP {filters.salaryRange[0]}k - {filters.salaryRange[1]}
             k
           </Label>
           <Slider

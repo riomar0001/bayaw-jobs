@@ -1,29 +1,37 @@
 "use client";
 
 import { useState, useEffect, useCallback } from "react";
+import { useSearchParams } from "next/navigation";
 import { Footer } from "@/components/shared/footer";
 import { SearchBar } from "@/components/home/search-bar";
 import { JobCard } from "@/components/home/job-card";
 import { JobFilters } from "@/components/jobs/job-filters";
 import { Pagination } from "@/components/shared/pagination";
 import { jobsService } from "@/api/services/jobs.service";
+import { useDebounce } from "@/hooks/use-debounce";
 import type { JobSummary, PaginationMeta, EmploymentType } from "@/api/types";
 import { Loader2 } from "lucide-react";
 
 const JOBS_PER_PAGE = 12;
 
 export default function JobsPage() {
+  const searchParams = useSearchParams();
+
   const [jobs, setJobs] = useState<JobSummary[]>([]);
   const [meta, setMeta] = useState<PaginationMeta | null>(null);
   const [loading, setLoading] = useState(true);
   const [currentPage, setCurrentPage] = useState(1);
-  const [searchQuery, setSearchQuery] = useState("");
-  const [searchLocation, setSearchLocation] = useState("");
+  const [searchQuery, setSearchQuery] = useState(searchParams.get("search") ?? "");
+  const [searchLocation, setSearchLocation] = useState(searchParams.get("location") ?? "");
   const [filters, setFilters] = useState({
     jobTypes: [] as string[],
     location: "",
     salaryRange: [0, 200],
   });
+
+  const debouncedSearchQuery = useDebounce(searchQuery, 400);
+  const debouncedSearchLocation = useDebounce(searchLocation, 400);
+  const debouncedFilters = useDebounce(filters, 400);
 
   const fetchJobs = useCallback(async () => {
     setLoading(true);
@@ -31,18 +39,18 @@ export default function JobsPage() {
       const res = await jobsService.getJobs({
         page: currentPage,
         limit: JOBS_PER_PAGE,
-        ...(searchQuery && { search: searchQuery }),
-        ...((searchLocation || filters.location) && {
-          location: searchLocation || filters.location,
+        ...(debouncedSearchQuery && { search: debouncedSearchQuery }),
+        ...((debouncedSearchLocation || debouncedFilters.location) && {
+          location: debouncedSearchLocation || debouncedFilters.location,
         }),
-        ...(filters.jobTypes.length === 1 && {
-          employment_type: filters.jobTypes[0] as EmploymentType,
+        ...(debouncedFilters.jobTypes.length === 1 && {
+          employment_type: debouncedFilters.jobTypes[0] as EmploymentType,
         }),
-        ...(filters.salaryRange[0] > 0 && {
-          min_salary: filters.salaryRange[0] * 1000,
+        ...(debouncedFilters.salaryRange[0] > 0 && {
+          min_salary: debouncedFilters.salaryRange[0] * 1000,
         }),
-        ...(filters.salaryRange[1] < 200 && {
-          max_salary: filters.salaryRange[1] * 1000,
+        ...(debouncedFilters.salaryRange[1] < 200 && {
+          max_salary: debouncedFilters.salaryRange[1] * 1000,
         }),
       });
       setJobs(res.data);
@@ -53,7 +61,7 @@ export default function JobsPage() {
     } finally {
       setLoading(false);
     }
-  }, [currentPage, searchQuery, searchLocation, filters]);
+  }, [currentPage, debouncedSearchQuery, debouncedSearchLocation, debouncedFilters]);
 
   useEffect(() => {
     fetchJobs();
@@ -96,7 +104,11 @@ export default function JobsPage() {
 
         {/* Search Bar */}
         <div className="mb-20">
-          <SearchBar onSearch={handleSearch} />
+          <SearchBar
+            onSearch={handleSearch}
+            defaultJobTitle={searchQuery}
+            defaultLocation={searchLocation}
+          />
         </div>
 
         {/* 2-Column Layout */}
