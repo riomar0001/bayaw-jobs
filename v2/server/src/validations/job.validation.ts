@@ -7,7 +7,9 @@ const jobBodyFields = {
   location_type: z.enum(['ONSITE', 'REMOTE', 'HYBRID'], {
     error: 'location_type must be one of: ONSITE, REMOTE, HYBRID',
   }),
-  employment_type: z.string().min(1, 'Employment type is required'),
+  employment_type: z.enum(['FULL_TIME', 'PART_TIME', 'CONTRACT', 'FREELANCE', 'INTERN'], {
+    error: 'employment_type must be one of: FULL_TIME, PART_TIME, CONTRACT, FREELANCE, INTERN',
+  }),
   minimum_salary: z.string().min(1, 'Minimum salary is required'),
   maximum_salary: z.string().min(1, 'Maximum salary is required'),
   currency: z.string().min(1, 'Currency is required'),
@@ -40,7 +42,7 @@ export const getAllJobsSchema = z.object({
       .refine((val) => val === undefined || /^\d+$/.test(val), {
         message: 'limit must be a positive integer',
       }),
-    employment_type: z.string().optional(),
+    employment_type: z.enum(['FULL_TIME', 'PART_TIME', 'CONTRACT', 'FREELANCE', 'INTERN']).optional(),
     location_type: z.enum(['ONSITE', 'REMOTE', 'HYBRID']).optional(),
     location: z.string().optional(),
     min_salary: z.coerce.number().positive().optional(),

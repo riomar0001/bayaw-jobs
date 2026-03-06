@@ -7,7 +7,7 @@ import { JobCard } from "@/components/home/job-card";
 import { JobFilters } from "@/components/jobs/job-filters";
 import { Pagination } from "@/components/shared/pagination";
 import { jobsService } from "@/api/services/jobs.service";
-import type { JobSummary, PaginationMeta } from "@/api/types";
+import type { JobSummary, PaginationMeta, EmploymentType } from "@/api/types";
 import { Loader2 } from "lucide-react";
 
 const JOBS_PER_PAGE = 12;
@@ -36,7 +36,7 @@ export default function JobsPage() {
           location: searchLocation || filters.location,
         }),
         ...(filters.jobTypes.length === 1 && {
-          employment_type: filters.jobTypes[0],
+          employment_type: filters.jobTypes[0] as EmploymentType,
         }),
         ...(filters.salaryRange[0] > 0 && {
           min_salary: filters.salaryRange[0] * 1000,

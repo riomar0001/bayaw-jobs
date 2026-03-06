@@ -1,4 +1,5 @@
 import prisma from '@/configs/prisma.config';
+import { job_status } from '@/generated/prisma/client';
 
 const COMPANY_INCLUDE = {
   companyContacts: true,
@@ -138,7 +139,7 @@ export class CompanyRepository {
         company_size: true,
         logo: true,
         website: true,
-        _count: { select: { jobs: { where: { status: 'OPEN' } } } },
+        _count: { select: { jobs: { where: { status: job_status.OPEN } } } },
       },
     });
   }
@@ -301,7 +302,7 @@ export class CompanyRepository {
           companyLocations: {
             select: { id: true, city: true, country: true, is_headquarter: true },
           },
-          _count: { select: { jobs: { where: { status: 'OPEN' } } } },
+          _count: { select: { jobs: { where: { status: job_status.OPEN } } } },
         },
       }),
       prisma.company_information.count({ where }),
@@ -352,7 +353,7 @@ export class CompanyRepository {
             is_headquarter: true,
           },
         },
-        _count: { select: { jobs: { where: { status: 'OPEN' } } } },
+        _count: { select: { jobs: { where: { status: job_status.OPEN } } } },
       },
     });
   }
@@ -492,8 +493,8 @@ export class CompanyRepository {
   async getJobPostingStats(companyId: string) {
     const [total_jobs, active_jobs, closed_jobs, total_applicants] = await prisma.$transaction([
       prisma.job.count({ where: { company_id: companyId } }),
-      prisma.job.count({ where: { company_id: companyId, status: 'OPEN' } }),
-      prisma.job.count({ where: { company_id: companyId, status: 'CLOSED' } }),
+      prisma.job.count({ where: { company_id: companyId, status: job_status.OPEN } }),
+      prisma.job.count({ where: { company_id: companyId, status: job_status.CLOSED } }),
       prisma.applicant_applied_job.count({ where: { job: { company_id: companyId } } }),
     ]);
 

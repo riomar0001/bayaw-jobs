@@ -1,4 +1,4 @@
-import { location_type, job_status } from '@/generated/prisma/enums';
+import { location_type, employment_type, job_status } from '@/generated/prisma/enums';
 import { GetAllJobsQuery } from '@/validations/job.validation';
 import { jobRepository } from '@/repositories/job.repository';
 import { userRepository } from '@/repositories/user.repository';
@@ -26,7 +26,7 @@ export class JobService {
     return jobRepository.findAll({
       page,
       limit,
-      ...(query.employment_type && { employment_type: query.employment_type }),
+      ...(query.employment_type && { employment_type: query.employment_type as employment_type }),
       ...(query.location_type && { location_type: query.location_type as location_type }),
       ...(query.location && { location: query.location }),
       ...(query.min_salary !== undefined && { min_salary: query.min_salary }),
@@ -85,14 +85,14 @@ export class JobService {
     return jobRepository.create({
       ...rest,
       company_id: companyId,
-      location_type: data.location_type as location_type,
+      location_type: data.location_type,
       minimum_salary: data.minimum_salary.toString(),
       maximum_salary: data.maximum_salary.toString(),
-      ...(status ? { status: status as job_status } : {}),
+      ...(status ? { status } : {}),
     });
   }
 
-  async updateJobStatus(jobId: string, status: string, userId: string, companyId: string) {
+  async updateJobStatus(jobId: string, status: job_status, userId: string, companyId: string) {
     const existingJob = await jobRepository.findById(jobId);
     if (!existingJob) {
       throw new NotFoundError('Job not found');
@@ -112,7 +112,7 @@ export class JobService {
       throw new AuthorizationError('Only authorized company users can update job postings');
     }
 
-    return jobRepository.updateStatus(jobId, companyId, status as job_status);
+    return jobRepository.updateStatus(jobId, companyId, status);
   }
 
   async updateJob(id: string, data: Partial<CreateJobData>, userId: string, companyId: string) {
@@ -149,10 +149,10 @@ export class JobService {
     const { status: updateStatus, ...updateRest } = data;
     return jobRepository.update(id, companyId, {
       ...updateRest,
-      location_type: (data.location_type as location_type) || existingJob.location_type,
+      location_type: data.location_type || existingJob.location_type,
       minimum_salary: data.minimum_salary?.toString() || existingJob.minimum_salary,
       maximum_salary: data.maximum_salary?.toString() || existingJob.maximum_salary,
-      ...(updateStatus ? { status: updateStatus as job_status } : {}),
+      ...(updateStatus ? { status: updateStatus } : {}),
     });
   }
 }

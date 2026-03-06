@@ -394,7 +394,7 @@ model job {
   department       String
   location         String
   location_type    location_type
-  employment_type  String
+  employment_type  employment_type
   minimum_salary   String
   maximum_salary   String
   currency         String
@@ -480,4 +480,12 @@ enum job_status {
   OPEN
   CLOSED
   PAUSED
+}
+
+enum employment_type {
+  FULL_TIME
+  PART_TIME
+  CONTRACT
+  FREELANCE
+  INTERN
 }

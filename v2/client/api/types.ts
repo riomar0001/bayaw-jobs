@@ -279,7 +279,7 @@ export interface ActiveApplication {
     title: string;
     department: string;
     location: string;
-    employment_type: string;
+    employment_type: EmploymentType;
     company_id: string;
   };
 }
@@ -304,16 +304,17 @@ export interface Application {
     title: string;
     department: string;
     location: string;
-    employment_type: string;
+    employment_type: EmploymentType;
     location_type: LocationType;
     company_id: string;
   };
 }
 
-// ─── Jobs ────────────────────────────────────────────────────────────────────
+// ─── Jobs ─────────────────────────────────────────────────────────────────────
 
 export type LocationType = "ONSITE" | "REMOTE" | "HYBRID";
 export type JobStatus = "OPEN" | "CLOSED" | "PAUSED";
+export type EmploymentType = "FULL_TIME" | "PART_TIME" | "CONTRACT" | "FREELANCE" | "INTERN";
 
 export interface Job {
   id: string;
@@ -322,7 +323,7 @@ export interface Job {
   department: string;
   location: string;
   location_type: LocationType;
-  employment_type: string;
+  employment_type: EmploymentType;
   minimum_salary: string;
   maximum_salary: string;
   currency: string;
@@ -342,7 +343,7 @@ export interface JobSummary {
   department: string;
   location: string;
   location_type: LocationType;
-  employment_type: string;
+  employment_type: EmploymentType;
   minimum_salary: string;
   maximum_salary: string;
   currency: string;
@@ -359,7 +360,7 @@ export interface CompanyJob {
   title: string;
   department: string;
   location: string;
-  employment_type: string;
+  employment_type: EmploymentType;
   location_type: LocationType;
   status: JobStatus;
   applicant_count: number;
@@ -401,7 +402,7 @@ export interface CreateJobInput {
   department: string;
   location: string;
   location_type: LocationType;
-  employment_type: string;
+  employment_type: EmploymentType;
   minimum_salary: string;
   maximum_salary: string;
   currency: string;
@@ -419,7 +420,7 @@ export interface JobFilters {
   limit?: number;
   search?: string;
   location_type?: LocationType;
-  employment_type?: string;
+  employment_type?: EmploymentType;
   location?: string;
   min_salary?: number;
   max_salary?: number;

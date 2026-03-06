@@ -1,12 +1,12 @@
 import prisma from '@/configs/prisma.config';
-import { Prisma, location_type, job_status } from '@/generated/prisma/client';
+import { Prisma, location_type, employment_type, job_status } from '@/generated/prisma/client';
 
 export interface CreateJobData {
   title: string;
   department: string;
   location: string;
   location_type: location_type;
-  employment_type: string;
+  employment_type: employment_type;
   minimum_salary: string;
   maximum_salary: string;
   currency: string;
@@ -34,7 +34,7 @@ export class JobRepository {
   async findAll(params: {
     page?: number;
     limit?: number;
-    employment_type?: string;
+    employment_type?: employment_type;
     location_type?: location_type;
     location?: string;
     min_salary?: number;
@@ -45,7 +45,7 @@ export class JobRepository {
     const skip = (page - 1) * limit;
 
     const where: Prisma.jobWhereInput = {
-      status: 'OPEN',
+      status: job_status.OPEN,
       ...(employment_type && { employment_type }),
       ...(locType && { location_type: locType }),
       ...(location && { location: { contains: location, mode: 'insensitive' } }),
@@ -108,7 +108,7 @@ export class JobRepository {
 
   async findPopularJobs(limit: number = 4) {
     return prisma.job.findMany({
-      where: { status: 'OPEN' },
+      where: { status: job_status.OPEN },
       take: limit,
       orderBy: { applicant_applied_job: { _count: 'desc' } },
       select: {
@@ -199,7 +199,7 @@ export class JobRepository {
         qualifications: data.qualifications,
         benefits: data.benefits,
         company_id: data.company_id,
-        status: data.status || 'OPEN',
+        status: data.status || job_status.OPEN,
       },
     });
   }
@@ -220,7 +220,7 @@ export class JobRepository {
 
   async findTopJobs(limit: number = 8) {
     return prisma.job.findMany({
-      where: { status: 'OPEN' },
+      where: { status: job_status.OPEN },
       take: limit,
       orderBy: { created_at: 'desc' },
       select: {

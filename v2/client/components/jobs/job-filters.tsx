@@ -18,7 +18,13 @@ interface JobFiltersProps {
   onFilterChange: (filters: JobFiltersState) => void;
 }
 
-const jobTypes = ["Full-time", "Part-time", "Contract", "Internship"];
+const jobTypes = [
+  { value: "FULL_TIME", label: "Full Time" },
+  { value: "PART_TIME", label: "Part Time" },
+  { value: "CONTRACT", label: "Contract" },
+  { value: "FREELANCE", label: "Freelance" },
+  { value: "INTERN", label: "Internship" },
+];
 
 export function JobFilters({ filters, onFilterChange }: JobFiltersProps) {
   const handleJobTypeChange = (type: string, checked: boolean) => {
@@ -45,16 +51,16 @@ export function JobFilters({ filters, onFilterChange }: JobFiltersProps) {
           <Label className="text-sm font-semibold">Job Type</Label>
           <div className="space-y-2">
             {jobTypes.map((type) => (
-              <div key={type} className="flex items-center space-x-2">
+              <div key={type.value} className="flex items-center space-x-2">
                 <Checkbox
-                  id={type}
-                  checked={filters.jobTypes.includes(type)}
+                  id={type.value}
+                  checked={filters.jobTypes.includes(type.value)}
                   onCheckedChange={(checked) =>
-                    handleJobTypeChange(type, checked as boolean)
+                    handleJobTypeChange(type.value, checked as boolean)
                   }
                 />
-                <Label htmlFor={type} className="font-normal cursor-pointer">
-                  {type}
+                <Label htmlFor={type.value} className="font-normal cursor-pointer">
+                  {type.label}
                 </Label>
               </div>
             ))}

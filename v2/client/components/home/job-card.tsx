@@ -11,7 +11,21 @@ import {
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { MapPin, DollarSign, Briefcase } from "lucide-react";
-import type { JobSummary } from "@/api/types";
+import type { JobSummary, EmploymentType, LocationType } from "@/api/types";
+
+const employmentTypeLabels: Record<EmploymentType, string> = {
+  FULL_TIME: "Full Time",
+  PART_TIME: "Part Time",
+  CONTRACT: "Contract",
+  FREELANCE: "Freelance",
+  INTERN: "Internship",
+};
+
+const locationTypeLabels: Record<LocationType, string> = {
+  ONSITE: "On-site",
+  REMOTE: "Remote",
+  HYBRID: "Hybrid",
+};
 
 interface JobCardProps {
   job: JobSummary;
@@ -29,10 +43,10 @@ export function JobCard({ job }: JobCardProps) {
             variant="secondary"
             className="bg-primary/10 text-primary border-primary/20 group-hover:bg-primary/20 transition-colors"
           >
-            {job.employment_type}
+            {employmentTypeLabels[job.employment_type] ?? job.employment_type}
           </Badge>
           <Badge variant="outline" className="text-xs">
-            {job.location_type}
+            {locationTypeLabels[job.location_type] ?? job.location_type}
           </Badge>
         </div>
         <CardTitle className="text-xl group-hover:text-primary transition-colors">
