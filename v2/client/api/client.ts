@@ -20,15 +20,21 @@ export class ApiError extends Error {
   }
 }
 
-type RefreshSubscriber = (token: string) => void;
+type RefreshSubscriber = {
+  onSuccess: (token: string) => void;
+  onError: (error: unknown) => void;
+};
 type AuthErrorCallback = () => void;
+type RefreshFn = () => Promise<string>;
 
 class ApiClient {
   private instance: AxiosInstance;
   private token: string | null = null;
   private isRefreshing = false;
+  private pendingRefresh: Promise<string> | null = null;
   private refreshSubscribers: RefreshSubscriber[] = [];
   private onAuthError: AuthErrorCallback | null = null;
+  private refreshFn: RefreshFn | null = null;
 
   constructor() {
     this.instance = axios.create({
@@ -46,23 +52,62 @@ class ApiClient {
     this.onAuthError = cb;
   }
 
+  /** Register the function that performs the actual token refresh (called by both explicit refresh and the interceptor) */
+  setRefreshFn(fn: RefreshFn) {
+    this.refreshFn = fn;
+  }
+
   setToken(token: string | null) {
     this.token = token;
   }
 
-  private addRefreshSubscriber(cb: RefreshSubscriber) {
-    this.refreshSubscribers.push(cb);
+  private addRefreshSubscriber(onSuccess: (token: string) => void, onError: (error: unknown) => void) {
+    this.refreshSubscribers.push({ onSuccess, onError });
   }
 
   private notifySubscribers(token: string) {
-    this.refreshSubscribers.forEach((cb) => cb(token));
+    this.refreshSubscribers.forEach((s) => s.onSuccess(token));
     this.refreshSubscribers = [];
   }
 
   private rejectSubscribers(error: unknown) {
-    this.refreshSubscribers.forEach((_, __, arr) => arr.splice(0));
+    this.refreshSubscribers.forEach((s) => s.onError(error));
     this.refreshSubscribers = [];
-    void error;
+  }
+
+  /**
+   * Single entry point for token refresh — used by both the explicit store.refresh() call
+   * and the 401 interceptor. The isRefreshing flag and pendingRefresh promise ensure only
+   * one refresh call is in-flight at a time, regardless of which path triggered it.
+   */
+  triggerRefresh(): Promise<string> {
+    if (this.pendingRefresh) return this.pendingRefresh;
+
+    if (!this.refreshFn) {
+      const err = new Error("No refresh function registered");
+      this.onAuthError?.();
+      return Promise.reject(err);
+    }
+
+    this.isRefreshing = true;
+    this.pendingRefresh = this.refreshFn()
+      .then((token) => {
+        this.setToken(token);
+        this.notifySubscribers(token);
+        return token;
+      })
+      .catch((err) => {
+        this.rejectSubscribers(err);
+        this.setToken(null);
+        this.onAuthError?.();
+        throw err;
+      })
+      .finally(() => {
+        this.isRefreshing = false;
+        this.pendingRefresh = null;
+      });
+
+    return this.pendingRefresh;
   }
 
   private setupInterceptors() {
@@ -100,36 +145,22 @@ class ApiClient {
           if (this.isRefreshing) {
             // Queue while another refresh is in progress
             return new Promise<AxiosResponse>((resolve, reject) => {
-              this.addRefreshSubscriber((newToken) => {
-                original.headers["Authorization"] = `Bearer ${newToken}`;
-                resolve(this.instance(original));
-              });
-              void reject; // reject path handled by rejectSubscribers
+              this.addRefreshSubscriber(
+                (newToken) => {
+                  original.headers["Authorization"] = `Bearer ${newToken}`;
+                  resolve(this.instance(original));
+                },
+                (err) => reject(err),
+              );
             });
           }
 
-          this.isRefreshing = true;
-
           try {
-            const res = await this.instance.post<{
-              data?: { accessToken?: string };
-            }>("/auth/refresh");
-            const newToken = res.data?.data?.accessToken;
-
-            if (!newToken)
-              throw new Error("No access token in refresh response");
-
-            this.setToken(newToken);
-            this.notifySubscribers(newToken);
+            const newToken = await this.triggerRefresh();
             original.headers["Authorization"] = `Bearer ${newToken}`;
             return this.instance(original);
           } catch (refreshError) {
-            this.rejectSubscribers(refreshError);
-            this.setToken(null);
-            this.onAuthError?.();
             return Promise.reject(refreshError);
-          } finally {
-            this.isRefreshing = false;
           }
         }
 
