@@ -85,8 +85,12 @@ export class CompanyRepository {
 
   async upsertAdminProfilePicture(userId: string, companyId: string, fileName: string) {
     return prisma.$transaction(async (tx) => {
-      await tx.company_admin_profile_picture.deleteMany({ where: { user_id: userId, company_id: companyId } });
-      return tx.company_admin_profile_picture.create({ data: { user_id: userId, company_id: companyId, file_name: fileName } });
+      await tx.company_admin_profile_picture.deleteMany({
+        where: { user_id: userId, company_id: companyId },
+      });
+      return tx.company_admin_profile_picture.create({
+        data: { user_id: userId, company_id: companyId, file_name: fileName },
+      });
     });
   }
 
@@ -228,7 +232,6 @@ export class CompanyRepository {
       weekStart.setDate(startOfThisWeek.getDate() - (7 - i) * 7);
       return { week_start: new Date(weekStart), count: 0 };
     });
-    
 
     for (const app of trendApplications) {
       const appDate = new Date(app.application_date);
@@ -370,7 +373,12 @@ export class CompanyRepository {
 
   async updateCompanyInfo(
     companyId: string,
-    data: Partial<Pick<CreateCompanyData, 'company_name' | 'industry' | 'about' | 'company_size' | 'foundation_year' | 'website'>>
+    data: Partial<
+      Pick<
+        CreateCompanyData,
+        'company_name' | 'industry' | 'about' | 'company_size' | 'foundation_year' | 'website'
+      >
+    >
   ) {
     return prisma.company_information.update({
       where: { id: companyId },
@@ -392,11 +400,18 @@ export class CompanyRepository {
   async upsertSocialLinks(companyId: string, links: { platform: string; url: string | null }[]) {
     const ops = links.flatMap(({ platform, url }) => {
       const del = prisma.company_social_link.deleteMany({
-        where: { company_id: companyId, platform: platform as 'FACEBOOK' | 'TWITTER' | 'LINKEDIN' | 'INSTAGRAM' },
+        where: {
+          company_id: companyId,
+          platform: platform as 'FACEBOOK' | 'TWITTER' | 'LINKEDIN' | 'INSTAGRAM',
+        },
       });
       if (!url) return [del];
       const create = prisma.company_social_link.create({
-        data: { company_id: companyId, platform: platform as 'FACEBOOK' | 'TWITTER' | 'LINKEDIN' | 'INSTAGRAM', url },
+        data: {
+          company_id: companyId,
+          platform: platform as 'FACEBOOK' | 'TWITTER' | 'LINKEDIN' | 'INSTAGRAM',
+          url,
+        },
       });
       return [del, create];
     });
@@ -411,7 +426,14 @@ export class CompanyRepository {
 
   async addLocation(
     companyId: string,
-    data: { address: string; city: string; state: string; country: string; postal_code: string; is_headquarter?: boolean }
+    data: {
+      address: string;
+      city: string;
+      state: string;
+      country: string;
+      postal_code: string;
+      is_headquarter?: boolean;
+    }
   ) {
     return prisma.company_location.create({ data: { company_id: companyId, ...data } });
   }
@@ -419,15 +441,26 @@ export class CompanyRepository {
   async updateLocation(
     locationId: string,
     companyId: string,
-    data: { address?: string; city?: string; state?: string; country?: string; postal_code?: string; is_headquarter?: boolean }
+    data: {
+      address?: string;
+      city?: string;
+      state?: string;
+      country?: string;
+      postal_code?: string;
+      is_headquarter?: boolean;
+    }
   ) {
-    const existing = await prisma.company_location.findFirst({ where: { id: locationId, company_id: companyId } });
+    const existing = await prisma.company_location.findFirst({
+      where: { id: locationId, company_id: companyId },
+    });
     if (!existing) return null;
     return prisma.company_location.update({ where: { id: locationId }, data });
   }
 
   async deleteLocation(locationId: string, companyId: string) {
-    const existing = await prisma.company_location.findFirst({ where: { id: locationId, company_id: companyId } });
+    const existing = await prisma.company_location.findFirst({
+      where: { id: locationId, company_id: companyId },
+    });
     if (!existing) return null;
     return prisma.company_location.delete({ where: { id: locationId } });
   }

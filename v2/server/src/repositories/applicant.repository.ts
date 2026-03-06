@@ -162,7 +162,9 @@ export class ApplicantRepository {
 
   async updateEducation(
     id: string,
-    data: Partial<Pick<ApplicantEducation, 'institution_name' | 'field_of_study' | 'start_year'>> & {
+    data: Partial<
+      Pick<ApplicantEducation, 'institution_name' | 'field_of_study' | 'start_year'>
+    > & {
       end_year?: number | null;
     }
   ) {
@@ -268,10 +270,21 @@ export class ApplicantRepository {
       prisma.applicant_applied_job.count({ where: { applicant_profile_id: profileId } }),
     ]);
 
-    const ALL_STATUSES = ['NEW', 'SCREENING', 'INTERVIEW', 'OFFER', 'REJECTED', 'HIRED', 'CANCELLED'] as const;
+    const ALL_STATUSES = [
+      'NEW',
+      'SCREENING',
+      'INTERVIEW',
+      'OFFER',
+      'REJECTED',
+      'HIRED',
+      'CANCELLED',
+    ] as const;
     const countsMap = Object.fromEntries(grouped.map((g) => [g.status, g._count._all]));
     const stats = ALL_STATUSES.reduce(
-      (acc, s) => { acc[s] = countsMap[s] ?? 0; return acc; },
+      (acc, s) => {
+        acc[s] = countsMap[s] ?? 0;
+        return acc;
+      },
       {} as Record<string, number>
     );
 

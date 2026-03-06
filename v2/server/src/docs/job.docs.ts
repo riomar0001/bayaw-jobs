@@ -148,7 +148,11 @@ const getTopJobs = {
                         title: { type: 'string', example: 'Senior Software Engineer' },
                         department: { type: 'string', example: 'Engineering' },
                         location: { type: 'string', example: 'Cebu City, Philippines' },
-                        location_type: { type: 'string', enum: ['ONSITE', 'REMOTE', 'HYBRID'], example: 'HYBRID' },
+                        location_type: {
+                          type: 'string',
+                          enum: ['ONSITE', 'REMOTE', 'HYBRID'],
+                          example: 'HYBRID',
+                        },
                         employment_type: { type: 'string', example: 'Full-time' },
                         minimum_salary: { type: 'string', example: '50000' },
                         maximum_salary: { type: 'string', example: '80000' },
@@ -176,16 +180,70 @@ const getAllJobs = {
     get: {
       tags: ['Jobs'],
       summary: 'Get all job postings with pagination and filters',
-      description: 'Returns all OPEN job postings. Supports pagination, keyword search, and filters by job type, location, location type, and salary range.',
+      description:
+        'Returns all OPEN job postings. Supports pagination, keyword search, and filters by job type, location, location type, and salary range.',
       parameters: [
-        { name: 'page', in: 'query', required: false, schema: { type: 'integer', default: 1, minimum: 1 } },
-        { name: 'limit', in: 'query', required: false, schema: { type: 'integer', default: 10, minimum: 1, maximum: 100 } },
-        { name: 'search', in: 'query', required: false, schema: { type: 'string' }, description: 'Search by job title or department (case-insensitive)', example: 'engineer' },
-        { name: 'employment_type', in: 'query', required: false, schema: { type: 'string' }, description: 'Filter by job type', example: 'Full-time' },
-        { name: 'location_type', in: 'query', required: false, schema: { type: 'string', enum: ['ONSITE', 'REMOTE', 'HYBRID'] }, description: 'Filter by work arrangement' },
-        { name: 'location', in: 'query', required: false, schema: { type: 'string' }, description: 'Filter by location (partial match)', example: 'Manila' },
-        { name: 'min_salary', in: 'query', required: false, schema: { type: 'number' }, description: 'Minimum salary range filter — excludes jobs whose maximum salary is below this value', example: 30000 },
-        { name: 'max_salary', in: 'query', required: false, schema: { type: 'number' }, description: 'Maximum salary range filter — excludes jobs whose minimum salary exceeds this value', example: 100000 },
+        {
+          name: 'page',
+          in: 'query',
+          required: false,
+          schema: { type: 'integer', default: 1, minimum: 1 },
+        },
+        {
+          name: 'limit',
+          in: 'query',
+          required: false,
+          schema: { type: 'integer', default: 10, minimum: 1, maximum: 100 },
+        },
+        {
+          name: 'search',
+          in: 'query',
+          required: false,
+          schema: { type: 'string' },
+          description: 'Search by job title or department (case-insensitive)',
+          example: 'engineer',
+        },
+        {
+          name: 'employment_type',
+          in: 'query',
+          required: false,
+          schema: { type: 'string' },
+          description: 'Filter by job type',
+          example: 'Full-time',
+        },
+        {
+          name: 'location_type',
+          in: 'query',
+          required: false,
+          schema: { type: 'string', enum: ['ONSITE', 'REMOTE', 'HYBRID'] },
+          description: 'Filter by work arrangement',
+        },
+        {
+          name: 'location',
+          in: 'query',
+          required: false,
+          schema: { type: 'string' },
+          description: 'Filter by location (partial match)',
+          example: 'Manila',
+        },
+        {
+          name: 'min_salary',
+          in: 'query',
+          required: false,
+          schema: { type: 'number' },
+          description:
+            'Minimum salary range filter — excludes jobs whose maximum salary is below this value',
+          example: 30000,
+        },
+        {
+          name: 'max_salary',
+          in: 'query',
+          required: false,
+          schema: { type: 'number' },
+          description:
+            'Maximum salary range filter — excludes jobs whose minimum salary exceeds this value',
+          example: 100000,
+        },
       ],
       responses: {
         200: {
@@ -237,7 +295,7 @@ const getCompanyJobs = {
       tags: ['Jobs'],
       summary: "Get the authenticated company's job postings",
       description:
-        'Returns all job postings belonging to the authenticated user\'s company, resolved from the JWT token. ' +
+        "Returns all job postings belonging to the authenticated user's company, resolved from the JWT token. " +
         'Supports pagination via page and limit query parameters.',
       security: [{ bearerAuth: [] }],
       parameters: [
@@ -614,11 +672,20 @@ const jobById = {
                       },
                       application: {
                         type: 'object',
-                        description: 'Only present when the authenticated applicant has already applied to this job.',
+                        description:
+                          'Only present when the authenticated applicant has already applied to this job.',
                         properties: {
                           status: {
                             type: 'string',
-                            enum: ['NEW', 'SCREENING', 'INTERVIEW', 'OFFER', 'HIRED', 'REJECTED', 'CANCELLED'],
+                            enum: [
+                              'NEW',
+                              'SCREENING',
+                              'INTERVIEW',
+                              'OFFER',
+                              'HIRED',
+                              'REJECTED',
+                              'CANCELLED',
+                            ],
                             example: 'NEW',
                           },
                           application_date: { type: 'string', format: 'date-time' },
@@ -640,7 +707,7 @@ const jobById = {
       summary: 'Update an existing job posting',
       description:
         'Updates a job posting. Both the user and company are resolved from the JWT token. ' +
-        'The update is scoped to the authenticated user\'s company — the job must belong to their company or the request will fail. ' +
+        "The update is scoped to the authenticated user's company — the job must belong to their company or the request will fail. " +
         'All body fields are optional; at least one must be provided.',
       security: [{ bearerAuth: [] }],
       parameters: [
@@ -724,7 +791,7 @@ const createJob = {
       tags: ['Jobs'],
       summary: 'Create a new job posting',
       description:
-        'Creates a job posting under the authenticated user\'s company. ' +
+        "Creates a job posting under the authenticated user's company. " +
         'The company is resolved automatically from the JWT token — no company_id is required in the request body. ' +
         'The token must include a company_id (i.e. the user must have completed company onboarding).',
       security: [{ bearerAuth: [] }],
@@ -814,7 +881,7 @@ const updateJobStatus = {
       summary: 'Update job posting status',
       description:
         'Updates the status of a job posting. Only authorized company users (owner or can_update) can change the status. ' +
-        'The job must belong to the authenticated user\'s company.',
+        "The job must belong to the authenticated user's company.",
       security: [{ bearerAuth: [] }],
       parameters: [
         {
@@ -867,7 +934,10 @@ const updateJobStatus = {
                 type: 'object',
                 properties: {
                   success: { type: 'boolean', example: false },
-                  message: { type: 'string', example: 'status must be one of: OPEN, CLOSED, PAUSED' },
+                  message: {
+                    type: 'string',
+                    example: 'status must be one of: OPEN, CLOSED, PAUSED',
+                  },
                 },
               },
             },
@@ -926,14 +996,22 @@ const getPopularJobs = {
                         title: { type: 'string', example: 'Senior Software Engineer' },
                         department: { type: 'string', example: 'Engineering' },
                         location: { type: 'string', example: 'Cebu City, Philippines' },
-                        location_type: { type: 'string', enum: ['ONSITE', 'REMOTE', 'HYBRID'], example: 'HYBRID' },
+                        location_type: {
+                          type: 'string',
+                          enum: ['ONSITE', 'REMOTE', 'HYBRID'],
+                          example: 'HYBRID',
+                        },
                         employment_type: { type: 'string', example: 'Full-time' },
                         minimum_salary: { type: 'string', example: '50000' },
                         maximum_salary: { type: 'string', example: '80000' },
                         currency: { type: 'string', example: 'PHP' },
                         status: { type: 'string', enum: ['OPEN'], example: 'OPEN' },
                         created_at: { type: 'string', format: 'date-time' },
-                        applicant_count: { type: 'integer', example: 34, description: 'Number of applicants for this job' },
+                        applicant_count: {
+                          type: 'integer',
+                          example: 34,
+                          description: 'Number of applicants for this job',
+                        },
                       },
                     },
                   },

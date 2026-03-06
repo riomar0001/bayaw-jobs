@@ -70,9 +70,7 @@ export class CompanyService {
     // Update user role to COMPANY_OWNER
     await userRepository.update(userId, { role: 'COMPANY_OWNER' });
 
-    const logo_url = company.logo
-      ? `${process.env.APP_URL}/api/business/logo/${company.id}`
-      : null;
+    const logo_url = company.logo ? `${process.env.APP_URL}/api/business/logo/${company.id}` : null;
 
     return { ...company, logo_url };
   }
@@ -109,7 +107,11 @@ export class CompanyService {
     companyId: string,
     file: { buffer: Buffer; originalname: string }
   ) {
-    const fileName = await storageService.uploadAdminProfilePicture(file.buffer, userId, file.originalname);
+    const fileName = await storageService.uploadAdminProfilePicture(
+      file.buffer,
+      userId,
+      file.originalname
+    );
     await companyRepository.upsertAdminProfilePicture(userId, companyId, fileName);
     return {
       profile_picture: fileName,
@@ -117,7 +119,9 @@ export class CompanyService {
     };
   }
 
-  async getAdminProfilePicture(userId: string): Promise<{ buffer: Buffer; contentType: string; filename: string }> {
+  async getAdminProfilePicture(
+    userId: string
+  ): Promise<{ buffer: Buffer; contentType: string; filename: string }> {
     const record = await companyRepository.findAdminProfilePicture(userId);
     if (!record) {
       throw new NotFoundError('Admin profile picture');
@@ -184,7 +188,13 @@ export class CompanyService {
     return companyRepository.removeAdmin(adminId);
   }
 
-  async getAllCompanies(query: { page: number; limit: number; industry?: string; company_size?: string; search?: string }) {
+  async getAllCompanies(query: {
+    page: number;
+    limit: number;
+    industry?: string;
+    company_size?: string;
+    search?: string;
+  }) {
     const result = await companyRepository.findAllCompanies(query);
     return {
       ...result,
@@ -214,10 +224,20 @@ export class CompanyService {
       throw new NotFoundError('Company');
     }
 
-    const { companyContacts, companySocialLinks, companyLocations, companyAdmins: _companyAdmins, logo, ...info } = company;
+    const {
+      companyContacts,
+      companySocialLinks,
+      companyLocations,
+      companyAdmins: _companyAdmins,
+      logo,
+      ...info
+    } = company;
 
     const PLATFORM_MAP: Record<string, string | null> = {
-      FACEBOOK: null, LINKEDIN: null, TWITTER: null, INSTAGRAM: null,
+      FACEBOOK: null,
+      LINKEDIN: null,
+      TWITTER: null,
+      INSTAGRAM: null,
     };
     for (const link of companySocialLinks) {
       PLATFORM_MAP[link.platform] = link.url;
@@ -260,7 +280,9 @@ export class CompanyService {
       instagram: 'INSTAGRAM',
     } as const;
 
-    const links = (Object.entries(data) as [keyof typeof PLATFORM_KEY_MAP, string | null | undefined][])
+    const links = (
+      Object.entries(data) as [keyof typeof PLATFORM_KEY_MAP, string | null | undefined][]
+    )
       .filter(([, url]) => url !== undefined)
       .map(([key, url]) => ({ platform: PLATFORM_KEY_MAP[key], url: url ?? null }));
 

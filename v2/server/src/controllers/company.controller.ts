@@ -188,7 +188,11 @@ export class CompanyController {
     try {
       const companyId = req.user?.company_id;
       if (!companyId) throw new Error('Company ID missing in request');
-      const result = await companyService.updateLocation(companyId, req.params.id as string, req.body);
+      const result = await companyService.updateLocation(
+        companyId,
+        req.params.id as string,
+        req.body
+      );
       successResponse(res, result, 'Location updated successfully');
     } catch (error) {
       next(error);

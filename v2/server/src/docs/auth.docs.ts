@@ -502,7 +502,8 @@ const refresh = {
                 'Name: `refreshToken`. Expires in 7 days. HttpOnly, SameSite=Strict.',
               schema: {
                 type: 'string',
-                example: 'refreshToken=eyJhbGci...; HttpOnly; Secure; SameSite=Strict; Path=/; Max-Age=604800',
+                example:
+                  'refreshToken=eyJhbGci...; HttpOnly; Secure; SameSite=Strict; Path=/; Max-Age=604800',
               },
             },
           },
@@ -1033,7 +1034,7 @@ const loginHistory = {
       tags: ['Authentication'],
       summary: 'Get login history',
       description:
-        'Returns a paginated list of the authenticated user\'s login sessions (refresh tokens), ordered by most recent. Each entry includes device info, location, and session status.',
+        "Returns a paginated list of the authenticated user's login sessions (refresh tokens), ordered by most recent. Each entry includes device info, location, and session status.",
       security: [{ bearerAuth: [] }],
       parameters: [
         {
@@ -1078,7 +1079,11 @@ const loginHistory = {
                             region: { type: 'string', nullable: true, example: 'NCR' },
                             country: { type: 'string', nullable: true, example: 'Philippines' },
                             is_active: { type: 'boolean', example: true },
-                            created_at: { type: 'string', format: 'date-time', description: 'Login time' },
+                            created_at: {
+                              type: 'string',
+                              format: 'date-time',
+                              description: 'Login time',
+                            },
                             last_used: { type: 'string', format: 'date-time', nullable: true },
                             revoked_at: { type: 'string', format: 'date-time', nullable: true },
                             expires_at: { type: 'string', format: 'date-time' },

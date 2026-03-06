@@ -25,7 +25,7 @@ export class JobService {
 
     const application = await applicantRepository.findApplicationByProfileAndJob(
       applicantProfileId,
-      id,
+      id
     );
 
     return {

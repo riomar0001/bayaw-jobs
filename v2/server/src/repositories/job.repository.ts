@@ -52,17 +52,28 @@ export class JobRepository {
     });
   }
 
-  async findAll(params: {
-    page?: number;
-    limit?: number;
-    employment_type?: employment_type;
-    location_type?: location_type;
-    location?: string;
-    min_salary?: number;
-    max_salary?: number;
-    search?: string;
-  } = {}) {
-    const { page = 1, limit = 10, employment_type, location_type: locType, location, min_salary, max_salary, search } = params;
+  async findAll(
+    params: {
+      page?: number;
+      limit?: number;
+      employment_type?: employment_type;
+      location_type?: location_type;
+      location?: string;
+      min_salary?: number;
+      max_salary?: number;
+      search?: string;
+    } = {}
+  ) {
+    const {
+      page = 1,
+      limit = 10,
+      employment_type,
+      location_type: locType,
+      location,
+      min_salary,
+      max_salary,
+      search,
+    } = params;
     const skip = (page - 1) * limit;
 
     const where: Prisma.jobWhereInput = {
@@ -104,15 +115,16 @@ export class JobRepository {
 
     const minSal = min_salary;
     const maxSal = max_salary;
-    const filtered = (minSal !== undefined || maxSal !== undefined)
-      ? jobs.filter((j) => {
-          const jMin = parseFloat(j.minimum_salary);
-          const jMax = parseFloat(j.maximum_salary);
-          if (minSal !== undefined && jMax < minSal) return false;
-          if (maxSal !== undefined && jMin > maxSal) return false;
-          return true;
-        })
-      : jobs;
+    const filtered =
+      minSal !== undefined || maxSal !== undefined
+        ? jobs.filter((j) => {
+            const jMin = parseFloat(j.minimum_salary);
+            const jMax = parseFloat(j.maximum_salary);
+            if (minSal !== undefined && jMax < minSal) return false;
+            if (maxSal !== undefined && jMin > maxSal) return false;
+            return true;
+          })
+        : jobs;
 
     return {
       data: filtered,

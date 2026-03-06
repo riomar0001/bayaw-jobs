@@ -67,11 +67,23 @@ router.post(
 
 router.get('/profile', authenticate, applicantController.getProfile.bind(applicantController));
 
-router.get('/educations', authenticate, applicantController.getEducations.bind(applicantController));
+router.get(
+  '/educations',
+  authenticate,
+  applicantController.getEducations.bind(applicantController)
+);
 
-router.get('/experiences', authenticate, applicantController.getExperiences.bind(applicantController));
+router.get(
+  '/experiences',
+  authenticate,
+  applicantController.getExperiences.bind(applicantController)
+);
 
-router.get('/career-status', authenticate, applicantController.getCareerStatus.bind(applicantController));
+router.get(
+  '/career-status',
+  authenticate,
+  applicantController.getCareerStatus.bind(applicantController)
+);
 
 router.patch(
   '/career-status',
@@ -150,14 +162,40 @@ router.delete(
 );
 
 router.get('/skills', authenticate, applicantController.getSkills.bind(applicantController));
-router.post('/skills', authenticate, validate(addSkillsSchema), applicantController.addSkills.bind(applicantController));
-router.delete('/skills/:id', authenticate, validate(deleteSkillSchema), applicantController.deleteSkill.bind(applicantController));
+router.post(
+  '/skills',
+  authenticate,
+  validate(addSkillsSchema),
+  applicantController.addSkills.bind(applicantController)
+);
+router.delete(
+  '/skills/:id',
+  authenticate,
+  validate(deleteSkillSchema),
+  applicantController.deleteSkill.bind(applicantController)
+);
 
-router.get('/applications/active', authenticate, applicantController.getActiveApplications.bind(applicantController));
-router.get('/applications/stats', authenticate, applicantController.getApplicationStats.bind(applicantController));
-router.get('/applications', authenticate, applicantController.getAllApplications.bind(applicantController));
+router.get(
+  '/applications/active',
+  authenticate,
+  applicantController.getActiveApplications.bind(applicantController)
+);
+router.get(
+  '/applications/stats',
+  authenticate,
+  applicantController.getApplicationStats.bind(applicantController)
+);
+router.get(
+  '/applications',
+  authenticate,
+  applicantController.getAllApplications.bind(applicantController)
+);
 
-router.post('/jobs/:jobId/apply', authenticate, applicantController.applyToJob.bind(applicantController));
+router.post(
+  '/jobs/:jobId/apply',
+  authenticate,
+  applicantController.applyToJob.bind(applicantController)
+);
 
 router.get('/resume/:id', applicantController.getResume.bind(applicantController));
 

@@ -14,7 +14,7 @@ import {
 } from '@/validations/auth.validation';
 
 const router = Router();
-// router.use(authRateLimiter);
+router.use(authRateLimiter);
 
 router.post('/register', validate(registerSchema), authController.register.bind(authController));
 

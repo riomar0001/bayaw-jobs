@@ -42,7 +42,9 @@ export const getAllJobsSchema = z.object({
       .refine((val) => val === undefined || /^\d+$/.test(val), {
         message: 'limit must be a positive integer',
       }),
-    employment_type: z.enum(['FULL_TIME', 'PART_TIME', 'CONTRACT', 'FREELANCE', 'INTERN']).optional(),
+    employment_type: z
+      .enum(['FULL_TIME', 'PART_TIME', 'CONTRACT', 'FREELANCE', 'INTERN'])
+      .optional(),
     location_type: z.enum(['ONSITE', 'REMOTE', 'HYBRID']).optional(),
     location: z.string().optional(),
     min_salary: z.coerce.number().positive().optional(),

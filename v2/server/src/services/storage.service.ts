@@ -1,4 +1,9 @@
-import { supabase, PROFILE_PICTURE_BUCKET, RESUME_BUCKET, COMPANY_LOGO_BUCKET } from '@/configs/supabase.config';
+import {
+  supabase,
+  PROFILE_PICTURE_BUCKET,
+  RESUME_BUCKET,
+  COMPANY_LOGO_BUCKET,
+} from '@/configs/supabase.config';
 import { AppError } from '@/utils/errors.util';
 import { ErrorMessages } from '@/constants/errorMessages.constant';
 import { readFileSync } from 'fs';

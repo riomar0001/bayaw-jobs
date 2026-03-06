@@ -3,7 +3,8 @@ const getTopCompanies = {
     get: {
       tags: ['Business'],
       summary: 'Get top 6 companies by open job count',
-      description: 'Returns the 6 companies with the most open job postings. No authentication required.',
+      description:
+        'Returns the 6 companies with the most open job postings. No authentication required.',
       responses: {
         200: {
           description: 'Top companies retrieved successfully',
@@ -86,7 +87,9 @@ const onboarding = {
                     website: 'https://acme.com',
                     owner_position: 'CEO',
                     contact: { email: 'hr@acme.com', phone: '+1234567890' },
-                    social_links: [{ platform: 'LINKEDIN', url: 'https://linkedin.com/company/acme' }],
+                    social_links: [
+                      { platform: 'LINKEDIN', url: 'https://linkedin.com/company/acme' },
+                    ],
                     locations: [
                       {
                         address: '123 Main St',
@@ -210,7 +213,7 @@ const logo = {
     patch: {
       tags: ['Business'],
       summary: 'Update company logo',
-      description: 'Upload a new logo for the authenticated user\'s company.',
+      description: "Upload a new logo for the authenticated user's company.",
       security: [{ bearerAuth: [] }],
       requestBody: {
         required: true,
@@ -362,13 +365,15 @@ const admins = {
                               type: 'string',
                               nullable: true,
                               example: 'company_admin_abc123.jpg',
-                              description: 'Stored filename in the profile picture bucket, null if not uploaded',
+                              description:
+                                'Stored filename in the profile picture bucket, null if not uploaded',
                             },
                             profile_picture_url: {
                               type: 'string',
                               nullable: true,
                               example: '/api/business/admins/profile-picture/abc123',
-                              description: 'Serve URL for the profile picture, null if not uploaded',
+                              description:
+                                'Serve URL for the profile picture, null if not uploaded',
                             },
                             user: {
                               type: 'object',
@@ -416,7 +421,7 @@ const admins = {
       tags: ['Business'],
       summary: 'Add a company admin',
       description:
-        'Add a new admin to the authenticated user\'s company. Only admins with full rights (can_create, can_read, can_update, can_delete all set to `true`) can perform this action. The `company_id` is derived from the authenticated user\'s JWT.',
+        "Add a new admin to the authenticated user's company. Only admins with full rights (can_create, can_read, can_update, can_delete all set to `true`) can perform this action. The `company_id` is derived from the authenticated user's JWT.",
       security: [{ bearerAuth: [] }],
       requestBody: {
         required: true,
@@ -472,7 +477,7 @@ const admins = {
       tags: ['Business'],
       summary: 'Remove a company admin',
       description:
-        'Remove an admin from the authenticated user\'s company by admin record ID. Only admins with full rights can perform this action. An admin cannot remove themselves.',
+        "Remove an admin from the authenticated user's company by admin record ID. Only admins with full rights can perform this action. An admin cannot remove themselves.",
       security: [{ bearerAuth: [] }],
       parameters: [
         {
@@ -500,7 +505,9 @@ const admins = {
           },
         },
         '401': { description: 'Unauthorized' },
-        '403': { description: 'Insufficient permissions — full rights required, or self-removal attempted' },
+        '403': {
+          description: 'Insufficient permissions — full rights required, or self-removal attempted',
+        },
         '404': { description: 'Admin record not found' },
         '422': { description: 'Company ID missing from token — user has no company' },
       },
@@ -541,12 +548,18 @@ const admins = {
                 type: 'object',
                 properties: {
                   success: { type: 'boolean', example: true },
-                  message: { type: 'string', example: 'Admin profile picture updated successfully' },
+                  message: {
+                    type: 'string',
+                    example: 'Admin profile picture updated successfully',
+                  },
                   data: {
                     type: 'object',
                     properties: {
                       profile_picture: { type: 'string', example: 'company_admin_abc123.jpg' },
-                      url: { type: 'string', example: '/api/business/admins/profile-picture/abc123' },
+                      url: {
+                        type: 'string',
+                        example: '/api/business/admins/profile-picture/abc123',
+                      },
                     },
                   },
                 },
@@ -564,7 +577,8 @@ const admins = {
     get: {
       tags: ['Business'],
       summary: 'Get admin profile picture',
-      description: 'Serves the profile picture image for a given admin user. No authentication required.',
+      description:
+        'Serves the profile picture image for a given admin user. No authentication required.',
       parameters: [
         {
           name: 'userId',
@@ -613,10 +627,32 @@ const getAllCompanies = {
         'Returns a paginated list of companies that have posted at least one job. Includes available industries for filter UI. No authentication required.',
       parameters: [
         { name: 'page', in: 'query', schema: { type: 'integer', default: 1, minimum: 1 } },
-        { name: 'limit', in: 'query', schema: { type: 'integer', default: 10, minimum: 1, maximum: 50 } },
-        { name: 'industry', in: 'query', schema: { type: 'string' }, description: 'Filter by industry (exact match)', example: 'Technology' },
-        { name: 'company_size', in: 'query', schema: { type: 'string' }, description: 'Filter by company size', example: '11-50' },
-        { name: 'search', in: 'query', schema: { type: 'string' }, description: 'Search by company name (case-insensitive)', example: 'acme' },
+        {
+          name: 'limit',
+          in: 'query',
+          schema: { type: 'integer', default: 10, minimum: 1, maximum: 50 },
+        },
+        {
+          name: 'industry',
+          in: 'query',
+          schema: { type: 'string' },
+          description: 'Filter by industry (exact match)',
+          example: 'Technology',
+        },
+        {
+          name: 'company_size',
+          in: 'query',
+          schema: { type: 'string' },
+          description: 'Filter by company size',
+          example: '11-50',
+        },
+        {
+          name: 'search',
+          in: 'query',
+          schema: { type: 'string' },
+          description: 'Search by company name (case-insensitive)',
+          example: 'acme',
+        },
       ],
       responses: {
         '200': {
@@ -661,7 +697,8 @@ const getAllCompanies = {
                       },
                       industries: {
                         type: 'array',
-                        description: 'All distinct industries across companies with jobs — use for filter dropdown',
+                        description:
+                          'All distinct industries across companies with jobs — use for filter dropdown',
                         items: { type: 'string', example: 'Technology' },
                         example: ['Finance', 'Healthcare', 'Technology'],
                       },
@@ -722,7 +759,11 @@ const publicCompanyInfo = {
                       about: { type: 'string', example: 'We build awesome products.' },
                       company_size: { type: 'string', example: '11-50' },
                       website: { type: 'string', example: 'https://acme.com' },
-                      logo_url: { type: 'string', nullable: true, example: 'https://api.example.com/api/business/logo/companyId' },
+                      logo_url: {
+                        type: 'string',
+                        nullable: true,
+                        example: 'https://api.example.com/api/business/logo/companyId',
+                      },
                       open_positions: { type: 'integer', example: 8 },
                       job_openings: {
                         type: 'array',
@@ -732,7 +773,11 @@ const publicCompanyInfo = {
                             id: { type: 'string', format: 'uuid' },
                             title: { type: 'string', example: 'Frontend Engineer' },
                             location: { type: 'string', example: 'San Francisco, CA' },
-                            location_type: { type: 'string', enum: ['REMOTE', 'ONSITE', 'HYBRID'], example: 'HYBRID' },
+                            location_type: {
+                              type: 'string',
+                              enum: ['REMOTE', 'ONSITE', 'HYBRID'],
+                              example: 'HYBRID',
+                            },
                             minimum_salary: { type: 'string', example: '80000' },
                             maximum_salary: { type: 'string', example: '120000' },
                           },
@@ -772,7 +817,8 @@ const companyInfo = {
     get: {
       tags: ['Business'],
       summary: 'Get company info',
-      description: "Returns the authenticated user's full company profile including contact, socials, and locations.",
+      description:
+        "Returns the authenticated user's full company profile including contact, socials, and locations.",
       security: [{ bearerAuth: [] }],
       responses: {
         '200': {
@@ -807,8 +853,16 @@ const companyInfo = {
                       social_links: {
                         type: 'object',
                         properties: {
-                          facebook: { type: 'string', nullable: true, example: 'https://facebook.com/acme' },
-                          linkedin: { type: 'string', nullable: true, example: 'https://linkedin.com/company/acme' },
+                          facebook: {
+                            type: 'string',
+                            nullable: true,
+                            example: 'https://facebook.com/acme',
+                          },
+                          linkedin: {
+                            type: 'string',
+                            nullable: true,
+                            example: 'https://linkedin.com/company/acme',
+                          },
                           twitter: { type: 'string', nullable: true, example: null },
                           instagram: { type: 'string', nullable: true, example: null },
                         },
@@ -829,7 +883,8 @@ const companyInfo = {
     patch: {
       tags: ['Business'],
       summary: 'Update company information',
-      description: 'Update basic company details. All fields are optional — only provided fields are updated.',
+      description:
+        'Update basic company details. All fields are optional — only provided fields are updated.',
       security: [{ bearerAuth: [] }],
       requestBody: {
         required: true,
@@ -891,7 +946,8 @@ const socials = {
     patch: {
       tags: ['Business'],
       summary: 'Update social links',
-      description: 'Upsert social links for the company. Passing `null` for a platform removes that link. Only provided fields are processed.',
+      description:
+        'Upsert social links for the company. Passing `null` for a platform removes that link. Only provided fields are processed.',
       security: [{ bearerAuth: [] }],
       requestBody: {
         required: true,
@@ -901,7 +957,11 @@ const socials = {
               type: 'object',
               properties: {
                 facebook: { type: 'string', nullable: true, example: 'https://facebook.com/acme' },
-                linkedin: { type: 'string', nullable: true, example: 'https://linkedin.com/company/acme' },
+                linkedin: {
+                  type: 'string',
+                  nullable: true,
+                  example: 'https://linkedin.com/company/acme',
+                },
                 twitter: { type: 'string', nullable: true, example: null },
                 instagram: { type: 'string', nullable: true, example: null },
               },
@@ -925,7 +985,10 @@ const socials = {
                       type: 'object',
                       properties: {
                         id: { type: 'string', format: 'uuid' },
-                        platform: { type: 'string', enum: ['FACEBOOK', 'TWITTER', 'LINKEDIN', 'INSTAGRAM'] },
+                        platform: {
+                          type: 'string',
+                          enum: ['FACEBOOK', 'TWITTER', 'LINKEDIN', 'INSTAGRAM'],
+                        },
                         url: { type: 'string' },
                       },
                     },
@@ -1051,7 +1114,13 @@ const locations = {
       summary: 'Update a company location',
       security: [{ bearerAuth: [] }],
       parameters: [
-        { name: 'id', in: 'path', required: true, schema: { type: 'string', format: 'uuid' }, description: 'Location ID' },
+        {
+          name: 'id',
+          in: 'path',
+          required: true,
+          schema: { type: 'string', format: 'uuid' },
+          description: 'Location ID',
+        },
       ],
       requestBody: {
         required: true,
@@ -1097,7 +1166,13 @@ const locations = {
       summary: 'Delete a company location',
       security: [{ bearerAuth: [] }],
       parameters: [
-        { name: 'id', in: 'path', required: true, schema: { type: 'string', format: 'uuid' }, description: 'Location ID' },
+        {
+          name: 'id',
+          in: 'path',
+          required: true,
+          schema: { type: 'string', format: 'uuid' },
+          description: 'Location ID',
+        },
       ],
       responses: {
         '200': {
@@ -1232,7 +1307,10 @@ const applicantInfo = {
                               type: 'object',
                               properties: {
                                 id: { type: 'string', format: 'uuid' },
-                                institution_name: { type: 'string', example: 'University of Manila' },
+                                institution_name: {
+                                  type: 'string',
+                                  example: 'University of Manila',
+                                },
                                 field_of_study: { type: 'string', example: 'Computer Science' },
                                 start_year: { type: 'integer', example: 2016 },
                                 end_year: { type: 'integer', nullable: true, example: 2020 },
@@ -1243,7 +1321,8 @@ const applicantInfo = {
                       },
                       other_applications: {
                         type: 'array',
-                        description: 'Other positions this applicant applied for within the same company',
+                        description:
+                          'Other positions this applicant applied for within the same company',
                         items: {
                           type: 'object',
                           properties: {
@@ -1323,13 +1402,18 @@ const dashboard = {
                               example: 'NEW',
                             },
                             count: { type: 'integer', example: 40 },
-                            percentage: { type: 'integer', example: 27, description: 'Rounded percentage of total applicants' },
+                            percentage: {
+                              type: 'integer',
+                              example: 27,
+                              description: 'Rounded percentage of total applicants',
+                            },
                           },
                         },
                       },
                       applicant_trends: {
                         type: 'array',
-                        description: 'Weekly applicant counts for the past 8 weeks (oldest to newest)',
+                        description:
+                          'Weekly applicant counts for the past 8 weeks (oldest to newest)',
                         items: {
                           type: 'object',
                           properties: {
