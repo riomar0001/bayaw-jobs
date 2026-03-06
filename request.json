@@ -1,0 +1,21 @@
+{
+  "profile": {
+    "age": 26,
+    "gender": "male",
+    "desired_position": "Janitor",
+    "location": "Davao City, Philippines",
+    "phone_number": " 63 9292932986"
+  },
+  "education": [],
+  "experience": [
+    {
+      "company_name": "University of Mindanao",
+      "position": "Janitor",
+      "start_date": "2026-01-01",
+      "is_current": true,
+      "end_date": null
+    }
+  ],
+  "skills": ["Scamming", "Plunder", "Hacker"],
+  "languages": [{ "language_name": "Bisaya", "proficiency_level": "NATIVE" }]
+}

@@ -204,6 +204,7 @@ export interface ApplicantOnboardingInput {
     gender: string;
     desired_position: string;
     location: string;
+    phone_number: string;
     career_status?: CareerStatus;
   };
   education?: Array<{

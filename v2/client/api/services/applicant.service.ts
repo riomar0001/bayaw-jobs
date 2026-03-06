@@ -26,10 +26,14 @@ class ApplicantService {
 
   async completeOnboarding(
     data: ApplicantOnboardingInput,
+    resume: File,
   ): Promise<ApplicantProfile> {
-    const res = await apiClient.post<ApiResponse<ApplicantProfile>>(
+    const fd = new FormData();
+    fd.append("data", JSON.stringify(data));
+    fd.append("resume", resume);
+    const res = await apiClient.postForm<ApiResponse<ApplicantProfile>>(
       "/applicants/onboarding",
-      data,
+      fd,
     );
     return unwrapResponse(res.data);
   }

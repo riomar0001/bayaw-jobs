@@ -5,8 +5,6 @@ import { useRouter } from "next/navigation";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { CheckCircle, ArrowLeft, ArrowRight, Loader2 } from "lucide-react";
-
-const API_BASE = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:4000/api";
 import { ProgressStepper } from "@/components/applicants/onboarding/progress-stepper";
 import { PersonalInfoStep } from "@/components/applicants/onboarding/forms/personal-info-step";
 import {
@@ -23,12 +21,16 @@ import {
   type LanguageData,
 } from "@/components/applicants/onboarding/forms/languages-form";
 import { ResumeUpload } from "@/components/applicants/onboarding/resume-upload";
+import { applicantService } from "@/api/services/applicant.service";
+import { useAuthStore } from "@/stores/auth.store";
 
 interface OnboardingData {
   // Step 1: Personal Info
   age: string;
   gender: string;
   desiredPosition: string;
+  location: string;
+  phoneNumber: string;
 
   // Step 2: Background
   education: EducationData;
@@ -47,6 +49,7 @@ const TOTAL_STEPS = 3;
 
 export default function OnboardingPage() {
   const router = useRouter();
+  const { refresh } = useAuthStore();
   const [currentStep, setCurrentStep] = useState(1);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -55,6 +58,8 @@ export default function OnboardingPage() {
     age: "",
     gender: "",
     desiredPosition: "",
+    location: "",
+    phoneNumber: "",
     education: {
       school: "",
       field: "",
@@ -97,55 +102,50 @@ export default function OnboardingPage() {
     setError(null);
 
     try {
-      const payload = {
-        profile: {
-          age: Number(formData.age),
-          gender: formData.gender,
-          desired_position: formData.desiredPosition,
-        },
-        education: formData.education.school
-          ? [
-              {
-                institution_name: formData.education.school,
-                field_of_study: formData.education.field,
-                start_year: Number(formData.education.yearGraduated) - 4,
-                end_year: Number(formData.education.yearGraduated) || null,
-              },
-            ]
-          : [],
-        experience: formData.experiences
-          .filter((e) => e.companyName)
-          .map((e) => ({
-            company_name: e.companyName,
-            position: e.position,
-            start_date: `${e.fromYear}-01-01`,
-            is_current: e.currentlyWorking,
-            end_date: e.currentlyWorking ? null : `${e.toYear}-12-31`,
+      await applicantService.completeOnboarding(
+        {
+          profile: {
+            age: Number(formData.age),
+            gender: formData.gender,
+            desired_position: formData.desiredPosition,
+            location: formData.location,
+            phone_number: formData.phoneNumber,
+          },
+          education: formData.education.school
+            ? [
+                {
+                  institution_name: formData.education.school,
+                  field_of_study: formData.education.field,
+                  start_year: Number(formData.education.yearGraduated) - 4,
+                  end_year: Number(formData.education.yearGraduated) || null,
+                },
+              ]
+            : [],
+          experience: formData.experiences
+            .filter((e) => e.companyName)
+            .map((e) => ({
+              company_name: e.companyName,
+              position: e.position,
+              start_date: `${e.fromYear}-01-01`,
+              is_current: e.currentlyWorking,
+              end_date: e.currentlyWorking ? null : `${e.toYear}-12-31`,
+            })),
+          skills: formData.skills,
+          languages: formData.languages.map((l) => ({
+            language_name: l.language,
+            proficiency_level: l.proficiency.toUpperCase() as
+              | "BASIC"
+              | "CONVERSATIONAL"
+              | "FLUENT"
+              | "NATIVE",
           })),
-        skills: formData.skills.map((s) => ({ skill_name: s })),
-        languages: formData.languages.map((l) => ({
-          language_name: l.language,
-          proficiency_level: l.proficiency.toUpperCase(),
-        })),
-      };
+        },
+        formData.resume,
+      );
 
-      // Always multipart/form-data so the resume can be included in one request
-      const fd = new FormData();
-      fd.append("data", JSON.stringify(payload));
-      fd.append("resume", formData.resume);
-
-      const res = await fetch(`${API_BASE}/applicants/onboarding`, {
-        method: "POST",
-        credentials: "include",
-        body: fd,
-      });
-
-      if (!res.ok) {
-        const body = await res.json();
-        throw new Error(body.message ?? "Onboarding failed");
-      }
-
-      router.push("/");
+      // Get a fresh token with applicant_profile_id embedded
+      await refresh();
+      router.replace("/applicant");
     } catch (err) {
       setError(err instanceof Error ? err.message : "Something went wrong");
     } finally {
@@ -255,6 +255,8 @@ export default function OnboardingPage() {
                   age: formData.age,
                   gender: formData.gender,
                   desiredPosition: formData.desiredPosition,
+                  location: formData.location,
+                  phoneNumber: formData.phoneNumber,
                 }}
                 onChange={(data) => setFormData({ ...formData, ...data })}
               />

@@ -229,6 +229,17 @@ class ApiClient {
       headers: { "Content-Type": "multipart/form-data", ...config?.headers },
     });
   }
+
+  async postForm<T>(
+    url: string,
+    formData: FormData,
+    config?: AxiosRequestConfig,
+  ): Promise<AxiosResponse<T>> {
+    return this.instance.post<T>(url, formData, {
+      ...config,
+      headers: { "Content-Type": "multipart/form-data", ...config?.headers },
+    });
+  }
 }
 
 export const apiClient = new ApiClient();

@@ -45,6 +45,7 @@ const applicantProfileSchema = {
     age: { type: 'integer', example: 25 },
     gender: { type: 'string', example: 'Male' },
     desired_position: { type: 'string', example: 'Software Engineer' },
+    phone_number: { type: 'string', example: '+639123456789' },
     location: { type: 'string', example: 'Cebu City, Philippines' },
     career_status: {
       type: 'string',
@@ -53,7 +54,7 @@ const applicantProfileSchema = {
       description: 'Defaults to ACTIVELY_LOOKING if not provided.',
     },
   },
-  required: ['age', 'gender', 'desired_position', 'location'],
+  required: ['age', 'gender', 'desired_position', 'location', 'phone_number'],
 };
 
 const applicantProfileResponseData = {
@@ -64,6 +65,7 @@ const applicantProfileResponseData = {
     first_name: { type: 'string', example: 'John' },
     last_name: { type: 'string', example: 'Doe' },
     email: { type: 'string', example: 'john@example.com' },
+    phone_number: { type: 'string', example: '+639123456789' },
     age: { type: 'integer', example: 25 },
     gender: { type: 'string', example: 'Male' },
     desired_position: { type: 'string', example: 'Software Engineer' },
@@ -193,6 +195,7 @@ const onboarding = {
                     profile: {
                       age: 25,
                       gender: 'Male',
+                      phone_number: '+639123456789',
                       desired_position: 'Software Engineer',
                       location: 'Cebu City, Philippines',
                     },

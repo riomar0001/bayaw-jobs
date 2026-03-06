@@ -7,6 +7,8 @@ interface PersonalInfoData {
   age: string;
   gender: string;
   desiredPosition: string;
+  location: string;
+  phoneNumber: string;
 }
 
 interface PersonalInfoStepProps {
@@ -27,6 +29,30 @@ export function PersonalInfoStep({ data, onChange }: PersonalInfoStepProps) {
           onChange={(e) =>
             onChange({ ...data, desiredPosition: e.target.value })
           }
+          required
+        />
+      </Field>
+
+      <Field>
+        <FieldLabel htmlFor="location">Location</FieldLabel>
+        <Input
+          id="location"
+          type="text"
+          placeholder="e.g. Makati City, Metro Manila"
+          value={data.location}
+          onChange={(e) => onChange({ ...data, location: e.target.value })}
+          required
+        />
+      </Field>
+
+      <Field>
+        <FieldLabel htmlFor="phoneNumber">Phone Number</FieldLabel>
+        <Input
+          id="phoneNumber"
+          type="tel"
+          placeholder="e.g. +63 912 345 6789"
+          value={data.phoneNumber}
+          onChange={(e) => onChange({ ...data, phoneNumber: e.target.value })}
           required
         />
       </Field>
