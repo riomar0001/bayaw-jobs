@@ -9,8 +9,6 @@ import {
   Building2,
   Clock,
   DollarSign,
-  Users,
-  Eye,
 } from "lucide-react";
 import { PageHeader } from "@/components/company/dashboard/layout/page-header";
 import { Button } from "@/components/ui/button";
@@ -20,7 +18,7 @@ import { Separator } from "@/components/ui/separator";
 import { JobStatusBadge } from "@/components/company/dashboard/jobs/job-status-badge";
 import { JobApplicantsTable } from "@/components/company/dashboard/jobs/job-applicants-table";
 import { getJobById, getApplicationsByJobId, mockCandidates } from "@/data";
-import { formatSalaryRange, formatDate } from "@/lib/formatters";
+import { formatSalaryRange} from "@/lib/formatters";
 
 interface JobDetailPageProps {
   params: Promise<{ id: string }>;

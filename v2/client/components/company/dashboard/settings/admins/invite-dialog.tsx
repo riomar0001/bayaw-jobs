@@ -38,7 +38,11 @@ const addAdminSchema = z.object({
 type AddAdminValues = z.infer<typeof addAdminSchema>;
 
 interface AddAdminDialogProps {
-  onAdd: (data: { email: string; position: string; permissions: AdminPermissions }) => void;
+  onAdd: (data: {
+    email: string;
+    position: string;
+    permissions: AdminPermissions;
+  }) => void;
 }
 
 export function InviteDialog({ onAdd }: AddAdminDialogProps) {

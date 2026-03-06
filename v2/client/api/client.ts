@@ -1,16 +1,22 @@
-import axios, { AxiosInstance, AxiosError, AxiosRequestConfig, AxiosResponse, InternalAxiosRequestConfig } from 'axios';
+import axios, {
+  AxiosInstance,
+  AxiosError,
+  AxiosRequestConfig,
+  AxiosResponse,
+  InternalAxiosRequestConfig,
+} from "axios";
 
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:5090';
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:5090";
 const API_TIMEOUT = 30000;
 
 export class ApiError extends Error {
   constructor(
     message: string,
     public status?: number,
-    public errors?: Record<string, string[]>
+    public errors?: Record<string, string[]>,
   ) {
     super(message);
-    this.name = 'ApiError';
+    this.name = "ApiError";
   }
 }
 
@@ -29,7 +35,7 @@ class ApiClient {
       baseURL: API_BASE_URL,
       timeout: API_TIMEOUT,
       withCredentials: true, // required for httpOnly refresh token cookie
-      headers: { 'Content-Type': 'application/json' },
+      headers: { "Content-Type": "application/json" },
     });
 
     this.setupInterceptors();
@@ -63,33 +69,39 @@ class ApiClient {
     // Request — attach access token, but don't override an already-set Authorization header
     this.instance.interceptors.request.use(
       (config: InternalAxiosRequestConfig) => {
-        if (this.token && !config.headers['Authorization']) {
-          config.headers['Authorization'] = `Bearer ${this.token}`;
+        if (this.token && !config.headers["Authorization"]) {
+          config.headers["Authorization"] = `Bearer ${this.token}`;
         }
         return config;
       },
-      (error) => Promise.reject(error)
+      (error) => Promise.reject(error),
     );
 
     // Response — handle 401 with silent token refresh + request retry
     this.instance.interceptors.response.use(
       (response) => response,
       async (error: AxiosError) => {
-        const original = error.config as InternalAxiosRequestConfig & { _retry?: boolean };
+        const original = error.config as InternalAxiosRequestConfig & {
+          _retry?: boolean;
+        };
 
         const isAuthEndpoint =
-          original?.url?.includes('/auth/refresh') ||
-          original?.url?.includes('/auth/login') ||
-          original?.url?.includes('/auth/verify-auth');
+          original?.url?.includes("/auth/refresh") ||
+          original?.url?.includes("/auth/login") ||
+          original?.url?.includes("/auth/verify-auth");
 
-        if (error.response?.status === 401 && !original?._retry && !isAuthEndpoint) {
+        if (
+          error.response?.status === 401 &&
+          !original?._retry &&
+          !isAuthEndpoint
+        ) {
           original._retry = true;
 
           if (this.isRefreshing) {
             // Queue while another refresh is in progress
             return new Promise<AxiosResponse>((resolve, reject) => {
               this.addRefreshSubscriber((newToken) => {
-                original.headers['Authorization'] = `Bearer ${newToken}`;
+                original.headers["Authorization"] = `Bearer ${newToken}`;
                 resolve(this.instance(original));
               });
               void reject; // reject path handled by rejectSubscribers
@@ -99,16 +111,17 @@ class ApiClient {
           this.isRefreshing = true;
 
           try {
-            const res = await this.instance.post<{ data?: { accessToken?: string } }>(
-              '/auth/refresh'
-            );
+            const res = await this.instance.post<{
+              data?: { accessToken?: string };
+            }>("/auth/refresh");
             const newToken = res.data?.data?.accessToken;
 
-            if (!newToken) throw new Error('No access token in refresh response');
+            if (!newToken)
+              throw new Error("No access token in refresh response");
 
             this.setToken(newToken);
             this.notifySubscribers(newToken);
-            original.headers['Authorization'] = `Bearer ${newToken}`;
+            original.headers["Authorization"] = `Bearer ${newToken}`;
             return this.instance(original);
           } catch (refreshError) {
             this.rejectSubscribers(refreshError);
@@ -124,43 +137,65 @@ class ApiClient {
         if (error.response) {
           const data = error.response.data as Record<string, unknown>;
           throw new ApiError(
-            (data?.message as string) || 'Request failed',
+            (data?.message as string) || "Request failed",
             error.response.status,
-            data?.errors as Record<string, string[]>
+            data?.errors as Record<string, string[]>,
           );
         } else if (error.request) {
-          throw new ApiError('Network error. Please check your connection.');
+          throw new ApiError("Network error. Please check your connection.");
         } else {
-          throw new ApiError(error.message || 'Request failed');
+          throw new ApiError(error.message || "Request failed");
         }
-      }
+      },
     );
   }
 
-  async get<T>(url: string, config?: AxiosRequestConfig): Promise<AxiosResponse<T>> {
+  async get<T>(
+    url: string,
+    config?: AxiosRequestConfig,
+  ): Promise<AxiosResponse<T>> {
     return this.instance.get<T>(url, config);
   }
 
-  async post<T>(url: string, data?: unknown, config?: AxiosRequestConfig): Promise<AxiosResponse<T>> {
+  async post<T>(
+    url: string,
+    data?: unknown,
+    config?: AxiosRequestConfig,
+  ): Promise<AxiosResponse<T>> {
     return this.instance.post<T>(url, data, config);
   }
 
-  async put<T>(url: string, data?: unknown, config?: AxiosRequestConfig): Promise<AxiosResponse<T>> {
+  async put<T>(
+    url: string,
+    data?: unknown,
+    config?: AxiosRequestConfig,
+  ): Promise<AxiosResponse<T>> {
     return this.instance.put<T>(url, data, config);
   }
 
-  async patch<T>(url: string, data?: unknown, config?: AxiosRequestConfig): Promise<AxiosResponse<T>> {
+  async patch<T>(
+    url: string,
+    data?: unknown,
+    config?: AxiosRequestConfig,
+  ): Promise<AxiosResponse<T>> {
     return this.instance.patch<T>(url, data, config);
   }
 
-  async delete<T>(url: string, config?: AxiosRequestConfig): Promise<AxiosResponse<T>> {
+  async delete<T>(
+    url: string,
+    config?: AxiosRequestConfig,
+  ): Promise<AxiosResponse<T>> {
     return this.instance.delete<T>(url, config);
   }
 
-  async upload<T>(url: string, formData: FormData, config?: AxiosRequestConfig): Promise<AxiosResponse<T>> {
+  async upload<T>(
+    url: string,
+    formData: FormData,
+    config?: AxiosRequestConfig,
+  ): Promise<AxiosResponse<T>> {
     return this.instance.patch<T>(url, formData, {
       ...config,
-      headers: { 'Content-Type': 'multipart/form-data', ...config?.headers },
+      headers: { "Content-Type": "multipart/form-data", ...config?.headers },
     });
   }
 }

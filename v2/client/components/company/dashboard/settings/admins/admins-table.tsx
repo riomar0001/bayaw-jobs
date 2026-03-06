@@ -27,7 +27,10 @@ import { RemoveDialog } from "./remove-dialog";
 
 interface AdminsTableProps {
   admins: AdminUser[];
-  onEdit: (id: string, data: { position: string; permissions: AdminPermissions }) => void;
+  onEdit: (
+    id: string,
+    data: { position: string; permissions: AdminPermissions },
+  ) => void;
   onRemove: (id: string) => void;
 }
 

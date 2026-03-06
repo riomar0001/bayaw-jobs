@@ -39,7 +39,10 @@ type EditAdminValues = z.infer<typeof editAdminSchema>;
 
 interface EditMemberDialogProps {
   admin: AdminUser;
-  onUpdate: (id: string, data: { position: string; permissions: AdminPermissions }) => void;
+  onUpdate: (
+    id: string,
+    data: { position: string; permissions: AdminPermissions },
+  ) => void;
 }
 
 export function EditMemberDialog({ admin, onUpdate }: EditMemberDialogProps) {

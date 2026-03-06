@@ -1,5 +1,5 @@
-import { ZodError } from 'zod';
-import { ApiError } from './client';
+import { ZodError } from "zod";
+import { ApiError } from "./client";
 
 // ─── Common ───────────────────────────────────────────────────────────────────
 
@@ -25,7 +25,7 @@ export interface PaginatedResponse<T> {
 
 export function unwrapResponse<T>(response: ApiResponse<T>): T {
   if (!response.success || response.data === undefined) {
-    throw new ApiError(response.message || 'Request failed');
+    throw new ApiError(response.message || "Request failed");
   }
   return response.data;
 }
@@ -33,14 +33,18 @@ export function unwrapResponse<T>(response: ApiResponse<T>): T {
 export function handleValidationError(error: ZodError): ApiError {
   const errorMap = error.issues.reduce(
     (acc, issue) => {
-      const path = issue.path.join('.');
+      const path = issue.path.join(".");
       if (!acc[path]) acc[path] = [];
       acc[path].push(issue.message);
       return acc;
     },
-    {} as Record<string, string[]>
+    {} as Record<string, string[]>,
   );
-  return new ApiError(error.issues[0]?.message || 'Validation error', 400, errorMap);
+  return new ApiError(
+    error.issues[0]?.message || "Validation error",
+    400,
+    errorMap,
+  );
 }
 
 // ─── Auth ────────────────────────────────────────────────────────────────────
@@ -93,7 +97,7 @@ export interface LoginStep1Response {
 
 export interface LoginStep2Response {
   access_token: string;
-  user: Pick<User, 'id' | 'email' | 'first_name' | 'last_name' | 'role'>;
+  user: Pick<User, "id" | "email" | "first_name" | "last_name" | "role">;
 }
 
 export interface RefreshResponse {
@@ -124,21 +128,21 @@ export interface LoginHistoryItem {
 // ─── Applicant ───────────────────────────────────────────────────────────────
 
 export type CareerStatus =
-  | 'ACTIVELY_LOOKING'
-  | 'OPEN_TO_OPPORTUNITIES'
-  | 'EMPLOYED_NOT_LOOKING'
-  | 'NOT_LOOKING';
+  | "ACTIVELY_LOOKING"
+  | "OPEN_TO_OPPORTUNITIES"
+  | "EMPLOYED_NOT_LOOKING"
+  | "NOT_LOOKING";
 
-export type ProficiencyLevel = 'BASIC' | 'CONVERSATIONAL' | 'FLUENT' | 'NATIVE';
+export type ProficiencyLevel = "BASIC" | "CONVERSATIONAL" | "FLUENT" | "NATIVE";
 
 export type ApplicationStatus =
-  | 'NEW'
-  | 'SCREENING'
-  | 'INTERVIEW'
-  | 'OFFER'
-  | 'REJECTED'
-  | 'HIRED'
-  | 'CANCELLED';
+  | "NEW"
+  | "SCREENING"
+  | "INTERVIEW"
+  | "OFFER"
+  | "REJECTED"
+  | "HIRED"
+  | "CANCELLED";
 
 export interface Education {
   id: string;
@@ -256,7 +260,7 @@ export interface AddLanguageInput {
 
 export interface ApplyJobResponse {
   id: string;
-  status: 'NEW';
+  status: "NEW";
   application_date: string;
   job: {
     id: string;
@@ -308,8 +312,8 @@ export interface Application {
 
 // ─── Jobs ────────────────────────────────────────────────────────────────────
 
-export type LocationType = 'ONSITE' | 'REMOTE' | 'HYBRID';
-export type JobStatus = 'OPEN' | 'CLOSED' | 'PAUSED';
+export type LocationType = "ONSITE" | "REMOTE" | "HYBRID";
+export type JobStatus = "OPEN" | "CLOSED" | "PAUSED";
 
 export interface Job {
   id: string;
@@ -457,7 +461,7 @@ export interface CompanyLocation {
 
 export interface CompanySocial {
   id: string;
-  platform: 'FACEBOOK' | 'TWITTER' | 'LINKEDIN' | 'INSTAGRAM';
+  platform: "FACEBOOK" | "TWITTER" | "LINKEDIN" | "INSTAGRAM";
   url: string;
 }
 

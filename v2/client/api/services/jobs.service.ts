@@ -1,4 +1,4 @@
-import { apiClient } from '../client';
+import { apiClient } from "../client";
 import {
   ApiResponse,
   CompanyJob,
@@ -13,25 +13,28 @@ import {
   PopularJob,
   UpdateJobInput,
   unwrapResponse,
-} from '../types';
+} from "../types";
 
 class JobsService {
   // ── Public ───────────────────────────────────────────────────────────────────
 
   async getTopJobs(): Promise<JobSummary[]> {
-    const res = await apiClient.get<ApiResponse<JobSummary[]>>('/jobs/top');
+    const res = await apiClient.get<ApiResponse<JobSummary[]>>("/jobs/top");
     return unwrapResponse(res.data);
   }
 
   async getJobs(filters?: JobFilters): Promise<PaginatedResponse<Job>> {
-    const res = await apiClient.get<ApiResponse<PaginatedResponse<Job>>>('/jobs', {
-      params: filters,
-    });
+    const res = await apiClient.get<ApiResponse<PaginatedResponse<Job>>>(
+      "/jobs",
+      {
+        params: filters,
+      },
+    );
     return unwrapResponse(res.data);
   }
 
   async getPopularJobs(): Promise<PopularJob[]> {
-    const res = await apiClient.get<ApiResponse<PopularJob[]>>('/jobs/popular');
+    const res = await apiClient.get<ApiResponse<PopularJob[]>>("/jobs/popular");
     return unwrapResponse(res.data);
   }
 
@@ -47,9 +50,12 @@ class JobsService {
     limit?: number;
     status?: JobStatus;
   }): Promise<PaginatedResponse<CompanyJob>> {
-    const res = await apiClient.get<ApiResponse<PaginatedResponse<CompanyJob>>>('/jobs/company', {
-      params,
-    });
+    const res = await apiClient.get<ApiResponse<PaginatedResponse<CompanyJob>>>(
+      "/jobs/company",
+      {
+        params,
+      },
+    );
     return unwrapResponse(res.data);
   }
 
@@ -58,20 +64,21 @@ class JobsService {
     limit?: number;
     status?: string;
   }): Promise<PaginatedResponse<CompanyJobApplicant>> {
-    const res = await apiClient.get<ApiResponse<PaginatedResponse<CompanyJobApplicant>>>(
-      '/jobs/company/applicants',
-      { params }
-    );
+    const res = await apiClient.get<
+      ApiResponse<PaginatedResponse<CompanyJobApplicant>>
+    >("/jobs/company/applicants", { params });
     return unwrapResponse(res.data);
   }
 
   async getCompanyJob(id: string): Promise<JobWithApplicants> {
-    const res = await apiClient.get<ApiResponse<JobWithApplicants>>(`/jobs/company/${id}`);
+    const res = await apiClient.get<ApiResponse<JobWithApplicants>>(
+      `/jobs/company/${id}`,
+    );
     return unwrapResponse(res.data);
   }
 
   async createJob(data: CreateJobInput): Promise<Job> {
-    const res = await apiClient.post<ApiResponse<Job>>('/jobs/create', data);
+    const res = await apiClient.post<ApiResponse<Job>>("/jobs/create", data);
     return unwrapResponse(res.data);
   }
 
@@ -81,7 +88,9 @@ class JobsService {
   }
 
   async updateJobStatus(id: string, status: JobStatus): Promise<Job> {
-    const res = await apiClient.patch<ApiResponse<Job>>(`/jobs/${id}/status`, { status });
+    const res = await apiClient.patch<ApiResponse<Job>>(`/jobs/${id}/status`, {
+      status,
+    });
     return unwrapResponse(res.data);
   }
 }
