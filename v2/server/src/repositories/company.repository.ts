@@ -59,19 +59,40 @@ export class CompanyRepository {
   }
 
   async findAllAdminsByCompany(companyId: string) {
-    return prisma.company_admin.findMany({
-      where: { company_id: companyId },
-      include: {
-        user: {
-          select: {
-            id: true,
-            email: true,
-            first_name: true,
-            last_name: true,
+    const [admins, pictures] = await Promise.all([
+      prisma.company_admin.findMany({
+        where: { company_id: companyId },
+        include: {
+          user: {
+            select: { id: true, email: true, first_name: true, last_name: true },
           },
         },
-      },
-      orderBy: { created_at: 'asc' },
+        orderBy: { created_at: 'asc' },
+      }),
+      prisma.company_admin_profile_picture.findMany({
+        where: { company_id: companyId },
+        select: { user_id: true, file_name: true },
+      }),
+    ]);
+
+    const pictureMap = new Map(pictures.map((p) => [p.user_id, p.file_name]));
+    return admins.map((admin) => ({
+      ...admin,
+      profile_picture: pictureMap.get(admin.user_id) ?? null,
+    }));
+  }
+
+  async upsertAdminProfilePicture(userId: string, companyId: string, fileName: string) {
+    return prisma.$transaction(async (tx) => {
+      await tx.company_admin_profile_picture.deleteMany({ where: { user_id: userId, company_id: companyId } });
+      return tx.company_admin_profile_picture.create({ data: { user_id: userId, company_id: companyId, file_name: fileName } });
+    });
+  }
+
+  async findAdminProfilePicture(userId: string) {
+    return prisma.company_admin_profile_picture.findFirst({
+      where: { user_id: userId },
+      select: { file_name: true },
     });
   }
 

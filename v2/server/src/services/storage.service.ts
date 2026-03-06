@@ -91,6 +91,31 @@ export class StorageService {
     await this.deleteFile(PROFILE_PICTURE_BUCKET, filename);
   }
 
+  async uploadAdminProfilePicture(
+    buffer: Buffer,
+    userId: string,
+    originalFilename: string
+  ): Promise<string> {
+    if (!supabase) {
+      throw new AppError(500, 'Storage service not configured');
+    }
+
+    const extension = originalFilename.split('.').pop()?.toLowerCase() || 'jpg';
+    const filename = `company_admin_${userId}.${extension}`;
+
+    const { error } = await supabase.storage.from(PROFILE_PICTURE_BUCKET).upload(filename, buffer, {
+      contentType: `image/${extension}`,
+      upsert: true,
+    });
+
+    if (error) {
+      logger.error('Storage upload error', { error });
+      throw new AppError(500, ErrorMessages.STORAGE.UPLOAD_FAILED);
+    }
+
+    return filename;
+  }
+
   // ─── Resume ─────────────────────────────────────────────────────────────────
 
   async uploadResume(buffer: Buffer, userId: string): Promise<string> {

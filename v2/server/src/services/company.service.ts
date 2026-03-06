@@ -94,8 +94,36 @@ export class CompanyService {
 
   async getAdmins(requesterId: string, companyId: string) {
     const admins = await companyRepository.findAllAdminsByCompany(companyId);
-    const myRecord = admins.find((a) => a.user_id === requesterId) ?? null;
-    return { admins, my_rights: myRecord };
+    const adminsWithUrls = admins.map((admin) => ({
+      ...admin,
+      profile_picture_url: admin.profile_picture
+        ? `${process.env.APP_URL}/api/business/admins/profile-picture/${admin.user_id}`
+        : null,
+    }));
+    const myRecord = adminsWithUrls.find((a) => a.user_id === requesterId) ?? null;
+    return { admins: adminsWithUrls, my_rights: myRecord };
+  }
+
+  async updateAdminProfilePicture(
+    userId: string,
+    companyId: string,
+    file: { buffer: Buffer; originalname: string }
+  ) {
+    const fileName = await storageService.uploadAdminProfilePicture(file.buffer, userId, file.originalname);
+    await companyRepository.upsertAdminProfilePicture(userId, companyId, fileName);
+    return {
+      profile_picture: fileName,
+      url: `${process.env.APP_URL}/api/business/admins/profile-picture/${userId}`,
+    };
+  }
+
+  async getAdminProfilePicture(userId: string): Promise<{ buffer: Buffer; contentType: string; filename: string }> {
+    const record = await companyRepository.findAdminProfilePicture(userId);
+    if (!record) {
+      throw new NotFoundError('Admin profile picture');
+    }
+    const { buffer, contentType } = await storageService.downloadProfilePicture(record.file_name);
+    return { buffer, contentType, filename: record.file_name };
   }
 
   async addAdmin(requesterId: string, companyId: string, data: AddAdminInput) {

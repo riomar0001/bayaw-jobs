@@ -97,4 +97,13 @@ router.delete(
   companyController.removeAdmin.bind(companyController)
 );
 
+router.patch(
+  '/admins/profile-picture',
+  authenticate,
+  uploadImage.single('picture'),
+  companyController.updateAdminProfilePicture.bind(companyController)
+);
+
+router.get('/admins/profile-picture/:userId', companyController.getAdminProfilePicture.bind(companyController));
+
 export default router;

@@ -358,24 +358,25 @@ const admins = {
                               type: 'string',
                               format: 'date-time',
                             },
+                            profile_picture: {
+                              type: 'string',
+                              nullable: true,
+                              example: 'company_admin_abc123.jpg',
+                              description: 'Stored filename in the profile picture bucket, null if not uploaded',
+                            },
+                            profile_picture_url: {
+                              type: 'string',
+                              nullable: true,
+                              example: '/api/business/admins/profile-picture/abc123',
+                              description: 'Serve URL for the profile picture, null if not uploaded',
+                            },
                             user: {
                               type: 'object',
                               properties: {
                                 id: { type: 'string', format: 'uuid' },
-                                email: {
-                                  type: 'string',
-                                  example: 'admin@acme.com',
-                                },
-                                first_name: {
-                                  type: 'string',
-                                  nullable: true,
-                                  example: 'Jane',
-                                },
-                                last_name: {
-                                  type: 'string',
-                                  nullable: true,
-                                  example: 'Doe',
-                                },
+                                email: { type: 'string', example: 'admin@acme.com' },
+                                first_name: { type: 'string', nullable: true, example: 'Jane' },
+                                last_name: { type: 'string', nullable: true, example: 'Doe' },
                               },
                             },
                           },
@@ -502,6 +503,87 @@ const admins = {
         '403': { description: 'Insufficient permissions — full rights required, or self-removal attempted' },
         '404': { description: 'Admin record not found' },
         '422': { description: 'Company ID missing from token — user has no company' },
+      },
+    },
+  },
+  '/business/admins/profile-picture': {
+    patch: {
+      tags: ['Business'],
+      summary: 'Update admin profile picture',
+      description:
+        'Upload or replace the profile picture for the authenticated admin. ' +
+        'Stored in the profile-picture bucket as `company_admin_<userId>.<ext>`.',
+      security: [{ bearerAuth: [] }],
+      requestBody: {
+        required: true,
+        content: {
+          'multipart/form-data': {
+            schema: {
+              type: 'object',
+              required: ['picture'],
+              properties: {
+                picture: {
+                  type: 'string',
+                  format: 'binary',
+                  description: 'Image file (JPEG, PNG, or WebP, max 5MB)',
+                },
+              },
+            },
+          },
+        },
+      },
+      responses: {
+        '200': {
+          description: 'Admin profile picture updated successfully',
+          content: {
+            'application/json': {
+              schema: {
+                type: 'object',
+                properties: {
+                  success: { type: 'boolean', example: true },
+                  message: { type: 'string', example: 'Admin profile picture updated successfully' },
+                  data: {
+                    type: 'object',
+                    properties: {
+                      profile_picture: { type: 'string', example: 'company_admin_abc123.jpg' },
+                      url: { type: 'string', example: '/api/business/admins/profile-picture/abc123' },
+                    },
+                  },
+                },
+              },
+            },
+          },
+        },
+        '400': { description: 'No image file provided' },
+        '401': { description: 'Unauthorized' },
+        '422': { description: 'Company ID missing from token' },
+      },
+    },
+  },
+  '/business/admins/profile-picture/{userId}': {
+    get: {
+      tags: ['Business'],
+      summary: 'Get admin profile picture',
+      description: 'Serves the profile picture image for a given admin user. No authentication required.',
+      parameters: [
+        {
+          name: 'userId',
+          in: 'path',
+          required: true,
+          schema: { type: 'string', format: 'uuid' },
+          description: 'User ID of the admin',
+        },
+      ],
+      responses: {
+        '200': {
+          description: 'Image file',
+          content: {
+            'image/jpeg': { schema: { type: 'string', format: 'binary' } },
+            'image/png': { schema: { type: 'string', format: 'binary' } },
+            'image/webp': { schema: { type: 'string', format: 'binary' } },
+          },
+        },
+        '404': { description: 'Profile picture not found' },
       },
     },
   },

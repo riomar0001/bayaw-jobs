@@ -283,6 +283,36 @@ export class CompanyController {
       next(error);
     }
   }
+
+  async updateAdminProfilePicture(req: Request, res: Response, next: NextFunction): Promise<void> {
+    try {
+      const userId = req.user?.user_id;
+      const companyId = req.user?.company_id;
+      if (!userId || !companyId) throw new Error('User ID or Company ID missing in request');
+
+      if (!req.file) throw new BadRequestError('Image file is required');
+
+      const result = await companyService.updateAdminProfilePicture(userId, companyId, req.file);
+      successResponse(res, result, 'Admin profile picture updated successfully');
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  async getAdminProfilePicture(req: Request, res: Response, next: NextFunction): Promise<void> {
+    try {
+      const userId = req.params.userId as string;
+      if (!userId) throw new BadRequestError('User ID is required');
+
+      const { buffer, contentType, filename } = await companyService.getAdminProfilePicture(userId);
+
+      res.setHeader('Content-Type', contentType);
+      res.setHeader('Content-Disposition', `inline; filename="${filename}"`);
+      res.send(buffer);
+    } catch (error) {
+      next(error);
+    }
+  }
 }
 
 export const companyController = new CompanyController();
