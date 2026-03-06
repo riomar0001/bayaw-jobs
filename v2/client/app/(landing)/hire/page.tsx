@@ -1,15 +1,24 @@
 "use client";
 
+import { useRouter } from "next/navigation";
 import NextLink from "next/link";
 import { Footer } from "@/components/shared/footer";
 import { CTABanner } from "@/components/shared/cta-banner";
 import { ValueProposition } from "@/components/shared/value-proposition";
 import { HeroSection } from "@/components/shared/hero-section";
 import { Button } from "@/components/ui/button";
-
 import { Target, Users, Zap } from "lucide-react";
+import { useAuthStore } from "@/stores/auth.store";
 
 export default function CompaniesLandingPage() {
+  const router = useRouter();
+  const { isAuthenticated, user } = useAuthStore();
+
+  function handlePostJob() {
+    if (!isAuthenticated) { router.push("/signup"); return; }
+    if (!user?.company_id) { router.push("/company/onboarding"); return; }
+    router.push("/company/jobs/create");
+  }
   return (
     <main>
       <HeroSection
@@ -18,11 +27,9 @@ export default function CompaniesLandingPage() {
         subtitle="Post jobs and connect with qualified candidates who are ready to make an impact"
       >
         <div className="flex justify-center gap-4 mt-8">
-          <NextLink href="/signup">
-            <Button size="lg" className="px-8">
+          <Button size="lg" className="px-8" onClick={handlePostJob}>
               Post a Job
             </Button>
-          </NextLink>
 
           <NextLink href="/login">
             <Button size="lg" variant="outline" className="px-8">

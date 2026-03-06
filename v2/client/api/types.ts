@@ -565,6 +565,7 @@ export interface BusinessOnboardingInput {
   company_size: string;
   foundation_year: number;
   website: string;
+  owner_position: string;
   locations: Array<{
     address: string;
     city: string;
