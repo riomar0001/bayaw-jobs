@@ -22,6 +22,27 @@ export class JobRepository {
   async findById(id: string) {
     return prisma.job.findUnique({
       where: { id },
+      include: {
+        company_information: {
+          select: {
+            id: true,
+            company_name: true,
+            industry: true,
+            company_size: true,
+            website: true,
+            companyLocations: {
+              select: {
+                id: true,
+                city: true,
+                state: true,
+                country: true,
+                is_headquarter: true,
+              },
+            },
+            _count: { select: { jobs: { where: { status: job_status.OPEN } } } },
+          },
+        },
+      },
     });
   }
 

@@ -1,7 +1,7 @@
 import { Router } from 'express';
 import { jobController } from '@/controllers/job.controller';
 import { validate } from '@/middlewares/validation.middleware';
-import { authenticate } from '@/middlewares/auth.middleware';
+import { authenticate, authenticateOptional } from '@/middlewares/auth.middleware';
 import {
   getAllJobsSchema,
   getJobByIdSchema,
@@ -19,7 +19,7 @@ router.get('/', validate(getAllJobsSchema), jobController.getAllJobs.bind(jobCon
 router.get('/company', authenticate, validate(getAllJobsSchema), jobController.getCompanyJobs.bind(jobController));
 router.get('/company/applicants', authenticate, validate(getAllJobsSchema), jobController.getCompanyApplicants.bind(jobController));
 router.get('/company/:id', authenticate, validate(getJobByIdSchema), jobController.getCompanyJobById.bind(jobController));
-router.get('/:id', validate(getJobByIdSchema), jobController.getJobById.bind(jobController));
+router.get('/:id', authenticateOptional, validate(getJobByIdSchema), jobController.getJobById.bind(jobController));
 router.post('/create', authenticate, validate(createJobSchema), jobController.createJob.bind(jobController));
 router.put('/:id', authenticate, validate(updateJobSchema), jobController.updateJob.bind(jobController));
 router.patch('/:id/status', authenticate, validate(updateJobStatusSchema), jobController.updateJobStatus.bind(jobController));

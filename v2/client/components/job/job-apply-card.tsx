@@ -30,7 +30,7 @@ export function JobApplyCard() {
 
         <Link href="/applications">
           <Button variant="outline" className="w-full" size="sm">
-            View Application
+            View All Application
           </Button>
         </Link>
       </CardContent>

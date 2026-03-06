@@ -558,6 +558,12 @@ const jobById = {
     get: {
       tags: ['Jobs'],
       summary: 'Get a job posting by ID',
+      description:
+        'Returns full job details including company info and open positions count. ' +
+        'If a valid Bearer token is provided and the authenticated applicant has already applied, ' +
+        'the response will also include an `application` object with `status` and `application_date`. ' +
+        'If the applicant has not yet applied, `application` is omitted entirely.',
+      security: [{ bearerAuth: [] }],
       parameters: [
         {
           name: 'id',
@@ -577,7 +583,49 @@ const jobById = {
                 properties: {
                   success: { type: 'boolean', example: true },
                   message: { type: 'string', example: 'Job retrieved successfully' },
-                  data: jobResponseData,
+                  data: {
+                    type: 'object',
+                    properties: {
+                      ...jobResponseData.properties,
+                      company: {
+                        type: 'object',
+                        nullable: true,
+                        properties: {
+                          id: { type: 'string', format: 'uuid' },
+                          company_name: { type: 'string', example: 'Acme Corp' },
+                          industry: { type: 'string', example: 'Technology' },
+                          company_size: { type: 'string', example: '11-50' },
+                          website: { type: 'string', example: 'https://acme.com' },
+                          open_positions: { type: 'integer', example: 8 },
+                          companyLocations: {
+                            type: 'array',
+                            items: {
+                              type: 'object',
+                              properties: {
+                                id: { type: 'string', format: 'uuid' },
+                                city: { type: 'string', example: 'Cebu City' },
+                                state: { type: 'string', example: 'Cebu' },
+                                country: { type: 'string', example: 'Philippines' },
+                                is_headquarter: { type: 'boolean', example: true },
+                              },
+                            },
+                          },
+                        },
+                      },
+                      application: {
+                        type: 'object',
+                        description: 'Only present when the authenticated applicant has already applied to this job.',
+                        properties: {
+                          status: {
+                            type: 'string',
+                            enum: ['NEW', 'SCREENING', 'INTERVIEW', 'OFFER', 'HIRED', 'REJECTED', 'CANCELLED'],
+                            example: 'NEW',
+                          },
+                          application_date: { type: 'string', format: 'date-time' },
+                        },
+                      },
+                    },
+                  },
                 },
               },
             },

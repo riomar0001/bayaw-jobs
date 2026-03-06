@@ -17,7 +17,8 @@ export class JobController {
   async getJobById(req: Request<{ id: string }>, res: Response, next: NextFunction): Promise<void> {
     try {
       const id = req.params.id;
-      const result = await jobService.getJobById(id);
+      const applicantProfileId = req.user?.applicant_profile_id;
+      const result = await jobService.getJobById(id, applicantProfileId);
       successResponse(res, result, 'Job retrieved successfully');
     } catch (error) {
       next(error);

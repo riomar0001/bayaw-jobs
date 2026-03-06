@@ -5,15 +5,39 @@ import { userRepository } from '@/repositories/user.repository';
 import { CompanyAdmin } from '@/types/company.type';
 import { CreateJobData } from '@/types/job.type';
 
+import { applicantRepository } from '@/repositories/applicant.repository';
 import { AuthorizationError, NotFoundError } from '@/utils/errors.util';
 
 export class JobService {
-  async getJobById(id: string) {
-    const job = await jobRepository.findById(id);
-    if (!job) {
-      throw new NotFoundError('Job not found');
-    }
-    return job;
+  async getJobById(id: string, applicantProfileId?: string) {
+    const raw = await jobRepository.findById(id);
+    if (!raw) throw new NotFoundError('Job not found');
+
+    const { company_information, ...job } = raw;
+    const company = company_information
+      ? (() => {
+          const { _count, ...info } = company_information;
+          return { ...info, open_positions: _count.jobs };
+        })()
+      : null;
+
+    if (!applicantProfileId) return { ...job, company };
+
+    const application = await applicantRepository.findApplicationByProfileAndJob(
+      applicantProfileId,
+      id,
+    );
+
+    return {
+      ...job,
+      company,
+      ...(application && {
+        application: {
+          status: application.status,
+          application_date: application.application_date,
+        },
+      }),
+    };
   }
 
   async getTopJobs() {

@@ -320,6 +320,27 @@ export type EmploymentType =
   | "FREELANCE"
   | "INTERN";
 
+export interface JobCompany {
+  id: string;
+  company_name: string;
+  industry: string;
+  company_size: string;
+  website: string;
+  open_positions: number;
+  companyLocations: Array<{
+    id: string;
+    city: string;
+    state: string;
+    country: string;
+    is_headquarter: boolean;
+  }>;
+}
+
+export interface JobApplication {
+  status: ApplicationStatus;
+  application_date: string;
+}
+
 export interface Job {
   id: string;
   company_id: string;
@@ -338,6 +359,8 @@ export interface Job {
   status: JobStatus;
   created_at: string;
   updated_at: string;
+  company: JobCompany | null;
+  application?: JobApplication;
 }
 
 export interface JobSummary {
