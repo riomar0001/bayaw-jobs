@@ -100,13 +100,12 @@ export const useAuthStore = create<AuthState>()(
           set({ isLoading: true });
           try {
             const data = await authService.refresh();
-            // Build a minimal User from the refresh response
+            const existing = get().user;
             set({
               user: {
-                id: "",
-                email: "",
-                first_name: data.user.first_name ?? "",
-                last_name: data.user.last_name ?? "",
+                ...existing,
+                first_name: data.user.first_name ?? existing?.first_name ?? "",
+                last_name: data.user.last_name ?? existing?.last_name ?? "",
                 role: data.user.role,
               },
               isAuthenticated: true,
