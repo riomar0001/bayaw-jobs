@@ -118,19 +118,30 @@ export function Navbar() {
                 <DropdownMenuContent align="end" className="w-56">
                   <DropdownMenuLabel>My Account</DropdownMenuLabel>
                   <DropdownMenuSeparator />
-                  <DropdownMenuItem asChild>
-                    {user?.applicant_profile_id ? (
-                      <Link href="/applicant/profile" className="cursor-pointer">
-                        <User className="mr-2 h-4 w-4" />
-                        Profile
-                      </Link>
-                    ) : (
+                  {!user?.applicant_profile_id && !user?.company_id && (
+                    <DropdownMenuItem asChild>
                       <Link href="/onboarding" className="cursor-pointer">
                         <User className="mr-2 h-4 w-4" />
                         Complete Account Onboarding
                       </Link>
-                    )}
-                  </DropdownMenuItem>
+                    </DropdownMenuItem>
+                  )}
+                  {user?.applicant_profile_id && (
+                    <DropdownMenuItem asChild>
+                      <Link href="/applicant/profile" className="cursor-pointer">
+                        <User className="mr-2 h-4 w-4" />
+                        Applicant Profile
+                      </Link>
+                    </DropdownMenuItem>
+                  )}
+                  {user?.company_id && (
+                    <DropdownMenuItem asChild>
+                      <Link href="/company" className="cursor-pointer">
+                        <Building2 className="mr-2 h-4 w-4" />
+                        Company Dashboard
+                      </Link>
+                    </DropdownMenuItem>
+                  )}
                   <DropdownMenuItem asChild>
                     <Link href="/jobs" className="cursor-pointer">
                       <Briefcase className="mr-2 h-4 w-4" />
