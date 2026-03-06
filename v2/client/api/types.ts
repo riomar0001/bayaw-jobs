@@ -97,19 +97,11 @@ export interface LoginStep1Response {
 }
 
 export interface LoginStep2Response {
-  access_token: string;
-  user: Pick<User, "id" | "email" | "first_name" | "last_name" | "role"> & {
-    applicant_profile_id?: string;
-  };
+  accessToken: string;
 }
 
 export interface RefreshResponse {
   accessToken: string;
-  user: {
-    first_name: string | null;
-    last_name: string | null;
-    role: string;
-  };
 }
 
 export interface LoginHistoryItem {

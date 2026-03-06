@@ -43,7 +43,10 @@ export interface LoginResponse {
 export interface RefreshTokenResponse {
   accessToken: string;
   refreshToken: string;
-  user: Pick<UserData, 'first_name' | 'last_name' | 'role'>;
+  user: Pick<UserData, 'first_name' | 'last_name' | 'role'> & {
+    applicant_profile_id?: string;
+    company_id?: string;
+  };
 }
 
 export interface RefreshTokenData {

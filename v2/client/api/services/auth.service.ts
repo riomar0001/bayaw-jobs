@@ -14,6 +14,7 @@ import {
   User,
   unwrapResponse,
 } from "../types";
+import { decodeTokenUser } from "@/lib/token";
 
 class AuthService {
   async register(data: RegisterInput): Promise<User> {
@@ -47,15 +48,17 @@ class AuthService {
   async verifyAuth(
     code: string,
     tempToken: string,
-  ): Promise<LoginStep2Response> {
+  ): Promise<User> {
     const res = await apiClient.post<ApiResponse<LoginStep2Response>>(
       "/auth/verify-auth",
       { code },
       { headers: { Authorization: `Bearer ${tempToken}` } },
     );
-    const data = unwrapResponse(res.data);
-    apiClient.setToken(data.access_token);
-    return data;
+    const { accessToken } = unwrapResponse(res.data);
+    apiClient.setToken(accessToken);
+    const user = decodeTokenUser(accessToken);
+    if (!user) throw new Error("Failed to decode access token");
+    return user;
   }
 
   async refresh(): Promise<RefreshResponse> {

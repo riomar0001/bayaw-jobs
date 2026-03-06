@@ -2,6 +2,7 @@ import { create } from "zustand";
 import { persist } from "zustand/middleware";
 import { authService } from "@/api/services/auth.service";
 import { apiClient } from "@/api/client";
+import { decodeTokenUser } from "@/lib/token";
 import type { User, RegisterInput, ResetPasswordInput } from "@/api/types";
 
 type AuthStep = "idle" | "otp";
@@ -39,22 +40,19 @@ export const useAuthStore = create<AuthState>()(
 
       // Register the single refresh function — used by both store.refresh() and the 401 interceptor
       apiClient.setRefreshFn(async () => {
-        const data = await authService.refresh();
+        const { accessToken } = await authService.refresh();
+        const decoded = decodeTokenUser(accessToken);
         const existing = get().user;
         set({
           user: {
-            id: existing?.id ?? "",
-            email: existing?.email ?? "",
-            first_name: data.user.first_name ?? existing?.first_name ?? "",
-            last_name: data.user.last_name ?? existing?.last_name ?? "",
-            role: data.user.role,
+            ...(decoded ?? {}),
+            // Preserve fields not in the JWT payload
             ...(existing?.is_verified !== undefined && { is_verified: existing.is_verified }),
             ...(existing?.created_at && { created_at: existing.created_at }),
-            ...(existing?.applicant_profile_id && { applicant_profile_id: existing.applicant_profile_id }),
-          },
+          } as User,
           isAuthenticated: true,
         });
-        return data.accessToken;
+        return accessToken;
       });
 
       return {
@@ -81,7 +79,7 @@ export const useAuthStore = create<AuthState>()(
           if (!_tempToken) return;
           set({ isLoading: true, error: null });
           try {
-            const { user } = await authService.verifyAuth(code, _tempToken);
+            const user = await authService.verifyAuth(code, _tempToken);
             set({
               user,
               isAuthenticated: true,
