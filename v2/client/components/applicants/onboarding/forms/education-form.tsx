@@ -1,3 +1,5 @@
+"use client";
+
 import { Input } from "@/components/ui/input";
 import { Field, FieldLabel } from "@/components/ui/field";
 import {
@@ -7,7 +9,8 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { GraduationCap } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { GraduationCap, Plus, Trash2 } from "lucide-react";
 
 export interface EducationData {
   school: string;
@@ -17,89 +20,131 @@ export interface EducationData {
 }
 
 interface EducationFormProps {
-  data: EducationData;
-  onChange: (data: EducationData) => void;
+  educations: EducationData[];
+  onAdd: () => void;
+  onRemove: (index: number) => void;
+  onUpdate: (index: number, field: keyof EducationData, value: string) => void;
 }
 
-export function EducationForm({ data, onChange }: EducationFormProps) {
+export function EducationForm({
+  educations,
+  onAdd,
+  onRemove,
+  onUpdate,
+}: EducationFormProps) {
   return (
     <div className="space-y-4">
-      <div className="flex items-center gap-2 mb-4">
-        <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center">
-          <GraduationCap className="h-4 w-4 text-primary" />
+      <div className="flex items-center justify-between mb-4">
+        <div className="flex items-center gap-2">
+          <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center">
+            <GraduationCap className="h-4 w-4 text-primary" />
+          </div>
+          <h3 className="text-lg font-semibold">Education</h3>
         </div>
-        <h3 className="text-lg font-semibold">Education</h3>
+        <Button type="button" variant="outline" size="sm" onClick={onAdd}>
+          <Plus className="h-4 w-4 mr-1" />
+          Add Education
+        </Button>
       </div>
 
-      <Field>
-        <FieldLabel htmlFor="school">School / University</FieldLabel>
-        <Input
-          id="school"
-          type="text"
-          placeholder="e.g. University of California"
-          value={data.school}
-          onChange={(e) => onChange({ ...data, school: e.target.value })}
-          required
-        />
-      </Field>
+      {educations.length === 0 && (
+        <p className="text-sm text-muted-foreground text-center py-4">
+          No education entries yet. Click &quot;Add Education&quot; to add one.
+        </p>
+      )}
 
-      <Field>
-        <FieldLabel htmlFor="field">Field of Study</FieldLabel>
-        <Input
-          id="field"
-          type="text"
-          placeholder="e.g. Computer Science"
-          value={data.field}
-          onChange={(e) => onChange({ ...data, field: e.target.value })}
-          required
-        />
-      </Field>
+      {educations.map((edu, index) => (
+        <div key={index} className="border rounded-lg p-4 space-y-4 relative">
+          {educations.length > 0 && (
+            <Button
+              type="button"
+              variant="ghost"
+              size="sm"
+              className="absolute top-2 right-2 text-destructive hover:text-destructive"
+              onClick={() => onRemove(index)}
+            >
+              <Trash2 className="h-4 w-4" />
+            </Button>
+          )}
 
-      <div className="grid grid-cols-2 gap-4">
-        <Field>
-          <FieldLabel htmlFor="monthGraduated">Month Graduated</FieldLabel>
-          <Select
-            value={data.monthGraduated}
-            onValueChange={(value) =>
-              onChange({ ...data, monthGraduated: value })
-            }
-          >
-            <SelectTrigger>
-              <SelectValue placeholder="Select month" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="01">January</SelectItem>
-              <SelectItem value="02">February</SelectItem>
-              <SelectItem value="03">March</SelectItem>
-              <SelectItem value="04">April</SelectItem>
-              <SelectItem value="05">May</SelectItem>
-              <SelectItem value="06">June</SelectItem>
-              <SelectItem value="07">July</SelectItem>
-              <SelectItem value="08">August</SelectItem>
-              <SelectItem value="09">September</SelectItem>
-              <SelectItem value="10">October</SelectItem>
-              <SelectItem value="11">November</SelectItem>
-              <SelectItem value="12">December</SelectItem>
-            </SelectContent>
-          </Select>
-        </Field>
+          <p className="text-sm font-medium text-muted-foreground">
+            Education #{index + 1}
+          </p>
 
-        <Field>
-          <FieldLabel htmlFor="yearGraduated">Year Graduated</FieldLabel>
-          <Input
-            id="yearGraduated"
-            type="number"
-            placeholder="e.g. 2020"
-            min="1950"
-            max="2030"
-            value={data.yearGraduated}
-            onChange={(e) =>
-              onChange({ ...data, yearGraduated: e.target.value })
-            }
-            required
-          />
-        </Field>
-      </div>
+          <Field>
+            <FieldLabel htmlFor={`school-${index}`}>
+              School / University
+            </FieldLabel>
+            <Input
+              id={`school-${index}`}
+              type="text"
+              placeholder="e.g. University of California"
+              value={edu.school}
+              onChange={(e) => onUpdate(index, "school", e.target.value)}
+            />
+          </Field>
+
+          <Field>
+            <FieldLabel htmlFor={`field-${index}`}>Field of Study</FieldLabel>
+            <Input
+              id={`field-${index}`}
+              type="text"
+              placeholder="e.g. Computer Science"
+              value={edu.field}
+              onChange={(e) => onUpdate(index, "field", e.target.value)}
+            />
+          </Field>
+
+          <div className="grid grid-cols-2 gap-4">
+            <Field>
+              <FieldLabel htmlFor={`monthGraduated-${index}`}>
+                Month Graduated
+              </FieldLabel>
+              <Select
+                value={edu.monthGraduated}
+                onValueChange={(value) =>
+                  onUpdate(index, "monthGraduated", value)
+                }
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder="Select month" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="01">January</SelectItem>
+                  <SelectItem value="02">February</SelectItem>
+                  <SelectItem value="03">March</SelectItem>
+                  <SelectItem value="04">April</SelectItem>
+                  <SelectItem value="05">May</SelectItem>
+                  <SelectItem value="06">June</SelectItem>
+                  <SelectItem value="07">July</SelectItem>
+                  <SelectItem value="08">August</SelectItem>
+                  <SelectItem value="09">September</SelectItem>
+                  <SelectItem value="10">October</SelectItem>
+                  <SelectItem value="11">November</SelectItem>
+                  <SelectItem value="12">December</SelectItem>
+                </SelectContent>
+              </Select>
+            </Field>
+
+            <Field>
+              <FieldLabel htmlFor={`yearGraduated-${index}`}>
+                Year Graduated
+              </FieldLabel>
+              <Input
+                id={`yearGraduated-${index}`}
+                type="number"
+                placeholder="e.g. 2020"
+                min="1950"
+                max="2030"
+                value={edu.yearGraduated}
+                onChange={(e) =>
+                  onUpdate(index, "yearGraduated", e.target.value)
+                }
+              />
+            </Field>
+          </div>
+        </div>
+      ))}
     </div>
   );
 }

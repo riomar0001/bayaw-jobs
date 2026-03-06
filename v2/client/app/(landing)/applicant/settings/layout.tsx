@@ -8,7 +8,11 @@ import { Footer } from "@/components/shared/footer";
 const navItems = [
   { label: "Information", href: "/applicant/settings/information", icon: User },
   { label: "Password", href: "/applicant/settings/password", icon: Lock },
-  { label: "Login History", href: "/applicant/settings/login-history", icon: History },
+  {
+    label: "Login History",
+    href: "/applicant/settings/login-history",
+    icon: History,
+  },
 ];
 
 export default function SettingsLayout({

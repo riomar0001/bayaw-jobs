@@ -1,7 +1,7 @@
 ﻿"use client";
 
 import React, { useEffect } from "react";
-import { useRouter, usePathname } from "next/navigation";
+import { useRouter } from "next/navigation";
 
 import { SidebarProvider, SidebarInset } from "@/components/ui/sidebar";
 import { AppSidebar } from "@/components/company/dashboard/layout/app-sidebar";
@@ -16,7 +16,6 @@ export default function DashboardLayout({
 }) {
   const router = useRouter();
   const { isAuthenticated, isLoading, _hasHydrated, user } = useAuthStore();
-  const pathname = usePathname();
 
   useEffect(() => {
     if (!_hasHydrated || isLoading) return;

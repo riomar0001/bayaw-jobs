@@ -128,7 +128,10 @@ export function Navbar() {
                   )}
                   {user?.applicant_profile_id && (
                     <DropdownMenuItem asChild>
-                      <Link href="/applicant/profile" className="cursor-pointer">
+                      <Link
+                        href="/applicant/profile"
+                        className="cursor-pointer"
+                      >
                         <User className="mr-2 h-4 w-4" />
                         Applicant Profile
                       </Link>
@@ -244,7 +247,10 @@ export function Navbar() {
             <div className="flex flex-col space-y-2 pt-4 border-t border-border">
               {isAuthenticated ? (
                 <>
-                  <Link href="/applicant/settings" onClick={() => setMobileMenuOpen(false)}>
+                  <Link
+                    href="/applicant/settings"
+                    onClick={() => setMobileMenuOpen(false)}
+                  >
                     <Button variant="ghost" className="w-full justify-start">
                       <Settings className="mr-2 h-4 w-4" />
                       Settings
@@ -270,7 +276,9 @@ export function Navbar() {
                     </Button>
                   </Link>
                   <Link href="/signup" onClick={() => setMobileMenuOpen(false)}>
-                    <Button className="w-full justify-start">Get Started</Button>
+                    <Button className="w-full justify-start">
+                      Get Started
+                    </Button>
                   </Link>
                 </>
               )}

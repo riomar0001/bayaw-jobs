@@ -47,11 +47,12 @@ export function CompanyOpenPositions({ jobs }: CompanyOpenPositionsProps) {
                         <DollarSign className="h-3 w-3" />
                         {job.minimum_salary && job.maximum_salary
                           ? `${job.minimum_salary} – ${job.maximum_salary}`
-                          : job.minimum_salary ?? job.maximum_salary}
+                          : (job.minimum_salary ?? job.maximum_salary)}
                       </span>
                     )}
                     <Badge variant="secondary" className="text-xs py-0">
-                      {LOCATION_TYPE_LABEL[job.location_type] ?? job.location_type}
+                      {LOCATION_TYPE_LABEL[job.location_type] ??
+                        job.location_type}
                     </Badge>
                   </div>
                 </div>

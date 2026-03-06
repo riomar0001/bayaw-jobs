@@ -21,8 +21,12 @@ export default function JobsPage() {
   const [meta, setMeta] = useState<PaginationMeta | null>(null);
   const [loading, setLoading] = useState(true);
   const [currentPage, setCurrentPage] = useState(1);
-  const [searchQuery, setSearchQuery] = useState(searchParams.get("search") ?? "");
-  const [searchLocation, setSearchLocation] = useState(searchParams.get("location") ?? "");
+  const [searchQuery, setSearchQuery] = useState(
+    searchParams.get("search") ?? "",
+  );
+  const [searchLocation, setSearchLocation] = useState(
+    searchParams.get("location") ?? "",
+  );
   const [filters, setFilters] = useState({
     jobTypes: [] as string[],
     location: "",
@@ -61,7 +65,12 @@ export default function JobsPage() {
     } finally {
       setLoading(false);
     }
-  }, [currentPage, debouncedSearchQuery, debouncedSearchLocation, debouncedFilters]);
+  }, [
+    currentPage,
+    debouncedSearchQuery,
+    debouncedSearchLocation,
+    debouncedFilters,
+  ]);
 
   useEffect(() => {
     fetchJobs();

@@ -79,7 +79,9 @@ export function useCompanyOnboarding(onSuccess: () => Promise<void>) {
       await onSuccess();
       return true;
     } catch (err) {
-      setError((err as Error).message ?? "Something went wrong. Please try again.");
+      setError(
+        (err as Error).message ?? "Something went wrong. Please try again.",
+      );
       return false;
     } finally {
       setIsSubmitting(false);

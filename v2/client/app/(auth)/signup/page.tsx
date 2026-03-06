@@ -9,7 +9,10 @@ import { Field, FieldGroup, FieldLabel } from "@/components/ui/field";
 import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
 import { AuthError } from "@/components/auth/auth-error";
-import { PasswordStrength, isPasswordValid } from "@/components/auth/password-strength";
+import {
+  PasswordStrength,
+  isPasswordValid,
+} from "@/components/auth/password-strength";
 import { useAuthStore } from "@/stores/auth.store";
 import { Loader2, Mail } from "lucide-react";
 
@@ -161,10 +164,15 @@ export default function SignupPage() {
           <Checkbox
             id="agreeToTerms"
             checked={formData.agreeToTerms}
-            onCheckedChange={(checked) => set("agreeToTerms", checked as boolean)}
+            onCheckedChange={(checked) =>
+              set("agreeToTerms", checked as boolean)
+            }
             className="mt-1"
           />
-          <Label htmlFor="agreeToTerms" className="text-sm font-normal leading-relaxed cursor-pointer">
+          <Label
+            htmlFor="agreeToTerms"
+            className="text-sm font-normal leading-relaxed cursor-pointer"
+          >
             I agree to the{" "}
             <Link href="/terms" className="text-primary hover:underline">
               Terms of Service
@@ -194,7 +202,10 @@ export default function SignupPage() {
 
         <p className="text-center text-sm text-muted-foreground">
           Already have an account?{" "}
-          <Link href="/login" className="text-primary hover:underline font-medium">
+          <Link
+            href="/login"
+            className="text-primary hover:underline font-medium"
+          >
             Log in
           </Link>
         </p>

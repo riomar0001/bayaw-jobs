@@ -3,13 +3,7 @@
 import { use } from "react";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import {
-  Pencil,
-  MapPin,
-  Building2,
-  Clock,
-  DollarSign,
-} from "lucide-react";
+import { Pencil, MapPin, Building2, Clock, DollarSign } from "lucide-react";
 import { PageHeader } from "@/components/company/dashboard/layout/page-header";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -18,7 +12,7 @@ import { Separator } from "@/components/ui/separator";
 import { JobStatusBadge } from "@/components/company/dashboard/jobs/job-status-badge";
 import { JobApplicantsTable } from "@/components/company/dashboard/jobs/job-applicants-table";
 import { getJobById, getApplicationsByJobId, mockCandidates } from "@/data";
-import { formatSalaryRange} from "@/lib/formatters";
+import { formatSalaryRange } from "@/lib/formatters";
 
 interface JobDetailPageProps {
   params: Promise<{ id: string }>;

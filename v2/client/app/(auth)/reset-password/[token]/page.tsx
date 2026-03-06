@@ -76,7 +76,9 @@ export default function ResetPasswordPage() {
           </Field>
 
           <Field>
-            <FieldLabel htmlFor="confirm_password">Confirm New Password</FieldLabel>
+            <FieldLabel htmlFor="confirm_password">
+              Confirm New Password
+            </FieldLabel>
             <Input
               id="confirm_password"
               type="password"
@@ -98,7 +100,9 @@ export default function ResetPasswordPage() {
         <Button
           type="submit"
           className="w-full"
-          disabled={isLoading || newPassword !== confirmPassword || !newPassword}
+          disabled={
+            isLoading || newPassword !== confirmPassword || !newPassword
+          }
         >
           {isLoading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
           Reset Password

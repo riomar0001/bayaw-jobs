@@ -1,3 +1,4 @@
+import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import {
@@ -26,10 +27,11 @@ export function CompanyHeader({ company }: CompanyHeaderProps) {
         <div className="flex items-start gap-5 mb-6">
           <div className="w-20 h-20 rounded-2xl bg-gradient-to-br from-primary/10 to-primary/5 flex items-center justify-center flex-shrink-0 border overflow-hidden">
             {company.logo_url ? (
-              <img
+              <Image
                 src={company.logo_url}
                 alt={company.company_name}
-                className="w-full h-full object-cover"
+                fill
+                className="object-cover"
               />
             ) : (
               <span className="text-3xl font-bold bg-gradient-to-br from-sky-500 to-cyan-600 bg-clip-text text-transparent">

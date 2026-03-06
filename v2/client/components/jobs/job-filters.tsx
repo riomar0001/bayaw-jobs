@@ -59,7 +59,10 @@ export function JobFilters({ filters, onFilterChange }: JobFiltersProps) {
                     handleJobTypeChange(type.value, checked as boolean)
                   }
                 />
-                <Label htmlFor={type.value} className="font-normal cursor-pointer">
+                <Label
+                  htmlFor={type.value}
+                  className="font-normal cursor-pointer"
+                >
                   {type.label}
                 </Label>
               </div>
@@ -85,8 +88,8 @@ export function JobFilters({ filters, onFilterChange }: JobFiltersProps) {
         {/* Salary Range */}
         <div className="space-y-3">
           <Label className="text-sm font-semibold">
-            Salary Range: PHP {filters.salaryRange[0]}k - {filters.salaryRange[1]}
-            k
+            Salary Range: PHP {filters.salaryRange[0]}k -{" "}
+            {filters.salaryRange[1]}k
           </Label>
           <Slider
             min={0}

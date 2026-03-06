@@ -11,7 +11,11 @@ interface SearchBarProps {
   defaultLocation?: string;
 }
 
-export function SearchBar({ onSearch, defaultJobTitle = "", defaultLocation = "" }: SearchBarProps) {
+export function SearchBar({
+  onSearch,
+  defaultJobTitle = "",
+  defaultLocation = "",
+}: SearchBarProps) {
   const [jobTitle, setJobTitle] = useState(defaultJobTitle);
   const [location, setLocation] = useState(defaultLocation);
 

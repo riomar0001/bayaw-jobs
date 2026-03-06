@@ -21,7 +21,7 @@ import {
   Briefcase,
   Building2,
 } from "lucide-react";
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useAuthStore } from "@/stores/auth.store";
 
 export function Navbar() {

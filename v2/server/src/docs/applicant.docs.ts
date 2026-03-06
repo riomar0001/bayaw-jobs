@@ -216,7 +216,7 @@ const onboarding = {
                         end_date: '2023-06-01',
                       },
                     ],
-                    skills: [{ skill_name: 'TypeScript' }, { skill_name: 'Node.js' }],
+                    skills: ['TypeScript', 'Node.js'],
                     languages: [{ language_name: 'English', proficiency_level: 'FLUENT' }],
                   }),
                 },
@@ -237,7 +237,7 @@ const onboarding = {
                 profile: applicantProfileSchema,
                 education: {
                   type: 'array',
-                  minItems: 1,
+                  description: 'Optional. Pass an empty array or omit to skip education.',
                   items: {
                     type: 'object',
                     required: ['institution_name', 'field_of_study', 'start_year'],
@@ -271,13 +271,8 @@ const onboarding = {
                 skills: {
                   type: 'array',
                   minItems: 1,
-                  items: {
-                    type: 'object',
-                    required: ['skill_name'],
-                    properties: {
-                      skill_name: { type: 'string', example: 'TypeScript' },
-                    },
-                  },
+                  description: 'At least one skill is required.',
+                  items: { type: 'string', example: 'TypeScript' },
                 },
                 languages: {
                   type: 'array',
@@ -321,7 +316,7 @@ const onboarding = {
                   end_date: '2023-06-01',
                 },
               ],
-              skills: [{ skill_name: 'TypeScript' }, { skill_name: 'Node.js' }],
+              skills: ['TypeScript', 'Node.js'],
               languages: [{ language_name: 'English', proficiency_level: 'FLUENT' }],
             },
           },
@@ -408,7 +403,6 @@ const onboarding = {
     },
   },
 };
-
 
 // ─── GET /applicants/profile ──────────────────────────────────────────────────
 
@@ -878,8 +872,17 @@ const experiences = {
                         applicant_profile_id: { type: 'string', example: 'a1b2c3d4-...' },
                         company_name: { type: 'string', example: 'Tech Corp' },
                         position: { type: 'string', example: 'Junior Developer' },
-                        start_date: { type: 'string', format: 'date-time', example: '2022-01-01T00:00:00.000Z' },
-                        end_date: { type: 'string', format: 'date-time', nullable: true, example: '2023-06-01T00:00:00.000Z' },
+                        start_date: {
+                          type: 'string',
+                          format: 'date-time',
+                          example: '2022-01-01T00:00:00.000Z',
+                        },
+                        end_date: {
+                          type: 'string',
+                          format: 'date-time',
+                          nullable: true,
+                          example: '2023-06-01T00:00:00.000Z',
+                        },
                         is_current: { type: 'boolean', example: false },
                       },
                     },
@@ -1019,7 +1022,11 @@ const careerStatus = {
                 type: 'object',
                 properties: {
                   success: { type: 'boolean', example: false },
-                  message: { type: 'string', example: 'career_status must be one of: ACTIVELY_LOOKING, OPEN_TO_OPPORTUNITIES, EMPLOYED_NOT_LOOKING, NOT_LOOKING' },
+                  message: {
+                    type: 'string',
+                    example:
+                      'career_status must be one of: ACTIVELY_LOOKING, OPEN_TO_OPPORTUNITIES, EMPLOYED_NOT_LOOKING, NOT_LOOKING',
+                  },
                 },
               },
             },
@@ -1384,8 +1391,17 @@ const experience = {
                       applicant_profile_id: { type: 'string', example: 'a1b2c3d4-...' },
                       company_name: { type: 'string', example: 'Tech Corp' },
                       position: { type: 'string', example: 'Junior Developer' },
-                      start_date: { type: 'string', format: 'date-time', example: '2022-01-01T00:00:00.000Z' },
-                      end_date: { type: 'string', format: 'date-time', nullable: true, example: '2023-06-01T00:00:00.000Z' },
+                      start_date: {
+                        type: 'string',
+                        format: 'date-time',
+                        example: '2022-01-01T00:00:00.000Z',
+                      },
+                      end_date: {
+                        type: 'string',
+                        format: 'date-time',
+                        nullable: true,
+                        example: '2023-06-01T00:00:00.000Z',
+                      },
                       is_current: { type: 'boolean', example: false },
                     },
                   },
@@ -1482,8 +1498,17 @@ const experience = {
                       applicant_profile_id: { type: 'string', example: 'a1b2c3d4-...' },
                       company_name: { type: 'string', example: 'Tech Corp' },
                       position: { type: 'string', example: 'Senior Developer' },
-                      start_date: { type: 'string', format: 'date-time', example: '2022-01-01T00:00:00.000Z' },
-                      end_date: { type: 'string', format: 'date-time', nullable: true, example: null },
+                      start_date: {
+                        type: 'string',
+                        format: 'date-time',
+                        example: '2022-01-01T00:00:00.000Z',
+                      },
+                      end_date: {
+                        type: 'string',
+                        format: 'date-time',
+                        nullable: true,
+                        example: null,
+                      },
                       is_current: { type: 'boolean', example: true },
                     },
                   },
@@ -1931,7 +1956,8 @@ const skills = {
     post: {
       tags: ['Applicants'],
       summary: 'Add skills',
-      description: 'Add one or more skills to the applicant profile. Returns the full updated skills list.',
+      description:
+        'Add one or more skills to the applicant profile. Returns the full updated skills list.',
       security: [{ bearerAuth: [] }],
       requestBody: {
         required: true,
@@ -2071,7 +2097,9 @@ const applyJob = {
         },
         '400': { description: 'Job is no longer accepting applications (not OPEN)' },
         '401': { description: 'Unauthorized' },
-        '404': { description: 'Job not found or applicant profile not found (onboarding not completed)' },
+        '404': {
+          description: 'Job not found or applicant profile not found (onboarding not completed)',
+        },
         '409': { description: 'You have already applied to this job' },
       },
     },
@@ -2121,7 +2149,10 @@ const activeApplications = {
                 type: 'object',
                 properties: {
                   success: { type: 'boolean', example: true },
-                  message: { type: 'string', example: 'Active applications retrieved successfully' },
+                  message: {
+                    type: 'string',
+                    example: 'Active applications retrieved successfully',
+                  },
                   data: {
                     type: 'array',
                     maxItems: 3,
@@ -2195,8 +2226,18 @@ const allApplications = {
         'Returns a paginated list of all job applications for the authenticated applicant. Default limit is 4.',
       security: [{ bearerAuth: [] }],
       parameters: [
-        { name: 'page', in: 'query', required: false, schema: { type: 'integer', default: 1, minimum: 1 } },
-        { name: 'limit', in: 'query', required: false, schema: { type: 'integer', default: 4, minimum: 1, maximum: 100 } },
+        {
+          name: 'page',
+          in: 'query',
+          required: false,
+          schema: { type: 'integer', default: 1, minimum: 1 },
+        },
+        {
+          name: 'limit',
+          in: 'query',
+          required: false,
+          schema: { type: 'integer', default: 4, minimum: 1, maximum: 100 },
+        },
       ],
       responses: {
         200: {
@@ -2215,7 +2256,7 @@ const allApplications = {
                         type: 'array',
                         items: {
                           allOf: [
-                            { '$ref': '#/components/schemas/ApplicationItem' },
+                            { $ref: '#/components/schemas/ApplicationItem' },
                             {
                               type: 'object',
                               properties: {
@@ -2227,7 +2268,10 @@ const allApplications = {
                                     department: { type: 'string', example: 'Engineering' },
                                     location: { type: 'string', example: 'Cebu City, Philippines' },
                                     employment_type: { type: 'string', example: 'Full-time' },
-                                    location_type: { type: 'string', enum: ['ONSITE', 'REMOTE', 'HYBRID'] },
+                                    location_type: {
+                                      type: 'string',
+                                      enum: ['ONSITE', 'REMOTE', 'HYBRID'],
+                                    },
                                     company_id: { type: 'string', format: 'uuid' },
                                   },
                                 },

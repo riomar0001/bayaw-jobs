@@ -14,8 +14,15 @@ import { Loader2, ArrowLeft } from "lucide-react";
 
 export default function LoginPage() {
   const router = useRouter();
-  const { login, verifyOtp, resetLoginStep, isLoading, error, _loginStep, clearError } =
-    useAuthStore();
+  const {
+    login,
+    verifyOtp,
+    resetLoginStep,
+    isLoading,
+    error,
+    _loginStep,
+    clearError,
+  } = useAuthStore();
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -34,8 +41,14 @@ export default function LoginPage() {
     const { isAuthenticated, user } = useAuthStore.getState();
     if (!isAuthenticated) return;
     // Route based on existing profile
-    if (user?.applicant_profile_id) { router.push("/applicant"); return; }
-    if (user?.company_id) { router.push("/company"); return; }
+    if (user?.applicant_profile_id) {
+      router.push("/applicant");
+      return;
+    }
+    if (user?.company_id) {
+      router.push("/company");
+      return;
+    }
     router.push("/onboarding");
   };
 
@@ -63,7 +76,10 @@ export default function LoginPage() {
 
           <button
             type="button"
-            onClick={() => { resetLoginStep(); setOtp(""); }}
+            onClick={() => {
+              resetLoginStep();
+              setOtp("");
+            }}
             className="flex items-center gap-1 text-sm text-muted-foreground hover:text-primary transition-colors mx-auto "
           >
             <ArrowLeft className="h-3 w-3" />
@@ -123,7 +139,10 @@ export default function LoginPage() {
 
         <p className="text-center text-sm text-muted-foreground">
           Don&apos;t have an account?{" "}
-          <Link href="/signup" className="text-primary hover:underline font-medium">
+          <Link
+            href="/signup"
+            className="text-primary hover:underline font-medium"
+          >
             Sign up
           </Link>
         </p>

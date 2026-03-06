@@ -102,7 +102,10 @@ export default function ForgotPasswordPage() {
 
         <p className="text-center text-xs text-muted-foreground">
           Are you a company?{" "}
-          <Link href="/company/forgot-password" className="text-primary hover:underline">
+          <Link
+            href="/company/forgot-password"
+            className="text-primary hover:underline"
+          >
             Reset company password
           </Link>
         </p>

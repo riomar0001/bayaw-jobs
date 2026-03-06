@@ -124,7 +124,7 @@ export class ApplicantService {
         ...exp,
         end_date: 'end_date' in exp ? (exp.end_date ?? null) : null,
       })),
-      skills: data.skills || [],
+      skills: (data.skills || []).map((s) => ({ skill_name: s })),
       languages: data.languages || [],
     });
 

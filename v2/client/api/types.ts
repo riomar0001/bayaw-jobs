@@ -532,7 +532,7 @@ export interface PublicCompanyJobOpening {
   id: string;
   title: string;
   location: string;
-  location_type: 'REMOTE' | 'ONSITE' | 'HYBRID';
+  location_type: "REMOTE" | "ONSITE" | "HYBRID";
   minimum_salary: string;
   maximum_salary: string;
 }

@@ -17,6 +17,8 @@ import {
 import { ArrowLeft, ArrowRight, Building2, Loader2 } from "lucide-react";
 import { businessService } from "@/api/services/business.service";
 import { useAuthStore } from "@/stores/auth.store";
+import { ApiError } from "@/api/client";
+import { toast } from "sonner";
 
 const COMPANY_SIZES = [
   "1-10",
@@ -49,10 +51,7 @@ const INDUSTRIES = [
 
 const TOTAL_STEPS = 2;
 
-const STEPS = [
-  { label: "Company Info" },
-  { label: "Contact & Location" },
-];
+const STEPS = [{ label: "Company Info" }, { label: "Contact & Location" }];
 
 interface FormData {
   company_name: string;
@@ -94,19 +93,38 @@ export default function CompanyOnboardingPage() {
   const [step, setStep] = useState(1);
   const [form, setForm] = useState<FormData>(initialForm);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [error, setError] = useState<string | null>(null);
 
   const set = (field: keyof FormData, value: string) =>
     setForm((prev) => ({ ...prev, [field]: value }));
 
   const handleNext = (e: React.FormEvent) => {
     e.preventDefault();
+    const {
+      company_name,
+      industry,
+      about,
+      company_size,
+      foundation_year,
+      website,
+      owner_position,
+    } = form;
+    if (
+      !company_name ||
+      !industry ||
+      !about ||
+      !company_size ||
+      !foundation_year ||
+      !website ||
+      !owner_position
+    ) {
+      toast.error("Please complete all required fields before continuing.");
+      return;
+    }
     setStep(2);
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setError(null);
     setIsSubmitting(true);
     try {
       await businessService.completeOnboarding({
@@ -140,7 +158,17 @@ export default function CompanyOnboardingPage() {
       await refresh();
       router.replace("/company");
     } catch (err) {
-      setError((err as Error).message ?? "Something went wrong.");
+      if (err instanceof ApiError && err.errors) {
+        Object.entries(err.errors).forEach(([field, messages]) => {
+          const label = field
+            .replace(/^body\./, "")
+            .replace(/\./g, " → ")
+            .replace(/_/g, " ");
+          messages.forEach((msg) => toast.error(msg, { description: label }));
+        });
+      } else {
+        toast.error((err as Error).message ?? "Something went wrong.");
+      }
     } finally {
       setIsSubmitting(false);
     }
@@ -378,12 +406,6 @@ export default function CompanyOnboardingPage() {
                   </div>
                 </div>
 
-                {error && (
-                  <p className="text-sm text-destructive text-center">
-                    {error}
-                  </p>
-                )}
-
                 <div className="flex gap-3 pt-2">
                   <Button
                     type="button"
@@ -413,4 +435,3 @@ export default function CompanyOnboardingPage() {
     </div>
   );
 }
-

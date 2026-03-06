@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
+import { Toaster } from "sonner";
 import "./globals.css";
 import { AuthProvider } from "@/components/shared/auth-provider";
 
@@ -27,6 +28,7 @@ export default function RootLayout({
         suppressHydrationWarning
       >
         <AuthProvider>{children}</AuthProvider>
+        <Toaster richColors position="top-right" />
       </body>
     </html>
   );

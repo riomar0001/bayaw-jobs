@@ -49,7 +49,10 @@ export function OtpInput({
 
   const handlePaste = (e: ClipboardEvent<HTMLInputElement>) => {
     e.preventDefault();
-    const pasted = e.clipboardData.getData("text").replace(/\D/g, "").slice(0, length);
+    const pasted = e.clipboardData
+      .getData("text")
+      .replace(/\D/g, "")
+      .slice(0, length);
     onChange(pasted.padEnd(length, " "));
     const focusIdx = Math.min(pasted.length, length - 1);
     inputRefs.current[focusIdx]?.focus();
@@ -60,7 +63,9 @@ export function OtpInput({
       {Array.from({ length }).map((_, i) => (
         <Input
           key={i}
-          ref={(el) => { inputRefs.current[i] = el; }}
+          ref={(el) => {
+            inputRefs.current[i] = el;
+          }}
           type="text"
           inputMode="numeric"
           maxLength={1}

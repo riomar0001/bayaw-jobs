@@ -14,7 +14,11 @@ interface JobRelatedProps {
   companyName: string;
 }
 
-export function JobRelated({ companyId, currentJobId, companyName }: JobRelatedProps) {
+export function JobRelated({
+  companyId,
+  currentJobId,
+  companyName,
+}: JobRelatedProps) {
   const [jobs, setJobs] = useState<PublicCompanyJobOpening[]>([]);
 
   useEffect(() => {
@@ -22,7 +26,9 @@ export function JobRelated({ companyId, currentJobId, companyName }: JobRelatedP
     businessService
       .getPublicCompany(companyId)
       .then((company) =>
-        setJobs(company.job_openings.filter((j) => j.id !== currentJobId).slice(0, 3))
+        setJobs(
+          company.job_openings.filter((j) => j.id !== currentJobId).slice(0, 3),
+        ),
       )
       .catch(() => {});
   }, [companyId, currentJobId]);

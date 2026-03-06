@@ -60,7 +60,11 @@ export default function JobDetailPage({
           <div className="lg:col-span-2 space-y-6">
             <JobHeader job={job} />
             <JobDescription job={job} />
-            <JobRelated companyId={job.company?.id ?? null} currentJobId={job.id} companyName={job.company?.company_name ?? ""} />
+            <JobRelated
+              companyId={job.company?.id ?? null}
+              currentJobId={job.id}
+              companyName={job.company?.company_name ?? ""}
+            />
           </div>
 
           <div className="lg:col-span-1 space-y-6">

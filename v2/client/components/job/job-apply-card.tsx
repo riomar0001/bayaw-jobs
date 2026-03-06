@@ -40,8 +40,14 @@ export function JobApplyCard({ job, onApplied }: JobApplyCardProps) {
     : null;
 
   async function handleApply() {
-    if (!isAuthenticated) { router.push("/signup"); return; }
-    if (!user?.applicant_profile_id) { router.push("/applicant/onboarding"); return; }
+    if (!isAuthenticated) {
+      router.push("/signup");
+      return;
+    }
+    if (!user?.applicant_profile_id) {
+      router.push("/applicant/onboarding");
+      return;
+    }
     setApplying(true);
     try {
       const res = await applicantService.applyToJob(job.id);

@@ -45,10 +45,7 @@ class AuthService {
    * Pass the temp_token received from login() — it's used as the Bearer token for this call.
    * On success, store the returned access_token via apiClient.setToken().
    */
-  async verifyAuth(
-    code: string,
-    tempToken: string,
-  ): Promise<User> {
+  async verifyAuth(code: string, tempToken: string): Promise<User> {
     const res = await apiClient.post<ApiResponse<LoginStep2Response>>(
       "/auth/verify-auth",
       { code },

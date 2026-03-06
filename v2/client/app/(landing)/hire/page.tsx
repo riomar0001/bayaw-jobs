@@ -15,8 +15,14 @@ export default function CompaniesLandingPage() {
   const { isAuthenticated, user } = useAuthStore();
 
   function handlePostJob() {
-    if (!isAuthenticated) { router.push("/signup"); return; }
-    if (!user?.company_id) { router.push("/company/onboarding"); return; }
+    if (!isAuthenticated) {
+      router.push("/signup");
+      return;
+    }
+    if (!user?.company_id) {
+      router.push("/company/onboarding");
+      return;
+    }
     router.push("/company/jobs/create");
   }
   return (
@@ -28,8 +34,8 @@ export default function CompaniesLandingPage() {
       >
         <div className="flex justify-center gap-4 mt-8">
           <Button size="lg" className="px-8" onClick={handlePostJob}>
-              Post a Job
-            </Button>
+            Post a Job
+          </Button>
 
           <NextLink href="/login">
             <Button size="lg" variant="outline" className="px-8">

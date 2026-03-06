@@ -6,7 +6,8 @@ import axios, {
   InternalAxiosRequestConfig,
 } from "axios";
 
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:4000/api";
+const API_BASE_URL =
+  process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:4000/api";
 const API_TIMEOUT = 30000;
 
 export class ApiError extends Error {
@@ -61,7 +62,10 @@ class ApiClient {
     this.token = token;
   }
 
-  private addRefreshSubscriber(onSuccess: (token: string) => void, onError: (error: unknown) => void) {
+  private addRefreshSubscriber(
+    onSuccess: (token: string) => void,
+    onError: (error: unknown) => void,
+  ) {
     this.refreshSubscribers.push({ onSuccess, onError });
   }
 

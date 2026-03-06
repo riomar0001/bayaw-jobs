@@ -77,8 +77,14 @@ export function JobHeader({ job }: JobHeaderProps) {
             size="lg"
             className="w-full sm:w-auto px-12"
             onClick={() => {
-              if (!isAuthenticated) { router.push("/signup"); return; }
-              if (!user?.applicant_profile_id) { router.push("/applicant/onboarding"); return; }
+              if (!isAuthenticated) {
+                router.push("/signup");
+                return;
+              }
+              if (!user?.applicant_profile_id) {
+                router.push("/applicant/onboarding");
+                return;
+              }
             }}
           >
             Apply Now

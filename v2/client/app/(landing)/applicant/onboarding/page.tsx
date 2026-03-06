@@ -6,7 +6,10 @@ import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { CheckCircle, ArrowLeft, ArrowRight, Loader2 } from "lucide-react";
 import { ProgressStepper } from "@/components/applicants/onboarding/progress-stepper";
-import { PersonalInfoStep } from "@/components/applicants/onboarding/forms/personal-info-step";
+import {
+  PersonalInfoStep,
+  type PersonalInfoData,
+} from "@/components/applicants/onboarding/forms/personal-info-step";
 import {
   EducationForm,
   type EducationData,
@@ -23,6 +26,8 @@ import {
 import { ResumeUpload } from "@/components/applicants/onboarding/resume-upload";
 import { applicantService } from "@/api/services/applicant.service";
 import { useAuthStore } from "@/stores/auth.store";
+import { ApiError } from "@/api/client";
+import { toast } from "sonner";
 
 interface OnboardingData {
   // Step 1: Personal Info
@@ -30,10 +35,11 @@ interface OnboardingData {
   gender: string;
   desiredPosition: string;
   location: string;
+  countryCode: string;
   phoneNumber: string;
 
   // Step 2: Background
-  education: EducationData;
+  educations: EducationData[];
   experiences: ExperienceData[];
   skills: string[];
   languages: Array<{
@@ -52,20 +58,15 @@ export default function OnboardingPage() {
   const { refresh } = useAuthStore();
   const [currentStep, setCurrentStep] = useState(1);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [error, setError] = useState<string | null>(null);
 
   const [formData, setFormData] = useState<OnboardingData>({
     age: "",
     gender: "",
     desiredPosition: "",
     location: "",
+    countryCode: "+63",
     phoneNumber: "",
-    education: {
-      school: "",
-      field: "",
-      monthGraduated: "",
-      yearGraduated: "",
-    },
+    educations: [],
     experiences: [
       {
         companyName: "",
@@ -81,6 +82,45 @@ export default function OnboardingPage() {
   });
 
   const handleNext = () => {
+    if (currentStep === 1) {
+      const {
+        age,
+        gender,
+        desiredPosition,
+        location,
+        countryCode,
+        phoneNumber,
+      } = formData;
+      if (
+        !age ||
+        !gender ||
+        !desiredPosition ||
+        !location ||
+        !countryCode ||
+        !phoneNumber
+      ) {
+        toast.error(
+          "Please complete all personal information fields before continuing.",
+        );
+        return;
+      }
+      if (Number(age) < 16) {
+        toast.error("You must be at least 16 years old.");
+        return;
+      }
+    }
+
+    if (currentStep === 2) {
+      if (formData.skills.length === 0) {
+        toast.error("Please add at least one skill before continuing.");
+        return;
+      }
+      if (formData.languages.length === 0) {
+        toast.error("Please add at least one language before continuing.");
+        return;
+      }
+    }
+
     if (currentStep < TOTAL_STEPS) {
       setCurrentStep(currentStep + 1);
     }
@@ -94,12 +134,11 @@ export default function OnboardingPage() {
 
   const handleSubmit = async () => {
     if (!formData.resume) {
-      setError("Please upload your resume (PDF) to continue.");
+      toast.error("Please upload your resume (PDF) to continue.");
       return;
     }
 
     setIsSubmitting(true);
-    setError(null);
 
     try {
       await applicantService.completeOnboarding(
@@ -109,18 +148,16 @@ export default function OnboardingPage() {
             gender: formData.gender,
             desired_position: formData.desiredPosition,
             location: formData.location,
-            phone_number: formData.phoneNumber,
+            phone_number: `${formData.countryCode} ${formData.phoneNumber.trim()}`,
           },
-          education: formData.education.school
-            ? [
-                {
-                  institution_name: formData.education.school,
-                  field_of_study: formData.education.field,
-                  start_year: Number(formData.education.yearGraduated) - 4,
-                  end_year: Number(formData.education.yearGraduated) || null,
-                },
-              ]
-            : [],
+          education: formData.educations
+            .filter((e) => e.school)
+            .map((e) => ({
+              institution_name: e.school,
+              field_of_study: e.field,
+              start_year: Number(e.yearGraduated) - 4,
+              end_year: Number(e.yearGraduated) || null,
+            })),
           experience: formData.experiences
             .filter((e) => e.companyName)
             .map((e) => ({
@@ -145,12 +182,55 @@ export default function OnboardingPage() {
 
       // Get a fresh token with applicant_profile_id embedded
       await refresh();
-      router.replace("/applicant");
+      router.replace("/applicant/profile");
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Something went wrong");
+      if (err instanceof ApiError && err.errors) {
+        Object.entries(err.errors).forEach(([field, messages]) => {
+          // Strip "body." prefix and convert dot-path to readable label
+          const label = field
+            .replace(/^body\./, "")
+            .replace(/\./g, " → ")
+            .replace(/_/g, " ");
+          messages.forEach((msg) => toast.error(msg, { description: label }));
+        });
+      } else {
+        const message =
+          err instanceof Error ? err.message : "Something went wrong";
+        toast.error(message);
+      }
     } finally {
       setIsSubmitting(false);
     }
+  };
+
+  const addEducation = () => {
+    setFormData({
+      ...formData,
+      educations: [
+        ...formData.educations,
+        {
+          school: "",
+          field: "",
+          monthGraduated: "",
+          yearGraduated: "",
+        },
+      ],
+    });
+  };
+
+  const removeEducation = (index: number) => {
+    const newEducations = formData.educations.filter((_, i) => i !== index);
+    setFormData({ ...formData, educations: newEducations });
+  };
+
+  const updateEducation = (
+    index: number,
+    field: keyof EducationData,
+    value: string,
+  ) => {
+    const newEducations = [...formData.educations];
+    newEducations[index] = { ...newEducations[index], [field]: value };
+    setFormData({ ...formData, educations: newEducations });
   };
 
   const addExperience = () => {
@@ -256,9 +336,12 @@ export default function OnboardingPage() {
                   gender: formData.gender,
                   desiredPosition: formData.desiredPosition,
                   location: formData.location,
+                  countryCode: formData.countryCode,
                   phoneNumber: formData.phoneNumber,
                 }}
-                onChange={(data) => setFormData({ ...formData, ...data })}
+                onChange={(data: PersonalInfoData) =>
+                  setFormData({ ...formData, ...data })
+                }
               />
             )}
 
@@ -266,10 +349,10 @@ export default function OnboardingPage() {
             {currentStep === 2 && (
               <div className="space-y-8">
                 <EducationForm
-                  data={formData.education}
-                  onChange={(education) =>
-                    setFormData({ ...formData, education })
-                  }
+                  educations={formData.educations}
+                  onAdd={addEducation}
+                  onRemove={removeEducation}
+                  onUpdate={updateEducation}
                 />
 
                 <ExperienceForm
@@ -281,7 +364,9 @@ export default function OnboardingPage() {
 
                 <SkillsForm
                   skills={formData.skills}
-                  onChange={(skills) => setFormData({ ...formData, skills })}
+                  onChange={(skills: string[]) =>
+                    setFormData({ ...formData, skills })
+                  }
                 />
 
                 <LanguagesForm
@@ -299,11 +384,6 @@ export default function OnboardingPage() {
                 file={formData.resume}
                 onFileChange={(resume) => setFormData({ ...formData, resume })}
               />
-            )}
-
-            {/* Error message */}
-            {error && (
-              <p className="text-sm text-destructive text-center">{error}</p>
             )}
 
             {/* Navigation Buttons */}

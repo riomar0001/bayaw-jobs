@@ -29,16 +29,22 @@ export function PasswordStrength({ password }: PasswordStrengthProps) {
   const passedCount = results.filter((r) => r.passed).length;
 
   const strengthLabel =
-    passedCount <= 1 ? "Weak"
-    : passedCount <= 3 ? "Fair"
-    : passedCount === 4 ? "Good"
-    : "Strong";
+    passedCount <= 1
+      ? "Weak"
+      : passedCount <= 3
+        ? "Fair"
+        : passedCount === 4
+          ? "Good"
+          : "Strong";
 
   const strengthColor =
-    passedCount <= 1 ? "bg-destructive"
-    : passedCount <= 3 ? "bg-yellow-500"
-    : passedCount === 4 ? "bg-blue-500"
-    : "bg-green-500";
+    passedCount <= 1
+      ? "bg-destructive"
+      : passedCount <= 3
+        ? "bg-yellow-500"
+        : passedCount === 4
+          ? "bg-blue-500"
+          : "bg-green-500";
 
   if (!password) return null;
 
@@ -50,10 +56,13 @@ export function PasswordStrength({ password }: PasswordStrengthProps) {
           <span className="text-muted-foreground">Password strength</span>
           <span
             className={`font-semibold ${
-              passedCount <= 1 ? "text-destructive"
-              : passedCount <= 3 ? "text-yellow-500"
-              : passedCount === 4 ? "text-blue-500"
-              : "text-green-500"
+              passedCount <= 1
+                ? "text-destructive"
+                : passedCount <= 3
+                  ? "text-yellow-500"
+                  : passedCount === 4
+                    ? "text-blue-500"
+                    : "text-green-500"
             }`}
           >
             {strengthLabel}
@@ -80,7 +89,13 @@ export function PasswordStrength({ password }: PasswordStrengthProps) {
             ) : (
               <X className="h-3.5 w-3.5 text-muted-foreground shrink-0" />
             )}
-            <span className={rule.passed ? "text-green-600 dark:text-green-400" : "text-muted-foreground"}>
+            <span
+              className={
+                rule.passed
+                  ? "text-green-600 dark:text-green-400"
+                  : "text-muted-foreground"
+              }
+            >
               {rule.label}
             </span>
           </li>

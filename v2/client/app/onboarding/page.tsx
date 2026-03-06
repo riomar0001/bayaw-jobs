@@ -56,12 +56,14 @@ const INDUSTRIES = [
 
 type View = "select" | "recruiter-step1" | "recruiter-step2";
 
-const RECRUITER_STEPS = [{ label: "Company Info" }, { label: "Contact & Location" }];
+const RECRUITER_STEPS = [
+  { label: "Company Info" },
+  { label: "Contact & Location" },
+];
 
 export default function OnboardingSelectionPage() {
   const router = useRouter();
-  const { isLoading, user, refresh } = useAuthStore();
-  const [mounted, setMounted] = useState(false);
+  const { isLoading, user, refresh, _hasHydrated } = useAuthStore();
   const [view, setView] = useState<View>("select");
 
   const onSuccess = useCallback(async () => {
@@ -73,16 +75,18 @@ export default function OnboardingSelectionPage() {
     useCompanyOnboarding(onSuccess);
 
   useEffect(() => {
-    setMounted(true);
-  }, []);
+    if (!_hasHydrated || isLoading) return;
+    if (user?.applicant_profile_id) {
+      router.replace("/applicant");
+      return;
+    }
+    if (user?.company_id) {
+      router.replace("/company");
+      return;
+    }
+  }, [_hasHydrated, isLoading, user, router]);
 
-  useEffect(() => {
-    if (!mounted || isLoading) return;
-    if (user?.applicant_profile_id) { router.replace("/applicant"); return; }
-    if (user?.company_id) { router.replace("/company"); return; }
-  }, [mounted, isLoading, user, router]);
-
-  if (!mounted || isLoading) {
+  if (!_hasHydrated || isLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <Loader2 className="h-8 w-8 animate-spin text-primary" />
@@ -98,8 +102,8 @@ export default function OnboardingSelectionPage() {
           <div className="text-center mb-10">
             <h1 className="text-3xl font-bold mb-2">Welcome to Bayaw Jobs</h1>
             <p className="text-muted-foreground">
-              How would you like to get started? You can always set up the
-              other account later.
+              How would you like to get started? You can always set up the other
+              account later.
             </p>
           </div>
 

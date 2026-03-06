@@ -18,7 +18,10 @@ const locationSchema = z.object({
   state: z.string().min(1, 'State is required'),
   country: z.string().min(1, 'Country is required'),
   postal_code: z.string().min(1, 'Postal code is required'),
-  is_headquarter: z.boolean().optional().default(false),
+  is_headquarter: z
+    .boolean({ error: '"is_headquarter" must be a boolean' })
+    .optional()
+    .default(false),
 });
 
 export const businessOnboardingSchema = z.object({
@@ -28,7 +31,7 @@ export const businessOnboardingSchema = z.object({
     about: z.string().min(1, 'About company is required'),
     company_size: z.string().min(1, 'Company size is required'),
     foundation_year: z
-      .number()
+      .number({ error: 'Foundation year must be a number' })
       .int()
       .min(1800, 'Foundation year must be at least 1800')
       .max(new Date().getFullYear(), 'Foundation year cannot be in the future'),
@@ -62,7 +65,7 @@ export const updateCompanyInfoSchema = z.object({
       about: z.string().min(1, 'About is required').optional(),
       company_size: z.string().min(1, 'Company size is required').optional(),
       foundation_year: z
-        .number()
+        .number({ error: 'Foundation year must be a number' })
         .int()
         .min(1800, 'Foundation year must be at least 1800')
         .max(new Date().getFullYear(), 'Foundation year cannot be in the future')
@@ -125,10 +128,10 @@ export const addAdminSchema = z.object({
     user_id: z.string().uuid('User ID must be a valid UUID'),
     role: z.string().min(1, 'Role is required'),
     position: z.string().optional(),
-    can_create: z.boolean().default(false),
-    can_read: z.boolean().default(true),
-    can_update: z.boolean().default(false),
-    can_delete: z.boolean().default(false),
+    can_create: z.boolean({ error: '"can_create" must be a boolean' }).default(false),
+    can_read: z.boolean({ error: '"can_read" must be a boolean' }).default(true),
+    can_update: z.boolean({ error: '"can_update" must be a boolean' }).default(false),
+    can_delete: z.boolean({ error: '"can_delete" must be a boolean' }).default(false),
   }),
 });
 

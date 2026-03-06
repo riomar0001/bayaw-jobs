@@ -3,12 +3,16 @@ import { z } from 'zod';
 const educationSchema = z.object({
   institution_name: z.string().min(1, 'Institution name is required'),
   field_of_study: z.string().min(1, 'Field of study is required'),
-  start_year: z.number().int().min(1900).max(new Date().getFullYear()),
-  end_year: z
-    .number()
+  start_year: z
+    .number({ error: 'Start year must be a number' })
     .int()
-    .min(1900)
-    .max(new Date().getFullYear() + 10)
+    .min(1900, 'Start year must be at least 1900')
+    .max(new Date().getFullYear(), 'Start year cannot be in the future'),
+  end_year: z
+    .number({ error: 'End year must be a number' })
+    .int()
+    .min(1900, 'End year must be at least 1900')
+    .max(new Date().getFullYear() + 10, 'End year is too far in the future')
     .nullable()
     .optional(),
 });
@@ -17,12 +21,8 @@ const experienceSchema = z.object({
   company_name: z.string().min(1, 'Company name is required'),
   position: z.string().min(1, 'Position is required'),
   start_date: z.string().min(1, 'Start date is required'),
-  is_current: z.boolean(),
+  is_current: z.boolean({ error: '"is_current" must be a boolean' }),
   end_date: z.string().nullable().optional(),
-});
-
-const skillSchema = z.object({
-  skill_name: z.string().min(1, 'Skill name is required'),
 });
 
 const languageSchema = z.object({
@@ -33,7 +33,11 @@ const languageSchema = z.object({
 });
 
 const profileSchema = z.object({
-  age: z.number().int().min(16, 'Must be at least 16 years old').max(100),
+  age: z
+    .number({ error: 'Age must be a number' })
+    .int()
+    .min(16, 'Must be at least 16 years old')
+    .max(100, 'Age cannot exceed 100'),
   gender: z.string().min(1, 'Gender is required'),
   desired_position: z.string().min(1, 'Desired position is required'),
   location: z.string().min(1, 'Location is required'),
@@ -62,12 +66,11 @@ export const updateProfileSchema = z.object({
 export const onboardingSchema = z.object({
   body: z.object({
     profile: profileSchema,
-    education: z
-      .array(educationSchema)
-      .min(1, 'At least one education entry is required')
-      .optional(),
+    education: z.array(educationSchema).optional(),
     experience: z.array(experienceSchema).optional(),
-    skills: z.array(skillSchema).min(1, 'At least one skill is required'),
+    skills: z
+      .array(z.string().min(1, 'Skill name cannot be empty'))
+      .min(1, 'At least one skill is required'),
     languages: z.array(languageSchema).min(1, 'At least one language is required'),
   }),
 });
@@ -99,7 +102,7 @@ export const addExperienceSchema = z.object({
     company_name: z.string().min(1, 'Company name is required'),
     position: z.string().min(1, 'Position is required'),
     start_date: z.string().min(1, 'Start date is required'),
-    is_current: z.boolean(),
+    is_current: z.boolean({ error: '"is_current" must be a boolean' }),
     end_date: z.string().nullable().optional(),
   }),
 });
@@ -113,7 +116,7 @@ export const updateExperienceSchema = z.object({
       company_name: z.string().min(1, 'Company name is required').optional(),
       position: z.string().min(1, 'Position is required').optional(),
       start_date: z.string().min(1, 'Start date is required').optional(),
-      is_current: z.boolean().optional(),
+      is_current: z.boolean({ error: '"is_current" must be a boolean' }).optional(),
       end_date: z.string().nullable().optional(),
     })
     .refine((data) => Object.keys(data).length > 0, {
@@ -125,12 +128,16 @@ export const addEducationSchema = z.object({
   body: z.object({
     institution_name: z.string().min(1, 'Institution name is required'),
     field_of_study: z.string().min(1, 'Field of study is required'),
-    start_year: z.number().int().min(1900).max(new Date().getFullYear()),
-    end_year: z
-      .number()
+    start_year: z
+      .number({ error: 'Start year must be a number' })
       .int()
-      .min(1900)
-      .max(new Date().getFullYear() + 10)
+      .min(1900, 'Start year must be at least 1900')
+      .max(new Date().getFullYear(), 'Start year cannot be in the future'),
+    end_year: z
+      .number({ error: 'End year must be a number' })
+      .int()
+      .min(1900, 'End year must be at least 1900')
+      .max(new Date().getFullYear() + 10, 'End year is too far in the future')
       .nullable()
       .optional(),
   }),

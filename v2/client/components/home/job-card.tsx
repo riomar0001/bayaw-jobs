@@ -38,8 +38,8 @@ export function JobCard({ job }: JobCardProps) {
   const applyHref = !isAuthenticated
     ? "/signup"
     : !user?.applicant_profile_id
-    ? "/applicant/onboarding"
-    : `/jobs/${job.id}`;
+      ? "/applicant/onboarding"
+      : `/jobs/${job.id}`;
 
   return (
     <Card className="group border hover:shadow-2xl transition-all duration-300 h-full flex flex-col hover:border-primary/50 relative overflow-hidden">

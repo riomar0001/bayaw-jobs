@@ -47,7 +47,9 @@ export const useAuthStore = create<AuthState>()(
           user: {
             ...(decoded ?? {}),
             // Preserve fields not in the JWT payload
-            ...(existing?.is_verified !== undefined && { is_verified: existing.is_verified }),
+            ...(existing?.is_verified !== undefined && {
+              is_verified: existing.is_verified,
+            }),
             ...(existing?.created_at && { created_at: existing.created_at }),
           } as User,
           isAuthenticated: true,
