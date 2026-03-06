@@ -420,6 +420,9 @@ export interface JobFilters {
   search?: string;
   location_type?: LocationType;
   employment_type?: string;
+  location?: string;
+  min_salary?: number;
+  max_salary?: number;
   status?: JobStatus;
 }
 

@@ -10,11 +10,11 @@ import {
 } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Building2, MapPin, DollarSign, Clock } from "lucide-react";
-import type { Job } from "@/data";
+import { MapPin, DollarSign, Briefcase } from "lucide-react";
+import type { JobSummary } from "@/api/types";
 
 interface JobCardProps {
-  job: Job;
+  job: JobSummary;
 }
 
 export function JobCard({ job }: JobCardProps) {
@@ -29,14 +29,11 @@ export function JobCard({ job }: JobCardProps) {
             variant="secondary"
             className="bg-primary/10 text-primary border-primary/20 group-hover:bg-primary/20 transition-colors"
           >
-            {job.type}
+            {job.employment_type}
           </Badge>
-          {job.featured && (
-            <div className="flex items-center gap-1 text-xs text-primary font-semibold">
-              <Clock className="h-3 w-3" />
-              New
-            </div>
-          )}
+          <Badge variant="outline" className="text-xs">
+            {job.location_type}
+          </Badge>
         </div>
         <CardTitle className="text-xl group-hover:text-primary transition-colors">
           {job.title}
@@ -44,25 +41,22 @@ export function JobCard({ job }: JobCardProps) {
       </CardHeader>
 
       <CardContent className="flex-1 relative">
-        <div className="space-y-3 mb-4">
+        <div className="space-y-3">
           <div className="flex items-center text-sm text-muted-foreground">
-            <Building2 className="mr-2 h-4 w-4 text-primary/70" />
-            <span className="font-medium">{job.company}</span>
+            <Briefcase className="mr-2 h-4 w-4 text-primary/70" />
+            <span className="font-medium">{job.department}</span>
           </div>
           <div className="flex items-center text-sm text-muted-foreground">
             <MapPin className="mr-2 h-4 w-4 text-primary/70" />
             {job.location}
           </div>
-          {job.salary && (
+          {(job.minimum_salary || job.maximum_salary) && (
             <div className="flex items-center text-sm font-semibold text-primary">
               <DollarSign className="mr-1 h-4 w-4" />
-              {job.salary}
+              {job.currency} {job.minimum_salary} - {job.maximum_salary}
             </div>
           )}
         </div>
-        <p className="text-sm text-muted-foreground line-clamp-2 leading-relaxed">
-          {job.description}
-        </p>
       </CardContent>
 
       <CardFooter className="gap-2">

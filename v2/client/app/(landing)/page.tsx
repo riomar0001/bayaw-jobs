@@ -1,12 +1,35 @@
+"use client";
+
+import { useEffect, useState } from "react";
 import { HeroSection } from "@/components/shared/hero-section";
 import { SearchBar } from "@/components/home/search-bar";
 import { JobCard } from "@/components/home/job-card";
 import { CompanyCard } from "@/components/home/company-card";
 import { Footer } from "@/components/shared/footer";
-import { jobs, companies } from "@/data";
-import { TrendingUp } from "lucide-react";
+import { jobsService } from "@/api/services/jobs.service";
+import { businessService } from "@/api/services/business.service";
+import type { JobSummary, CompanySummary } from "@/api/types";
+import { TrendingUp, Loader2 } from "lucide-react";
 
 export default function Home() {
+  const [jobs, setJobs] = useState<JobSummary[]>([]);
+  const [companies, setCompanies] = useState<CompanySummary[]>([]);
+  const [loadingJobs, setLoadingJobs] = useState(true);
+  const [loadingCompanies, setLoadingCompanies] = useState(true);
+
+  useEffect(() => {
+    jobsService
+      .getTopJobs()
+      .then(setJobs)
+      .catch(() => setJobs([]))
+      .finally(() => setLoadingJobs(false));
+
+    businessService
+      .getTopCompanies()
+      .then(setCompanies)
+      .catch(() => setCompanies([]))
+      .finally(() => setLoadingCompanies(false));
+  }, []);
   return (
     <main className="overflow-hidden">
       <HeroSection
@@ -35,9 +58,17 @@ export default function Home() {
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 relative z-10">
-          {jobs.slice(0, 8).map((job) => (
-            <JobCard key={job.id} job={job} />
-          ))}
+          {loadingJobs ? (
+            <div className="col-span-full flex justify-center py-12">
+              <Loader2 className="h-8 w-8 animate-spin text-primary" />
+            </div>
+          ) : jobs.length > 0 ? (
+            jobs.map((job) => <JobCard key={job.id} job={job} />)
+          ) : (
+            <p className="col-span-full text-center text-muted-foreground py-12">
+              No jobs available at the moment.
+            </p>
+          )}
         </div>
       </section>
 
@@ -74,9 +105,19 @@ export default function Home() {
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mx-auto">
-            {companies.slice(0, 6).map((company) => (
-              <CompanyCard key={company.id} company={company} />
-            ))}
+            {loadingCompanies ? (
+              <div className="col-span-full flex justify-center py-12">
+                <Loader2 className="h-8 w-8 animate-spin text-primary" />
+              </div>
+            ) : companies.length > 0 ? (
+              companies.map((company) => (
+                <CompanyCard key={company.id} company={company} />
+              ))
+            ) : (
+              <p className="col-span-full text-center text-muted-foreground py-12">
+                No companies available at the moment.
+              </p>
+            )}
           </div>
         </div>
       </section>

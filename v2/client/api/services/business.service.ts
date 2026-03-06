@@ -17,6 +17,7 @@ import {
   DashboardData,
   JobStats,
   PaginatedResponse,
+  PaginationMeta,
   PublicCompany,
   UpdateCompanyInfoInput,
   UpdateContactInput,
@@ -37,9 +38,19 @@ class BusinessService {
     page?: number;
     limit?: number;
     search?: string;
-  }): Promise<{ companies: CompanyListItem[] }> {
+    industry?: string;
+    company_size?: string;
+  }): Promise<{
+    companies: CompanyListItem[];
+    industries: string[];
+    meta: PaginationMeta;
+  }> {
     const res = await apiClient.get<
-      ApiResponse<{ companies: CompanyListItem[] }>
+      ApiResponse<{
+        companies: CompanyListItem[];
+        industries: string[];
+        meta: PaginationMeta;
+      }>
     >("/business", {
       params,
     });

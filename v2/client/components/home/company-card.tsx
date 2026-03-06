@@ -3,11 +3,11 @@
 import { useRouter } from "next/navigation";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Briefcase, Users, Building2, MapPin, ArrowRight } from "lucide-react";
-import type { Company } from "@/data";
+import { Briefcase, Users, Building2, ArrowRight } from "lucide-react";
+import type { CompanySummary, CompanyListItem } from "@/api/types";
 
 interface CompanyCardProps {
-  company: Company;
+  company: CompanySummary | CompanyListItem;
 }
 
 export function CompanyCard({ company }: CompanyCardProps) {
@@ -24,13 +24,18 @@ export function CompanyCard({ company }: CompanyCardProps) {
           <div className="flex flex-row justify-center items-center gap-5">
             <div className="w-16 h-16 rounded-xl bg-gradient-to-br from-primary/10 to-primary/5 flex items-center justify-center group-hover:scale-110 transition-all duration-500">
               <span className="text-2xl font-bold bg-gradient-to-br from-sky-500 to-cyan-600 bg-clip-text text-transparent">
-                {company.logo}
+                {company.company_name
+                  .split(" ")
+                  .map((w) => w[0])
+                  .join("")
+                  .slice(0, 2)
+                  .toUpperCase()}
               </span>
             </div>
             {/* Company Name */}
             <div>
               <h3 className="font-bold text-xl mb-1 group-hover:text-primary transition-colors">
-                {company.name}
+                {company.company_name}
               </h3>
               <div className="flex items-center gap-2 text-sm text-muted-foreground">
                 <Building2 className="h-4 w-4 text-primary/70" />
@@ -42,28 +47,22 @@ export function CompanyCard({ company }: CompanyCardProps) {
           {/* Open Positions Badge */}
           <Badge className="bg-primary/10 text-primary border-primary/20 hover:bg-primary/20 transition-colors">
             <Briefcase className="mr-1 h-3 w-3" />
-            {company.openPositions} Open
+            {"open_jobs_count" in company
+              ? company.open_jobs_count
+              : company.open_positions}{" "}
+            Open
           </Badge>
         </div>
 
         {/* Location & Employee Count */}
-        <div className="grid grid-cols-2 gap-3">
-          <div className="flex items-center gap-2 text-sm">
-            <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center flex-shrink-0">
-              <MapPin className="h-4 w-4 text-primary" />
-            </div>
-            <span className="text-muted-foreground truncate">
-              {company.location}
-            </span>
-          </div>
-
-          {company.employeeCount && (
+        <div className="grid grid-cols-1 gap-3">
+          {company.company_size && (
             <div className="flex items-center gap-2 text-sm">
               <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center flex-shrink-0">
                 <Users className="h-4 w-4 text-primary" />
               </div>
               <span className="text-muted-foreground">
-                {company.employeeCount}
+                {company.company_size}
               </span>
             </div>
           )}

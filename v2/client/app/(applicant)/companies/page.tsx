@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { Footer } from "@/components/shared/footer";
 import { CompanyCard } from "@/components/home/company-card";
 import { Pagination } from "@/components/shared/pagination";
@@ -12,38 +12,44 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Search, Building2 } from "lucide-react";
-import { companies } from "@/data";
+import { Search, Building2, Loader2 } from "lucide-react";
+import { businessService } from "@/api/services/business.service";
+import type { CompanyListItem, PaginationMeta } from "@/api/types";
 
 const COMPANIES_PER_PAGE = 9;
 
 export default function CompaniesPage() {
+  const [companies, setCompanies] = useState<CompanyListItem[]>([]);
+  const [industries, setIndustries] = useState<string[]>([]);
+  const [meta, setMeta] = useState<PaginationMeta | null>(null);
+  const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState("");
   const [industryFilter, setIndustryFilter] = useState("all");
   const [currentPage, setCurrentPage] = useState(1);
 
-  // Get unique industries
-  const industries = ["all", ...new Set(companies.map((c) => c.industry))];
+  const fetchCompanies = useCallback(async () => {
+    setLoading(true);
+    try {
+      const result = await businessService.getCompanies({
+        page: currentPage,
+        limit: COMPANIES_PER_PAGE,
+        ...(searchQuery && { search: searchQuery }),
+        ...(industryFilter !== "all" && { industry: industryFilter }),
+      });
+      setCompanies(result.companies);
+      setIndustries(result.industries);
+      setMeta(result.meta);
+    } catch {
+      setCompanies([]);
+      setMeta(null);
+    } finally {
+      setLoading(false);
+    }
+  }, [currentPage, searchQuery, industryFilter]);
 
-  // Filter companies
-  const filteredCompanies = companies.filter((company) => {
-    const matchesSearch =
-      searchQuery === "" ||
-      company.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      company.industry.toLowerCase().includes(searchQuery.toLowerCase());
-
-    const matchesIndustry =
-      industryFilter === "all" || company.industry === industryFilter;
-
-    return matchesSearch && matchesIndustry;
-  });
-
-  const totalPages = Math.ceil(filteredCompanies.length / COMPANIES_PER_PAGE);
-  const startIndex = (currentPage - 1) * COMPANIES_PER_PAGE;
-  const paginatedCompanies = filteredCompanies.slice(
-    startIndex,
-    startIndex + COMPANIES_PER_PAGE,
-  );
+  useEffect(() => {
+    fetchCompanies();
+  }, [fetchCompanies]);
 
   const handleSearch = (value: string) => {
     setSearchQuery(value);
@@ -53,6 +59,11 @@ export default function CompaniesPage() {
   const handleIndustryChange = (value: string) => {
     setIndustryFilter(value);
     setCurrentPage(1);
+  };
+
+  const handlePageChange = (page: number) => {
+    setCurrentPage(page);
+    window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
   return (
@@ -68,8 +79,9 @@ export default function CompaniesPage() {
             Explore Top Companies
           </h1>
           <p className="text-muted-foreground text-lg">
-            Discover {filteredCompanies.length} companies hiring for great
-            opportunities
+            {meta
+              ? `Discover ${meta.total} companies hiring for great opportunities`
+              : "Discover companies hiring for great opportunities"}
           </p>
         </div>
 
@@ -98,9 +110,10 @@ export default function CompaniesPage() {
                   <SelectValue placeholder="Select industry" />
                 </SelectTrigger>
                 <SelectContent>
+                  <SelectItem value="all">All Industries</SelectItem>
                   {industries.map((industry) => (
                     <SelectItem key={industry} value={industry}>
-                      {industry === "all" ? "All Industries" : industry}
+                      {industry}
                     </SelectItem>
                   ))}
                 </SelectContent>
@@ -110,21 +123,25 @@ export default function CompaniesPage() {
         </div>
 
         {/* Companies Grid */}
-        {paginatedCompanies.length > 0 ? (
+        {loading ? (
+          <div className="flex justify-center py-12">
+            <Loader2 className="h-8 w-8 animate-spin text-primary" />
+          </div>
+        ) : companies.length > 0 ? (
           <>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {paginatedCompanies.map((company) => (
+              {companies.map((company) => (
                 <CompanyCard key={company.id} company={company} />
               ))}
             </div>
 
             {/* Pagination */}
-            {totalPages > 1 && (
+            {meta && meta.totalPages > 1 && (
               <div className="mt-10">
                 <Pagination
                   currentPage={currentPage}
-                  totalPages={totalPages}
-                  onPageChange={setCurrentPage}
+                  totalPages={meta.totalPages}
+                  onPageChange={handlePageChange}
                 />
               </div>
             )}

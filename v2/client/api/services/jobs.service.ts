@@ -23,13 +23,12 @@ class JobsService {
     return unwrapResponse(res.data);
   }
 
-  async getJobs(filters?: JobFilters): Promise<PaginatedResponse<Job>> {
-    const res = await apiClient.get<ApiResponse<PaginatedResponse<Job>>>(
-      "/jobs",
-      {
-        params: filters,
-      },
-    );
+  async getJobs(filters?: JobFilters): Promise<PaginatedResponse<JobSummary>> {
+    const res = await apiClient.get<
+      ApiResponse<PaginatedResponse<JobSummary>>
+    >("/jobs", {
+      params: filters,
+    });
     return unwrapResponse(res.data);
   }
 

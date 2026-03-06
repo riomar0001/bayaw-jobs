@@ -1,51 +1,78 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { Footer } from "@/components/shared/footer";
 import { SearchBar } from "@/components/home/search-bar";
 import { JobCard } from "@/components/home/job-card";
 import { JobFilters } from "@/components/jobs/job-filters";
 import { Pagination } from "@/components/shared/pagination";
-import { jobs } from "@/data";
+import { jobsService } from "@/api/services/jobs.service";
+import type { JobSummary, PaginationMeta } from "@/api/types";
+import { Loader2 } from "lucide-react";
 
 const JOBS_PER_PAGE = 12;
 
 export default function JobsPage() {
+  const [jobs, setJobs] = useState<JobSummary[]>([]);
+  const [meta, setMeta] = useState<PaginationMeta | null>(null);
+  const [loading, setLoading] = useState(true);
   const [currentPage, setCurrentPage] = useState(1);
   const [searchQuery, setSearchQuery] = useState("");
+  const [searchLocation, setSearchLocation] = useState("");
   const [filters, setFilters] = useState({
     jobTypes: [] as string[],
     location: "",
     salaryRange: [0, 200],
   });
 
-  // Filter jobs based on search and filters
-  const filteredJobs = jobs.filter((job) => {
-    const matchesSearch =
-      searchQuery === "" ||
-      job.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      job.company.toLowerCase().includes(searchQuery.toLowerCase());
+  const fetchJobs = useCallback(async () => {
+    setLoading(true);
+    try {
+      const res = await jobsService.getJobs({
+        page: currentPage,
+        limit: JOBS_PER_PAGE,
+        ...(searchQuery && { search: searchQuery }),
+        ...((searchLocation || filters.location) && {
+          location: searchLocation || filters.location,
+        }),
+        ...(filters.jobTypes.length === 1 && {
+          employment_type: filters.jobTypes[0],
+        }),
+        ...(filters.salaryRange[0] > 0 && {
+          min_salary: filters.salaryRange[0] * 1000,
+        }),
+        ...(filters.salaryRange[1] < 200 && {
+          max_salary: filters.salaryRange[1] * 1000,
+        }),
+      });
+      setJobs(res.data);
+      setMeta(res.meta);
+    } catch {
+      setJobs([]);
+      setMeta(null);
+    } finally {
+      setLoading(false);
+    }
+  }, [currentPage, searchQuery, searchLocation, filters]);
 
-    const matchesJobType =
-      filters.jobTypes.length === 0 || filters.jobTypes.includes(job.type);
+  useEffect(() => {
+    fetchJobs();
+  }, [fetchJobs]);
 
-    const matchesLocation =
-      filters.location === "" ||
-      job.location.toLowerCase().includes(filters.location.toLowerCase());
-
-    return matchesSearch && matchesJobType && matchesLocation;
-  });
-
-  const totalPages = Math.ceil(filteredJobs.length / JOBS_PER_PAGE);
-  const startIndex = (currentPage - 1) * JOBS_PER_PAGE;
-  const paginatedJobs = filteredJobs.slice(
-    startIndex,
-    startIndex + JOBS_PER_PAGE,
-  );
-
-  const handleSearch = (query: string) => {
+  const handleSearch = (query: string, location: string) => {
     setSearchQuery(query);
+    setSearchLocation(location);
     setCurrentPage(1);
+  };
+
+  const handleFilterChange = (newFilters: typeof filters) => {
+    setFilters(newFilters);
+    setCurrentPage(1);
+  };
+
+  const handlePageChange = (page: number) => {
+    setCurrentPage(page);
+    window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
   return (
@@ -61,7 +88,9 @@ export default function JobsPage() {
             Find Your Dream Job
           </h1>
           <p className="text-muted-foreground text-lg">
-            Explore {filteredJobs.length} opportunities from top companies
+            {meta
+              ? `Explore ${meta.total} opportunities from top companies`
+              : "Discover opportunities from top companies"}
           </p>
         </div>
 
@@ -74,27 +103,30 @@ export default function JobsPage() {
         <div className="grid grid-cols-1 lg:grid-cols-4 gap-8 mt-20">
           {/* Sidebar Filters */}
           <div className="lg:col-span-1">
-            <JobFilters filters={filters} onFilterChange={setFilters} />
+            <JobFilters filters={filters} onFilterChange={handleFilterChange} />
           </div>
 
           {/* Main Content */}
           <div className="lg:col-span-3 space-y-8">
-            {/* Jobs Grid */}
-            {paginatedJobs.length > 0 ? (
+            {loading ? (
+              <div className="flex justify-center py-12">
+                <Loader2 className="h-8 w-8 animate-spin text-primary" />
+              </div>
+            ) : jobs.length > 0 ? (
               <>
                 <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
-                  {paginatedJobs.map((job) => (
+                  {jobs.map((job) => (
                     <JobCard key={job.id} job={job} />
                   ))}
                 </div>
 
                 {/* Pagination */}
-                {totalPages > 1 && (
+                {meta && meta.totalPages > 1 && (
                   <div className="mt-8">
                     <Pagination
                       currentPage={currentPage}
-                      totalPages={totalPages}
-                      onPageChange={setCurrentPage}
+                      totalPages={meta.totalPages}
+                      onPageChange={handlePageChange}
                     />
                   </div>
                 )}
