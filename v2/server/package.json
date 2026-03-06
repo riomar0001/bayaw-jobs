@@ -3,7 +3,11 @@
   "version": "1.0.0",
   "description": "Certification API built with Express and TypeScript",
   "main": "dist/server.js",
+  "prisma": {
+    "seed": "tsx prisma/seed.ts"
+  },
   "scripts": {
+    "seed": "tsx prisma/seed.ts",
     "dev": "nodemon --exec tsx src/server.ts",
     "build": "tsup",
     "start": "node dist/server.js",
