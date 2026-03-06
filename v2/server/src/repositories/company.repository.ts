@@ -247,6 +247,33 @@ export class CompanyRepository {
     };
   }
 
+  async findPublicById(companyId: string) {
+    return prisma.company_information.findUnique({
+      where: { id: companyId },
+      select: {
+        id: true,
+        company_name: true,
+        industry: true,
+        about: true,
+        company_size: true,
+        website: true,
+        logo: true,
+        companyLocations: {
+          select: {
+            id: true,
+            address: true,
+            city: true,
+            state: true,
+            country: true,
+            postal_code: true,
+            is_headquarter: true,
+          },
+        },
+        _count: { select: { jobs: { where: { status: 'OPEN' } } } },
+      },
+    });
+  }
+
   async updateCompanyInfo(
     companyId: string,
     data: Partial<Pick<CreateCompanyData, 'company_name' | 'industry' | 'about' | 'company_size' | 'foundation_year' | 'website'>>

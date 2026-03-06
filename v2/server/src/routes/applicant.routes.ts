@@ -13,6 +13,8 @@ import {
   updateCareerStatusSchema,
   addLanguageSchema,
   updateLanguageSchema,
+  addSkillsSchema,
+  deleteSkillSchema,
 } from '@/validations/applicant.validation';
 import { BadRequestError } from '@/utils/errors.util';
 
@@ -147,6 +149,10 @@ router.delete(
   authenticate,
   applicantController.deleteExperience.bind(applicantController)
 );
+
+router.get('/skills', authenticate, applicantController.getSkills.bind(applicantController));
+router.post('/skills', authenticate, validate(addSkillsSchema), applicantController.addSkills.bind(applicantController));
+router.delete('/skills/:id', authenticate, validate(deleteSkillSchema), applicantController.deleteSkill.bind(applicantController));
 
 router.post('/jobs/:jobId/apply', authenticate, applicantController.applyToJob.bind(applicantController));
 

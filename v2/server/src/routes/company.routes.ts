@@ -44,6 +44,8 @@ function parseOnboardingData(req: Request, _res: Response, next: NextFunction): 
 
 router.get('/top', companyController.getTopCompanies.bind(companyController));
 
+router.get('/:id/public', companyController.getPublicCompanyInfo.bind(companyController));
+
 router.get('/info', authenticate, companyController.getCompanyInfo.bind(companyController));
 router.patch('/info', authenticate, validate(updateCompanyInfoSchema), companyController.updateCompanyInfo.bind(companyController));
 router.patch('/socials', authenticate, validate(updateSocialLinksSchema), companyController.updateSocialLinks.bind(companyController));

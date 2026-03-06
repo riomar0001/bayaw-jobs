@@ -174,6 +174,20 @@ export const updateLanguageSchema = z.object({
     }),
 });
 
+export const addSkillsSchema = z.object({
+  body: z.object({
+    skills: z
+      .array(z.string().min(1, 'Skill name cannot be empty'))
+      .min(1, 'At least one skill is required'),
+  }),
+});
+
+export const deleteSkillSchema = z.object({
+  params: z.object({ id: z.string().uuid('Skill ID must be a valid UUID') }),
+});
+
+export type AddSkillsInput = z.infer<typeof addSkillsSchema>['body'];
+
 export type OnboardingInput = z.infer<typeof onboardingSchema>['body'];
 export type UpdateProfileInput = z.infer<typeof updateProfileSchema>['body'];
 export type UpdateEducationInput = z.infer<typeof updateEducationSchema>['body'];

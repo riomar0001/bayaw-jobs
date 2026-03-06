@@ -51,160 +51,116 @@ export default function JobDetailPage({ params }: JobDetailPageProps) {
       />
       <div className="flex flex-1 flex-col gap-6 p-6">
         {/* Job Overview */}
-        <div className="grid gap-6 lg:grid-cols-3">
-          <div className="lg:col-span-2 space-y-6">
-            <Card>
-              <CardHeader>
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-2.5">
-                    <CardTitle>{job.title}</CardTitle>
-                    <JobStatusBadge status={job.status} />
-                  </div>
-                  <Button asChild size="sm" variant="outline">
-                    <Link href={`/company/jobs/${id}/edit`}>
-                      <Pencil className="mr-2 size-4" />
-                      Edit Job
-                    </Link>
-                  </Button>
+        <div className="lg:col-span-2 space-y-6">
+          <Card>
+            <CardHeader>
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2.5">
+                  <CardTitle>{job.title}</CardTitle>
+                  <JobStatusBadge status={job.status} />
                 </div>
-              </CardHeader>
-              <CardContent className="space-y-6">
-                {/* Quick Info */}
-                <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-                  <div className="flex items-center gap-2">
-                    <MapPin className="size-4 text-muted-foreground" />
-                    <div>
-                      <p className="text-xs text-muted-foreground">Location</p>
-                      <p className="text-sm font-medium">{job.location}</p>
-                    </div>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <Building2 className="size-4 text-muted-foreground" />
-                    <div>
-                      <p className="text-xs text-muted-foreground">
-                        Department
-                      </p>
-                      <p className="text-sm font-medium">{job.department}</p>
-                    </div>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <Clock className="size-4 text-muted-foreground" />
-                    <div>
-                      <p className="text-xs text-muted-foreground">Type</p>
-                      <p className="text-sm font-medium">
-                        {job.employmentType} • {job.locationType}
-                      </p>
-                    </div>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <DollarSign className="size-4 text-muted-foreground" />
-                    <div>
-                      <p className="text-xs text-muted-foreground">Salary</p>
-                      <p className="text-sm font-medium">
-                        {formatSalaryRange(
-                          job.salaryRange.min,
-                          job.salaryRange.max,
-                          job.salaryRange.currency,
-                        )}
-                      </p>
-                    </div>
+                <Button asChild size="sm" variant="outline">
+                  <Link href={`/company/jobs/${id}/edit`}>
+                    <Pencil className="mr-2 size-4" />
+                    Edit Job
+                  </Link>
+                </Button>
+              </div>
+            </CardHeader>
+            <CardContent className="space-y-6">
+              {/* Quick Info */}
+              <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+                <div className="flex items-center gap-2">
+                  <MapPin className="size-4 text-muted-foreground" />
+                  <div>
+                    <p className="text-xs text-muted-foreground">Location</p>
+                    <p className="text-sm font-medium">{job.location}</p>
                   </div>
                 </div>
+                <div className="flex items-center gap-2">
+                  <Building2 className="size-4 text-muted-foreground" />
+                  <div>
+                    <p className="text-xs text-muted-foreground">Department</p>
+                    <p className="text-sm font-medium">{job.department}</p>
+                  </div>
+                </div>
+                <div className="flex items-center gap-2">
+                  <Clock className="size-4 text-muted-foreground" />
+                  <div>
+                    <p className="text-xs text-muted-foreground">Type</p>
+                    <p className="text-sm font-medium">
+                      {job.employmentType} • {job.locationType}
+                    </p>
+                  </div>
+                </div>
+                <div className="flex items-center gap-2">
+                  <DollarSign className="size-4 text-muted-foreground" />
+                  <div>
+                    <p className="text-xs text-muted-foreground">Salary</p>
+                    <p className="text-sm font-medium">
+                      {formatSalaryRange(
+                        job.salaryRange.min,
+                        job.salaryRange.max,
+                        job.salaryRange.currency,
+                      )}
+                    </p>
+                  </div>
+                </div>
+              </div>
 
-                <Separator />
+              <Separator />
 
-                {/* Description */}
-                <div>
-                  <h3 className="mb-2 font-semibold">Description</h3>
-                  <p className="text-sm text-muted-foreground">
-                    {job.description}
-                  </p>
-                </div>
+              {/* Description */}
+              <div>
+                <h3 className="mb-2 font-semibold">Description</h3>
+                <p className="text-sm text-muted-foreground">
+                  {job.description}
+                </p>
+              </div>
 
-                {/* Responsibilities */}
-                <div>
-                  <h3 className="mb-2 font-semibold">Responsibilities</h3>
-                  <ul className="list-inside list-disc space-y-1 text-sm text-muted-foreground">
-                    {job.responsibilities.map((item, i) => (
-                      <li key={i}>{item}</li>
-                    ))}
-                  </ul>
-                </div>
+              {/* Responsibilities */}
+              <div>
+                <h3 className="mb-2 font-semibold">Responsibilities</h3>
+                <ul className="list-inside list-disc space-y-1 text-sm text-muted-foreground">
+                  {job.responsibilities.map((item, i) => (
+                    <li key={i}>{item}</li>
+                  ))}
+                </ul>
+              </div>
 
-                {/* Requirements */}
-                <div>
-                  <h3 className="mb-2 font-semibold">Requirements</h3>
-                  <ul className="list-inside list-disc space-y-1 text-sm text-muted-foreground">
-                    {job.requirements.map((req, i) => (
-                      <li key={i}>{req}</li>
-                    ))}
-                  </ul>
-                </div>
+              {/* Requirements */}
+              <div>
+                <h3 className="mb-2 font-semibold">Requirements</h3>
+                <ul className="list-inside list-disc space-y-1 text-sm text-muted-foreground">
+                  {job.requirements.map((req, i) => (
+                    <li key={i}>{req}</li>
+                  ))}
+                </ul>
+              </div>
 
-                {/* Benefits */}
-                <div>
-                  <h3 className="mb-2 font-semibold">Benefits</h3>
-                  <div className="flex flex-wrap gap-2">
-                    {job.benefits.map((benefit, i) => (
-                      <Badge key={i} variant="secondary">
-                        {benefit}
-                      </Badge>
-                    ))}
-                  </div>
+              {/* Benefits */}
+              <div>
+                <h3 className="mb-2 font-semibold">Benefits</h3>
+                <div className="flex flex-wrap gap-2">
+                  {job.benefits.map((benefit, i) => (
+                    <Badge key={i} variant="secondary">
+                      {benefit}
+                    </Badge>
+                  ))}
                 </div>
-              </CardContent>
-            </Card>
+              </div>
+            </CardContent>
+          </Card>
 
-            {/* Applicants Tab */}
-            <Card>
-              <CardHeader>
-                <CardTitle>Applicants ({applications.length})</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <JobApplicantsTable applications={applications} />
-              </CardContent>
-            </Card>
-          </div>
-
-          {/* Stats Sidebar */}
-          <div className="space-y-6">
-            <Card>
-              <CardHeader>
-                <CardTitle className="text-base">Statistics</CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-2">
-                    <Users className="size-4 text-muted-foreground" />
-                    <span className="text-sm">Applicants</span>
-                  </div>
-                  <span className="font-semibold">{job.applicantCount}</span>
-                </div>
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-2">
-                    <Eye className="size-4 text-muted-foreground" />
-                    <span className="text-sm">Views</span>
-                  </div>
-                  <span className="font-semibold">{job.viewCount}</span>
-                </div>
-                <Separator />
-                <div className="flex items-center justify-between">
-                  <span className="text-sm text-muted-foreground">Posted</span>
-                  <span className="text-sm">{formatDate(job.createdAt)}</span>
-                </div>
-                {job.closingDate && (
-                  <div className="flex items-center justify-between">
-                    <span className="text-sm text-muted-foreground">
-                      Closes
-                    </span>
-                    <span className="text-sm">
-                      {formatDate(job.closingDate)}
-                    </span>
-                  </div>
-                )}
-              </CardContent>
-            </Card>
-          </div>
+          {/* Applicants Tab */}
+          <Card>
+            <CardHeader>
+              <CardTitle>Applicants ({applications.length})</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <JobApplicantsTable applications={applications} />
+            </CardContent>
+          </Card>
         </div>
       </div>
     </>

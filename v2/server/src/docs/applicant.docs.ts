@@ -1889,6 +1889,134 @@ const updateProfilePicture = {
   },
 };
 
+const skills = {
+  '/applicants/skills': {
+    get: {
+      tags: ['Applicants'],
+      summary: 'Get skills',
+      description: "Returns all skills for the authenticated applicant's profile.",
+      security: [{ bearerAuth: [] }],
+      responses: {
+        '200': {
+          description: 'Skills retrieved successfully',
+          content: {
+            'application/json': {
+              schema: {
+                type: 'object',
+                properties: {
+                  success: { type: 'boolean', example: true },
+                  message: { type: 'string', example: 'Skills retrieved successfully' },
+                  data: {
+                    type: 'array',
+                    items: {
+                      type: 'object',
+                      properties: {
+                        id: { type: 'string', format: 'uuid' },
+                        skill_name: { type: 'string', example: 'React' },
+                      },
+                    },
+                  },
+                },
+              },
+            },
+          },
+        },
+        '401': { description: 'Unauthorized' },
+        '404': { description: 'Applicant profile not found' },
+      },
+    },
+    post: {
+      tags: ['Applicants'],
+      summary: 'Add skills',
+      description: 'Add one or more skills to the applicant profile. Returns the full updated skills list.',
+      security: [{ bearerAuth: [] }],
+      requestBody: {
+        required: true,
+        content: {
+          'application/json': {
+            schema: {
+              type: 'object',
+              required: ['skills'],
+              properties: {
+                skills: {
+                  type: 'array',
+                  minItems: 1,
+                  items: { type: 'string', example: 'TypeScript' },
+                  example: ['React', 'TypeScript', 'Node.js'],
+                },
+              },
+            },
+          },
+        },
+      },
+      responses: {
+        '201': {
+          description: 'Skills added successfully',
+          content: {
+            'application/json': {
+              schema: {
+                type: 'object',
+                properties: {
+                  success: { type: 'boolean', example: true },
+                  message: { type: 'string', example: 'Skills added successfully' },
+                  data: {
+                    type: 'array',
+                    items: {
+                      type: 'object',
+                      properties: {
+                        id: { type: 'string', format: 'uuid' },
+                        skill_name: { type: 'string', example: 'React' },
+                      },
+                    },
+                  },
+                },
+              },
+            },
+          },
+        },
+        '400': { description: 'Validation error — at least one skill required' },
+        '401': { description: 'Unauthorized' },
+        '404': { description: 'Applicant profile not found' },
+      },
+    },
+  },
+  '/applicants/skills/{id}': {
+    delete: {
+      tags: ['Applicants'],
+      summary: 'Delete a skill',
+      security: [{ bearerAuth: [] }],
+      parameters: [
+        {
+          name: 'id',
+          in: 'path',
+          required: true,
+          schema: { type: 'string', format: 'uuid' },
+          description: 'Skill ID',
+        },
+      ],
+      responses: {
+        '200': {
+          description: 'Skill deleted successfully',
+          content: {
+            'application/json': {
+              schema: {
+                type: 'object',
+                properties: {
+                  success: { type: 'boolean', example: true },
+                  message: { type: 'string', example: 'Skill deleted successfully' },
+                  data: { type: 'null' },
+                },
+              },
+            },
+          },
+        },
+        '401': { description: 'Unauthorized' },
+        '404': { description: 'Skill not found' },
+      },
+    },
+  },
+};
+
 const applyJob = {
   '/applicants/jobs/{jobId}/apply': {
     post: {
@@ -1962,5 +2090,6 @@ export const applicantDocs = {
   ...getResume,
   ...updateResume,
   ...updateProfilePicture,
+  ...skills,
   ...applyJob,
 };

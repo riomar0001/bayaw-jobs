@@ -315,6 +315,39 @@ export class ApplicantController {
     }
   }
 
+  async getSkills(req: Request, res: Response, next: NextFunction): Promise<void> {
+    try {
+      const userId = req.user?.user_id;
+      if (!userId) throw new Error('User ID missing in request');
+      const result = await applicantService.getSkills(userId);
+      successResponse(res, result, 'Skills retrieved successfully');
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  async addSkills(req: Request, res: Response, next: NextFunction): Promise<void> {
+    try {
+      const userId = req.user?.user_id;
+      if (!userId) throw new Error('User ID missing in request');
+      const result = await applicantService.addSkills(userId, req.body);
+      createdResponse(res, result, 'Skills added successfully');
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  async deleteSkill(req: Request, res: Response, next: NextFunction): Promise<void> {
+    try {
+      const userId = req.user?.user_id;
+      if (!userId) throw new Error('User ID missing in request');
+      await applicantService.deleteSkill(userId, req.params.id);
+      successResponse(res, null, 'Skill deleted successfully');
+    } catch (error) {
+      next(error);
+    }
+  }
+
   async applyToJob(req: Request, res: Response, next: NextFunction): Promise<void> {
     try {
       const userId = req.user?.user_id;

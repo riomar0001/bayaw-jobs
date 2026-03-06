@@ -3,6 +3,7 @@ import { jobRepository } from '@/repositories/job.repository';
 import { userRepository } from '@/repositories/user.repository';
 import { ConflictError, NotFoundError, BadRequestError } from '@/utils/errors.util';
 import {
+  AddSkillsInput,
   OnboardingInput,
   UpdateProfileInput,
   UpdateEducationInput,
@@ -23,6 +24,26 @@ interface ResumeFile {
 }
 
 export class ApplicantService {
+  async getSkills(userId: string) {
+    const profile = await applicantRepository.findProfileByUserId(userId);
+    if (!profile) throw new NotFoundError('Applicant profile');
+    return applicantRepository.findSkillsByProfileId(profile.id);
+  }
+
+  async addSkills(userId: string, data: AddSkillsInput) {
+    const profile = await applicantRepository.findProfileByUserId(userId);
+    if (!profile) throw new NotFoundError('Applicant profile');
+    return applicantRepository.addSkills(profile.id, data.skills);
+  }
+
+  async deleteSkill(userId: string, skillId: string) {
+    const profile = await applicantRepository.findProfileByUserId(userId);
+    if (!profile) throw new NotFoundError('Applicant profile');
+    const result = await applicantRepository.deleteSkill(skillId, profile.id);
+    if (result.count === 0) throw new NotFoundError('Skill');
+    return result;
+  }
+
   async applyToJob(userId: string, jobId: string) {
     const profile = await applicantRepository.findProfileByUserId(userId);
     if (!profile) {

@@ -522,6 +522,71 @@ const locationSchema = {
   },
 };
 
+const publicCompanyInfo = {
+  '/business/{id}/public': {
+    get: {
+      tags: ['Business'],
+      summary: 'Get public company info',
+      description: 'Returns publicly visible company information. No authentication required.',
+      parameters: [
+        {
+          name: 'id',
+          in: 'path',
+          required: true,
+          schema: { type: 'string', format: 'uuid' },
+          description: 'Company ID',
+        },
+      ],
+      responses: {
+        '200': {
+          description: 'Company info retrieved successfully',
+          content: {
+            'application/json': {
+              schema: {
+                type: 'object',
+                properties: {
+                  success: { type: 'boolean', example: true },
+                  message: { type: 'string', example: 'Company info retrieved successfully' },
+                  data: {
+                    type: 'object',
+                    properties: {
+                      id: { type: 'string', format: 'uuid' },
+                      company_name: { type: 'string', example: 'Acme Corp' },
+                      industry: { type: 'string', example: 'Technology' },
+                      about: { type: 'string', example: 'We build awesome products.' },
+                      company_size: { type: 'string', example: '11-50' },
+                      website: { type: 'string', example: 'https://acme.com' },
+                      logo_url: { type: 'string', nullable: true, example: 'https://api.example.com/api/business/logo/companyId' },
+                      open_positions: { type: 'integer', example: 8 },
+                      companyLocations: {
+                        type: 'array',
+                        items: {
+                          type: 'object',
+                          properties: {
+                            id: { type: 'string', format: 'uuid' },
+                            address: { type: 'string', example: '123 Main St' },
+                            city: { type: 'string', example: 'San Francisco' },
+                            state: { type: 'string', example: 'CA' },
+                            country: { type: 'string', example: 'USA' },
+                            postal_code: { type: 'string', example: '94105' },
+                            is_headquarter: { type: 'boolean', example: true },
+                          },
+                        },
+                      },
+                    },
+                  },
+                },
+              },
+            },
+          },
+        },
+        '400': { description: 'Company ID is required' },
+        '404': { description: 'Company not found' },
+      },
+    },
+  },
+};
+
 const companyInfo = {
   '/business/info': {
     get: {
@@ -1248,6 +1313,7 @@ export const companyDocs = {
   ...onboarding,
   ...logo,
   ...admins,
+  ...publicCompanyInfo,
   ...companyInfo,
   ...socials,
   ...contact,

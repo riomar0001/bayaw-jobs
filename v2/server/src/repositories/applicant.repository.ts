@@ -206,6 +206,31 @@ export class ApplicantRepository {
     });
   }
 
+  async findSkillsByProfileId(profileId: string) {
+    return prisma.applicant_skill.findMany({
+      where: { applicant_profile_id: profileId },
+      select: { id: true, skill_name: true },
+      orderBy: { created_at: 'asc' },
+    });
+  }
+
+  async addSkills(profileId: string, skillNames: string[]) {
+    await prisma.applicant_skill.createMany({
+      data: skillNames.map((skill_name) => ({ applicant_profile_id: profileId, skill_name })),
+    });
+    return prisma.applicant_skill.findMany({
+      where: { applicant_profile_id: profileId },
+      select: { id: true, skill_name: true },
+      orderBy: { created_at: 'asc' },
+    });
+  }
+
+  async deleteSkill(skillId: string, profileId: string) {
+    return prisma.applicant_skill.deleteMany({
+      where: { id: skillId, applicant_profile_id: profileId },
+    });
+  }
+
   async findApplicationByProfileAndJob(profileId: string, jobId: string) {
     return prisma.applicant_applied_job.findFirst({
       where: { applicant_profile_id: profileId, jobId },

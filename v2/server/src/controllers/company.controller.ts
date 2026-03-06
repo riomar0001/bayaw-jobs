@@ -97,6 +97,17 @@ export class CompanyController {
     }
   }
 
+  async getPublicCompanyInfo(req: Request, res: Response, next: NextFunction): Promise<void> {
+    try {
+      const { id } = req.params;
+      if (!id) throw new BadRequestError('Company ID is required');
+      const result = await companyService.getPublicCompanyInfo(id);
+      successResponse(res, result, 'Company info retrieved successfully');
+    } catch (error) {
+      next(error);
+    }
+  }
+
   async getCompanyInfo(req: Request, res: Response, next: NextFunction): Promise<void> {
     try {
       const companyId = req.user?.company_id;

@@ -156,6 +156,18 @@ export class CompanyService {
     return companyRepository.removeAdmin(adminId);
   }
 
+  async getPublicCompanyInfo(companyId: string) {
+    const company = await companyRepository.findPublicById(companyId);
+    if (!company) throw new NotFoundError('Company');
+
+    const { _count, logo, ...rest } = company;
+    return {
+      ...rest,
+      logo_url: logo ? `${process.env.APP_URL}/api/business/logo/${companyId}` : null,
+      open_positions: _count.jobs,
+    };
+  }
+
   async getCompanyInfo(companyId: string) {
     const company = await companyRepository.findById(companyId);
     if (!company) {
