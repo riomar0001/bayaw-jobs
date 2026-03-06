@@ -103,10 +103,14 @@ export const useAuthStore = create<AuthState>()(
             const existing = get().user;
             set({
               user: {
-                ...existing,
+                id: existing?.id ?? "",
+                email: existing?.email ?? "",
                 first_name: data.user.first_name ?? existing?.first_name ?? "",
                 last_name: data.user.last_name ?? existing?.last_name ?? "",
                 role: data.user.role,
+                ...(existing?.is_verified !== undefined && { is_verified: existing.is_verified }),
+                ...(existing?.created_at && { created_at: existing.created_at }),
+                ...(existing?.applicant_profile_id && { applicant_profile_id: existing.applicant_profile_id }),
               },
               isAuthenticated: true,
               isLoading: false,
