@@ -19,16 +19,15 @@ import {
 import { BadRequestError } from '@/utils/errors.util';
 
 const router = Router();
-
 const upload = multer({
   storage: multer.memoryStorage(),
   limits: { fileSize: 10 * 1024 * 1024 }, // 10MB
   fileFilter: (_req, file, cb) => {
-    if (file.mimetype === 'application/pdf') {
-      cb(null, true);
-    } else {
+    if (file.mimetype !== 'application/pdf') {
       cb(new Error('Only PDF files are allowed'));
+      return;
     }
+    cb(null, true);
   },
 });
 
@@ -37,11 +36,11 @@ const uploadImage = multer({
   limits: { fileSize: 5 * 1024 * 1024 }, // 5MB
   fileFilter: (_req, file, cb) => {
     const allowed = ['image/jpeg', 'image/png', 'image/webp'];
-    if (allowed.includes(file.mimetype)) {
-      cb(null, true);
-    } else {
+    if (!allowed.includes(file.mimetype)) {
       cb(new Error('Only JPEG, PNG, and WebP images are allowed'));
+      return;
     }
+    cb(null, true);
   },
 });
 

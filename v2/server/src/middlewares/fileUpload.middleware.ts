@@ -106,9 +106,9 @@ export function validateImageUpload(_fieldName: string = 'image', required: bool
     const contentValidation = validateImageContent(file.buffer);
     if (!contentValidation.isValid) {
       errors.content = ['File content does not match a valid image format'];
-    } else if (contentValidation.detectedType !== file.mimetype) {
-      // Check if declared MIME type matches actual content
-      // Allow jpeg/jpg mismatch since they're the same
+    }
+
+    if (contentValidation.isValid && contentValidation.detectedType !== file.mimetype) {
       const declaredIsJpeg = file.mimetype === 'image/jpeg' || file.mimetype === 'image/jpg';
       const detectedIsJpeg = contentValidation.detectedType === 'image/jpeg';
 
