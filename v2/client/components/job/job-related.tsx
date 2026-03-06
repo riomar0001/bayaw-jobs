@@ -1,15 +1,32 @@
+"use client";
+
 import Link from "next/link";
+import { useState, useEffect } from "react";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
 import { ArrowLeft, MapPin } from "lucide-react";
-import type { Job } from "@/data";
+import { businessService } from "@/api/services/business.service";
+import type { PublicCompanyJobOpening } from "@/api/types";
 
 interface JobRelatedProps {
-  jobs: Job[];
+  companyId: string | null;
+  currentJobId: string;
   companyName: string;
 }
 
-export function JobRelated({ jobs, companyName }: JobRelatedProps) {
+export function JobRelated({ companyId, currentJobId, companyName }: JobRelatedProps) {
+  const [jobs, setJobs] = useState<PublicCompanyJobOpening[]>([]);
+
+  useEffect(() => {
+    if (!companyId) return;
+    businessService
+      .getPublicCompany(companyId)
+      .then((company) =>
+        setJobs(company.job_openings.filter((j) => j.id !== currentJobId).slice(0, 3))
+      )
+      .catch(() => {});
+  }, [companyId, currentJobId]);
+
   if (jobs.length === 0) return null;
 
   return (
@@ -35,7 +52,7 @@ export function JobRelated({ jobs, companyName }: JobRelatedProps) {
                     {job.location}
                   </span>
                   <Badge variant="secondary" className="text-xs py-0">
-                    {job.type}
+                    {job.location_type}
                   </Badge>
                 </div>
               </div>

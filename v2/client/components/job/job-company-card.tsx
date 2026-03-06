@@ -2,13 +2,18 @@ import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { MapPin, Users, Briefcase, ExternalLink } from "lucide-react";
-import type { Company } from "@/data";
+import type { JobCompany } from "@/api/types";
 
 interface JobCompanyCardProps {
-  company: Company;
+  company: JobCompany;
 }
 
 export function JobCompanyCard({ company }: JobCompanyCardProps) {
+  const hq =
+    company.companyLocations.find((l) => l.is_headquarter) ??
+    company.companyLocations[0];
+  const location = hq ? `${hq.city}, ${hq.country}` : null;
+
   return (
     <Card>
       <CardContent className="p-6">
@@ -17,29 +22,31 @@ export function JobCompanyCard({ company }: JobCompanyCardProps) {
         <div className="flex items-center gap-3 mb-4">
           <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-primary/10 to-primary/5 flex items-center justify-center border">
             <span className="font-bold bg-gradient-to-br from-sky-500 to-cyan-600 bg-clip-text text-transparent">
-              {company.logo}
+              {company.company_name.slice(0, 2).toUpperCase()}
             </span>
           </div>
           <div>
-            <p className="font-semibold">{company.name}</p>
+            <p className="font-semibold">{company.company_name}</p>
             <p className="text-xs text-muted-foreground">{company.industry}</p>
           </div>
         </div>
 
         <div className="space-y-3 text-sm mb-4">
-          <div className="flex items-center gap-2 text-muted-foreground">
-            <MapPin className="h-4 w-4 text-primary/70" />
-            {company.location}
-          </div>
-          {company.employeeCount && (
+          {location && (
+            <div className="flex items-center gap-2 text-muted-foreground">
+              <MapPin className="h-4 w-4 text-primary/70" />
+              {location}
+            </div>
+          )}
+          {company.company_size && (
             <div className="flex items-center gap-2 text-muted-foreground">
               <Users className="h-4 w-4 text-primary/70" />
-              {company.employeeCount} employees
+              {company.company_size} employees
             </div>
           )}
           <div className="flex items-center gap-2 text-muted-foreground">
             <Briefcase className="h-4 w-4 text-primary/70" />
-            {company.openPositions} open positions
+            {company.open_positions} open positions
           </div>
         </div>
 

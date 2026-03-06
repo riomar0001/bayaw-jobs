@@ -57,6 +57,7 @@ export interface User {
   role: string;
   is_verified?: boolean;
   created_at?: string;
+  applicant_profile_id?: string;
 }
 
 export interface RegisterInput {
@@ -96,7 +97,9 @@ export interface LoginStep1Response {
 
 export interface LoginStep2Response {
   access_token: string;
-  user: Pick<User, "id" | "email" | "first_name" | "last_name" | "role">;
+  user: Pick<User, "id" | "email" | "first_name" | "last_name" | "role"> & {
+    applicant_profile_id?: string;
+  };
 }
 
 export interface RefreshResponse {

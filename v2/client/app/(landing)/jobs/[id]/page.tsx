@@ -1,17 +1,18 @@
 "use client";
 
-import { notFound } from "next/navigation";
-import { use } from "react";
+import { use, useState, useEffect } from "react";
 import Link from "next/link";
-import { jobs, companies } from "@/data";
+import { notFound } from "next/navigation";
 import { Footer } from "@/components/shared/footer";
-import { ArrowLeft } from "lucide-react";
+import { ArrowLeft, Loader2 } from "lucide-react";
 import { JobHeader } from "@/components/job/job-header";
 import { JobDescription } from "@/components/job/job-description";
 import { JobRelated } from "@/components/job/job-related";
 import { JobApplyCard } from "@/components/job/job-apply-card";
 import { JobOverviewCard } from "@/components/job/job-overview-card";
 import { JobCompanyCard } from "@/components/job/job-company-card";
+import { jobsService } from "@/api/services/jobs.service";
+import type { Job } from "@/api/types";
 
 export default function JobDetailPage({
   params,
@@ -19,17 +20,27 @@ export default function JobDetailPage({
   params: Promise<{ id: string }>;
 }) {
   const { id } = use(params);
-  const job = jobs.find((j) => j.id === id);
+  const [job, setJob] = useState<Job | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [notFoundError, setNotFoundError] = useState(false);
 
-  if (!job) notFound();
+  useEffect(() => {
+    jobsService
+      .getJob(id)
+      .then(setJob)
+      .catch(() => setNotFoundError(true))
+      .finally(() => setLoading(false));
+  }, [id]);
 
-  const company = companies.find(
-    (c) => c.name.toLowerCase() === job.company.toLowerCase(),
-  );
+  if (loading) {
+    return (
+      <main className="min-h-screen flex items-center justify-center">
+        <Loader2 className="h-8 w-8 animate-spin text-primary" />
+      </main>
+    );
+  }
 
-  const relatedJobs = jobs
-    .filter((j) => j.id !== job.id && j.company === job.company)
-    .slice(0, 3);
+  if (notFoundError || !job) return notFound();
 
   return (
     <main className="min-h-screen bg-gradient-to-b from-muted/30 to-background">
@@ -47,15 +58,15 @@ export default function JobDetailPage({
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           <div className="lg:col-span-2 space-y-6">
-            <JobHeader job={job} company={company} />
+            <JobHeader job={job} />
             <JobDescription job={job} />
-            <JobRelated jobs={relatedJobs} companyName={job.company} />
+            <JobRelated companyId={job.company?.id ?? null} currentJobId={job.id} companyName={job.company?.company_name ?? ""} />
           </div>
 
           <div className="lg:col-span-1 space-y-6">
-            <JobApplyCard />
+            <JobApplyCard job={job} onApplied={setJob} />
             <JobOverviewCard job={job} />
-            {company && <JobCompanyCard company={company} />}
+            {job.company && <JobCompanyCard company={job.company} />}
           </div>
         </div>
       </div>
