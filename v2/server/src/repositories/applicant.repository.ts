@@ -1,4 +1,5 @@
 import prisma from '@/configs/prisma.config';
+import { application_status } from '@/generated/prisma/enums';
 import {
   ApplicantProfile,
   ApplicantEducation,
@@ -46,12 +47,6 @@ export class ApplicantRepository {
     return prisma.applicant_profile.findFirst({
       where: { user_id },
       select: { id: true },
-    });
-  }
-
-  async findProfileByEmail(email: string) {
-    return prisma.applicant_profile.findUnique({
-      where: { email },
     });
   }
 
@@ -179,7 +174,7 @@ export class ApplicantRepository {
 
   async updateProfile(
     profileId: string,
-    data: Partial<Pick<ApplicantProfile, 'desired_position' | 'age' | 'location' | 'gender'>>
+    data: Partial<Pick<ApplicantProfile, 'age' | 'location' | 'phone_number' | 'gender'>>
   ) {
     return prisma.applicant_profile.update({
       where: { id: profileId },
@@ -237,6 +232,94 @@ export class ApplicantRepository {
     });
   }
 
+  async findActiveApplications(profileId: string, limit: number = 3) {
+    return prisma.applicant_applied_job.findMany({
+      where: {
+        applicant_profile_id: profileId,
+        status: { notIn: ['HIRED', 'REJECTED', 'CANCELLED'] as application_status[] },
+      },
+      take: limit,
+      orderBy: { application_date: 'desc' },
+      select: {
+        id: true,
+        status: true,
+        application_date: true,
+        job: {
+          select: {
+            id: true,
+            title: true,
+            department: true,
+            location: true,
+            employment_type: true,
+            company_id: true,
+          },
+        },
+      },
+    });
+  }
+
+  async getApplicationStats(profileId: string) {
+    const [grouped, total] = await Promise.all([
+      prisma.applicant_applied_job.groupBy({
+        by: ['status'],
+        where: { applicant_profile_id: profileId },
+        _count: { _all: true },
+      }),
+      prisma.applicant_applied_job.count({ where: { applicant_profile_id: profileId } }),
+    ]);
+
+    const ALL_STATUSES = ['NEW', 'SCREENING', 'INTERVIEW', 'OFFER', 'REJECTED', 'HIRED', 'CANCELLED'] as const;
+    const countsMap = Object.fromEntries(grouped.map((g) => [g.status, g._count._all]));
+    const stats = ALL_STATUSES.reduce(
+      (acc, s) => { acc[s] = countsMap[s] ?? 0; return acc; },
+      {} as Record<string, number>
+    );
+
+    return { total, ...stats };
+  }
+
+  async findAllApplications(profileId: string, page: number = 1, limit: number = 4) {
+    const skip = (page - 1) * limit;
+
+    const [applications, total] = await Promise.all([
+      prisma.applicant_applied_job.findMany({
+        where: { applicant_profile_id: profileId },
+        skip,
+        take: limit,
+        orderBy: { application_date: 'desc' },
+        select: {
+          id: true,
+          status: true,
+          application_date: true,
+          job: {
+            select: {
+              id: true,
+              title: true,
+              department: true,
+              location: true,
+              employment_type: true,
+              location_type: true,
+              company_id: true,
+            },
+          },
+        },
+      }),
+      prisma.applicant_applied_job.count({ where: { applicant_profile_id: profileId } }),
+    ]);
+
+    return {
+      data: applications,
+      meta: {
+        total,
+        page,
+        limit,
+        totalPages: Math.ceil(total / limit),
+        hasNextPage: page < Math.ceil(total / limit),
+        hasPreviousPage: page > 1,
+      },
+    };
+  }
+
   async createApplication(profileId: string, jobId: string) {
     return prisma.applicant_applied_job.create({
       data: { applicant_profile_id: profileId, job_id: jobId, jobId },
@@ -264,8 +347,6 @@ export class ApplicantRepository {
           application_date: true,
           applicant_profile: {
             select: {
-              first_name: true,
-              last_name: true,
               desired_position: true,
               profile_picture: true,
             },
@@ -300,13 +381,11 @@ export class ApplicantRepository {
     return prisma.applicant_profile.create({
       data: {
         user_id: data.user_id,
-        first_name: data.first_name,
-        last_name: data.last_name,
-        email: data.email,
         age: data.age,
         gender: data.gender,
         desired_position: data.desired_position,
         location: data.location,
+        phone_number: data.phone_number,
         profile_picture: data.profile_picture ?? null,
         applicantEducations: {
           create: data.education.map((edu) => ({

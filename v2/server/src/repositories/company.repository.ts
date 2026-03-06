@@ -166,8 +166,6 @@ export class CompanyRepository {
           application_date: true,
           applicant_profile: {
             select: {
-              first_name: true,
-              last_name: true,
               desired_position: true,
               profile_picture: true,
             },
@@ -413,13 +411,11 @@ export class CompanyRepository {
         applicant_profile: {
           select: {
             id: true,
-            first_name: true,
-            last_name: true,
-            email: true,
             desired_position: true,
             location: true,
             gender: true,
             age: true,
+            phone_number: true,
             profile_picture: true,
             applicantSkills: { select: { id: true, skill_name: true } },
             applicantLanguages: {

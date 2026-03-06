@@ -37,6 +37,7 @@ const profileSchema = z.object({
   gender: z.string().min(1, 'Gender is required'),
   desired_position: z.string().min(1, 'Desired position is required'),
   location: z.string().min(1, 'Location is required'),
+  phone_number: z.string().min(1, 'Phone number is required'),
   career_status: z
     .enum(['ACTIVELY_LOOKING', 'OPEN_TO_OPPORTUNITIES', 'EMPLOYED_NOT_LOOKING', 'NOT_LOOKING'], {
       error:
@@ -48,9 +49,9 @@ const profileSchema = z.object({
 export const updateProfileSchema = z.object({
   body: z
     .object({
-      desired_position: z.string().min(1, 'Desired position is required').optional(),
       age: z.number().int().min(16, 'Must be at least 16 years old').max(100).optional(),
       location: z.string().min(1, 'Location is required').optional(),
+      phone_number: z.string().min(1, 'Phone number is required').optional(),
       gender: z.string().min(1, 'Gender is required').optional(),
     })
     .refine((data) => Object.keys(data).length > 0, {

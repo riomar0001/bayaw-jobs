@@ -154,6 +154,10 @@ router.get('/skills', authenticate, applicantController.getSkills.bind(applicant
 router.post('/skills', authenticate, validate(addSkillsSchema), applicantController.addSkills.bind(applicantController));
 router.delete('/skills/:id', authenticate, validate(deleteSkillSchema), applicantController.deleteSkill.bind(applicantController));
 
+router.get('/applications/active', authenticate, applicantController.getActiveApplications.bind(applicantController));
+router.get('/applications/stats', authenticate, applicantController.getApplicationStats.bind(applicantController));
+router.get('/applications', authenticate, applicantController.getAllApplications.bind(applicantController));
+
 router.post('/jobs/:jobId/apply', authenticate, applicantController.applyToJob.bind(applicantController));
 
 router.get('/resume/:id', applicantController.getResume.bind(applicantController));

@@ -67,6 +67,24 @@ export class ApplicantService {
     return applicantRepository.createApplication(profile.id, jobId);
   }
 
+  async getActiveApplications(userId: string) {
+    const profile = await applicantRepository.findProfileIdByUserId(userId);
+    if (!profile) throw new NotFoundError('Applicant profile');
+    return applicantRepository.findActiveApplications(profile.id);
+  }
+
+  async getApplicationStats(userId: string) {
+    const profile = await applicantRepository.findProfileIdByUserId(userId);
+    if (!profile) throw new NotFoundError('Applicant profile');
+    return applicantRepository.getApplicationStats(profile.id);
+  }
+
+  async getAllApplications(userId: string, page: number = 1, limit: number = 4) {
+    const profile = await applicantRepository.findProfileIdByUserId(userId);
+    if (!profile) throw new NotFoundError('Applicant profile');
+    return applicantRepository.findAllApplications(profile.id, page, limit);
+  }
+
   async getCompanyApplicants(companyId: string, page: number = 1, limit: number = 10) {
     return applicantRepository.findAllApplicantsByCompany(companyId, page, limit);
   }
@@ -96,9 +114,6 @@ export class ApplicantService {
 
     const profile = await applicantRepository.createProfile({
       user_id: userId,
-      first_name: user.first_name ?? '',
-      last_name: user.last_name ?? '',
-      email: user.email,
       ...data.profile,
       profile_picture: profilePicture,
       education: (data.education || []).map((edu) => ({

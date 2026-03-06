@@ -348,6 +348,46 @@ export class ApplicantController {
     }
   }
 
+  async getActiveApplications(req: Request, res: Response, next: NextFunction): Promise<void> {
+    try {
+      const userId = req.user?.user_id;
+      if (!userId) throw new Error('User ID missing in request');
+      const result = await applicantService.getActiveApplications(userId);
+      successResponse(res, result, 'Active applications retrieved successfully');
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  async getApplicationStats(req: Request, res: Response, next: NextFunction): Promise<void> {
+    try {
+      const userId = req.user?.user_id;
+      if (!userId) throw new Error('User ID missing in request');
+      const result = await applicantService.getApplicationStats(userId);
+      successResponse(res, result, 'Application stats retrieved successfully');
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  async getAllApplications(req: Request, res: Response, next: NextFunction): Promise<void> {
+    try {
+      const userId = req.user?.user_id;
+      if (!userId) throw new Error('User ID missing in request');
+
+      const parsedPage = parseInt(req.query.page as string, 10);
+      const page = Math.max(Number.isNaN(parsedPage) ? 1 : parsedPage, 1);
+
+      const parsedLimit = parseInt(req.query.limit as string, 10);
+      const limit = Math.min(Math.max(Number.isNaN(parsedLimit) ? 4 : parsedLimit, 1), 100);
+
+      const result = await applicantService.getAllApplications(userId, page, limit);
+      successResponse(res, result, 'Applications retrieved successfully');
+    } catch (error) {
+      next(error);
+    }
+  }
+
   async applyToJob(req: Request, res: Response, next: NextFunction): Promise<void> {
     try {
       const userId = req.user?.user_id;

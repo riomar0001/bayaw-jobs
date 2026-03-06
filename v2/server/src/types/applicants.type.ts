@@ -36,13 +36,11 @@ export type ApplicantCareerStatus =
 
 export interface ApplicantProfile {
   user_id: string;
-  first_name: string;
-  last_name: string;
-  email: string;
   age: number;
   gender: string;
   desired_position: string;
   location: string;
+  phone_number: string;
   profile_picture?: string | null | undefined;
   career_status?: ApplicantCareerStatus | undefined;
 }

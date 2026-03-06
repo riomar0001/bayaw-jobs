@@ -2075,6 +2075,189 @@ const applyJob = {
   },
 };
 
+// ─── GET /applicants/applications/active ──────────────────────────────────────
+
+const applicationItem = {
+  type: 'object',
+  properties: {
+    id: { type: 'string', format: 'uuid' },
+    status: {
+      type: 'string',
+      enum: ['NEW', 'SCREENING', 'INTERVIEW', 'OFFER', 'REJECTED', 'HIRED', 'CANCELLED'],
+      example: 'SCREENING',
+    },
+    application_date: { type: 'string', format: 'date-time' },
+    job: {
+      type: 'object',
+      properties: {
+        id: { type: 'string', format: 'uuid' },
+        title: { type: 'string', example: 'Senior Software Engineer' },
+        department: { type: 'string', example: 'Engineering' },
+        location: { type: 'string', example: 'Cebu City, Philippines' },
+        employment_type: { type: 'string', example: 'Full-time' },
+        company_id: { type: 'string', format: 'uuid' },
+      },
+    },
+  },
+};
+
+const activeApplications = {
+  '/applicants/applications/active': {
+    get: {
+      tags: ['Applicants'],
+      summary: 'Get top 3 active job applications',
+      description:
+        'Returns the 3 most recent job applications that are not yet resolved (excludes HIRED, REJECTED, CANCELLED). Requires authentication.',
+      security: [{ bearerAuth: [] }],
+      responses: {
+        200: {
+          description: 'Active applications retrieved successfully',
+          content: {
+            'application/json': {
+              schema: {
+                type: 'object',
+                properties: {
+                  success: { type: 'boolean', example: true },
+                  message: { type: 'string', example: 'Active applications retrieved successfully' },
+                  data: {
+                    type: 'array',
+                    maxItems: 3,
+                    items: applicationItem,
+                  },
+                },
+              },
+            },
+          },
+        },
+        401: { description: 'Unauthorized' },
+        404: { description: 'Applicant profile not found' },
+      },
+    },
+  },
+};
+
+// ─── GET /applicants/applications/stats ───────────────────────────────────────
+
+const applicationStats = {
+  '/applicants/applications/stats': {
+    get: {
+      tags: ['Applicants'],
+      summary: 'Get job application stats',
+      description:
+        'Returns the total application count and per-status counts for the authenticated applicant.',
+      security: [{ bearerAuth: [] }],
+      responses: {
+        200: {
+          description: 'Application stats retrieved successfully',
+          content: {
+            'application/json': {
+              schema: {
+                type: 'object',
+                properties: {
+                  success: { type: 'boolean', example: true },
+                  message: { type: 'string', example: 'Application stats retrieved successfully' },
+                  data: {
+                    type: 'object',
+                    properties: {
+                      total: { type: 'integer', example: 12 },
+                      NEW: { type: 'integer', example: 3 },
+                      SCREENING: { type: 'integer', example: 2 },
+                      INTERVIEW: { type: 'integer', example: 2 },
+                      OFFER: { type: 'integer', example: 1 },
+                      REJECTED: { type: 'integer', example: 3 },
+                      HIRED: { type: 'integer', example: 1 },
+                      CANCELLED: { type: 'integer', example: 0 },
+                    },
+                  },
+                },
+              },
+            },
+          },
+        },
+        401: { description: 'Unauthorized' },
+        404: { description: 'Applicant profile not found' },
+      },
+    },
+  },
+};
+
+// ─── GET /applicants/applications ─────────────────────────────────────────────
+
+const allApplications = {
+  '/applicants/applications': {
+    get: {
+      tags: ['Applicants'],
+      summary: 'Get all job applications (paginated)',
+      description:
+        'Returns a paginated list of all job applications for the authenticated applicant. Default limit is 4.',
+      security: [{ bearerAuth: [] }],
+      parameters: [
+        { name: 'page', in: 'query', required: false, schema: { type: 'integer', default: 1, minimum: 1 } },
+        { name: 'limit', in: 'query', required: false, schema: { type: 'integer', default: 4, minimum: 1, maximum: 100 } },
+      ],
+      responses: {
+        200: {
+          description: 'Applications retrieved successfully',
+          content: {
+            'application/json': {
+              schema: {
+                type: 'object',
+                properties: {
+                  success: { type: 'boolean', example: true },
+                  message: { type: 'string', example: 'Applications retrieved successfully' },
+                  data: {
+                    type: 'object',
+                    properties: {
+                      data: {
+                        type: 'array',
+                        items: {
+                          allOf: [
+                            { '$ref': '#/components/schemas/ApplicationItem' },
+                            {
+                              type: 'object',
+                              properties: {
+                                job: {
+                                  type: 'object',
+                                  properties: {
+                                    id: { type: 'string', format: 'uuid' },
+                                    title: { type: 'string', example: 'Senior Software Engineer' },
+                                    department: { type: 'string', example: 'Engineering' },
+                                    location: { type: 'string', example: 'Cebu City, Philippines' },
+                                    employment_type: { type: 'string', example: 'Full-time' },
+                                    location_type: { type: 'string', enum: ['ONSITE', 'REMOTE', 'HYBRID'] },
+                                    company_id: { type: 'string', format: 'uuid' },
+                                  },
+                                },
+                              },
+                            },
+                          ],
+                        },
+                      },
+                      meta: {
+                        type: 'object',
+                        properties: {
+                          total: { type: 'integer', example: 20 },
+                          page: { type: 'integer', example: 1 },
+                          limit: { type: 'integer', example: 4 },
+                          totalPages: { type: 'integer', example: 5 },
+                          hasNextPage: { type: 'boolean', example: true },
+                          hasPreviousPage: { type: 'boolean', example: false },
+                        },
+                      },
+                    },
+                  },
+                },
+              },
+            },
+          },
+        },
+        401: { description: 'Unauthorized' },
+        404: { description: 'Applicant profile not found' },
+      },
+    },
+  },
+};
+
 // ─── Exports ──────────────────────────────────────────────────────────────────
 
 export const applicantDocs = {
@@ -2092,4 +2275,7 @@ export const applicantDocs = {
   ...updateProfilePicture,
   ...skills,
   ...applyJob,
+  ...activeApplications,
+  ...applicationStats,
+  ...allApplications,
 };
