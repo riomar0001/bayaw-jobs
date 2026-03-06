@@ -6,9 +6,9 @@ import { User, Lock, History } from "lucide-react";
 import { Footer } from "@/components/shared/footer";
 
 const navItems = [
-  { label: "Information", href: "/settings/information", icon: User },
-  { label: "Password", href: "/settings/password", icon: Lock },
-  { label: "Login History", href: "/settings/login-history", icon: History },
+  { label: "Information", href: "/applicant/settings/information", icon: User },
+  { label: "Password", href: "/applicant/settings/password", icon: Lock },
+  { label: "Login History", href: "/applicant/settings/login-history", icon: History },
 ];
 
 export default function SettingsLayout({

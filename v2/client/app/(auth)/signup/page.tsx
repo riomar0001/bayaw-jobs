@@ -79,9 +79,9 @@ export default function SignupPage() {
   return (
     <AuthFormLayout
       title="Create Your Account"
-      description="Join thousands of job seekers finding their dream careers"
+      description="Join Bayaw Jobs and connect with top employers and opportunities"
     >
-      <form onSubmit={handleSubmit} className="space-y-6">
+      <form onSubmit={handleSubmit} className="space-y-6" autoComplete="off">
         <FieldGroup>
           <div className="grid grid-cols-2 gap-4">
             <Field>
@@ -91,6 +91,7 @@ export default function SignupPage() {
                 type="text"
                 placeholder="John"
                 required
+                autoComplete="off"
                 value={formData.first_name}
                 onChange={(e) => set("first_name", e.target.value)}
               />
@@ -102,6 +103,7 @@ export default function SignupPage() {
                 type="text"
                 placeholder="Doe"
                 required
+                autoComplete="off"
                 value={formData.last_name}
                 onChange={(e) => set("last_name", e.target.value)}
               />
@@ -115,6 +117,7 @@ export default function SignupPage() {
               type="email"
               placeholder="you@example.com"
               required
+              autoComplete="off"
               value={formData.email}
               onChange={(e) => set("email", e.target.value)}
             />
@@ -127,6 +130,7 @@ export default function SignupPage() {
               type="password"
               placeholder="••••••••"
               required
+              autoComplete="new-password"
               value={formData.password}
               onChange={(e) => set("password", e.target.value)}
             />
@@ -140,6 +144,7 @@ export default function SignupPage() {
               type="password"
               placeholder="••••••••"
               required
+              autoComplete="new-password"
               value={formData.confirmPassword}
               onChange={(e) => set("confirmPassword", e.target.value)}
             />

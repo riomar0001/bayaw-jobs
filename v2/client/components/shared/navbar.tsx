@@ -119,10 +119,17 @@ export function Navbar() {
                   <DropdownMenuLabel>My Account</DropdownMenuLabel>
                   <DropdownMenuSeparator />
                   <DropdownMenuItem asChild>
-                    <Link href="/profile" className="cursor-pointer">
-                      <User className="mr-2 h-4 w-4" />
-                      Profile
-                    </Link>
+                    {user?.applicant_profile_id ? (
+                      <Link href="/applicant/profile" className="cursor-pointer">
+                        <User className="mr-2 h-4 w-4" />
+                        Profile
+                      </Link>
+                    ) : (
+                      <Link href="/onboarding" className="cursor-pointer">
+                        <User className="mr-2 h-4 w-4" />
+                        Complete Account Onboarding
+                      </Link>
+                    )}
                   </DropdownMenuItem>
                   <DropdownMenuItem asChild>
                     <Link href="/jobs" className="cursor-pointer">
@@ -137,7 +144,7 @@ export function Navbar() {
                     </Link>
                   </DropdownMenuItem>
                   <DropdownMenuItem asChild>
-                    <Link href="/settings" className="cursor-pointer">
+                    <Link href="/applicant/settings" className="cursor-pointer">
                       <Settings className="mr-2 h-4 w-4" />
                       Settings
                     </Link>
@@ -226,7 +233,7 @@ export function Navbar() {
             <div className="flex flex-col space-y-2 pt-4 border-t border-border">
               {isAuthenticated ? (
                 <>
-                  <Link href="/settings" onClick={() => setMobileMenuOpen(false)}>
+                  <Link href="/applicant/settings" onClick={() => setMobileMenuOpen(false)}>
                     <Button variant="ghost" className="w-full justify-start">
                       <Settings className="mr-2 h-4 w-4" />
                       Settings

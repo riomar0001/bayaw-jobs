@@ -31,9 +31,12 @@ export default function LoginPage() {
     e.preventDefault();
     clearError();
     await verifyOtp(otp);
-    // If no error after verifyOtp, store sets isAuthenticated — redirect
-    const { isAuthenticated } = useAuthStore.getState();
-    if (isAuthenticated) router.push("/jobs");
+    const { isAuthenticated, user } = useAuthStore.getState();
+    if (!isAuthenticated) return;
+    // Route based on existing profile
+    if (user?.applicant_profile_id) { router.push("/applicant"); return; }
+    if (user?.company_id) { router.push("/company"); return; }
+    router.push("/onboarding");
   };
 
   if (_loginStep === "otp") {
@@ -74,7 +77,7 @@ export default function LoginPage() {
   return (
     <AuthFormLayout
       title="Welcome Back"
-      description="Sign in to your account to continue your job search"
+      description="Sign in to access your account and explore job opportunities"
     >
       <form onSubmit={handleCredentials} className="space-y-6">
         <FieldGroup>

@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -26,6 +27,7 @@ interface JobApplyCardProps {
 
 export function JobApplyCard({ job, onApplied }: JobApplyCardProps) {
   const { isAuthenticated, user } = useAuthStore();
+  const router = useRouter();
   const [applying, setApplying] = useState(false);
   const application: JobApplication | undefined = job.application;
 
@@ -38,6 +40,8 @@ export function JobApplyCard({ job, onApplied }: JobApplyCardProps) {
     : null;
 
   async function handleApply() {
+    if (!isAuthenticated) { router.push("/signup"); return; }
+    if (!user?.applicant_profile_id) { router.push("/applicant/onboarding"); return; }
     setApplying(true);
     try {
       const res = await applicantService.applyToJob(job.id);
@@ -54,6 +58,8 @@ export function JobApplyCard({ job, onApplied }: JobApplyCardProps) {
       setApplying(false);
     }
   }
+
+  if (!isAuthenticated) return null;
 
   if (application) {
     return (
@@ -82,22 +88,6 @@ export function JobApplyCard({ job, onApplied }: JobApplyCardProps) {
               View All Applications
             </Button>
           </Link>
-        </CardContent>
-      </Card>
-    );
-  }
-
-  if (!isAuthenticated) {
-    return null;
-  }
-
-  if (!user?.applicant_profile_id) {
-    return (
-      <Card>
-        <CardContent className="p-6">
-          <p className="text-sm text-muted-foreground text-center">
-            Complete your applicant profile to apply for jobs.
-          </p>
         </CardContent>
       </Card>
     );

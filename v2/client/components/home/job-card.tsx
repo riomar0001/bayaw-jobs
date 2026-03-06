@@ -12,6 +12,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { MapPin, DollarSign, Briefcase } from "lucide-react";
 import type { JobSummary, EmploymentType, LocationType } from "@/api/types";
+import { useAuthStore } from "@/stores/auth.store";
 
 const employmentTypeLabels: Record<EmploymentType, string> = {
   FULL_TIME: "Full Time",
@@ -32,6 +33,14 @@ interface JobCardProps {
 }
 
 export function JobCard({ job }: JobCardProps) {
+  const { isAuthenticated, user } = useAuthStore();
+
+  const applyHref = !isAuthenticated
+    ? "/signup"
+    : !user?.applicant_profile_id
+    ? "/applicant/onboarding"
+    : `/jobs/${job.id}`;
+
   return (
     <Card className="group border hover:shadow-2xl transition-all duration-300 h-full flex flex-col hover:border-primary/50 relative overflow-hidden">
       {/* Background Pattern */}
@@ -79,12 +88,11 @@ export function JobCard({ job }: JobCardProps) {
             View Job
           </Button>
         </Link>
-        <Button
-          className="flex-1 group-hover:bg-primary group-hover:shadow-lg transition-all"
-          onClick={() => console.log("Apply clicked for", job.title)}
-        >
-          Apply Now
-        </Button>
+        <Link href={applyHref} className="flex-1">
+          <Button className="w-full group-hover:bg-primary group-hover:shadow-lg transition-all">
+            Apply Now
+          </Button>
+        </Link>
       </CardFooter>
     </Card>
   );

@@ -10,6 +10,7 @@ interface AuthState {
   user: User | null;
   isAuthenticated: boolean;
   isLoading: boolean;
+  _hasHydrated: boolean;
   error: string | null;
   // Internal: stored between login step 1 & step 2
   _tempToken: string | null;
@@ -25,6 +26,7 @@ interface AuthState {
   resetPassword: (token: string, data: ResetPasswordInput) => Promise<void>;
   clearError: () => void;
   resetLoginStep: () => void;
+  setHasHydrated: (val: boolean) => void;
 }
 
 export const useAuthStore = create<AuthState>()(
@@ -59,6 +61,7 @@ export const useAuthStore = create<AuthState>()(
         user: null,
         isAuthenticated: false,
         isLoading: false,
+        _hasHydrated: false,
         error: null,
         _tempToken: null,
         _loginStep: "idle",
@@ -149,6 +152,7 @@ export const useAuthStore = create<AuthState>()(
         clearError: () => set({ error: null }),
         resetLoginStep: () =>
           set({ _loginStep: "idle", _tempToken: null, error: null }),
+        setHasHydrated: (val) => set({ _hasHydrated: val }),
       };
     },
     {
@@ -157,6 +161,9 @@ export const useAuthStore = create<AuthState>()(
         user: state.user,
         isAuthenticated: state.isAuthenticated,
       }),
+      onRehydrateStorage: () => (state) => {
+        state?.setHasHydrated(true);
+      },
     },
   ),
 );

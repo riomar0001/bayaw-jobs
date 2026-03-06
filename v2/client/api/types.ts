@@ -58,6 +58,7 @@ export interface User {
   is_verified?: boolean;
   created_at?: string;
   applicant_profile_id?: string;
+  company_id?: string;
 }
 
 export interface RegisterInput {
