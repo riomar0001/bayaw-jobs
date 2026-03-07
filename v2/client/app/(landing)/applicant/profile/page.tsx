@@ -18,7 +18,6 @@ import { applicantService } from "@/api/services/applicant.service";
 import { useAuthStore } from "@/stores/auth.store";
 import type {
   ApplicantProfile,
-  CareerStatus,
   ProficiencyLevel,
 } from "@/api/types";
 import {
@@ -37,13 +36,9 @@ import {
   Loader2,
 } from "lucide-react";
 
-type DisplayStatus = "actively-looking" | "employed" | "open-to-opportunities";
 
-function mapCareerStatus(cs: CareerStatus | null | undefined): DisplayStatus {
-  if (cs === "ACTIVELY_LOOKING") return "actively-looking";
-  if (cs === "OPEN_TO_OPPORTUNITIES") return "open-to-opportunities";
-  return "employed";
-}
+
+
 
 export default function ProfilePage() {
   const router = useRouter();
@@ -208,8 +203,6 @@ export default function ProfilePage() {
           },
     );
   };
-
-  const displayStatus = mapCareerStatus(profile?.career_status);
   const resumeFileName = `${user?.first_name ?? ""}-${user?.last_name ?? ""}-resume.pdf`;
   const displayResume =
     (localResume ??
