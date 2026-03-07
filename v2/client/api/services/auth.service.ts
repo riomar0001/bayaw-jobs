@@ -11,6 +11,8 @@ import {
   RegisterInput,
   ResetPasswordInput,
   UpdatePasswordInput,
+  AccountInfo,
+  UpdateAccountInfoInput,
   User,
   unwrapResponse,
 } from "../types";
@@ -95,6 +97,19 @@ class AuthService {
     const res = await apiClient.get<
       ApiResponse<PaginatedResponse<LoginHistoryItem>>
     >("/auth/login-history");
+    return unwrapResponse(res.data);
+  }
+
+  async getAccountInfo(): Promise<AccountInfo> {
+    const res = await apiClient.get<ApiResponse<AccountInfo>>("/auth/info");
+    return unwrapResponse(res.data);
+  }
+
+  async updateAccountInfo(data: UpdateAccountInfoInput): Promise<AccountInfo> {
+    const res = await apiClient.patch<ApiResponse<AccountInfo>>(
+      "/auth/info",
+      data,
+    );
     return unwrapResponse(res.data);
   }
 }

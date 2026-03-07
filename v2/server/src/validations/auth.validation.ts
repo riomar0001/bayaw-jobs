@@ -92,6 +92,30 @@ export const resetPasswordSchema = z.object({
     }),
 });
 
+export const updateAccountInfoSchema = z.object({
+  body: z
+    .object({
+      first_name: z
+        .string()
+        .min(1, 'First name is required')
+        .max(50, 'First name is too long')
+        .optional(),
+      last_name: z
+        .string()
+        .min(1, 'Last name is required')
+        .max(50, 'Last name is too long')
+        .optional(),
+      email: z.email('Invalid email format').optional(),
+    })
+    .refine(
+      (data) =>
+        data.first_name !== undefined || data.last_name !== undefined || data.email !== undefined,
+      {
+        message: 'At least one field must be provided to update',
+      }
+    ),
+});
+
 export type RegisterInput = z.infer<typeof registerSchema>['body'];
 export type VerifyEmailInput = z.infer<typeof verifyEmailSchema>['query'];
 export type LoginInput = z.infer<typeof loginSchema>['body'];
@@ -99,3 +123,4 @@ export type VerifyAuthInput = z.infer<typeof verifyAuthSchema>['body'];
 export type UpdatePasswordInput = z.infer<typeof updatePasswordSchema>['body'];
 export type ForgotPasswordInput = z.infer<typeof forgotPasswordSchema>['body'];
 export type ResetPasswordInput = z.infer<typeof resetPasswordSchema>['body'];
+export type UpdateAccountInfoInput = z.infer<typeof updateAccountInfoSchema>['body'];
