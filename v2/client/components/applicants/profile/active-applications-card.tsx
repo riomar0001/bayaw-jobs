@@ -82,7 +82,7 @@ export function ActiveApplicationsCard() {
               </div>
             ))}
 
-            <Link href="/applications" className="w-full">
+            <Link href="/applicant/applications" className="w-full">
               <Button variant="outline" className="w-full mt-2" size="sm">
                 View All Applications
               </Button>
