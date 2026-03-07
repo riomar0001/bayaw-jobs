@@ -1,6 +1,7 @@
 "use client";
 
 import { use, useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { Footer } from "@/components/shared/footer";
@@ -12,6 +13,8 @@ import { JobApplyCard } from "@/components/job/job-apply-card";
 import { JobOverviewCard } from "@/components/job/job-overview-card";
 import { JobCompanyCard } from "@/components/job/job-company-card";
 import { jobsService } from "@/api/services/jobs.service";
+import { applicantService } from "@/api/services/applicant.service";
+import { useAuthStore } from "@/stores/auth.store";
 import type { Job } from "@/api/types";
 
 export default function JobDetailPage({
@@ -20,9 +23,12 @@ export default function JobDetailPage({
   params: Promise<{ id: string }>;
 }) {
   const { id } = use(params);
+  const router = useRouter();
+  const { isAuthenticated, user } = useAuthStore();
   const [job, setJob] = useState<Job | null>(null);
   const [loading, setLoading] = useState(true);
   const [notFoundError, setNotFoundError] = useState(false);
+  const [applying, setApplying] = useState(false);
 
   useEffect(() => {
     jobsService
@@ -31,6 +37,33 @@ export default function JobDetailPage({
       .catch(() => setNotFoundError(true))
       .finally(() => setLoading(false));
   }, [id]);
+
+  async function handleApply() {
+    if (!isAuthenticated) {
+      router.push("/signup");
+      return;
+    }
+    if (!user?.applicant_profile_id) {
+      router.push("/applicant/onboarding");
+      return;
+    }
+    if (!job) return;
+    setApplying(true);
+    try {
+      const res = await applicantService.applyToJob(job.id);
+      setJob({
+        ...job,
+        application: {
+          status: res.status,
+          application_date: res.application_date,
+        },
+      });
+    } catch {
+      // silently fail
+    } finally {
+      setApplying(false);
+    }
+  }
 
   if (loading) {
     return (
@@ -58,7 +91,7 @@ export default function JobDetailPage({
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           <div className="lg:col-span-2 space-y-6">
-            <JobHeader job={job} />
+            <JobHeader job={job} onApply={handleApply} applying={applying} />
             <JobDescription job={job} />
             <JobRelated
               companyId={job.company?.id ?? null}
@@ -68,7 +101,7 @@ export default function JobDetailPage({
           </div>
 
           <div className="lg:col-span-1 space-y-6">
-            <JobApplyCard job={job} onApplied={setJob} />
+            <JobApplyCard job={job} onApply={handleApply} applying={applying} />
             <JobOverviewCard job={job} />
             {job.company && <JobCompanyCard company={job.company} />}
           </div>

@@ -12,6 +12,15 @@ const LOCATION_TYPE_LABEL: Record<string, string> = {
   HYBRID: "Hybrid",
 };
 
+const EMPLOYMENT_TYPE_LABEL: Record<string, string> = {
+  FULL_TIME: "Full-time",
+  PART_TIME: "Part-time",
+  CONTRACT: "Contract",
+  FREELANCE: "Freelance",
+  INTERNSHIP: "Internship",
+  TEMPORARY: "Temporary",
+};
+
 export function JobOverviewCard({ job }: JobOverviewCardProps) {
   const postedDate = new Date(job.created_at).toLocaleDateString("en-US", {
     year: "numeric",
@@ -30,7 +39,10 @@ export function JobOverviewCard({ job }: JobOverviewCardProps) {
             </div>
             <div>
               <p className="text-xs text-muted-foreground">Job Type</p>
-              <p className="text-sm font-medium">{job.employment_type}</p>
+              <p className="text-sm font-medium">
+                {EMPLOYMENT_TYPE_LABEL[job.employment_type] ??
+                  job.employment_type}
+              </p>
             </div>
           </div>
 

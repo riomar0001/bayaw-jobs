@@ -1,21 +1,34 @@
 "use client";
 
 import Link from "next/link";
-import { useRouter } from "next/navigation";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { MapPin, DollarSign, Building2, CalendarDays } from "lucide-react";
+import {
+  MapPin,
+  DollarSign,
+  Building2,
+  CalendarDays,
+  Loader2,
+} from "lucide-react";
 import type { Job } from "@/api/types";
-import { useAuthStore } from "@/stores/auth.store";
+
+const EMPLOYMENT_TYPE_LABEL: Record<string, string> = {
+  FULL_TIME: "Full-time",
+  PART_TIME: "Part-time",
+  CONTRACT: "Contract",
+  FREELANCE: "Freelance",
+  INTERNSHIP: "Internship",
+  TEMPORARY: "Temporary",
+};
 
 interface JobHeaderProps {
   job: Job;
+  onApply: () => void;
+  applying: boolean;
 }
 
-export function JobHeader({ job }: JobHeaderProps) {
-  const { isAuthenticated, user } = useAuthStore();
-  const router = useRouter();
+export function JobHeader({ job, onApply, applying }: JobHeaderProps) {
   const companyName = job.company?.company_name ?? "";
   const companyId = job.company?.id;
   const postedDate = new Date(job.created_at).toLocaleDateString("en-US", {
@@ -49,7 +62,7 @@ export function JobHeader({ job }: JobHeaderProps) {
             variant="secondary"
             className="bg-primary/10 text-primary border-primary/20 shrink-0"
           >
-            {job.employment_type}
+            {EMPLOYMENT_TYPE_LABEL[job.employment_type] ?? job.employment_type}
           </Badge>
         </div>
 
@@ -76,17 +89,10 @@ export function JobHeader({ job }: JobHeaderProps) {
           <Button
             size="lg"
             className="w-full sm:w-auto px-12"
-            onClick={() => {
-              if (!isAuthenticated) {
-                router.push("/signup");
-                return;
-              }
-              if (!user?.applicant_profile_id) {
-                router.push("/applicant/onboarding");
-                return;
-              }
-            }}
+            onClick={onApply}
+            disabled={applying}
           >
+            {applying && <Loader2 className="h-4 w-4 mr-2 animate-spin" />}
             Apply Now
           </Button>
         )}
