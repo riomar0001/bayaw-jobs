@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import {
   Dialog,
   DialogContent,
@@ -19,8 +19,12 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Trash2, Plus } from "lucide-react";
+import { applicantService } from "@/api/services/applicant.service";
+import { toast } from "sonner";
+import { type ProficiencyLevel } from "@/api/types";
 
 type LanguageData = {
+  id?: string;
   language: string;
   proficiency: "basic" | "conversational" | "fluent" | "native";
 };
@@ -46,6 +50,13 @@ export function EditLanguagesDialog({
   onSave,
 }: EditLanguagesDialogProps) {
   const [languages, setLanguages] = useState<LanguageData[]>(initialData);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  useEffect(() => {
+    if (open) {
+      setLanguages(initialData);
+    }
+  }, [open, initialData]);
 
   const addLanguage = () => {
     setLanguages([...languages, { language: "", proficiency: "basic" }]);
@@ -65,13 +76,57 @@ export function EditLanguagesDialog({
     setLanguages(newLanguages);
   };
 
-  const handleSave = () => {
-    // Filter out empty languages
-    const validLanguages = languages.filter(
-      (lang) => lang.language.trim() !== "",
-    );
-    onSave(validLanguages);
-    onOpenChange(false);
+  const handleSave = async () => {
+    try {
+      setIsSubmitting(true);
+      const validLanguages = languages.filter(
+        (lang) => lang.language.trim() !== "",
+      );
+
+      const currentIds = validLanguages.map((l) => l.id).filter(Boolean);
+      const originalIds = initialData.map((l) => l.id).filter(Boolean);
+      const toDelete = originalIds.filter((id) => !currentIds.includes(id));
+
+      for (const id of toDelete) {
+        if (id) await applicantService.deleteLanguage(id);
+      }
+
+      const newSavedLanguages: LanguageData[] = [];
+      for (const lang of validLanguages) {
+        const payload = {
+          language_name: lang.language,
+          // Server accepts uppercase
+          proficiency_level: lang.proficiency.toUpperCase() as ProficiencyLevel,
+        };
+        if (lang.id) {
+          const res = await applicantService.updateLanguage(lang.id, payload);
+          newSavedLanguages.push({
+            ...lang,
+            id: res.id,
+            proficiency:
+              res.proficiency_level.toLowerCase() as LanguageData["proficiency"],
+          });
+        } else {
+          const res = await applicantService.addLanguage(payload);
+          newSavedLanguages.push({
+            ...lang,
+            id: res.id,
+            proficiency:
+              res.proficiency_level.toLowerCase() as LanguageData["proficiency"],
+          });
+        }
+      }
+
+      toast.success("Languages updated successfully");
+      onSave(newSavedLanguages);
+      onOpenChange(false);
+    } catch (error) {
+      toast.error(
+        error instanceof Error ? error.message : "Failed to update languages",
+      );
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   const handleCancel = () => {
@@ -173,8 +228,8 @@ export function EditLanguagesDialog({
           <Button type="button" variant="outline" onClick={handleCancel}>
             Cancel
           </Button>
-          <Button type="button" onClick={handleSave}>
-            Save Changes
+          <Button type="button" onClick={handleSave} disabled={isSubmitting}>
+            {isSubmitting ? "Saving..." : "Save Changes"}
           </Button>
         </DialogFooter>
       </DialogContent>

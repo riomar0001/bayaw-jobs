@@ -1,10 +1,9 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { ProfileHeader } from "@/components/applicants/profile/profile-header";
 import { ProfileSectionCard } from "@/components/applicants/profile/profile-section-card";
-import { ActiveApplicationsCard } from "@/components/applicants/profile/active-applications-card";
 import { CareerStatusCard } from "@/components/applicants/profile/career-status-card";
 import { EditPersonalInfoDialog } from "@/components/applicants/profile/forms/edit-personal-info-dialog";
 import { EditEducationDialog } from "@/components/applicants/profile/forms/edit-education-dialog";
@@ -13,15 +12,17 @@ import { EditResumeDialog } from "@/components/applicants/profile/forms/edit-res
 import { EditSkillsDialog } from "@/components/applicants/profile/forms/edit-skills-dialog";
 import { EditLanguagesDialog } from "@/components/applicants/profile/forms/edit-languages-dialog";
 import { Footer } from "@/components/shared/footer";
+import { ActiveApplicationsCard } from "@/components/applicants/profile/active-applications-card";
 import { Button } from "@/components/ui/button";
-import { mockUserProfile, type UserProfile } from "@/data";
+import { applicantService } from "@/api/services/applicant.service";
+import { useAuthStore } from "@/stores/auth.store";
+import type { ApplicantProfile, ProficiencyLevel } from "@/api/types";
 import {
   User,
   GraduationCap,
   Briefcase,
   FileText,
   Calendar,
-  Mail,
   Phone,
   MapPin,
   Cake,
@@ -29,11 +30,21 @@ import {
   ArrowLeft,
   Code,
   Languages,
+  Loader2,
 } from "lucide-react";
 
 export default function ProfilePage() {
   const router = useRouter();
-  const [profile, setProfile] = useState(mockUserProfile);
+  const { user, updateUser, refresh } = useAuthStore();
+  const [profile, setProfile] = useState<ApplicantProfile | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [localResume, setLocalResume] = useState<{
+    fileName: string;
+    fileSize: string;
+    uploadedAt: string;
+  } | null>(null);
+
   const [editPersonalInfoOpen, setEditPersonalInfoOpen] = useState(false);
   const [editEducationOpen, setEditEducationOpen] = useState(false);
   const [editExperienceOpen, setEditExperienceOpen] = useState(false);
@@ -41,87 +52,180 @@ export default function ProfilePage() {
   const [editSkillsOpen, setEditSkillsOpen] = useState(false);
   const [editLanguagesOpen, setEditLanguagesOpen] = useState(false);
 
-  const getMonthName = (month: string) => {
-    const months = [
-      "January",
-      "February",
-      "March",
-      "April",
-      "May",
-      "June",
-      "July",
-      "August",
-      "September",
-      "October",
-      "November",
-      "December",
-    ];
-    return months[parseInt(month) - 1];
-  };
+  useEffect(() => {
+    applicantService
+      .getProfile()
+      .then((data) => {
+        setProfile(data);
+        if (data.resume_url) {
+          setLocalResume({
+            fileName: "",
+            fileSize: "",
+            uploadedAt: data.created_at,
+          });
+        }
+      })
+      .catch((err: unknown) => {
+        setError(err instanceof Error ? err.message : "Failed to load profile");
+      })
+      .finally(() => setIsLoading(false));
+  }, []);
 
   const handleSavePersonalInfo = (data: {
-    firstName: string;
-    lastName: string;
-    email: string;
     phone: string;
     age: string;
     gender: string;
     location: string;
     desiredPosition: string;
   }) => {
-    setProfile({
-      ...profile,
-      firstName: data.firstName,
-      lastName: data.lastName,
-      email: data.email,
-      phone: data.phone,
-      age: parseInt(data.age),
-      gender: data.gender,
-      desiredPosition: data.desiredPosition,
-      personalInfo: {
-        ...profile.personalInfo,
-        firstName: data.firstName,
-        lastName: data.lastName,
-        age: parseInt(data.age),
-        gender: data.gender,
-      },
-    });
+    setProfile((prev) =>
+      prev
+        ? {
+            ...prev,
+            phone_number: data.phone,
+            age: parseInt(data.age),
+            gender: data.gender,
+            location: data.location,
+            desired_position: data.desiredPosition,
+          }
+        : prev,
+    );
   };
 
-  const handleSaveEducation = (data: UserProfile["education"]) => {
-    setProfile({
-      ...profile,
-      education: data,
-    });
+  const handleSaveEducation = (
+    data: Array<{
+      id?: string;
+      school: string;
+      field: string;
+      fromYear: string;
+      toYear?: string;
+      currentlyEnrolled: boolean;
+    }>,
+  ) => {
+    setProfile((prev) =>
+      !prev
+        ? prev
+        : {
+            ...prev,
+            applicantEducations: data.map((edu, i) => ({
+              id:
+                edu.id ?? prev.applicantEducations?.[i]?.id ?? `temp-edu-${i}`,
+              applicant_profile_id: prev.id,
+              institution_name: edu.school,
+              field_of_study: edu.field,
+              start_year: parseInt(edu.fromYear, 10),
+              end_year: edu.currentlyEnrolled
+                ? null
+                : parseInt(edu.toYear || "0", 10),
+            })),
+          },
+    );
   };
 
-  const handleSaveExperience = (data: UserProfile["experiences"]) => {
-    setProfile({
-      ...profile,
-      experiences: data,
-    });
+  const handleSaveExperience = (
+    data: Array<{
+      companyName: string;
+      position: string;
+      fromYear: string;
+      toYear?: string;
+      currentlyWorking: boolean;
+    }>,
+  ) => {
+    setProfile((prev) =>
+      !prev
+        ? prev
+        : {
+            ...prev,
+            applicantExperiences: data.map((exp, i) => ({
+              id: prev.applicantExperiences?.[i]?.id ?? `temp-${i}`,
+              applicant_profile_id: prev.id,
+              company_name: exp.companyName,
+              position: exp.position,
+              start_date: `${exp.fromYear}-01-01`,
+              end_date: exp.currentlyWorking
+                ? null
+                : exp.toYear
+                  ? `${exp.toYear}-12-31`
+                  : null,
+              is_current: exp.currentlyWorking,
+            })),
+          },
+    );
   };
 
-  const handleSaveResume = (data: UserProfile["resume"]) => {
-    setProfile({
-      ...profile,
-      resume: data,
-    });
+  const handleSaveResume = (
+    data: { fileName: string; fileSize: string; uploadedAt: string } | null,
+  ) => {
+    setLocalResume(data);
   };
 
-  const handleSaveSkills = (skills: string[]) => {
-    setProfile({
-      ...profile,
-      skills,
-    });
+  const handleSaveSkills = (
+    skills: Array<{ id?: string; skill_name: string }>,
+  ) => {
+    setProfile((prev) =>
+      !prev
+        ? prev
+        : {
+            ...prev,
+            applicantSkills: skills.map((s, i) => ({
+              id: s.id ?? prev.applicantSkills?.[i]?.id ?? `temp-skill-${i}`,
+              skill_name: s.skill_name,
+            })),
+          },
+    );
   };
 
-  const handleSaveLanguages = (languages: UserProfile["languages"]) => {
-    setProfile({
-      ...profile,
-      languages,
-    });
+  const handleSaveLanguages = (
+    languages: Array<{
+      language: string;
+      proficiency: "basic" | "conversational" | "fluent" | "native";
+    }>,
+  ) => {
+    setProfile((prev) =>
+      !prev
+        ? prev
+        : {
+            ...prev,
+            applicantLanguages: languages.map((lang, i) => ({
+              id: prev.applicantLanguages?.[i]?.id ?? `temp-lang-${i}`,
+              applicant_profile_id: prev.id,
+              language_name: lang.language,
+              proficiency_level:
+                lang.proficiency.toUpperCase() as ProficiencyLevel,
+            })),
+          },
+    );
   };
+  const resumeFileName = `${user?.first_name ?? ""}-${user?.last_name ?? ""}-resume.pdf`;
+  const displayResume =
+    (localResume ??
+    (profile?.resume_url
+      ? { fileName: "", fileSize: "", uploadedAt: "" }
+      : null))
+      ? {
+          ...(localResume ?? { fileName: "", fileSize: "", uploadedAt: "" }),
+          fileName: resumeFileName,
+        }
+      : null;
+
+  if (isLoading) {
+    return (
+      <main className="min-h-screen bg-muted/30 flex items-center justify-center">
+        <Loader2 className="h-8 w-8 animate-spin text-primary" />
+      </main>
+    );
+  }
+
+  if (error || !profile) {
+    return (
+      <main className="min-h-screen bg-muted/30 flex flex-col items-center justify-center gap-4">
+        <p className="text-destructive">{error ?? "Profile not found."}</p>
+        <Button variant="ghost" onClick={() => router.back()}>
+          Go Back
+        </Button>
+      </main>
+    );
+  }
 
   return (
     <main className="min-h-screen bg-muted/30">
@@ -145,12 +249,20 @@ export default function ProfilePage() {
             {/* Profile Header */}
             <div className="mb-6">
               <ProfileHeader
-                firstName={profile.firstName}
-                lastName={profile.lastName}
-                email={profile.email}
-                phone={profile.phone}
-                desiredPosition={profile.desiredPosition}
-                status={profile.status}
+                firstName={user?.first_name ?? ""}
+                lastName={user?.last_name ?? ""}
+                email={user?.email ?? ""}
+                phone={profile.phone_number}
+                desiredPosition={profile.desired_position}
+                status={profile.career_status ?? "NOT_LOOKING"}
+                profilePictureUrl={profile.profile_picture_url}
+                onProfilePictureUpdate={(url) => {
+                  setProfile((prev) =>
+                    prev ? { ...prev, profile_picture_url: url } : prev,
+                  );
+                  updateUser({ profile_picture_url: url });
+                  void refresh();
+                }}
               />
             </div>
 
@@ -162,62 +274,46 @@ export default function ProfilePage() {
             >
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div className="flex items-start gap-3">
-                  <div className="w-10 h-10 rounded-lg bg-muted flex items-center justify-center flex-shrink-0">
-                    <Mail className="h-5 w-5 text-muted-foreground" />
-                  </div>
-                  <div>
-                    <p className="text-xs text-muted-foreground mb-1">
-                      Mail Address
-                    </p>
-                    <p className="font-medium">{profile.email}</p>
-                  </div>
-                </div>
-
-                <div className="flex items-start gap-3">
-                  <div className="w-10 h-10 rounded-lg bg-muted flex items-center justify-center flex-shrink-0">
+                  <div className="w-10 h-10 rounded-lg bg-muted flex items-center justify-center shrink-0">
                     <Phone className="h-5 w-5 text-muted-foreground" />
                   </div>
                   <div>
                     <p className="text-xs text-muted-foreground mb-1">
                       Phone Number
                     </p>
-                    <p className="font-medium">{profile.phone}</p>
+                    <p className="font-medium">{profile.phone_number}</p>
                   </div>
                 </div>
 
                 <div className="flex items-start gap-3">
-                  <div className="w-10 h-10 rounded-lg bg-muted flex items-center justify-center flex-shrink-0">
+                  <div className="w-10 h-10 rounded-lg bg-muted flex items-center justify-center shrink-0">
                     <Cake className="h-5 w-5 text-muted-foreground" />
                   </div>
                   <div>
                     <p className="text-xs text-muted-foreground mb-1">Age</p>
-                    <p className="font-medium">
-                      {profile.personalInfo.age} years old
-                    </p>
+                    <p className="font-medium">{profile.age} years old</p>
                   </div>
                 </div>
 
                 <div className="flex items-start gap-3">
-                  <div className="w-10 h-10 rounded-lg bg-muted flex items-center justify-center flex-shrink-0">
+                  <div className="w-10 h-10 rounded-lg bg-muted flex items-center justify-center shrink-0">
                     <User className="h-5 w-5 text-muted-foreground" />
                   </div>
                   <div>
                     <p className="text-xs text-muted-foreground mb-1">Gender</p>
-                    <p className="font-medium capitalize">
-                      {profile.personalInfo.gender}
-                    </p>
+                    <p className="font-medium capitalize">{profile.gender}</p>
                   </div>
                 </div>
 
                 <div className="flex items-start gap-3">
-                  <div className="w-10 h-10 rounded-lg bg-muted flex items-center justify-center flex-shrink-0">
+                  <div className="w-10 h-10 rounded-lg bg-muted flex items-center justify-center shrink-0">
                     <MapPin className="h-5 w-5 text-muted-foreground" />
                   </div>
                   <div>
                     <p className="text-xs text-muted-foreground mb-1">
                       Location
                     </p>
-                    <p className="font-medium">San Francisco, CA, USA</p>
+                    <p className="font-medium">{profile.location}</p>
                   </div>
                 </div>
               </div>
@@ -229,24 +325,32 @@ export default function ProfilePage() {
               icon={<GraduationCap className="h-5 w-5 text-primary" />}
               onEdit={() => setEditEducationOpen(true)}
             >
-              <div className="flex gap-4">
-                <div className="w-12 h-12 rounded-lg bg-muted flex items-center justify-center flex-shrink-0">
-                  <GraduationCap className="h-6 w-6 text-muted-foreground" />
+              {(profile.applicantEducations ?? []).length > 0 ? (
+                <div className="space-y-4">
+                  {(profile.applicantEducations ?? []).map((edu, index) => (
+                    <div key={edu.id || index} className="flex gap-4">
+                      <div className="w-12 h-12 rounded-lg bg-muted flex items-center justify-center shrink-0">
+                        <GraduationCap className="h-6 w-6 text-muted-foreground" />
+                      </div>
+                      <div className="flex-1">
+                        <h3 className="font-semibold mb-1">
+                          {edu.institution_name}
+                        </h3>
+                        <p className="text-sm text-muted-foreground mb-2">
+                          {edu.field_of_study}
+                        </p>
+                        <p className="text-sm text-muted-foreground">
+                          {edu.start_year} – {edu.end_year ?? "Present"}
+                        </p>
+                      </div>
+                    </div>
+                  ))}
                 </div>
-
-                <div className="flex-1">
-                  <h3 className="font-semibold mb-1">
-                    {profile.education.school}
-                  </h3>
-                  <p className="text-sm text-muted-foreground mb-2">
-                    Master degree in {profile.education.field}
-                  </p>
-                  <p className="text-sm text-muted-foreground">
-                    {getMonthName(profile.education.monthGraduated)}{" "}
-                    {profile.education.yearGraduated}
-                  </p>
-                </div>
-              </div>
+              ) : (
+                <p className="text-sm text-muted-foreground">
+                  No education added yet.
+                </p>
+              )}
             </ProfileSectionCard>
 
             {/* Work Experience */}
@@ -255,39 +359,49 @@ export default function ProfilePage() {
               icon={<Briefcase className="h-5 w-5 text-primary" />}
               onEdit={() => setEditExperienceOpen(true)}
             >
-              <div className="space-y-6">
-                {profile.experiences.map((exp, index) => (
-                  <div key={index} className="flex gap-4">
-                    <div className="w-12 h-12 rounded-lg bg-muted flex items-center justify-center flex-shrink-0">
-                      <Briefcase className="h-6 w-6 text-muted-foreground" />
-                    </div>
-
-                    <div className="flex-1">
-                      <div className="flex items-start justify-between mb-1">
-                        <div>
-                          <h3 className="font-semibold">{exp.companyName}</h3>
-                          <p className="text-sm text-muted-foreground">
-                            {exp.position}
-                          </p>
+              {(profile.applicantExperiences ?? []).length > 0 ? (
+                <div className="space-y-6">
+                  {(profile.applicantExperiences ?? []).map((exp, index) => (
+                    <div key={exp.id || index} className="flex gap-4">
+                      <div className="w-12 h-12 rounded-lg bg-muted flex items-center justify-center shrink-0">
+                        <Briefcase className="h-6 w-6 text-muted-foreground" />
+                      </div>
+                      <div className="flex-1">
+                        <div className="flex items-start justify-between mb-1">
+                          <div>
+                            <h3 className="font-semibold">
+                              {exp.company_name}
+                            </h3>
+                            <p className="text-sm text-muted-foreground">
+                              {exp.position}
+                            </p>
+                          </div>
+                          {exp.is_current && (
+                            <span className="px-2 py-1 bg-green-100 text-green-700 rounded text-xs font-medium">
+                              Current
+                            </span>
+                          )}
                         </div>
-                        {exp.currentlyWorking && (
-                          <span className="px-2 py-1 bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400 rounded text-xs font-medium">
-                            Current
+                        <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                          <Calendar className="h-3 w-3" />
+                          <span>
+                            {new Date(exp.start_date).getFullYear()} –{" "}
+                            {exp.is_current
+                              ? "Present"
+                              : exp.end_date
+                                ? new Date(exp.end_date).getFullYear()
+                                : "—"}
                           </span>
-                        )}
-                      </div>
-
-                      <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                        <Calendar className="h-3 w-3" />
-                        <span>
-                          {exp.fromYear} -{" "}
-                          {exp.currentlyWorking ? "Present" : exp.toYear}
-                        </span>
+                        </div>
                       </div>
                     </div>
-                  </div>
-                ))}
-              </div>
+                  ))}
+                </div>
+              ) : (
+                <p className="text-sm text-muted-foreground">
+                  No experience added yet.
+                </p>
+              )}
             </ProfileSectionCard>
 
             {/* Resume */}
@@ -296,24 +410,31 @@ export default function ProfilePage() {
               icon={<FileText className="h-5 w-5 text-primary" />}
               onEdit={() => setEditResumeOpen(true)}
             >
-              {profile.resume ? (
+              {displayResume ? (
                 <div className="flex flex-row items-center gap-4 p-4 border rounded-lg hover:bg-muted/50 transition-colors">
-                  <div className="w-12 h-12 rounded-lg bg-gradient-to-br from-sky-400/20 to-cyan-500/20 flex items-center justify-center flex-shrink-0">
+                  <div className="w-12 h-12 rounded-lg bg-linear-to-br from-sky-400/20 to-cyan-500/20 flex items-center justify-center shrink-0">
                     <FileText className="h-6 w-6 text-primary" />
                   </div>
-
                   <div className="flex-1">
                     <p className="font-semibold mb-1">
-                      {profile.resume.fileName}
+                      {displayResume.fileName}
                     </p>
-                    <div className="flex items-center gap-3 text-sm text-muted-foreground">
-                      <span>{profile.resume.fileSize}</span>
-                    </div>
+                    {displayResume.fileSize && (
+                      <div className="flex items-center gap-3 text-sm text-muted-foreground">
+                        <span>{displayResume.fileSize}</span>
+                      </div>
+                    )}
                   </div>
-
-                  <button className="text-primary hover:underline text-sm font-medium">
-                    Download
-                  </button>
+                  {profile.resume_url && (
+                    <a
+                      href={profile.resume_url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-primary hover:underline text-sm font-medium"
+                    >
+                      Download
+                    </a>
+                  )}
                 </div>
               ) : (
                 <p className="text-sm text-muted-foreground">
@@ -328,16 +449,22 @@ export default function ProfilePage() {
               icon={<Code className="h-5 w-5 text-primary" />}
               onEdit={() => setEditSkillsOpen(true)}
             >
-              <div className="flex flex-wrap gap-2">
-                {profile.skills.map((skill, index) => (
-                  <span
-                    key={index}
-                    className="px-3 py-1.5 bg-primary/10 text-primary rounded-full text-sm font-medium"
-                  >
-                    {skill}
-                  </span>
-                ))}
-              </div>
+              {(profile.applicantSkills ?? []).length > 0 ? (
+                <div className="flex flex-wrap gap-2">
+                  {(profile.applicantSkills ?? []).map((skill, index) => (
+                    <span
+                      key={skill.id || index}
+                      className="px-3 py-1.5 bg-primary/10 text-primary rounded-full text-sm font-medium"
+                    >
+                      {skill.skill_name}
+                    </span>
+                  ))}
+                </div>
+              ) : (
+                <p className="text-sm text-muted-foreground">
+                  No skills added yet.
+                </p>
+              )}
             </ProfileSectionCard>
 
             {/* Languages */}
@@ -346,31 +473,42 @@ export default function ProfilePage() {
               icon={<Languages className="h-5 w-5 text-primary" />}
               onEdit={() => setEditLanguagesOpen(true)}
             >
-              <div className="flex flex-wrap gap-2">
-                {profile.languages.map((lang, index) => (
-                  <span
-                    key={index}
-                    className="px-3 py-1.5 bg-secondary/50 text-foreground rounded-full text-sm font-medium"
-                  >
-                    {lang.language} •{" "}
-                    <span className="text-muted-foreground capitalize">
-                      {lang.proficiency}
+              {(profile.applicantLanguages ?? []).length > 0 ? (
+                <div className="flex flex-wrap gap-2">
+                  {(profile.applicantLanguages ?? []).map((lang, index) => (
+                    <span
+                      key={lang.id || index}
+                      className="px-3 py-1.5 bg-secondary/50 text-foreground rounded-full text-sm font-medium"
+                    >
+                      {lang.language_name} •{" "}
+                      <span className="text-muted-foreground capitalize">
+                        {lang.proficiency_level.toLowerCase()}
+                      </span>
                     </span>
-                  </span>
-                ))}
-              </div>
+                  ))}
+                </div>
+              ) : (
+                <p className="text-sm text-muted-foreground">
+                  No languages added yet.
+                </p>
+              )}
             </ProfileSectionCard>
           </div>
 
           {/* Right Column - Sidebar */}
           <div className="lg:col-span-1 space-y-6">
             {/* Active Applications */}
-            <ActiveApplicationsCard
-              applications={profile.currentlyApplyingFor}
-            />
+            <ActiveApplicationsCard />
 
             {/* Career Status */}
-            <CareerStatusCard status={profile.status} />
+            <CareerStatusCard
+              status={profile.career_status ?? "NOT_LOOKING"}
+              onStatusChange={(s) =>
+                setProfile((prev) =>
+                  prev ? { ...prev, career_status: s } : prev,
+                )
+              }
+            />
 
             {/* Personal Information Sidebar */}
             <ProfileSectionCard
@@ -383,14 +521,14 @@ export default function ProfilePage() {
                   <p className="text-xs text-muted-foreground mb-1">
                     Phone Number
                   </p>
-                  <p className="font-medium text-sm">{profile.phone}</p>
+                  <p className="font-medium text-sm">{profile.phone_number}</p>
                 </div>
 
                 <div>
                   <p className="text-xs text-muted-foreground mb-1">
                     Mail Address
                   </p>
-                  <p className="font-medium text-sm">{profile.email}</p>
+                  <p className="font-medium text-sm">{user?.email ?? ""}</p>
                 </div>
               </div>
             </ProfileSectionCard>
@@ -401,17 +539,24 @@ export default function ProfilePage() {
               icon={<FileText className="h-5 w-5 text-primary" />}
               hideEdit
             >
-              {profile.resume && (
-                <div className=" flex flex-row items-center justify-center gap-4 hover:bg-muted/50 transition-colors p-3 rounded-lg cursor-pointer">
-                  <div className=" bg-linear-to-br from-sky-400/20 to-cyan-500/20 flex items-center justify-center p-3 rounded-lg">
+              {displayResume && (
+                <div className="flex flex-row items-center justify-center gap-4 hover:bg-muted/50 transition-colors p-3 rounded-lg cursor-pointer">
+                  <div className="bg-linear-to-br from-sky-400/20 to-cyan-500/20 flex items-center justify-center p-3 rounded-lg">
                     <FileText className="h-4 w-4 text-primary" />
                   </div>
                   <p className="font-medium text-sm mb-1">
-                    {profile.resume.fileName}
+                    {displayResume.fileName}
                   </p>
-                  <button className="text-primary hover:underline text-xs ml-auto">
-                    <Download className="h-4 w-4 text-primary" />
-                  </button>
+                  {profile.resume_url && (
+                    <a
+                      href={profile.resume_url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="ml-auto"
+                    >
+                      <Download className="h-4 w-4 text-primary" />
+                    </a>
+                  )}
                 </div>
               )}
             </ProfileSectionCard>
@@ -424,18 +569,15 @@ export default function ProfilePage() {
         open={editPersonalInfoOpen}
         onOpenChange={setEditPersonalInfoOpen}
         initialData={{
-          firstName: profile.firstName,
-          lastName: profile.lastName,
-          email: profile.email,
-          phone: profile.phone,
+          phone: profile.phone_number,
           age: profile.age.toString(),
           gender: profile.gender as
             | "male"
             | "female"
             | "other"
             | "prefer-not-to-say",
-          location: "San Francisco, CA, USA",
-          desiredPosition: profile.desiredPosition,
+          location: profile.location,
+          desiredPosition: profile.desired_position,
         }}
         onSave={handleSavePersonalInfo}
       />
@@ -443,35 +585,62 @@ export default function ProfilePage() {
       <EditEducationDialog
         open={editEducationOpen}
         onOpenChange={setEditEducationOpen}
-        initialData={profile.education}
+        initialData={(profile.applicantEducations ?? []).map((edu) => ({
+          id: edu.id,
+          school: edu.institution_name,
+          field: edu.field_of_study,
+          fromYear: String(edu.start_year),
+          toYear: edu.end_year ? String(edu.end_year) : undefined,
+          currentlyEnrolled: !edu.end_year,
+        }))}
         onSave={handleSaveEducation}
       />
 
       <EditExperienceDialog
         open={editExperienceOpen}
         onOpenChange={setEditExperienceOpen}
-        initialData={profile.experiences}
+        initialData={(profile.applicantExperiences ?? []).map((exp) => ({
+          id: exp.id,
+          companyName: exp.company_name,
+          position: exp.position,
+          fromYear: String(new Date(exp.start_date).getFullYear()),
+          toYear: exp.end_date
+            ? String(new Date(exp.end_date).getFullYear())
+            : undefined,
+          currentlyWorking: exp.is_current,
+        }))}
         onSave={handleSaveExperience}
       />
 
       <EditResumeDialog
         open={editResumeOpen}
         onOpenChange={setEditResumeOpen}
-        initialData={profile.resume}
+        initialData={displayResume}
         onSave={handleSaveResume}
       />
 
       <EditSkillsDialog
         open={editSkillsOpen}
         onOpenChange={setEditSkillsOpen}
-        initialData={profile.skills}
+        initialData={(profile.applicantSkills ?? []).map((s) => ({
+          id: s.id,
+          skill_name: s.skill_name,
+        }))}
         onSave={handleSaveSkills}
       />
 
       <EditLanguagesDialog
         open={editLanguagesOpen}
         onOpenChange={setEditLanguagesOpen}
-        initialData={profile.languages}
+        initialData={(profile.applicantLanguages ?? []).map((lang) => ({
+          id: lang.id,
+          language: lang.language_name,
+          proficiency: lang.proficiency_level.toLowerCase() as
+            | "basic"
+            | "conversational"
+            | "fluent"
+            | "native",
+        }))}
         onSave={handleSaveLanguages}
       />
 

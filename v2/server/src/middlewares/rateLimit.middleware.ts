@@ -12,7 +12,7 @@ export const generalRateLimiter = rateLimit({
   skip: (req) =>
     req.method === 'GET' && PUBLIC_GET_SKIP_PATHS.some((path) => req.path.startsWith(path)),
   handler: (_req, _res, next) => {
-    next(new TooManyRequestsError('Too many requests, please try again later'));
+    next(new TooManyRequestsError('Too many requests, please try again laterss'));
   },
 });
 

@@ -1,5 +1,6 @@
 "use client";
 
+import { useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
@@ -14,11 +15,10 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import { applicantService } from "@/api/services/applicant.service";
+import { toast } from "sonner";
 
 const personalInfoSchema = z.object({
-  firstName: z.string().min(2, "First name must be at least 2 characters"),
-  lastName: z.string().min(2, "Last name must be at least 2 characters"),
-  email: z.string().email("Invalid email address"),
   phone: z.string().min(10, "Phone number must be at least 10 characters"),
   age: z.string().min(1, "Age is required"),
   gender: z.enum(["male", "female", "other", "prefer-not-to-say"]),
@@ -49,18 +49,38 @@ export function EditPersonalInfoDialog({
     formState: { errors, isSubmitting },
     setValue,
     watch,
+    reset,
   } = useForm<PersonalInfoFormData>({
     resolver: zodResolver(personalInfoSchema),
     defaultValues: initialData,
   });
 
+  useEffect(() => {
+    if (open) {
+      reset(initialData);
+    }
+  }, [open, initialData, reset]);
+
   // eslint-disable-next-line react-hooks/incompatible-library
   const gender = watch("gender");
 
   const onSubmit = async (data: PersonalInfoFormData) => {
-    await new Promise((resolve) => setTimeout(resolve, 500));
-    onSave(data);
-    onOpenChange(false);
+    try {
+      await applicantService.updateProfile({
+        phone_number: data.phone,
+        age: parseInt(data.age, 10),
+        gender: data.gender,
+        location: data.location,
+        desired_position: data.desiredPosition,
+      });
+      toast.success("Profile updated successfully");
+      onSave(data);
+      onOpenChange(false);
+    } catch (error) {
+      toast.error(
+        error instanceof Error ? error.message : "Failed to update profile",
+      );
+    }
   };
 
   return (
@@ -71,49 +91,6 @@ export function EditPersonalInfoDialog({
         </DialogHeader>
 
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
-          <div className="grid grid-cols-2 gap-4">
-            <div className="space-y-2">
-              <Label htmlFor="firstName">First Name</Label>
-              <Input
-                id="firstName"
-                {...register("firstName")}
-                className={errors.firstName ? "border-destructive" : ""}
-              />
-              {errors.firstName && (
-                <p className="text-sm text-destructive">
-                  {errors.firstName.message}
-                </p>
-              )}
-            </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="lastName">Last Name</Label>
-              <Input
-                id="lastName"
-                {...register("lastName")}
-                className={errors.lastName ? "border-destructive" : ""}
-              />
-              {errors.lastName && (
-                <p className="text-sm text-destructive">
-                  {errors.lastName.message}
-                </p>
-              )}
-            </div>
-          </div>
-
-          <div className="space-y-2">
-            <Label htmlFor="email">Email Address</Label>
-            <Input
-              id="email"
-              type="email"
-              {...register("email")}
-              className={errors.email ? "border-destructive" : ""}
-            />
-            {errors.email && (
-              <p className="text-sm text-destructive">{errors.email.message}</p>
-            )}
-          </div>
-
           <div className="space-y-2">
             <Label htmlFor="phone">Phone Number</Label>
             <Input
@@ -130,8 +107,12 @@ export function EditPersonalInfoDialog({
             <Label htmlFor="desiredPosition">Desired Position</Label>
             <Input
               id="desiredPosition"
-              placeholder="e.g. Senior Frontend Developer"
-              {...register("desiredPosition")}
+              placeholder="e.g. Senior-Frontend-Developer"
+              {...register("desiredPosition", {
+                onChange: (e) => {
+                  e.target.value = e.target.value.replace(/ /g, "-");
+                },
+              })}
               className={errors.desiredPosition ? "border-destructive" : ""}
             />
             {errors.desiredPosition && (

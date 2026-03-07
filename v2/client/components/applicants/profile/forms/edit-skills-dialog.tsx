@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import {
   Dialog,
   DialogContent,
@@ -11,13 +11,17 @@ import {
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { X, Plus } from "lucide-react";
+import { X, Plus, Loader2 } from "lucide-react";
+import { applicantService } from "@/api/services/applicant.service";
+import { toast } from "sonner";
+
+export type SkillItem = { id?: string; skill_name: string };
 
 interface EditSkillsDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  initialData: string[];
-  onSave: (skills: string[]) => void;
+  initialData: SkillItem[];
+  onSave: (skills: SkillItem[]) => void;
 }
 
 export function EditSkillsDialog({
@@ -26,12 +30,25 @@ export function EditSkillsDialog({
   initialData,
   onSave,
 }: EditSkillsDialogProps) {
-  const [skills, setSkills] = useState<string[]>(initialData);
+  const [skills, setSkills] = useState<SkillItem[]>(initialData);
   const [newSkill, setNewSkill] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  useEffect(() => {
+    if (open) {
+      setSkills(initialData);
+      setNewSkill("");
+    }
+  }, [open, initialData]);
 
   const addSkill = () => {
-    if (newSkill.trim() && !skills.includes(newSkill.trim())) {
-      setSkills([...skills, newSkill.trim()]);
+    if (
+      newSkill.trim() &&
+      !skills.some(
+        (s) => s.skill_name.toLowerCase() === newSkill.trim().toLowerCase(),
+      )
+    ) {
+      setSkills([...skills, { skill_name: newSkill.trim() }]);
       setNewSkill("");
     }
   };
@@ -47,9 +64,38 @@ export function EditSkillsDialog({
     }
   };
 
-  const handleSave = () => {
-    onSave(skills);
-    onOpenChange(false);
+  const handleSave = async () => {
+    try {
+      setIsSubmitting(true);
+      const currentIds = skills.map((s) => s.id).filter(Boolean);
+      const originalIds = initialData.map((s) => s.id).filter(Boolean);
+      const toDelete = originalIds.filter((id) => !currentIds.includes(id));
+
+      for (const id of toDelete) {
+        if (id) await applicantService.deleteSkill(id);
+      }
+
+      const toAdd = skills.filter((s) => !s.id).map((s) => s.skill_name);
+      let finalSkills = skills.filter((s) => s.id);
+
+      if (toAdd.length > 0) {
+        const newApiSkills = await applicantService.addSkills(toAdd);
+        finalSkills = newApiSkills.map((s) => ({
+          id: s.id,
+          skill_name: s.skill_name,
+        }));
+      }
+
+      toast.success("Skills updated successfully");
+      onSave(finalSkills);
+      onOpenChange(false);
+    } catch (error) {
+      toast.error(
+        error instanceof Error ? error.message : "Failed to update skills",
+      );
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   const handleCancel = () => {
@@ -92,7 +138,7 @@ export function EditSkillsDialog({
                     key={index}
                     className="inline-flex items-center gap-1 px-3 py-1.5 bg-primary/10 text-primary rounded-full text-sm font-medium"
                   >
-                    {skill}
+                    {skill.skill_name}
                     <button
                       type="button"
                       onClick={() => removeSkill(index)}
@@ -111,8 +157,11 @@ export function EditSkillsDialog({
           <Button type="button" variant="outline" onClick={handleCancel}>
             Cancel
           </Button>
-          <Button type="button" onClick={handleSave}>
-            Save Changes
+          <Button type="button" onClick={handleSave} disabled={isSubmitting}>
+            {isSubmitting ? (
+              <Loader2 className="h-4 w-4 animate-spin mr-2" />
+            ) : null}
+            {isSubmitting ? "Saving..." : "Save Changes"}
           </Button>
         </DialogFooter>
       </DialogContent>

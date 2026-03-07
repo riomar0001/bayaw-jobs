@@ -1,45 +1,58 @@
 import { Card, CardContent } from "@/components/ui/card";
-import type { CandidateApplication as Application } from "@/data";
+import { Skeleton } from "@/components/ui/skeleton";
+import type { ApplicationStats } from "@/api/types";
 
 interface ApplicationStatsProps {
-  applications: Application[];
+  stats: ApplicationStats | null;
+  isLoading?: boolean;
 }
 
-export function ApplicationStats({ applications }: ApplicationStatsProps) {
+export function ApplicationStats({ stats, isLoading }: ApplicationStatsProps) {
+  if (isLoading || !stats) {
+    return (
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+        {Array.from({ length: 4 }).map((_, i) => (
+          <Card key={i}>
+            <CardContent className="p-4 space-y-2">
+              <Skeleton className="h-8 w-12" />
+              <Skeleton className="h-4 w-24" />
+            </CardContent>
+          </Card>
+        ))}
+      </div>
+    );
+  }
+
   return (
-    <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
+    <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
       <Card>
         <CardContent className="p-4">
-          <div className="text-2xl font-bold text-primary">
-            {applications.length}
-          </div>
-          <div className="text-sm text-muted-foreground">
-            Total Applications
-          </div>
+          <div className="text-2xl font-bold text-primary">{stats.total}</div>
+          <div className="text-sm text-muted-foreground">Total</div>
         </CardContent>
       </Card>
       <Card>
         <CardContent className="p-4">
           <div className="text-2xl font-bold text-blue-600">
-            {applications.filter((a) => a.status === "reviewing").length}
+            {stats.SCREENING + stats.INTERVIEW}
           </div>
-          <div className="text-sm text-muted-foreground">Under Review</div>
+          <div className="text-sm text-muted-foreground">In Progress</div>
         </CardContent>
       </Card>
       <Card>
         <CardContent className="p-4">
           <div className="text-2xl font-bold text-green-600">
-            {applications.filter((a) => a.status === "interview").length}
+            {stats.OFFER + stats.HIRED}
           </div>
-          <div className="text-sm text-muted-foreground">Interview Stage</div>
+          <div className="text-sm text-muted-foreground">Offers / Hired</div>
         </CardContent>
       </Card>
       <Card>
         <CardContent className="p-4">
-          <div className="text-2xl font-bold text-gray-600">
-            {applications.filter((a) => a.status === "pending").length}
+          <div className="text-2xl font-bold text-red-500">
+            {stats.REJECTED}
           </div>
-          <div className="text-sm text-muted-foreground">Pending</div>
+          <div className="text-sm text-muted-foreground">Rejected</div>
         </CardContent>
       </Card>
     </div>

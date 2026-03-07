@@ -2127,6 +2127,12 @@ const applicationItem = {
         location: { type: 'string', example: 'Cebu City, Philippines' },
         employment_type: { type: 'string', example: 'Full-time' },
         company_id: { type: 'string', format: 'uuid' },
+        company_information: {
+          type: 'object',
+          properties: {
+            company_name: { type: 'string', example: 'Acme Corp' },
+          },
+        },
       },
     },
   },

@@ -59,6 +59,7 @@ export interface User {
   created_at?: string;
   applicant_profile_id?: string;
   company_id?: string;
+  profile_picture_url?: string;
 }
 
 export interface RegisterInput {
@@ -192,16 +193,18 @@ export interface Resume {
 export interface ApplicantProfile {
   id: string;
   user_id: string;
-  first_name: string;
-  last_name: string;
-  email: string;
+  first_name?: string;
+  last_name?: string;
+  email?: string;
   age: number;
   gender: string;
   desired_position: string;
   location: string;
+  phone_number: string;
   profile_picture: string | null;
   profile_picture_url: string | null;
   career_status?: CareerStatus | null;
+  resume_url?: string | null;
   created_at: string;
   updated_at: string;
   applicantEducations?: Education[];
@@ -244,6 +247,7 @@ export interface UpdateProfileInput {
   age?: number;
   location?: string;
   gender?: string;
+  phone_number?: string;
 }
 
 export interface AddEducationInput {
@@ -289,6 +293,9 @@ export interface ActiveApplication {
     location: string;
     employment_type: EmploymentType;
     company_id: string;
+    company_information: {
+      company_name: string;
+    };
   };
 }
 

@@ -17,8 +17,11 @@ import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Card, CardContent } from "@/components/ui/card";
 import { Plus, Trash2 } from "lucide-react";
+import { applicantService } from "@/api/services/applicant.service";
+import { toast } from "sonner";
 
 const experienceItemSchema = z.object({
+  id: z.string().optional(),
   companyName: z.string().min(2, "Company name is required"),
   position: z.string().min(2, "Position is required"),
   fromYear: z.string().min(4, "From year is required"),
@@ -48,7 +51,39 @@ export function EditExperienceDialog({
   initialData,
   onSave,
 }: EditExperienceDialogProps) {
-  const [experiences, setExperiences] = useState<ExperienceItem[]>(initialData);
+  const [experiences, setExperiences] = useState<ExperienceItem[]>(
+    initialData.length > 0
+      ? initialData
+      : [
+          {
+            companyName: "",
+            position: "",
+            fromYear: "",
+            toYear: "",
+            currentlyWorking: false,
+          },
+        ],
+  );
+
+  const [prevOpen, setPrevOpen] = useState(false);
+  if (open !== prevOpen) {
+    setPrevOpen(open);
+    if (open) {
+      setExperiences(
+        initialData.length > 0
+          ? initialData
+          : [
+              {
+                companyName: "",
+                position: "",
+                fromYear: "",
+                toYear: "",
+                currentlyWorking: false,
+              },
+            ],
+      );
+    }
+  }
 
   const {
     handleSubmit,
@@ -88,9 +123,49 @@ export function EditExperienceDialog({
   };
 
   const onSubmit = async () => {
-    await new Promise((resolve) => setTimeout(resolve, 500));
-    onSave(experiences);
-    onOpenChange(false);
+    try {
+      const currentIds = experiences.map((e) => e.id).filter(Boolean);
+      const originalIds = initialData.map((e) => e.id).filter(Boolean);
+
+      const toDelete = originalIds.filter((id) => !currentIds.includes(id));
+
+      // Perform deletions
+      for (const id of toDelete) {
+        if (id) await applicantService.deleteExperience(id);
+      }
+
+      const newSavedExperiences: ExperienceItem[] = [];
+      for (const exp of experiences) {
+        const payload = {
+          company_name: exp.companyName,
+          position: exp.position,
+          start_date: `${exp.fromYear}-01-01`,
+          is_current: exp.currentlyWorking,
+          ...(exp.currentlyWorking
+            ? {}
+            : { end_date: exp.toYear ? `${exp.toYear}-12-31` : undefined }),
+        };
+
+        // Ensure strictly boolean or undefined/null for fields that might have them but AddExperienceInput does not care
+        // Wait, AddExperienceInput expects optional end_date as Date or string
+
+        if (exp.id) {
+          const res = await applicantService.updateExperience(exp.id, payload);
+          newSavedExperiences.push({ ...exp, id: res.id });
+        } else {
+          const res = await applicantService.addExperience(payload);
+          newSavedExperiences.push({ ...exp, id: res.id });
+        }
+      }
+
+      toast.success("Work experience updated successfully");
+      onSave(newSavedExperiences);
+      onOpenChange(false);
+    } catch (error) {
+      toast.error(
+        error instanceof Error ? error.message : "Failed to update experience",
+      );
+    }
   };
 
   return (

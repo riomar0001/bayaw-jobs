@@ -46,7 +46,7 @@ export class ApplicantRepository {
   async findProfileIdByUserId(user_id: string) {
     return prisma.applicant_profile.findFirst({
       where: { user_id },
-      select: { id: true },
+      select: { id: true, profile_picture: true },
     });
   }
 
@@ -254,6 +254,11 @@ export class ApplicantRepository {
             location: true,
             employment_type: true,
             company_id: true,
+            company_information: {
+              select: {
+                company_name: true,
+              },
+            },
           },
         },
       },

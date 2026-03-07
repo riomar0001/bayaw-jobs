@@ -327,14 +327,21 @@ export class AuthService {
 
   private async getProfileIds(
     userId: string
-  ): Promise<{ applicant_profile_id?: string; company_id?: string }> {
+  ): Promise<{ applicant_profile_id?: string; company_id?: string; profile_picture_url?: string }> {
     const [applicantProfile, companyAdmin] = await Promise.all([
       applicantRepository.findProfileIdByUserId(userId),
       companyRepository.findCompanyIdByAdminUserId(userId),
     ]);
+
+    // Fallback URL if env is missing
+    const baseUrl = process.env.APP_URL || 'http://localhost:4000/api';
+
     return {
       ...(applicantProfile ? { applicant_profile_id: applicantProfile.id } : {}),
       ...(companyAdmin ? { company_id: companyAdmin.company_id } : {}),
+      ...(applicantProfile?.profile_picture
+        ? { profile_picture_url: `${baseUrl}/applicants/profile/picture/${applicantProfile.id}` }
+        : {}),
     };
   }
 

@@ -52,6 +52,9 @@ export const useAuthStore = create<AuthState>()(
               is_verified: existing.is_verified,
             }),
             ...(existing?.created_at && { created_at: existing.created_at }),
+            ...(existing?.profile_picture_url && {
+              profile_picture_url: existing.profile_picture_url,
+            }),
           } as User,
           isAuthenticated: true,
         });
