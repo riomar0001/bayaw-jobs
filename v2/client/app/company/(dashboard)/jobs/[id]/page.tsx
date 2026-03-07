@@ -1,43 +1,138 @@
-"use client";
+'use client';
 
-import { use } from "react";
-import Link from "next/link";
-import { notFound } from "next/navigation";
-import { Pencil, MapPin, Building2, Clock, DollarSign } from "lucide-react";
-import { PageHeader } from "@/components/company/dashboard/layout/page-header";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { Separator } from "@/components/ui/separator";
-import { JobStatusBadge } from "@/components/company/dashboard/jobs/job-status-badge";
-import { JobApplicantsTable } from "@/components/company/dashboard/jobs/job-applicants-table";
-import { getJobById, getApplicationsByJobId, mockCandidates } from "@/data";
-import { formatSalaryRange } from "@/lib/formatters";
+import { use, useEffect, useState, useCallback } from 'react';
+import Link from 'next/link';
+import { Pencil, MapPin, Building2, Clock, DollarSign } from 'lucide-react';
+import { PageHeader } from '@/components/company/dashboard/layout/page-header';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
+import { Separator } from '@/components/ui/separator';
+import { Skeleton } from '@/components/ui/skeleton';
+import { JobStatusBadge } from '@/components/company/dashboard/jobs/job-status-badge';
+import { JobApplicantsTable } from '@/components/company/dashboard/jobs/job-applicants-table';
+import { ErrorAlert } from '@/components/common/error-alert';
+import { jobsService } from '@/api/services/jobs.service';
+import { businessService } from '@/api/services/business.service';
+import { JobWithApplicants, ApplicationStatus } from '@/api/types';
+import { formatSalaryRange } from '@/lib/formatters';
+import { toast } from 'sonner';
 
 interface JobDetailPageProps {
   params: Promise<{ id: string }>;
 }
 
+function JobDetailSkeleton() {
+  return (
+    <div className="flex flex-1 flex-col gap-6 p-6">
+      <Card>
+        <CardHeader>
+          <Skeleton className="h-8 w-64" />
+        </CardHeader>
+        <CardContent className="space-y-6">
+          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+            {[1, 2, 3, 4].map((i) => (
+              <Skeleton key={i} className="h-12 w-full" />
+            ))}
+          </div>
+          <Skeleton className="h-px w-full" />
+          <Skeleton className="h-32 w-full" />
+          <Skeleton className="h-24 w-full" />
+          <Skeleton className="h-24 w-full" />
+        </CardContent>
+      </Card>
+    </div>
+  );
+}
+
 export default function JobDetailPage({ params }: JobDetailPageProps) {
   const { id } = use(params);
-  const job = getJobById(id);
+  const [job, setJob] = useState<JobWithApplicants | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
-  if (!job) {
-    notFound();
+  const fetchJob = async () => {
+    try {
+      setIsLoading(true);
+      setError(null);
+      const result = await jobsService.getCompanyJob(id);
+      setJob(result);
+    } catch (err) {
+      const errorMsg = err instanceof Error ? err.message : 'Failed to load job details';
+      setError(errorMsg);
+      console.error('[JobDetailPage]', err);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    void fetchJob();
+  }, [id]);
+
+  const handleStatusUpdate = useCallback(
+    async (applicationId: string, status: ApplicationStatus) => {
+      try {
+        await businessService.updateApplicationStatus(applicationId, status);
+        setJob((prev) => {
+          if (!prev) return prev;
+          return {
+            ...prev,
+            applicant_applied_job: prev.applicant_applied_job.map((app) =>
+              app.id === applicationId ? { ...app, status } : app,
+            ),
+          };
+        });
+        toast.success(`Application status updated to ${status}`);
+      } catch (err) {
+        const message = err instanceof Error ? err.message : 'Failed to update status';
+        toast.error(message);
+      }
+    },
+    [],
+  );
+
+  if (isLoading) {
+    return (
+      <>
+        <PageHeader
+          title="Loading..."
+          breadcrumbs={[
+            { label: 'Dashboard', href: '/company' },
+            { label: 'Jobs', href: '/company/jobs' },
+            { label: '...' },
+          ]}
+        />
+        <JobDetailSkeleton />
+      </>
+    );
   }
 
-  const applications = getApplicationsByJobId(id).map((app) => ({
-    ...app,
-    candidate: mockCandidates.find((c) => c.id === app.candidateId),
-  }));
+  if (error || !job) {
+    return (
+      <>
+        <PageHeader
+          title="Job Not Found"
+          breadcrumbs={[
+            { label: 'Dashboard', href: '/company' },
+            { label: 'Jobs', href: '/company/jobs' },
+            { label: 'Error' },
+          ]}
+        />
+        <div className="p-6">
+          <ErrorAlert message={error ?? 'Job not found'} onRetry={fetchJob} />
+        </div>
+      </>
+    );
+  }
 
   return (
     <>
       <PageHeader
         title={job.title}
         breadcrumbs={[
-          { label: "Dashboard", href: "/company" },
-          { label: "Jobs", href: "/company/jobs" },
+          { label: 'Dashboard', href: '/company' },
+          { label: 'Jobs', href: '/company/jobs' },
           { label: job.title },
         ]}
       />
@@ -81,7 +176,7 @@ export default function JobDetailPage({ params }: JobDetailPageProps) {
                   <div>
                     <p className="text-xs text-muted-foreground">Type</p>
                     <p className="text-sm font-medium">
-                      {job.employmentType} • {job.locationType}
+                      {job.employment_type} • {job.location_type}
                     </p>
                   </div>
                 </div>
@@ -91,9 +186,9 @@ export default function JobDetailPage({ params }: JobDetailPageProps) {
                     <p className="text-xs text-muted-foreground">Salary</p>
                     <p className="text-sm font-medium">
                       {formatSalaryRange(
-                        job.salaryRange.min,
-                        job.salaryRange.max,
-                        job.salaryRange.currency,
+                        Number(job.minimum_salary),
+                        Number(job.maximum_salary),
+                        job.currency,
                       )}
                     </p>
                   </div>
@@ -105,9 +200,7 @@ export default function JobDetailPage({ params }: JobDetailPageProps) {
               {/* Description */}
               <div>
                 <h3 className="mb-2 font-semibold">Description</h3>
-                <p className="text-sm text-muted-foreground">
-                  {job.description}
-                </p>
+                <p className="text-sm text-muted-foreground">{job.description}</p>
               </div>
 
               {/* Responsibilities */}
@@ -124,7 +217,7 @@ export default function JobDetailPage({ params }: JobDetailPageProps) {
               <div>
                 <h3 className="mb-2 font-semibold">Requirements</h3>
                 <ul className="list-inside list-disc space-y-1 text-sm text-muted-foreground">
-                  {job.requirements.map((req, i) => (
+                  {job.qualifications.map((req, i) => (
                     <li key={i}>{req}</li>
                   ))}
                 </ul>
@@ -147,10 +240,13 @@ export default function JobDetailPage({ params }: JobDetailPageProps) {
           {/* Applicants Tab */}
           <Card>
             <CardHeader>
-              <CardTitle>Applicants ({applications.length})</CardTitle>
+              <CardTitle>Applicants ({job.applicant_applied_job.length})</CardTitle>
             </CardHeader>
             <CardContent>
-              <JobApplicantsTable applications={applications} />
+              <JobApplicantsTable
+                applications={job.applicant_applied_job}
+                onStatusUpdate={handleStatusUpdate}
+              />
             </CardContent>
           </Card>
         </div>

@@ -1,9 +1,10 @@
-import { apiClient } from "../client";
+import { apiClient } from '../client';
 import {
   AddAdminInput,
   AddLocationInput,
   ApiResponse,
   ApplicantStats,
+  ApplicationStatus,
   BusinessApplicantDetail,
   BusinessOnboardingInput,
   CompanyAdmin,
@@ -23,14 +24,13 @@ import {
   UpdateContactInput,
   UpdateSocialsInput,
   unwrapResponse,
-} from "../types";
+} from '../types';
 
 class BusinessService {
   // ── Public ───────────────────────────────────────────────────────────────────
 
   async getTopCompanies(): Promise<CompanySummary[]> {
-    const res =
-      await apiClient.get<ApiResponse<CompanySummary[]>>("/business/top");
+    const res = await apiClient.get<ApiResponse<CompanySummary[]>>('/business/top');
     return unwrapResponse(res.data);
   }
 
@@ -51,28 +51,21 @@ class BusinessService {
         industries: string[];
         meta: PaginationMeta;
       }>
-    >("/business", {
+    >('/business', {
       params,
     });
     return unwrapResponse(res.data);
   }
 
   async getPublicCompany(id: string): Promise<PublicCompany> {
-    const res = await apiClient.get<ApiResponse<PublicCompany>>(
-      `/business/${id}/public`,
-    );
+    const res = await apiClient.get<ApiResponse<PublicCompany>>(`/business/${id}/public`);
     return unwrapResponse(res.data);
   }
 
   // ── Onboarding ───────────────────────────────────────────────────────────────
 
-  async completeOnboarding(
-    data: BusinessOnboardingInput,
-  ): Promise<CompanyInfo> {
-    const res = await apiClient.post<ApiResponse<CompanyInfo>>(
-      "/business/onboarding",
-      data,
-    );
+  async completeOnboarding(data: BusinessOnboardingInput): Promise<CompanyInfo> {
+    const res = await apiClient.post<ApiResponse<CompanyInfo>>('/business/onboarding', data);
     return unwrapResponse(res.data);
   }
 
@@ -80,65 +73,49 @@ class BusinessService {
 
   async updateLogo(file: File): Promise<{ logo: string; url: string }> {
     const form = new FormData();
-    form.append("logo", file);
-    const res = await apiClient.upload<
-      ApiResponse<{ logo: string; url: string }>
-    >("/business/logo", form);
+    form.append('logo', file);
+    const res = await apiClient.upload<ApiResponse<{ logo: string; url: string }>>(
+      '/business/logo',
+      form,
+    );
     return unwrapResponse(res.data);
   }
 
   /** Returns the URL to fetch the company logo */
   getLogoUrl(companyId: string): string {
-    return `${process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:5090"}/business/logo/${companyId}`;
+    return `${process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:5090'}/business/logo/${companyId}`;
   }
 
   // ── Company Info ─────────────────────────────────────────────────────────────
 
   async getInfo(): Promise<CompanyInfo> {
-    const res = await apiClient.get<ApiResponse<CompanyInfo>>("/business/info");
+    const res = await apiClient.get<ApiResponse<CompanyInfo>>('/business/info');
     return unwrapResponse(res.data);
   }
 
-  async updateInfo(
-    data: UpdateCompanyInfoInput,
-  ): Promise<Partial<CompanyInfo>> {
-    const res = await apiClient.patch<ApiResponse<Partial<CompanyInfo>>>(
-      "/business/info",
-      data,
-    );
+  async updateInfo(data: UpdateCompanyInfoInput): Promise<Partial<CompanyInfo>> {
+    const res = await apiClient.patch<ApiResponse<Partial<CompanyInfo>>>('/business/info', data);
     return unwrapResponse(res.data);
   }
 
   async updateSocials(data: UpdateSocialsInput): Promise<CompanySocial[]> {
-    const res = await apiClient.patch<ApiResponse<CompanySocial[]>>(
-      "/business/socials",
-      data,
-    );
+    const res = await apiClient.patch<ApiResponse<CompanySocial[]>>('/business/socials', data);
     return unwrapResponse(res.data);
   }
 
   async updateContact(data: UpdateContactInput): Promise<CompanyContact> {
-    const res = await apiClient.patch<ApiResponse<CompanyContact>>(
-      "/business/contact",
-      data,
-    );
+    const res = await apiClient.patch<ApiResponse<CompanyContact>>('/business/contact', data);
     return unwrapResponse(res.data);
   }
 
   // ── Locations ─────────────────────────────────────────────────────────────────
 
   async addLocation(data: AddLocationInput): Promise<CompanyLocation> {
-    const res = await apiClient.post<ApiResponse<CompanyLocation>>(
-      "/business/locations",
-      data,
-    );
+    const res = await apiClient.post<ApiResponse<CompanyLocation>>('/business/locations', data);
     return unwrapResponse(res.data);
   }
 
-  async updateLocation(
-    id: string,
-    data: AddLocationInput,
-  ): Promise<CompanyLocation> {
+  async updateLocation(id: string, data: AddLocationInput): Promise<CompanyLocation> {
     const res = await apiClient.patch<ApiResponse<CompanyLocation>>(
       `/business/locations/${id}`,
       data,
@@ -155,16 +132,13 @@ class BusinessService {
   async getAdmins(): Promise<{ admins: CompanyAdmin[]; my_rights: CompanyAdmin | null }> {
     const res =
       await apiClient.get<ApiResponse<{ admins: CompanyAdmin[]; my_rights: CompanyAdmin | null }>>(
-        "/business/admins",
+        '/business/admins',
       );
     return unwrapResponse(res.data);
   }
 
   async addAdmin(data: AddAdminInput): Promise<CompanyAdmin> {
-    const res = await apiClient.post<ApiResponse<CompanyAdmin>>(
-      "/business/admins",
-      data,
-    );
+    const res = await apiClient.post<ApiResponse<CompanyAdmin>>('/business/admins', data);
     return unwrapResponse(res.data);
   }
 
@@ -172,49 +146,40 @@ class BusinessService {
     await apiClient.delete<ApiResponse<null>>(`/business/admins/${id}`);
   }
 
-  async updateAdminProfilePicture(
-    file: File,
-  ): Promise<{ profile_picture: string; url: string }> {
+  async updateAdminProfilePicture(file: File): Promise<{ profile_picture: string; url: string }> {
     const form = new FormData();
-    form.append("profile_picture", file);
-    const res = await apiClient.upload<
-      ApiResponse<{ profile_picture: string; url: string }>
-    >("/business/admins/profile-picture", form);
+    form.append('picture', file);
+    const res = await apiClient.upload<ApiResponse<{ profile_picture: string; url: string }>>(
+      '/business/admins/profile-picture',
+      form,
+    );
     return unwrapResponse(res.data);
   }
 
   getAdminProfilePictureUrl(userId: string): string {
-    return `${process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:5090"}/business/admins/profile-picture/${userId}`;
+    return `${process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:5090'}/business/admins/profile-picture/${userId}`;
   }
 
   // ── Dashboard & Stats ────────────────────────────────────────────────────────
 
   async getDashboard(): Promise<DashboardData> {
-    const res = await apiClient.get<ApiResponse<DashboardData>>(
-      "/business/dashboard",
-    );
+    const res = await apiClient.get<ApiResponse<DashboardData>>('/business/dashboard');
     return unwrapResponse(res.data);
   }
 
   async getJobStats(): Promise<JobStats> {
-    const res = await apiClient.get<ApiResponse<JobStats>>(
-      "/business/stats/jobs",
-    );
+    const res = await apiClient.get<ApiResponse<JobStats>>('/business/stats/jobs');
     return unwrapResponse(res.data);
   }
 
   async getApplicantStats(): Promise<ApplicantStats> {
-    const res = await apiClient.get<ApiResponse<ApplicantStats>>(
-      "/business/stats/applicants",
-    );
+    const res = await apiClient.get<ApiResponse<ApplicantStats>>('/business/stats/applicants');
     return unwrapResponse(res.data);
   }
 
   // ── Applicants ───────────────────────────────────────────────────────────────
 
-  async getApplicantByApplicationId(
-    applicationId: string,
-  ): Promise<BusinessApplicantDetail> {
+  async getApplicantByApplicationId(applicationId: string): Promise<BusinessApplicantDetail> {
     const res = await apiClient.get<ApiResponse<BusinessApplicantDetail>>(
       `/business/applicants/${applicationId}`,
     );
@@ -228,8 +193,19 @@ class BusinessService {
     jobId?: string;
   }): Promise<PaginatedResponse<CompanyJob>> {
     const res = await apiClient.get<ApiResponse<PaginatedResponse<CompanyJob>>>(
-      "/jobs/company/applicants",
+      '/jobs/company/applicants',
       { params },
+    );
+    return unwrapResponse(res.data);
+  }
+
+  async updateApplicationStatus(
+    applicationId: string,
+    status: ApplicationStatus,
+  ): Promise<{ id: string; status: ApplicationStatus }> {
+    const res = await apiClient.patch<ApiResponse<{ id: string; status: ApplicationStatus }>>(
+      `/business/applicants/${applicationId}/status`,
+      { status },
     );
     return unwrapResponse(res.data);
   }

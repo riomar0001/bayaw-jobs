@@ -1,28 +1,28 @@
-"use client";
+'use client';
 
-import { ColumnDef } from "@tanstack/react-table";
-import { Job } from "@/types/job";
-import { JobStatusBadge } from "./job-status-badge";
-import { formatDistanceToNow } from "@/lib/formatters";
-import { Users, MoreHorizontal, Eye, Trash2, ArrowUpDown } from "lucide-react";
-import Link from "next/link";
-import { Button } from "@/components/ui/button";
+import { ColumnDef } from '@tanstack/react-table';
+import { CompanyJob } from '@/api/types';
+import { JobStatusBadge } from './job-status-badge';
+import { formatDistanceToNow } from '@/lib/formatters';
+import { Users, MoreHorizontal, Eye, Trash2, ArrowUpDown } from 'lucide-react';
+import Link from 'next/link';
+import { Button } from '@/components/ui/button';
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
+} from '@/components/ui/dropdown-menu';
 
-export const columns: ColumnDef<Job>[] = [
+export const columns: ColumnDef<CompanyJob>[] = [
   {
-    accessorKey: "title",
+    accessorKey: 'title',
     header: ({ column }) => {
       return (
         <Button
           variant="ghost"
-          onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+          onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
         >
           Job Title
           <ArrowUpDown className="ml-2 h-4 w-4" />
@@ -32,51 +32,38 @@ export const columns: ColumnDef<Job>[] = [
     cell: ({ row }) => {
       const job = row.original;
       return (
-        <Link
-          href={`/company/jobs/${job.id}`}
-          className="font-medium hover:underline px-4"
-        >
+        <Link href={`/company/jobs/${job.id}`} className="font-medium hover:underline px-4">
           {job.title}
         </Link>
       );
     },
   },
   {
-    accessorKey: "department",
-    header: "Department",
+    accessorKey: 'department',
+    header: 'Department',
     cell: ({ row }) => {
-      return (
-        <div className="text-muted-foreground">
-          {row.getValue("department")}
-        </div>
-      );
+      return <div className="text-muted-foreground">{row.getValue('department')}</div>;
     },
   },
   {
-    accessorKey: "location",
-    header: "Location",
+    accessorKey: 'location',
+    header: 'Location',
     cell: ({ row }) => {
-      return (
-        <div className="text-muted-foreground">{row.getValue("location")}</div>
-      );
+      return <div className="text-muted-foreground">{row.getValue('location')}</div>;
     },
   },
   {
-    accessorKey: "employmentType",
-    header: "Type",
+    accessorKey: 'employment_type',
+    header: 'Type',
     cell: ({ row }) => {
-      return (
-        <div className="text-muted-foreground">
-          {row.getValue("employmentType")}
-        </div>
-      );
+      return <div className="text-muted-foreground">{row.getValue('employment_type')}</div>;
     },
   },
   {
-    accessorKey: "applicantCount",
+    accessorKey: 'applicant_count',
     header: () => <div className="text-center">Applicants</div>,
     cell: ({ row }) => {
-      const count = parseFloat(row.getValue("applicantCount"));
+      const count = parseFloat(row.getValue('applicant_count'));
       return (
         <div className="flex items-center justify-center gap-1">
           <Users className="size-4 text-muted-foreground" />
@@ -86,19 +73,19 @@ export const columns: ColumnDef<Job>[] = [
     },
   },
   {
-    accessorKey: "status",
-    header: "Status",
+    accessorKey: 'status',
+    header: 'Status',
     cell: ({ row }) => {
-      return <JobStatusBadge status={row.getValue("status")} />;
+      return <JobStatusBadge status={row.getValue('status')} />;
     },
   },
   {
-    accessorKey: "createdAt",
+    accessorKey: 'created_at',
     header: ({ column }) => {
       return (
         <Button
           variant="ghost"
-          onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+          onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
         >
           Posted
           <ArrowUpDown className="ml-2 h-4 w-4" />
@@ -108,13 +95,13 @@ export const columns: ColumnDef<Job>[] = [
     cell: ({ row }) => {
       return (
         <div className="text-muted-foreground px-4">
-          {formatDistanceToNow(row.getValue("createdAt"))}
+          {formatDistanceToNow(row.getValue('created_at'))}
         </div>
       );
     },
   },
   {
-    id: "actions",
+    id: 'actions',
     cell: ({ row }) => {
       const job = row.original;
 

@@ -141,4 +141,16 @@ export const deleteAdminSchema = z.object({
   }),
 });
 
+export const updateApplicationStatusSchema = z.object({
+  params: z.object({
+    id: z.string().uuid('Application ID must be a valid UUID'),
+  }),
+  body: z.object({
+    status: z.enum(['NEW', 'SCREENING', 'INTERVIEW', 'OFFER', 'HIRED', 'REJECTED', 'CANCELLED'], {
+      error: 'Invalid application status',
+    }),
+  }),
+});
+
 export type AddAdminInput = z.infer<typeof addAdminSchema>['body'];
+export type UpdateApplicationStatusInput = z.infer<typeof updateApplicationStatusSchema>['body'];

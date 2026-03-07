@@ -1,12 +1,12 @@
-"use client";
+'use client';
 
-import { useState } from "react";
-import { useRouter } from "next/navigation";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { useForm } from "react-hook-form";
-import * as z from "zod";
-import { CURRENCIES } from "@/constants/currencies";
-import { Button } from "@/components/ui/button";
+import { useState, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { useForm } from 'react-hook-form';
+import * as z from 'zod';
+import { CURRENCIES } from '@/constants/currencies';
+import { Button } from '@/components/ui/button';
 import {
   Form,
   FormControl,
@@ -15,17 +15,17 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-} from "@/components/ui/form";
-import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
+} from '@/components/ui/form';
+import { Input } from '@/components/ui/input';
+import { Textarea } from '@/components/ui/textarea';
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/select";
-import { Card, CardContent } from "@/components/ui/card";
+} from '@/components/ui/select';
+import { Card, CardContent } from '@/components/ui/card';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -33,44 +33,40 @@ import {
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-import { Job, EmploymentType, LocationType, JobStatus } from "@/types/job";
-import { ChevronDown, Loader2 } from "lucide-react";
+} from '@/components/ui/dropdown-menu';
+import { Job, JobStatus, EmploymentType, LocationType } from '@/api/types';
+import { jobsService } from '@/api/services/jobs.service';
+import { toast } from 'sonner';
+import { ChevronDown, Loader2 } from 'lucide-react';
+
 export const jobFormSchema = z.object({
-  title: z.string(),
-  department: z.string(),
-  location: z.string(),
-  locationType: z.enum(["Remote", "Onsite", "Hybrid"]),
-  employmentType: z.enum([
-    "Fulltime",
-    "Part-time",
-    "Contract",
-    "Freelance",
-    "Internship",
-  ]),
-  salaryMin: z.number(),
-  salaryMax: z.number(),
+  title: z.string().min(1, 'Job title is required'),
+  department: z.string().min(1, 'Department is required'),
+  location: z.string().min(1, 'Location is required'),
+  location_type: z.enum(['ONSITE', 'REMOTE', 'HYBRID']),
+  employment_type: z.enum(['FULL_TIME', 'PART_TIME', 'CONTRACT', 'FREELANCE', 'INTERN']),
+  minimum_salary: z.string(),
+  maximum_salary: z.string(),
   currency: z.string(),
-  description: z.string(),
+  description: z.string().min(1, 'Description is required'),
   responsibilities: z.string(),
-  requirements: z.string(),
+  qualifications: z.string(),
   benefits: z.string().optional(),
-  status: z.enum(["Draft", "Active", "Paused", "Closed"]),
+  status: z.enum(['OPEN', 'PAUSED', 'CLOSED']),
 });
 
 type JobFormValues = z.infer<typeof jobFormSchema>;
 
 interface JobFormProps {
   job?: Job;
-  mode: "create" | "edit";
+  mode: 'create' | 'edit';
+  onSuccess?: () => void | Promise<void>;
 }
 
-export function JobForm({ job, mode }: JobFormProps) {
+export function JobForm({ job, mode, onSuccess }: JobFormProps) {
   const router = useRouter();
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [pendingAction, setPendingAction] = useState<"publish" | "draft">(
-    "publish",
-  );
+  const [pendingAction, setPendingAction] = useState<'publish' | 'draft'>('publish');
 
   const form = useForm<JobFormValues>({
     resolver: zodResolver(jobFormSchema),
@@ -79,41 +75,78 @@ export function JobForm({ job, mode }: JobFormProps) {
           title: job.title,
           department: job.department,
           location: job.location,
-          locationType: job.locationType,
-          employmentType: job.employmentType,
-          salaryMin: job.salaryRange.min,
-          salaryMax: job.salaryRange.max,
-          currency: job.salaryRange.currency,
+          location_type: job.location_type,
+          employment_type: job.employment_type,
+          minimum_salary: job.minimum_salary,
+          maximum_salary: job.maximum_salary,
+          currency: job.currency,
           description: job.description,
-          responsibilities: job.responsibilities.join("\n"),
-          requirements: job.requirements.join("\n"),
-          benefits: job.benefits.join("\n"),
+          responsibilities: job.responsibilities.join('\n'),
+          qualifications: job.qualifications.join('\n'),
+          benefits: job.benefits.join('\n'),
           status: job.status,
         }
       : {
-          title: "",
-          department: "",
-          location: "",
-          locationType: "Hybrid" as LocationType,
-          employmentType: "Fulltime" as EmploymentType,
-          salaryMin: 0,
-          salaryMax: 0,
-          currency: "USD",
-          description: "",
-          responsibilities: "",
-          requirements: "",
-          benefits: "",
-          status: "Draft" as JobStatus,
+          title: '',
+          department: '',
+          location: '',
+          location_type: 'HYBRID' as LocationType,
+          employment_type: 'FULL_TIME' as EmploymentType,
+          minimum_salary: '0',
+          maximum_salary: '0',
+          currency: 'USD',
+          description: '',
+          responsibilities: '',
+          qualifications: '',
+          benefits: '',
+          status: 'OPEN' as JobStatus,
         },
   });
 
+  // Sync status from props when it changes (e.g., from parent's status update dropdown)
+  useEffect(() => {
+    if (job?.status && job.status !== form.getValues('status')) {
+      form.setValue('status', job.status);
+    }
+  }, [job?.status, form]);
+
   async function onSubmit(data: JobFormValues) {
     setIsSubmitting(true);
-    // Simulate API call
-    await new Promise((resolve) => setTimeout(resolve, 1000));
-    console.log("Form submitted:", data);
-    setIsSubmitting(false);
-    router.push("/jobs");
+    try {
+      const payload = {
+        title: data.title,
+        department: data.department,
+        location: data.location,
+        location_type: data.location_type,
+        employment_type: data.employment_type,
+        minimum_salary: data.minimum_salary,
+        maximum_salary: data.maximum_salary,
+        currency: data.currency,
+        description: data.description,
+        responsibilities: data.responsibilities.split('\n').filter(Boolean),
+        qualifications: data.qualifications.split('\n').filter(Boolean),
+        benefits: (data.benefits || '').split('\n').filter(Boolean),
+        status: data.status,
+      };
+
+      if (mode === 'create') {
+        await jobsService.createJob(payload);
+        toast.success('Job created successfully');
+      } else if (job) {
+        await jobsService.updateJob(job.id, payload);
+        toast.success('Job updated successfully');
+      }
+
+      if (onSuccess) {
+        await onSuccess();
+      }
+      router.push('/company/jobs');
+    } catch (err) {
+      const message = err instanceof Error ? err.message : 'Failed to save job';
+      toast.error(message);
+    } finally {
+      setIsSubmitting(false);
+    }
   }
 
   return (
@@ -129,10 +162,7 @@ export function JobForm({ job, mode }: JobFormProps) {
                   <FormItem>
                     <FormLabel>Job Title</FormLabel>
                     <FormControl>
-                      <Input
-                        placeholder="e.g. Senior Frontend Developer"
-                        {...field}
-                      />
+                      <Input placeholder="e.g. Senior Frontend Developer" {...field} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -171,23 +201,20 @@ export function JobForm({ job, mode }: JobFormProps) {
 
               <FormField
                 control={form.control}
-                name="locationType"
+                name="location_type"
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>Location Type</FormLabel>
-                    <Select
-                      onValueChange={field.onChange}
-                      defaultValue={field.value}
-                    >
+                    <Select onValueChange={field.onChange} defaultValue={field.value}>
                       <FormControl>
                         <SelectTrigger>
                           <SelectValue placeholder="Select location type" />
                         </SelectTrigger>
                       </FormControl>
                       <SelectContent>
-                        <SelectItem value="Remote">Remote</SelectItem>
-                        <SelectItem value="Onsite">Onsite</SelectItem>
-                        <SelectItem value="Hybrid">Hybrid</SelectItem>
+                        <SelectItem value="REMOTE">Remote</SelectItem>
+                        <SelectItem value="ONSITE">Onsite</SelectItem>
+                        <SelectItem value="HYBRID">Hybrid</SelectItem>
                       </SelectContent>
                     </Select>
                     <FormMessage />
@@ -199,25 +226,22 @@ export function JobForm({ job, mode }: JobFormProps) {
             <div className="grid gap-6 md:grid-cols-2">
               <FormField
                 control={form.control}
-                name="employmentType"
+                name="employment_type"
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>Employment Type</FormLabel>
-                    <Select
-                      onValueChange={field.onChange}
-                      defaultValue={field.value}
-                    >
+                    <Select onValueChange={field.onChange} defaultValue={field.value}>
                       <FormControl>
                         <SelectTrigger>
                           <SelectValue placeholder="Select employment type" />
                         </SelectTrigger>
                       </FormControl>
                       <SelectContent>
-                        <SelectItem value="Fulltime">Full-time</SelectItem>
-                        <SelectItem value="Part-time">Part-time</SelectItem>
-                        <SelectItem value="Contract">Contract</SelectItem>
-                        <SelectItem value="Freelance">Freelance</SelectItem>
-                        <SelectItem value="Internship">Internship</SelectItem>
+                        <SelectItem value="FULL_TIME">Full-time</SelectItem>
+                        <SelectItem value="PART_TIME">Part-time</SelectItem>
+                        <SelectItem value="CONTRACT">Contract</SelectItem>
+                        <SelectItem value="FREELANCE">Freelance</SelectItem>
+                        <SelectItem value="INTERN">Internship</SelectItem>
                       </SelectContent>
                     </Select>
                     <FormMessage />
@@ -229,7 +253,7 @@ export function JobForm({ job, mode }: JobFormProps) {
             <div className="grid gap-6 md:grid-cols-3">
               <FormField
                 control={form.control}
-                name="salaryMin"
+                name="minimum_salary"
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>Minimum Salary</FormLabel>
@@ -243,7 +267,7 @@ export function JobForm({ job, mode }: JobFormProps) {
 
               <FormField
                 control={form.control}
-                name="salaryMax"
+                name="maximum_salary"
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>Maximum Salary</FormLabel>
@@ -261,10 +285,7 @@ export function JobForm({ job, mode }: JobFormProps) {
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>Currency</FormLabel>
-                    <Select
-                      onValueChange={field.onChange}
-                      defaultValue={field.value}
-                    >
+                    <Select onValueChange={field.onChange} defaultValue={field.value}>
                       <FormControl>
                         <SelectTrigger>
                           <SelectValue placeholder="Currency" />
@@ -323,18 +344,18 @@ export function JobForm({ job, mode }: JobFormProps) {
 
             <FormField
               control={form.control}
-              name="requirements"
+              name="qualifications"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Requirements</FormLabel>
+                  <FormLabel>Qualifications</FormLabel>
                   <FormControl>
                     <Textarea
-                      placeholder="Enter each requirement on a new line..."
+                      placeholder="Enter each qualification on a new line..."
                       className="min-h-25"
                       {...field}
                     />
                   </FormControl>
-                  <FormDescription>One requirement per line</FormDescription>
+                  <FormDescription>One qualification per line</FormDescription>
                   <FormMessage />
                 </FormItem>
               )}
@@ -366,18 +387,18 @@ export function JobForm({ job, mode }: JobFormProps) {
             Cancel
           </Button>
 
-          {mode === "create" ? (
+          {mode === 'create' ? (
             <div className="flex">
               <Button
                 type="submit"
                 className="rounded-r-none"
                 disabled={isSubmitting}
                 onClick={() => {
-                  setPendingAction("publish");
-                  form.setValue("status", "Active");
+                  setPendingAction('publish');
+                  form.setValue('status', 'OPEN');
                 }}
               >
-                {isSubmitting && pendingAction === "publish" && (
+                {isSubmitting && pendingAction === 'publish' && (
                   <Loader2 className="mr-2 size-4 animate-spin" />
                 )}
                 Publish Job
@@ -389,7 +410,7 @@ export function JobForm({ job, mode }: JobFormProps) {
                     className="rounded-l-none border-l border-l-primary-foreground/25 px-2"
                     disabled={isSubmitting}
                   >
-                    {isSubmitting && pendingAction === "draft" ? (
+                    {isSubmitting && pendingAction === 'draft' ? (
                       <Loader2 className="size-4 animate-spin" />
                     ) : (
                       <ChevronDown className="size-4" />
@@ -401,8 +422,8 @@ export function JobForm({ job, mode }: JobFormProps) {
                   <DropdownMenuSeparator />
                   <DropdownMenuItem
                     onClick={() => {
-                      setPendingAction("draft");
-                      form.setValue("status", "Draft");
+                      setPendingAction('draft');
+                      form.setValue('status', 'PAUSED');
                       form.handleSubmit(onSubmit)();
                     }}
                   >

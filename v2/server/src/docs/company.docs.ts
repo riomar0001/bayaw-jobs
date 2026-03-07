@@ -1620,6 +1620,89 @@ const getUserByEmail = {
   },
 };
 
+const updateApplicationStatus = {
+  '/business/applicants/{id}/status': {
+    patch: {
+      tags: ['Business'],
+      summary: "Update an applicant's application status",
+      description:
+        "Update the status of a specific application. The `id` parameter is the `applicant_applied_job` record ID.",
+      security: [{ bearerAuth: [] }],
+      parameters: [
+        {
+          name: 'id',
+          in: 'path',
+          required: true,
+          schema: { type: 'string', format: 'uuid' },
+          description: 'Application ID (applicant_applied_job record ID)',
+        },
+      ],
+      requestBody: {
+        required: true,
+        content: {
+          'application/json': {
+            schema: {
+              type: 'object',
+              properties: {
+                status: {
+                  type: 'string',
+                  enum: ['NEW', 'SCREENING', 'INTERVIEW', 'OFFER', 'HIRED', 'REJECTED'],
+                  example: 'INTERVIEW',
+                },
+              },
+            },
+          },
+        },
+      },
+      responses: {
+        '200': {
+          description: 'Application status updated successfully',
+          content: {
+            'application/json': {
+              schema: {
+                type: 'object',
+                properties: {
+                  success: { type: 'boolean', example: true },
+                  message: { type: 'string', example: 'Application status updated successfully' },
+                  data: {
+                    type: 'object',
+                    properties: {
+                      id: { type: 'string', format: 'uuid' },
+                      status: {
+                        type: 'string',
+                        enum: ['NEW', 'SCREENING', 'INTERVIEW', 'OFFER', 'HIRED', 'REJECTED'],
+                        example: 'INTERVIEW',
+                      },
+                      application_date: { type: 'string', format: 'date-time' },
+                      job: {
+                        type: 'object',
+                        properties: {
+                          id: { type: 'string', format: 'uuid' },
+                          title: { type: 'string', example: 'Senior Engineer' },
+                          department: { type: 'string', example: 'Engineering' },
+                        },
+                      },
+                      applicant: {
+                        type: 'object',
+                        properties: {
+                          id: { type: 'string', format: 'uuid' },
+                          first_name: { type: 'string', example: 'Jane' },
+                          last_name: { type: 'string', example: 'Doe' },
+                          email: { type: 'string', example: 'jane.doe@example.com' },
+                        },
+                      },
+                    },
+                  },
+                },
+              },
+            },
+          },
+        },
+      },
+    },
+  },
+};
+
 export const companyDocs = {
   ...getTopCompanies,
   ...getAllCompanies,
@@ -1635,4 +1718,5 @@ export const companyDocs = {
   ...applicantInfo,
   ...stats,
   ...getUserByEmail,
+  ...updateApplicationStatus,
 };

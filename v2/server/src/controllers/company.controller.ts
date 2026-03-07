@@ -328,6 +328,28 @@ export class CompanyController {
       next(error);
     }
   }
+
+  async updateApplicationStatus(
+    req: Request<{ id: string }>,
+    res: Response,
+    next: NextFunction
+  ): Promise<void> {
+    try {
+      const userId = req.user?.user_id;
+      const companyId = req.user?.company_id;
+      if (!userId || !companyId) throw new Error('User ID or Company ID missing in request');
+
+      const result = await companyService.updateApplicationStatus(
+        req.params.id,
+        req.body.status,
+        userId,
+        companyId
+      );
+      successResponse(res, result, 'Application status updated successfully');
+    } catch (error) {
+      next(error);
+    }
+  }
 }
 
 export const companyController = new CompanyController();

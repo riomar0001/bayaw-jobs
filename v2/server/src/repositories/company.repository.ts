@@ -488,6 +488,13 @@ export class CompanyRepository {
             age: true,
             phone_number: true,
             profile_picture: true,
+            user: {
+              select: {
+                first_name: true,
+                last_name: true,
+                email: true,
+              },
+            },
             applicantSkills: { select: { id: true, skill_name: true } },
             applicantLanguages: {
               select: { id: true, language_name: true, proficiency_level: true },
@@ -610,6 +617,30 @@ export class CompanyRepository {
     return prisma.user.findUnique({
       where: { email },
       select: { id: true, email: true, first_name: true, last_name: true },
+    });
+  }
+
+  async findApplicationById(applicationId: string, companyId: string) {
+    return prisma.applicant_applied_job.findFirst({
+      where: {
+        id: applicationId,
+        job: { company_id: companyId },
+      },
+      select: { id: true, status: true },
+    });
+  }
+
+  async updateApplicationStatus(
+    applicationId: string,
+    companyId: string,
+    status: 'NEW' | 'SCREENING' | 'INTERVIEW' | 'OFFER' | 'HIRED' | 'REJECTED' | 'CANCELLED'
+  ) {
+    return prisma.applicant_applied_job.updateMany({
+      where: {
+        id: applicationId,
+        job: { company_id: companyId },
+      },
+      data: { status },
     });
   }
 }

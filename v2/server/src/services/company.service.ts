@@ -330,7 +330,7 @@ export class CompanyService {
     }
 
     const { applicant_profile, ...applicationMeta } = data.application;
-    const { applicantResumes, profile_picture, ...profileRest } = applicant_profile;
+    const { applicantResumes, profile_picture, user, ...profileRest } = applicant_profile;
 
     const resume_url =
       applicantResumes.length > 0
@@ -343,7 +343,14 @@ export class CompanyService {
 
     return {
       application: applicationMeta,
-      applicant: { ...profileRest, profile_picture_url, resume_url },
+      applicant: {
+        ...profileRest,
+        first_name: user?.first_name ?? null,
+        last_name: user?.last_name ?? null,
+        email: user?.email ?? null,
+        profile_picture_url,
+        resume_url,
+      },
       other_applications: data.other_applications,
     };
   }
@@ -378,6 +385,35 @@ export class CompanyService {
 
   async getUserByEmail(email: string) {
     return await companyRepository.findUserByEmail(email);
+  }
+
+  async updateApplicationStatus(
+    applicationId: string,
+    status: 'NEW' | 'SCREENING' | 'INTERVIEW' | 'OFFER' | 'HIRED' | 'REJECTED' | 'CANCELLED',
+    userId: string,
+    companyId: string
+  ) {
+    const application = await companyRepository.findApplicationById(applicationId, companyId);
+    if (!application) {
+      throw new NotFoundError('Application not found');
+    }
+
+    const user = await userRepository.findById(userId, { companyAdmins: true });
+    if (!user) {
+      throw new NotFoundError('User not found');
+    }
+
+    const isAuthorized = user.companyAdmins.some(
+      (admin: { role: string; can_update: boolean }) =>
+        admin.role === 'COMPANY_OWNER' || admin.role === 'OWNER' || admin.can_update
+    );
+
+    if (!isAuthorized) {
+      throw new AuthorizationError('Only authorized company users can update application status');
+    }
+
+    await companyRepository.updateApplicationStatus(applicationId, companyId, status);
+    return { id: applicationId, status };
   }
 }
 

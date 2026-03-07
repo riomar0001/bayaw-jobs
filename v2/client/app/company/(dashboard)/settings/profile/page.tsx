@@ -17,7 +17,7 @@ const FormLoadingSkeleton = () => {
       <Skeleton className="h-10 w-32" />
     </div>
   );
-} 
+};
 
 export default function SettingsProfilePage() {
   const [data, setData] = useState<CompanyUser | null>(null);
@@ -48,7 +48,7 @@ export default function SettingsProfilePage() {
       setIsLoading(false);
     }
   };
-  
+
   useEffect(() => {
     void fetchData();
   }, []);
@@ -69,7 +69,7 @@ export default function SettingsProfilePage() {
         {error && <ErrorAlert message={error} onRetry={fetchData} />}
         {!isLoading && !error && data && (
           <div className="p-6">
-            <ProfileForm user={data} />
+            <ProfileForm user={data} onSuccess={fetchData} />
           </div>
         )}
       </div>

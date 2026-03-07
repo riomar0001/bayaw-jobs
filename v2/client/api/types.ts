@@ -1,6 +1,6 @@
-import { ZodError } from "zod";
-import { ApiError } from "./client";
-import { CompanySize } from "@/types/business";
+import { ZodError } from 'zod';
+import { ApiError } from './client';
+import { CompanySize } from '@/types/business';
 
 // ─── Common ───────────────────────────────────────────────────────────────────
 
@@ -26,7 +26,7 @@ export interface PaginatedResponse<T> {
 
 export function unwrapResponse<T>(response: ApiResponse<T>): T {
   if (!response.success || response.data === undefined) {
-    throw new ApiError(response.message || "Request failed");
+    throw new ApiError(response.message || 'Request failed');
   }
   return response.data;
 }
@@ -34,18 +34,14 @@ export function unwrapResponse<T>(response: ApiResponse<T>): T {
 export function handleValidationError(error: ZodError): ApiError {
   const errorMap = error.issues.reduce(
     (acc, issue) => {
-      const path = issue.path.join(".");
+      const path = issue.path.join('.');
       if (!acc[path]) acc[path] = [];
       acc[path].push(issue.message);
       return acc;
     },
     {} as Record<string, string[]>,
   );
-  return new ApiError(
-    error.issues[0]?.message || "Validation error",
-    400,
-    errorMap,
-  );
+  return new ApiError(error.issues[0]?.message || 'Validation error', 400, errorMap);
 }
 
 // ─── Auth ────────────────────────────────────────────────────────────────────
@@ -137,21 +133,21 @@ export interface UpdateAccountInfoInput {
 // ─── Applicant ───────────────────────────────────────────────────────────────
 
 export type CareerStatus =
-  | "ACTIVELY_LOOKING"
-  | "OPEN_TO_OPPORTUNITIES"
-  | "EMPLOYED_NOT_LOOKING"
-  | "NOT_LOOKING";
+  | 'ACTIVELY_LOOKING'
+  | 'OPEN_TO_OPPORTUNITIES'
+  | 'EMPLOYED_NOT_LOOKING'
+  | 'NOT_LOOKING';
 
-export type ProficiencyLevel = "BASIC" | "CONVERSATIONAL" | "FLUENT" | "NATIVE";
+export type ProficiencyLevel = 'BASIC' | 'CONVERSATIONAL' | 'FLUENT' | 'NATIVE';
 
 export type ApplicationStatus =
-  | "NEW"
-  | "SCREENING"
-  | "INTERVIEW"
-  | "OFFER"
-  | "REJECTED"
-  | "HIRED"
-  | "CANCELLED";
+  | 'NEW'
+  | 'SCREENING'
+  | 'INTERVIEW'
+  | 'OFFER'
+  | 'REJECTED'
+  | 'HIRED'
+  | 'CANCELLED';
 
 export interface Education {
   id: string;
@@ -273,7 +269,7 @@ export interface AddLanguageInput {
 
 export interface ApplyJobResponse {
   id: string;
-  status: "NEW";
+  status: 'NEW';
   application_date: string;
   job: {
     id: string;
@@ -328,14 +324,9 @@ export interface Application {
 
 // ─── Jobs ─────────────────────────────────────────────────────────────────────
 
-export type LocationType = "ONSITE" | "REMOTE" | "HYBRID";
-export type JobStatus = "OPEN" | "CLOSED" | "PAUSED";
-export type EmploymentType =
-  | "FULL_TIME"
-  | "PART_TIME"
-  | "CONTRACT"
-  | "FREELANCE"
-  | "INTERN";
+export type LocationType = 'ONSITE' | 'REMOTE' | 'HYBRID';
+export type JobStatus = 'OPEN' | 'CLOSED' | 'PAUSED';
+export type EmploymentType = 'FULL_TIME' | 'PART_TIME' | 'CONTRACT' | 'FREELANCE' | 'INTERN';
 
 export interface JobCompany {
   id: string;
@@ -416,10 +407,12 @@ export interface CompanyJobApplicant {
   status: ApplicationStatus;
   application_date: string;
   applicant_profile: {
-    first_name: string;
-    last_name: string;
     desired_position: string;
     profile_picture: string | null;
+    user: {
+      first_name: string | null;
+      last_name: string | null;
+    };
   };
   job: {
     title: string;
@@ -433,10 +426,12 @@ export interface JobWithApplicants extends Job {
     status: ApplicationStatus;
     application_date: string;
     applicant_profile: {
-      first_name: string;
-      last_name: string;
       desired_position: string;
       profile_picture: string | null;
+      user: {
+        first_name: string | null;
+        last_name: string | null;
+      };
     };
   }>;
 }
@@ -508,7 +503,7 @@ export interface CompanyLocation {
 }
 
 export interface CompanySocial {
-  platform: "FACEBOOK" | "TWITTER" | "LINKEDIN" | "INSTAGRAM";
+  platform: 'FACEBOOK' | 'TWITTER' | 'LINKEDIN' | 'INSTAGRAM';
   url: string;
 }
 
@@ -558,7 +553,7 @@ export interface PublicCompanyJobOpening {
   id: string;
   title: string;
   location: string;
-  location_type: "REMOTE" | "ONSITE" | "HYBRID";
+  location_type: 'REMOTE' | 'ONSITE' | 'HYBRID';
   minimum_salary: string;
   maximum_salary: string;
 }
@@ -675,7 +670,7 @@ export interface DashboardData {
       user: {
         first_name: string;
         last_name: string;
-      }
+      };
       desired_position: string;
       profile_picture: string | null;
     };

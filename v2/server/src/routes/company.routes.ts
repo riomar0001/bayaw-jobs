@@ -13,6 +13,7 @@ import {
   updateContactSchema,
   updateLocationSchema,
   updateSocialLinksSchema,
+  updateApplicationStatusSchema,
 } from '@/validations/company.validation';
 import { BadRequestError } from '@/utils/errors.util';
 
@@ -92,6 +93,13 @@ router.get(
   '/applicants/:id',
   authenticate,
   companyController.getApplicantInfo.bind(companyController)
+);
+
+router.patch(
+  '/applicants/:id/status',
+  authenticate,
+  validate(updateApplicationStatusSchema),
+  companyController.updateApplicationStatus.bind(companyController)
 );
 
 router.get(

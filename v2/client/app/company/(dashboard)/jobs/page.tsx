@@ -1,18 +1,18 @@
-"use client";
+'use client';
 
-import Link from "next/link";
-import { Plus, Briefcase, Users, XCircle, TrendingUp } from "lucide-react";
-import { PageHeader } from "@/components/company/dashboard/layout/page-header";
-import { Button } from "@/components/ui/button";
-import { StatsCard } from "@/components/company/dashboard/dashboard/stats-card";
-import { DataTable } from "@/components/company/dashboard/jobs/data-table";
-import { columns } from "@/components/company/dashboard/jobs/columns";
-import { ErrorAlert } from "@/components/common/error-alert";
-import { mockJobs } from "@/data";
-import { businessService } from "@/api/services/business.service";
-import { useEffect, useState } from "react";
-import { JobStats } from "@/api/types";
-import { Skeleton } from "@/components/ui/skeleton";
+import Link from 'next/link';
+import { Plus, Briefcase, Users, XCircle, TrendingUp } from 'lucide-react';
+import { PageHeader } from '@/components/company/dashboard/layout/page-header';
+import { Button } from '@/components/ui/button';
+import { StatsCard } from '@/components/company/dashboard/dashboard/stats-card';
+import { DataTable } from '@/components/company/dashboard/jobs/data-table';
+import { columns } from '@/components/company/dashboard/jobs/columns';
+import { ErrorAlert } from '@/components/common/error-alert';
+import { businessService } from '@/api/services/business.service';
+import { jobsService } from '@/api/services/jobs.service';
+import { useEffect, useState } from 'react';
+import { CompanyJob, JobStats } from '@/api/types';
+import { Skeleton } from '@/components/ui/skeleton';
 
 const StatsLoadingSkeleton = () => {
   return (
@@ -27,6 +27,7 @@ const StatsLoadingSkeleton = () => {
 
 export default function JobsPage() {
   const [data, setData] = useState<JobStats | null>(null);
+  const [jobs, setJobs] = useState<CompanyJob[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -34,13 +35,17 @@ export default function JobsPage() {
     try {
       setIsLoading(true);
       setError(null);
-      const result = await businessService.getJobStats();
+      const [statsResult, jobsResult] = await Promise.all([
+        businessService.getJobStats(),
+        jobsService.getCompanyJobs(),
+      ]);
 
-      setData(result);
+      setData(statsResult);
+      setJobs(jobsResult.data);
     } catch (err) {
       const errorMsg = err instanceof Error ? err.message : 'Failed to load dashboard data';
       setError(errorMsg);
-      console.error('[useDashboardData]', err);
+      console.error('[JobsPage]', err);
     } finally {
       setIsLoading(false);
     }
@@ -55,10 +60,7 @@ export default function JobsPage() {
       <PageHeader
         title="Jobs"
         description="Manage your job postings"
-        breadcrumbs={[
-          { label: "Dashboard", href: "/company" },
-          { label: "Jobs" },
-        ]}
+        breadcrumbs={[{ label: 'Dashboard', href: '/company' }, { label: 'Jobs' }]}
       />
       <div className="flex flex-1 flex-col gap-6">
         {isLoading && <StatsLoadingSkeleton />}
@@ -81,9 +83,7 @@ export default function JobsPage() {
             <div className="rounded-md border bg-card text-card-foreground shadow-sm mx-6 mb-6">
               <div className="flex flex-col sm:flex-row sm:items-center justify-between space-y-4 sm:space-y-0 p-6">
                 <div className="flex flex-col space-y-1.5">
-                  <h3 className="text-lg font-semibold leading-none tracking-tight">
-                    All Jobs
-                  </h3>
+                  <h3 className="text-lg font-semibold leading-none tracking-tight">All Jobs</h3>
                   <p className="text-sm text-muted-foreground">
                     Manage your job postings and applicants.
                   </p>
@@ -96,7 +96,7 @@ export default function JobsPage() {
                 </Button>
               </div>
               <div className="p-6 pt-0">
-                <DataTable columns={columns} data={mockJobs} />
+                <DataTable columns={columns} data={jobs} />
               </div>
             </div>
           </>

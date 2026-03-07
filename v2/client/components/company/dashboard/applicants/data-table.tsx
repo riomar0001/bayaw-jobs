@@ -1,6 +1,6 @@
-"use client";
+'use client';
 
-import * as React from "react";
+import * as React from 'react';
 import {
   ColumnDef,
   ColumnFiltersState,
@@ -11,7 +11,7 @@ import {
   getPaginationRowModel,
   getSortedRowModel,
   useReactTable,
-} from "@tanstack/react-table";
+} from '@tanstack/react-table';
 import {
   Table,
   TableBody,
@@ -19,27 +19,27 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from "@/components/ui/table";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
+} from '@/components/ui/table';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/select";
-import { Search, X } from "lucide-react";
-import { ApplicationStatus } from "@/types/job";
-import { ApplicantWithDetails } from "./columns";
+} from '@/components/ui/select';
+import { Search, X } from 'lucide-react';
+import { ApplicationStatus, CompanyJobApplicant } from '@/api/types';
 
 const APPLICATION_STATUSES: ApplicationStatus[] = [
-  "New",
-  "Screening",
-  "Interview",
-  "Offer",
-  "Hired",
-  "Rejected",
+  'NEW',
+  'SCREENING',
+  'INTERVIEW',
+  'OFFER',
+  'HIRED',
+  'REJECTED',
+  'CANCELLED',
 ];
 
 interface DataTableProps<TData, TValue> {
@@ -47,14 +47,12 @@ interface DataTableProps<TData, TValue> {
   data: TData[];
 }
 
-export function DataTable<TData extends ApplicantWithDetails, TValue>({
+export function DataTable<TData extends CompanyJobApplicant, TValue>({
   columns,
   data,
 }: DataTableProps<TData, TValue>) {
   const [sorting, setSorting] = React.useState<SortingState>([]);
-  const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
-    [],
-  );
+  const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>([]);
 
   // eslint-disable-next-line react-hooks/incompatible-library
   const table = useReactTable({
@@ -69,29 +67,21 @@ export function DataTable<TData extends ApplicantWithDetails, TValue>({
     state: { sorting, columnFilters },
   });
 
-  const nameFilter =
-    (table.getColumn("candidate")?.getFilterValue() as string) ?? "";
-  const statusFilter =
-    (table.getColumn("status")?.getFilterValue() as string) ?? "all";
-  const deptFilter =
-    (table.getColumn("department")?.getFilterValue() as string) ?? "all";
+  const nameFilter = (table.getColumn('candidate')?.getFilterValue() as string) ?? '';
+  const statusFilter = (table.getColumn('status')?.getFilterValue() as string) ?? 'all';
+  const deptFilter = (table.getColumn('department')?.getFilterValue() as string) ?? 'all';
 
-  const hasActiveFilters =
-    !!nameFilter || statusFilter !== "all" || deptFilter !== "all";
+  const hasActiveFilters = !!nameFilter || statusFilter !== 'all' || deptFilter !== 'all';
 
   const clearFilters = () => {
-    table.getColumn("candidate")?.setFilterValue("");
-    table.getColumn("status")?.setFilterValue("");
-    table.getColumn("department")?.setFilterValue("");
+    table.getColumn('candidate')?.setFilterValue('');
+    table.getColumn('status')?.setFilterValue('');
+    table.getColumn('department')?.setFilterValue('');
   };
 
   // Unique departments from data
   const departments = Array.from(
-    new Set(
-      (data as ApplicantWithDetails[])
-        .map((d) => d.job?.department)
-        .filter(Boolean),
-    ),
+    new Set((data as CompanyJobApplicant[]).map((d) => d.job.department).filter(Boolean)),
   ).sort() as string[];
 
   return (
@@ -104,9 +94,7 @@ export function DataTable<TData extends ApplicantWithDetails, TValue>({
           <Input
             placeholder="Search candidate..."
             value={nameFilter}
-            onChange={(e) =>
-              table.getColumn("candidate")?.setFilterValue(e.target.value)
-            }
+            onChange={(e) => table.getColumn('candidate')?.setFilterValue(e.target.value)}
             className="pl-9"
           />
         </div>
@@ -115,7 +103,7 @@ export function DataTable<TData extends ApplicantWithDetails, TValue>({
         <Select
           value={statusFilter}
           onValueChange={(val) =>
-            table.getColumn("status")?.setFilterValue(val === "all" ? "" : val)
+            table.getColumn('status')?.setFilterValue(val === 'all' ? '' : val)
           }
         >
           <SelectTrigger className="w-40">
@@ -135,9 +123,7 @@ export function DataTable<TData extends ApplicantWithDetails, TValue>({
         <Select
           value={deptFilter}
           onValueChange={(val) =>
-            table
-              .getColumn("department")
-              ?.setFilterValue(val === "all" ? "" : val)
+            table.getColumn('department')?.setFilterValue(val === 'all' ? '' : val)
           }
         >
           <SelectTrigger className="w-44">
@@ -155,12 +141,7 @@ export function DataTable<TData extends ApplicantWithDetails, TValue>({
 
         {/* Clear */}
         {hasActiveFilters && (
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={clearFilters}
-            className="gap-1.5"
-          >
+          <Button variant="ghost" size="sm" onClick={clearFilters} className="gap-1.5">
             <X className="h-4 w-4" />
             Clear
           </Button>
@@ -178,10 +159,7 @@ export function DataTable<TData extends ApplicantWithDetails, TValue>({
                     <TableHead key={header.id}>
                       {header.isPlaceholder
                         ? null
-                        : flexRender(
-                            header.column.columnDef.header,
-                            header.getContext(),
-                          )}
+                        : flexRender(header.column.columnDef.header, header.getContext())}
                     </TableHead>
                   ))}
                 </TableRow>
@@ -190,26 +168,17 @@ export function DataTable<TData extends ApplicantWithDetails, TValue>({
             <TableBody>
               {table.getRowModel().rows?.length ? (
                 table.getRowModel().rows.map((row) => (
-                  <TableRow
-                    key={row.id}
-                    data-state={row.getIsSelected() && "selected"}
-                  >
+                  <TableRow key={row.id} data-state={row.getIsSelected() && 'selected'}>
                     {row.getVisibleCells().map((cell) => (
                       <TableCell key={cell.id}>
-                        {flexRender(
-                          cell.column.columnDef.cell,
-                          cell.getContext(),
-                        )}
+                        {flexRender(cell.column.columnDef.cell, cell.getContext())}
                       </TableCell>
                     ))}
                   </TableRow>
                 ))
               ) : (
                 <TableRow>
-                  <TableCell
-                    colSpan={columns.length}
-                    className="h-24 text-center"
-                  >
+                  <TableCell colSpan={columns.length} className="h-24 text-center">
                     No applicants found.
                   </TableCell>
                 </TableRow>
@@ -223,7 +192,7 @@ export function DataTable<TData extends ApplicantWithDetails, TValue>({
       <div className="flex items-center justify-between py-4">
         <p className="text-sm text-muted-foreground">
           {table.getFilteredRowModel().rows.length} applicant
-          {table.getFilteredRowModel().rows.length !== 1 ? "s" : ""}
+          {table.getFilteredRowModel().rows.length !== 1 ? 's' : ''}
         </p>
         <div className="flex items-center gap-1">
           <Button
@@ -237,11 +206,7 @@ export function DataTable<TData extends ApplicantWithDetails, TValue>({
           {Array.from({ length: table.getPageCount() }, (_, i) => (
             <Button
               key={i}
-              variant={
-                table.getState().pagination.pageIndex === i
-                  ? "default"
-                  : "outline"
-              }
+              variant={table.getState().pagination.pageIndex === i ? 'default' : 'outline'}
               size="sm"
               className="w-8"
               onClick={() => table.setPageIndex(i)}

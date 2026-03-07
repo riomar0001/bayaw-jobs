@@ -1,55 +1,46 @@
-"use client";
+'use client';
 
-import {
-  Sidebar,
-  SidebarContent,
-  SidebarFooter,
-  SidebarHeader,
-} from "@/components/ui/sidebar";
+import { Sidebar, SidebarContent, SidebarFooter, SidebarHeader } from '@/components/ui/sidebar';
 
-import { NavUser } from "@/components/company/dashboard/layout/nav-user";
-import { mockUser } from "@/data";
-import NavMain from "./nav-main";
-import {
-  LayoutDashboard,
-  Briefcase,
-  Users,
-  Building2,
-  Settings,
-} from "lucide-react";
+import { NavUser } from '@/components/company/dashboard/layout/nav-user';
+import { useAuthStore } from '@/stores/auth.store';
+import NavMain from './nav-main';
+import { LayoutDashboard, Briefcase, Users, Building2, Settings } from 'lucide-react';
 
 export function AppSidebar() {
+  const user = useAuthStore((state) => state.user);
+
   const navigation = [
     {
-      title: "Dashboard",
-      href: "/company",
+      title: 'Dashboard',
+      href: '/company',
       icon: LayoutDashboard,
     },
     {
-      title: "Jobs",
+      title: 'Jobs',
       icon: Briefcase,
       items: [
-        { title: "All Jobs", href: "/company/jobs" },
-        { title: "Post New Job", href: "/company/jobs/new" },
+        { title: 'All Jobs', href: '/company/jobs' },
+        { title: 'Post New Job', href: '/company/jobs/new' },
       ],
     },
     {
-      title: "Applicants",
-      href: "/company/applicants",
+      title: 'Applicants',
+      href: '/company/applicants',
       icon: Users,
     },
     {
-      title: "Business Profile",
-      href: "/company/business",
+      title: 'Business Profile',
+      href: '/company/business',
       icon: Building2,
     },
     {
-      title: "Settings",
+      title: 'Settings',
       icon: Settings,
       items: [
-        { title: "Profile", href: "/company/settings/profile" },
-        { title: "Security", href: "/company/settings/security" },
-        { title: "Manage Admins", href: "/company/settings/admins" },
+        { title: 'Profile', href: '/company/settings/profile' },
+        { title: 'Security', href: '/company/settings/security' },
+        { title: 'Manage Admins', href: '/company/settings/admins' },
       ],
     },
   ];
@@ -63,9 +54,7 @@ export function AppSidebar() {
           </div>
           <div className="flex flex-col">
             <span className="text-sm font-semibold">Bayaw Jobs</span>
-            <span className="text-xs text-muted-foreground">
-              Recruitment Dashboard
-            </span>
+            <span className="text-xs text-muted-foreground">Recruitment Dashboard</span>
           </div>
         </div>
       </SidebarHeader>
@@ -77,10 +66,10 @@ export function AppSidebar() {
       <SidebarFooter className="border-t border-sidebar-border">
         <NavUser
           user={{
-            name: mockUser.fullName,
-            email: mockUser.email,
-            avatar: "",
-            role: mockUser.role,
+            name: user ? `${user.first_name} ${user.last_name}` : '',
+            email: user?.email ?? '',
+            avatar: user?.profile_picture_url ?? '',
+            role: user?.role ?? '',
           }}
         />
       </SidebarFooter>

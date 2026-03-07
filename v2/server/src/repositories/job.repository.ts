@@ -168,7 +168,18 @@ export class JobRepository {
       include: {
         applicant_applied_job: {
           include: {
-            applicant_profile: true,
+            applicant_profile: {
+              select: {
+                desired_position: true,
+                profile_picture: true,
+                user: {
+                  select: {
+                    first_name: true,
+                    last_name: true,
+                  },
+                },
+              },
+            },
           },
           orderBy: { application_date: 'desc' },
         },

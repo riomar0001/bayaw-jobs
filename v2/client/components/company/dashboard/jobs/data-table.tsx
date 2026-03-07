@@ -1,6 +1,6 @@
-"use client";
+'use client';
 
-import * as React from "react";
+import * as React from 'react';
 import {
   ColumnDef,
   ColumnFiltersState,
@@ -11,7 +11,7 @@ import {
   getPaginationRowModel,
   getSortedRowModel,
   useReactTable,
-} from "@tanstack/react-table";
+} from '@tanstack/react-table';
 
 import {
   Table,
@@ -20,26 +20,26 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from "@/components/ui/table";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
+} from '@/components/ui/table';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/select";
-import { Search, X } from "lucide-react";
-import { Job, JobStatus, EmploymentType } from "@/types/job";
+} from '@/components/ui/select';
+import { Search, X } from 'lucide-react';
+import { CompanyJob, JobStatus, EmploymentType } from '@/api/types';
 
-const JOB_STATUSES: JobStatus[] = ["Active", "Draft", "Paused", "Closed"];
+const JOB_STATUSES: JobStatus[] = ['OPEN', 'PAUSED', 'CLOSED'];
 const EMPLOYMENT_TYPES: EmploymentType[] = [
-  "Fulltime",
-  "Part-time",
-  "Contract",
-  "Freelance",
-  "Internship",
+  'Fulltime',
+  'Part-time',
+  'Contract',
+  'Freelance',
+  'Internship',
 ];
 
 interface DataTableProps<TData, TValue> {
@@ -47,14 +47,12 @@ interface DataTableProps<TData, TValue> {
   data: TData[];
 }
 
-export function DataTable<TData extends Job, TValue>({
+export function DataTable<TData extends CompanyJob, TValue>({
   columns,
   data,
 }: DataTableProps<TData, TValue>) {
   const [sorting, setSorting] = React.useState<SortingState>([]);
-  const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
-    [],
-  );
+  const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>([]);
 
   // eslint-disable-next-line react-hooks/incompatible-library
   const table = useReactTable({
@@ -72,30 +70,25 @@ export function DataTable<TData extends Job, TValue>({
     },
   });
 
-  const statusFilter =
-    (table.getColumn("status")?.getFilterValue() as string) ?? "all";
-  const typeFilter =
-    (table.getColumn("employmentType")?.getFilterValue() as string) ?? "all";
-  const departmentFilter =
-    (table.getColumn("department")?.getFilterValue() as string) ?? "";
+  const statusFilter = (table.getColumn('status')?.getFilterValue() as string) ?? 'all';
+  const typeFilter = (table.getColumn('employment_type')?.getFilterValue() as string) ?? 'all';
+  const departmentFilter = (table.getColumn('department')?.getFilterValue() as string) ?? '';
 
   const hasActiveFilters =
-    !!table.getColumn("title")?.getFilterValue() ||
-    statusFilter !== "all" ||
-    typeFilter !== "all" ||
+    !!table.getColumn('title')?.getFilterValue() ||
+    statusFilter !== 'all' ||
+    typeFilter !== 'all' ||
     !!departmentFilter;
 
   const clearFilters = () => {
-    table.getColumn("title")?.setFilterValue("");
-    table.getColumn("status")?.setFilterValue("");
-    table.getColumn("employmentType")?.setFilterValue("");
-    table.getColumn("department")?.setFilterValue("");
+    table.getColumn('title')?.setFilterValue('');
+    table.getColumn('status')?.setFilterValue('');
+    table.getColumn('employment_type')?.setFilterValue('');
+    table.getColumn('department')?.setFilterValue('');
   };
 
   // Get unique departments from data
-  const departments = Array.from(
-    new Set((data as Job[]).map((d) => d.department)),
-  ).sort();
+  const departments = Array.from(new Set((data as CompanyJob[]).map((d) => d.department))).sort();
 
   return (
     <div>
@@ -106,10 +99,8 @@ export function DataTable<TData extends Job, TValue>({
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
           <Input
             placeholder="Search job title..."
-            value={(table.getColumn("title")?.getFilterValue() as string) ?? ""}
-            onChange={(e) =>
-              table.getColumn("title")?.setFilterValue(e.target.value)
-            }
+            value={(table.getColumn('title')?.getFilterValue() as string) ?? ''}
+            onChange={(e) => table.getColumn('title')?.setFilterValue(e.target.value)}
             className="pl-9"
           />
         </div>
@@ -118,7 +109,7 @@ export function DataTable<TData extends Job, TValue>({
         <Select
           value={statusFilter}
           onValueChange={(val) =>
-            table.getColumn("status")?.setFilterValue(val === "all" ? "" : val)
+            table.getColumn('status')?.setFilterValue(val === 'all' ? '' : val)
           }
         >
           <SelectTrigger className="w-36">
@@ -136,11 +127,9 @@ export function DataTable<TData extends Job, TValue>({
 
         {/* Department filter */}
         <Select
-          value={departmentFilter || "all"}
+          value={departmentFilter || 'all'}
           onValueChange={(val) =>
-            table
-              .getColumn("department")
-              ?.setFilterValue(val === "all" ? "" : val)
+            table.getColumn('department')?.setFilterValue(val === 'all' ? '' : val)
           }
         >
           <SelectTrigger className="w-44">
@@ -160,9 +149,7 @@ export function DataTable<TData extends Job, TValue>({
         <Select
           value={typeFilter}
           onValueChange={(val) =>
-            table
-              .getColumn("employmentType")
-              ?.setFilterValue(val === "all" ? "" : val)
+            table.getColumn('employment_type')?.setFilterValue(val === 'all' ? '' : val)
           }
         >
           <SelectTrigger className="w-36">
@@ -180,12 +167,7 @@ export function DataTable<TData extends Job, TValue>({
 
         {/* Clear filters */}
         {hasActiveFilters && (
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={clearFilters}
-            className="gap-1.5"
-          >
+          <Button variant="ghost" size="sm" onClick={clearFilters} className="gap-1.5">
             <X className="h-4 w-4" />
             Clear
           </Button>
@@ -203,10 +185,7 @@ export function DataTable<TData extends Job, TValue>({
                     <TableHead key={header.id}>
                       {header.isPlaceholder
                         ? null
-                        : flexRender(
-                            header.column.columnDef.header,
-                            header.getContext(),
-                          )}
+                        : flexRender(header.column.columnDef.header, header.getContext())}
                     </TableHead>
                   ))}
                 </TableRow>
@@ -215,26 +194,17 @@ export function DataTable<TData extends Job, TValue>({
             <TableBody>
               {table.getRowModel().rows?.length ? (
                 table.getRowModel().rows.map((row) => (
-                  <TableRow
-                    key={row.id}
-                    data-state={row.getIsSelected() && "selected"}
-                  >
+                  <TableRow key={row.id} data-state={row.getIsSelected() && 'selected'}>
                     {row.getVisibleCells().map((cell) => (
                       <TableCell key={cell.id}>
-                        {flexRender(
-                          cell.column.columnDef.cell,
-                          cell.getContext(),
-                        )}
+                        {flexRender(cell.column.columnDef.cell, cell.getContext())}
                       </TableCell>
                     ))}
                   </TableRow>
                 ))
               ) : (
                 <TableRow>
-                  <TableCell
-                    colSpan={columns.length}
-                    className="h-24 text-center"
-                  >
+                  <TableCell colSpan={columns.length} className="h-24 text-center">
                     No results.
                   </TableCell>
                 </TableRow>
@@ -248,7 +218,7 @@ export function DataTable<TData extends Job, TValue>({
       <div className="flex items-center justify-between py-4">
         <p className="text-sm text-muted-foreground">
           {table.getFilteredRowModel().rows.length} result
-          {table.getFilteredRowModel().rows.length !== 1 ? "s" : ""}
+          {table.getFilteredRowModel().rows.length !== 1 ? 's' : ''}
         </p>
         <div className="flex items-center gap-1">
           <Button
@@ -262,11 +232,7 @@ export function DataTable<TData extends Job, TValue>({
           {Array.from({ length: table.getPageCount() }, (_, i) => (
             <Button
               key={i}
-              variant={
-                table.getState().pagination.pageIndex === i
-                  ? "default"
-                  : "outline"
-              }
+              variant={table.getState().pagination.pageIndex === i ? 'default' : 'outline'}
               size="sm"
               className="w-8"
               onClick={() => table.setPageIndex(i)}

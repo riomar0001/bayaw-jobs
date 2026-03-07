@@ -1,7 +1,7 @@
-"use client";
+'use client';
 
-import { use, useState } from "react";
-import { notFound } from "next/navigation";
+import { use, useState, useEffect } from 'react';
+import { notFound, useRouter } from 'next/navigation';
 import {
   Building2,
   CheckCircle2,
@@ -12,10 +12,11 @@ import {
   MapPin,
   PauseCircle,
   XCircle,
-} from "lucide-react";
-import { PageHeader } from "@/components/company/dashboard/layout/page-header";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
+  Loader2,
+} from 'lucide-react';
+import { PageHeader } from '@/components/company/dashboard/layout/page-header';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent } from '@/components/ui/card';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -23,28 +24,28 @@ import {
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-import { JobStatusBadge } from "@/components/company/dashboard/jobs/job-status-badge";
-import { JobForm } from "@/components/company/dashboard/jobs/forms/job-form";
-import { getJobById } from "@/data";
-import { formatSalaryRange } from "@/lib/formatters";
-import { JobStatus } from "@/types/job";
+} from '@/components/ui/dropdown-menu';
+import { JobStatusBadge } from '@/components/company/dashboard/jobs/job-status-badge';
+import { JobForm } from '@/components/company/dashboard/jobs/forms/job-form';
+import { jobsService } from '@/api/services/jobs.service';
+import { formatSalaryRange } from '@/lib/formatters';
+import { Job, JobStatus } from '@/api/types';
+import { toast } from 'sonner';
 
 const STATUS_ACTIONS: Record<
   JobStatus,
   { label: string; icon: React.ElementType; className?: string }
 > = {
-  Active: { label: "Publish", icon: CheckCircle2, className: "text-green-600" },
-  Draft: { label: "Move to Draft", icon: FileText },
-  Paused: {
-    label: "Pause",
+  OPEN: { label: 'Publish', icon: CheckCircle2, className: 'text-green-600' },
+  PAUSED: {
+    label: 'Pause',
     icon: PauseCircle,
-    className: "text-yellow-600",
+    className: 'text-yellow-600',
   },
-  Closed: { label: "Close Job", icon: XCircle, className: "text-destructive" },
+  CLOSED: { label: 'Close Job', icon: XCircle, className: 'text-destructive' },
 };
 
-const ALL_STATUSES: JobStatus[] = ["Active", "Draft", "Paused", "Closed"];
+const ALL_STATUSES: JobStatus[] = ['OPEN', 'PAUSED', 'CLOSED'];
 
 interface EditJobPageProps {
   params: Promise<{ id: string }>;
@@ -52,13 +53,81 @@ interface EditJobPageProps {
 
 export default function EditJobPage({ params }: EditJobPageProps) {
   const { id } = use(params);
-  const job = getJobById(id);
+  const router = useRouter();
+  const [job, setJob] = useState<Job | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [currentStatus, setCurrentStatus] = useState<JobStatus>('OPEN');
+  const [isUpdatingStatus, setIsUpdatingStatus] = useState(false);
 
-  if (!job) {
-    notFound();
+  useEffect(() => {
+    async function fetchJob() {
+      try {
+        const data = await jobsService.getCompanyJob(id);
+        setJob(data);
+        setCurrentStatus(data.status);
+      } catch (err) {
+        const message = err instanceof Error ? err.message : 'Failed to load job';
+        setError(message);
+      } finally {
+        setLoading(false);
+      }
+    }
+    fetchJob();
+  }, [id]);
+
+  const handleStatusChange = async (status: JobStatus) => {
+    if (!job) return;
+    setIsUpdatingStatus(true);
+    try {
+      await jobsService.updateJobStatus(job.id, status);
+      setCurrentStatus(status);
+      setJob({ ...job, status }); // Update the job object so the form gets the new status
+      toast.success(`Job status updated to ${status}`);
+    } catch (err) {
+      const message = err instanceof Error ? err.message : 'Failed to update status';
+      toast.error(message);
+    } finally {
+      setIsUpdatingStatus(false);
+    }
+  };
+
+  if (loading) {
+    return (
+      <>
+        <PageHeader
+          title="Edit Job"
+          breadcrumbs={[
+            { label: 'Dashboard', href: '/company/' },
+            { label: 'Jobs', href: '/company/jobs' },
+            { label: 'Loading...' },
+          ]}
+        />
+        <div className="flex flex-1 items-center justify-center p-6">
+          <Loader2 className="size-8 animate-spin text-muted-foreground" />
+        </div>
+      </>
+    );
   }
 
-  const [currentStatus, setCurrentStatus] = useState<JobStatus>(job.status);
+  if (error || !job) {
+    return (
+      <>
+        <PageHeader
+          title="Edit Job"
+          breadcrumbs={[
+            { label: 'Dashboard', href: '/company/' },
+            { label: 'Jobs', href: '/company/jobs' },
+            { label: 'Error' },
+          ]}
+        />
+        <div className="flex flex-1 items-center justify-center p-6">
+          <p className="text-muted-foreground">{error || 'Job not found'}</p>
+        </div>
+      </>
+    );
+  }
+
   const otherStatuses = ALL_STATUSES.filter((s) => s !== currentStatus);
 
   return (
@@ -66,10 +135,10 @@ export default function EditJobPage({ params }: EditJobPageProps) {
       <PageHeader
         title="Edit Job"
         breadcrumbs={[
-          { label: "Dashboard", href: "/company/" },
-          { label: "Jobs", href: "/company/jobs" },
+          { label: 'Dashboard', href: '/company/' },
+          { label: 'Jobs', href: '/company/jobs' },
           { label: job.title, href: `/company/jobs/${id}` },
-          { label: "Edit" },
+          { label: 'Edit' },
         ]}
       />
 
@@ -90,18 +159,18 @@ export default function EditJobPage({ params }: EditJobPageProps) {
                   </span>
                   <span className="flex items-center gap-1.5">
                     <MapPin className="size-3.5" />
-                    {job.location} · {job.locationType}
+                    {job.location} · {job.location_type}
                   </span>
                   <span className="flex items-center gap-1.5">
                     <Clock className="size-3.5" />
-                    {job.employmentType}
+                    {job.employment_type}
                   </span>
                   <span className="flex items-center gap-1.5">
                     <DollarSign className="size-3.5" />
                     {formatSalaryRange(
-                      job.salaryRange.min,
-                      job.salaryRange.max,
-                      job.salaryRange.currency,
+                      Number(job.minimum_salary),
+                      Number(job.maximum_salary),
+                      job.currency,
                     )}
                   </span>
                 </div>
@@ -109,7 +178,8 @@ export default function EditJobPage({ params }: EditJobPageProps) {
 
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
-                  <Button variant="outline" size="sm">
+                  <Button variant="outline" size="sm" disabled={isUpdatingStatus}>
+                    {isUpdatingStatus ? <Loader2 className="mr-1 size-4 animate-spin" /> : null}
                     Update Status
                     <ChevronDown className="ml-1 size-4" />
                   </Button>
@@ -118,16 +188,12 @@ export default function EditJobPage({ params }: EditJobPageProps) {
                   <DropdownMenuLabel>Change Status</DropdownMenuLabel>
                   <DropdownMenuSeparator />
                   {otherStatuses.map((status) => {
-                    const {
-                      label,
-                      icon: Icon,
-                      className,
-                    } = STATUS_ACTIONS[status];
+                    const { label, icon: Icon, className } = STATUS_ACTIONS[status];
                     return (
                       <DropdownMenuItem
                         key={status}
                         className={className}
-                        onClick={() => setCurrentStatus(status)}
+                        onClick={() => handleStatusChange(status)}
                       >
                         <Icon className="mr-2 size-4" />
                         {label}
@@ -140,7 +206,7 @@ export default function EditJobPage({ params }: EditJobPageProps) {
           </CardContent>
         </Card>
 
-        <JobForm job={job} mode="edit" />
+        <JobForm job={job} mode="edit" key={job.id} />
       </div>
     </>
   );

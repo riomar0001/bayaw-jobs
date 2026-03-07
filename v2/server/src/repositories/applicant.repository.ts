@@ -367,6 +367,12 @@ export class ApplicantRepository {
             select: {
               desired_position: true,
               profile_picture: true,
+              user: {
+                select: {
+                  first_name: true,
+                  last_name: true,
+                },
+              },
             },
           },
           job: {
