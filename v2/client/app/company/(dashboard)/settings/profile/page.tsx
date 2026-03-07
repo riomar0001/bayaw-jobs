@@ -2,11 +2,22 @@
 
 import { PageHeader } from '@/components/company/dashboard/layout/page-header';
 import { ProfileForm } from '@/components/company/dashboard/settings/profile/profile-form';
-import { FormLoadingSkeleton } from '@/components/common/loading-skeletons';
 import { ErrorAlert } from '@/components/common/error-alert';
 import { useEffect, useState } from 'react';
 import { businessService } from '@/api';
 import { CompanyUser } from '@/types/user';
+import { Skeleton } from '@/components/ui/skeleton';
+
+const FormLoadingSkeleton = () => {
+  return (
+    <div className="space-y-6 p-6">
+      <Skeleton className="h-12 w-full" />
+      <Skeleton className="h-12 w-full" />
+      <Skeleton className="h-12 w-full" />
+      <Skeleton className="h-10 w-32" />
+    </div>
+  );
+} 
 
 export default function SettingsProfilePage() {
   const [data, setData] = useState<CompanyUser | null>(null);

@@ -7,16 +7,48 @@ import { Button } from "@/components/ui/button";
 import { StatsCard } from "@/components/company/dashboard/dashboard/stats-card";
 import { DataTable } from "@/components/company/dashboard/jobs/data-table";
 import { columns } from "@/components/company/dashboard/jobs/columns";
+import { ErrorAlert } from "@/components/common/error-alert";
 import { mockJobs } from "@/data";
+import { businessService } from "@/api/services/business.service";
+import { useEffect, useState } from "react";
+import { JobStats } from "@/api/types";
+import { Skeleton } from "@/components/ui/skeleton";
+
+const StatsLoadingSkeleton = () => {
+  return (
+    <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4 p-6">
+      <Skeleton className="h-32 w-full" />
+      <Skeleton className="h-32 w-full" />
+      <Skeleton className="h-32 w-full" />
+      <Skeleton className="h-32 w-full" />
+    </div>
+  );
+};
 
 export default function JobsPage() {
-  const totalJobs = mockJobs.length;
-  const activeJobs = mockJobs.filter((j) => j.status === "Active").length;
-  const totalApplicants = mockJobs.reduce(
-    (sum, j) => sum + j.applicantCount,
-    0,
-  );
-  const closedJobs = mockJobs.filter((j) => j.status === "Closed").length;
+  const [data, setData] = useState<JobStats | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  const fetchData = async () => {
+    try {
+      setIsLoading(true);
+      setError(null);
+      const result = await businessService.getJobStats();
+
+      setData(result);
+    } catch (err) {
+      const errorMsg = err instanceof Error ? err.message : 'Failed to load dashboard data';
+      setError(errorMsg);
+      console.error('[useDashboardData]', err);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    void fetchData();
+  }, []);
 
   return (
     <>
@@ -28,41 +60,47 @@ export default function JobsPage() {
           { label: "Jobs" },
         ]}
       />
-      <div className="flex flex-1 flex-col gap-6 p-6">
-        {/* Stats */}
-        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-          <StatsCard title="Total Jobs" value={totalJobs} icon={Briefcase} />
-          <StatsCard title="Active Jobs" value={activeJobs} icon={TrendingUp} />
-          <StatsCard
-            title="Total Applicants"
-            value={totalApplicants}
-            icon={Users}
-          />
-          <StatsCard title="Closed Jobs" value={closedJobs} icon={XCircle} />
-        </div>
-
-        {/* Jobs Table */}
-        <div className="rounded-md border bg-card text-card-foreground shadow-sm">
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between space-y-4 sm:space-y-0 p-6">
-            <div className="flex flex-col space-y-1.5">
-              <h3 className="text-lg font-semibold leading-none tracking-tight">
-                All Jobs
-              </h3>
-              <p className="text-sm text-muted-foreground">
-                Manage your job postings and applicants.
-              </p>
+      <div className="flex flex-1 flex-col gap-6">
+        {isLoading && <StatsLoadingSkeleton />}
+        {error && <ErrorAlert message={error} onRetry={fetchData} />}
+        {!isLoading && !error && (
+          <>
+            {/* Stats */}
+            <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4 p-6">
+              <StatsCard title="Total Jobs" value={data?.total_jobs ?? 0} icon={Briefcase} />
+              <StatsCard title="Active Jobs" value={data?.active_jobs ?? 0} icon={TrendingUp} />
+              <StatsCard
+                title="Total Applicants"
+                value={data?.total_applicants ?? 0}
+                icon={Users}
+              />
+              <StatsCard title="Closed Jobs" value={data?.closed_jobs ?? 0} icon={XCircle} />
             </div>
-            <Button asChild size="sm">
-              <Link href="/company/jobs/new">
-                <Plus className="mr-2 size-4" />
-                Post New Job
-              </Link>
-            </Button>
-          </div>
-          <div className="p-6 pt-0">
-            <DataTable columns={columns} data={mockJobs} />
-          </div>
-        </div>
+
+            {/* Jobs Table */}
+            <div className="rounded-md border bg-card text-card-foreground shadow-sm mx-6 mb-6">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between space-y-4 sm:space-y-0 p-6">
+                <div className="flex flex-col space-y-1.5">
+                  <h3 className="text-lg font-semibold leading-none tracking-tight">
+                    All Jobs
+                  </h3>
+                  <p className="text-sm text-muted-foreground">
+                    Manage your job postings and applicants.
+                  </p>
+                </div>
+                <Button asChild size="sm">
+                  <Link href="/company/jobs/new">
+                    <Plus className="mr-2 size-4" />
+                    Post New Job
+                  </Link>
+                </Button>
+              </div>
+              <div className="p-6 pt-0">
+                <DataTable columns={columns} data={mockJobs} />
+              </div>
+            </div>
+          </>
+        )}
       </div>
     </>
   );

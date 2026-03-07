@@ -1,44 +1,62 @@
-"use client";
+'use client';
 
-import { useState } from "react";
-import { AdminPermissions, AdminUser, mockAdmins } from "@/data/mock-admins";
-import { InviteDialog } from "./invite-dialog";
-import { AdminsTable } from "./admins-table";
+import { useState } from 'react';
+import { CompanyAdmin, AddAdminInput } from '@/api/types';
+import { businessService } from '@/api';
+import { InviteDialog } from './invite-dialog';
+import { AdminsTable } from './admins-table';
+import { toast } from 'sonner';
 
-export function ManageAdmins() {
-  const [admins, setAdmins] = useState<AdminUser[]>(mockAdmins);
+interface ManageAdminsProps {
+  admins?: CompanyAdmin[];
+  currentUserRights?: CompanyAdmin | null;
+  onSuccess?: () => void | Promise<void>;
+}
 
-  const activeCount = admins.filter((a) => a.status === "Active").length;
-  const pendingCount = admins.filter((a) => a.status === "Pending").length;
+export function ManageAdmins({ admins = [], currentUserRights, onSuccess }: ManageAdminsProps) {
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const handleAdd = (data: {
-    email: string;
-    position: string;
-    permissions: AdminPermissions;
-  }) => {
-    const newAdmin: AdminUser = {
-      id: Date.now().toString(),
-      name: data.email.split("@")[0].replace(/[._]/g, " "),
-      email: data.email,
-      position: data.position,
-      role: "Admin",
-      permissions: data.permissions,
-      joinedAt: new Date().toISOString().split("T")[0],
-      lastActive: new Date().toISOString().split("T")[0],
-      status: "Pending",
-    };
-    setAdmins((prev) => [...prev, newAdmin]);
+  // Count based on created_at (all returned admins are active)
+  const totalCount = admins.length;
+
+  // Check if current user has full rights to manage admins
+  const canManageAdmins = currentUserRights?.can_create && currentUserRights?.can_delete;
+
+  const handleAdd = async (data: Omit<AddAdminInput, 'can_read'>) => {
+    try {
+      setIsSubmitting(true);
+      await businessService.addAdmin({
+        ...data,
+        can_read: true, // Always allow read
+      });
+      toast.success('Admin added successfully');
+      if (onSuccess) {
+        await onSuccess();
+      }
+    } catch (err) {
+      const message = err instanceof Error ? err.message : 'Failed to add admin';
+      toast.error(message);
+      throw err;
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
-  const handleEdit = (
-    id: string,
-    data: { position: string; permissions: AdminPermissions },
-  ) => {
-    setAdmins((prev) => prev.map((a) => (a.id === id ? { ...a, ...data } : a)));
-  };
-
-  const handleRemove = (id: string) => {
-    setAdmins((prev) => prev.filter((a) => a.id !== id));
+  const handleRemove = async (adminId: string) => {
+    try {
+      setIsSubmitting(true);
+      await businessService.removeAdmin(adminId);
+      toast.success('Admin removed successfully');
+      if (onSuccess) {
+        await onSuccess();
+      }
+    } catch (err) {
+      const message = err instanceof Error ? err.message : 'Failed to remove admin';
+      toast.error(message);
+      throw err;
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -47,19 +65,15 @@ export function ManageAdmins() {
       <div className="grid gap-4 sm:grid-cols-3">
         <div className="rounded-lg border bg-card p-4">
           <p className="text-sm text-muted-foreground">Total Members</p>
-          <p className="text-2xl font-bold mt-1">{admins.length}</p>
+          <p className="text-2xl font-bold mt-1">{totalCount}</p>
         </div>
         <div className="rounded-lg border bg-card p-4">
           <p className="text-sm text-muted-foreground">Active</p>
-          <p className="text-2xl font-bold mt-1 text-green-600">
-            {activeCount}
-          </p>
+          <p className="text-2xl font-bold mt-1 text-green-600">{totalCount}</p>
         </div>
         <div className="rounded-lg border bg-card p-4">
-          <p className="text-sm text-muted-foreground">Pending Invites</p>
-          <p className="text-2xl font-bold mt-1 text-yellow-600">
-            {pendingCount}
-          </p>
+          <p className="text-sm text-muted-foreground">Your Permissions</p>
+          <p className="text-sm font-medium mt-1">{canManageAdmins ? 'Full Access' : 'Limited'}</p>
         </div>
       </div>
 
@@ -67,20 +81,20 @@ export function ManageAdmins() {
       <div className="rounded-md border bg-card text-card-foreground shadow-sm">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 p-6">
           <div className="space-y-1">
-            <h3 className="text-lg font-semibold leading-none tracking-tight">
-              Team Members
-            </h3>
+            <h3 className="text-lg font-semibold leading-none tracking-tight">Team Members</h3>
             <p className="text-sm text-muted-foreground">
               Manage who has access to your company dashboard.
             </p>
           </div>
-          <InviteDialog onAdd={handleAdd} />
+          {canManageAdmins && <InviteDialog onAdd={handleAdd} isSubmitting={isSubmitting} />}
         </div>
         <div className="px-6 pb-6">
           <AdminsTable
             admins={admins}
-            onEdit={handleEdit}
+            currentUserId={currentUserRights?.user_id}
+            canManage={canManageAdmins ?? false}
             onRemove={handleRemove}
+            isSubmitting={isSubmitting}
           />
         </div>
       </div>

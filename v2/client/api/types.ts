@@ -1,5 +1,6 @@
 import { ZodError } from "zod";
 import { ApiError } from "./client";
+import { CompanySize } from "@/types/business";
 
 // ─── Common ───────────────────────────────────────────────────────────────────
 
@@ -507,13 +508,11 @@ export interface CompanyLocation {
 }
 
 export interface CompanySocial {
-  id: string;
   platform: "FACEBOOK" | "TWITTER" | "LINKEDIN" | "INSTAGRAM";
   url: string;
 }
 
 export interface CompanyContact {
-  id: string;
   email: string;
   phone: string;
 }
@@ -530,6 +529,14 @@ export interface CompanyAdmin {
   can_delete: boolean;
   created_at: string;
   updated_at: string;
+  user: {
+    id: string;
+    email: string;
+    first_name: string;
+    last_name: string;
+  };
+  profile_picture: string | null;
+  profile_picture_url: string | null;
 }
 
 export interface CompanyInfo {
@@ -537,14 +544,14 @@ export interface CompanyInfo {
   company_name: string;
   industry: string;
   about: string;
-  company_size: string;
+  company_size: CompanySize;
   foundation_year: number;
   website: string;
   logo: string | null;
   logo_url: string | null;
   contact: CompanyContact | null;
-  companyLocations: CompanyLocation[];
-  companySocials: CompanySocial[];
+  locations: CompanyLocation[];
+  social_links: CompanySocial[];
 }
 
 export interface PublicCompanyJobOpening {
@@ -623,7 +630,7 @@ export interface AddLocationInput {
 }
 
 export interface AddAdminInput {
-  user_id: string;
+  email: string;
   role: string;
   position?: string;
   can_create: boolean;
@@ -638,6 +645,11 @@ export interface PipelineItem {
   percentage: number;
 }
 
+export interface ApplicantTrend {
+  week_start: string;
+  count: number;
+}
+
 export interface DashboardData {
   summary: {
     total_jobs: number;
@@ -645,6 +657,7 @@ export interface DashboardData {
     new_applicants_this_week: number;
     interviewed_applicants: number;
   };
+  applicant_trends: ApplicantTrend[];
   application_pipeline: PipelineItem[];
   recent_jobs: Array<{
     id: string;
@@ -659,8 +672,10 @@ export interface DashboardData {
     status: ApplicationStatus;
     application_date: string;
     applicant_profile: {
-      first_name: string;
-      last_name: string;
+      user: {
+        first_name: string;
+        last_name: string;
+      }
       desired_position: string;
       profile_picture: string | null;
     };

@@ -317,6 +317,17 @@ export class CompanyController {
       next(error);
     }
   }
+
+  async getUserByEmail(req: Request, res: Response, next: NextFunction): Promise<void> {
+    try {
+      const email = req.query.email as string;
+      if (!email) throw new BadRequestError('Email query parameter is required');
+      const result = await companyService.getUserByEmail(email);
+      successResponse(res, result, 'User retrieved successfully');
+    } catch (error) {
+      next(error);
+    }
+  }
 }
 
 export const companyController = new CompanyController();

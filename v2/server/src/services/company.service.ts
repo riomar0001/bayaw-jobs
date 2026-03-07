@@ -142,19 +142,19 @@ export class CompanyService {
       throw new AuthorizationError('Only admins with full rights can add new admins');
     }
 
-    const targetUser = await userRepository.findById(data.user_id);
+    const targetUser = await userRepository.findByEmail(data.email);
     if (!targetUser) {
-      throw new NotFoundError('User not found');
+      throw new NotFoundError('User with this email not found');
     }
 
-    const existing = await companyRepository.findAdminByUserAndCompany(data.user_id, companyId);
+    const existing = await companyRepository.findAdminByUserAndCompany(targetUser.id, companyId);
     if (existing) {
       throw new ConflictError('User is already an admin of this company');
     }
 
     return companyRepository.addAdmin({
       company_id: companyId,
-      user_id: data.user_id,
+      user_id: targetUser.id,
       role: data.role,
       ...(data.position !== undefined ? { position: data.position } : {}),
       can_create: data.can_create,
@@ -374,6 +374,10 @@ export class CompanyService {
 
     const { buffer, contentType } = await storageService.downloadCompanyLogo(company.logo);
     return { buffer, contentType, filename: company.logo };
+  }
+
+  async getUserByEmail(email: string) {
+    return await companyRepository.findUserByEmail(email);
   }
 }
 

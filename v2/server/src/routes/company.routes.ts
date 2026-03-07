@@ -151,4 +151,6 @@ router.get(
   companyController.getAdminProfilePicture.bind(companyController)
 );
 
+router.get('/users/:email', companyController.getUserByEmail.bind(companyController));
+
 export default router;

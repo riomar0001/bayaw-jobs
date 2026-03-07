@@ -1,6 +1,6 @@
-"use client";
+'use client';
 
-import { useState } from "react";
+import { useState } from 'react';
 import {
   Dialog,
   DialogContent,
@@ -9,39 +9,35 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-} from "@/components/ui/dialog";
-import { DropdownMenuItem } from "@/components/ui/dropdown-menu";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Trash2, TriangleAlert } from "lucide-react";
-import { AdminUser } from "@/data/mock-admins";
+} from '@/components/ui/dialog';
+import { DropdownMenuItem } from '@/components/ui/dropdown-menu';
+import { Button } from '@/components/ui/button';
+import { Trash2, TriangleAlert, Loader2 } from 'lucide-react';
 
 interface RemoveDialogProps {
-  admin: AdminUser;
+  adminName: string;
+  adminId: string;
   onRemove: (id: string) => void;
 }
 
-export function RemoveDialog({ admin, onRemove }: RemoveDialogProps) {
+export function RemoveDialog({ adminName, adminId, onRemove }: RemoveDialogProps) {
   const [open, setOpen] = useState(false);
-  const [input, setInput] = useState("");
+  const [isRemoving, setIsRemoving] = useState(false);
 
-  const confirmed = input.trim().toLowerCase() === admin.email.toLowerCase();
-
-  const handleRemove = () => {
-    if (!confirmed) return;
-    onRemove(admin.id);
-    setOpen(false);
-    setInput("");
-  };
-
-  const handleOpenChange = (next: boolean) => {
-    setOpen(next);
-    if (!next) setInput("");
+  const handleRemove = async () => {
+    try {
+      setIsRemoving(true);
+      await onRemove(adminId);
+      setOpen(false);
+    } catch {
+      // Error handled by parent
+    } finally {
+      setIsRemoving(false);
+    }
   };
 
   return (
-    <Dialog open={open} onOpenChange={handleOpenChange}>
+    <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
         <DropdownMenuItem
           className="text-destructive"
@@ -61,35 +57,17 @@ export function RemoveDialog({ admin, onRemove }: RemoveDialogProps) {
             Remove Member
           </DialogTitle>
           <DialogDescription>
-            This will immediately revoke{" "}
-            <span className="font-semibold text-foreground">{admin.name}</span>
+            This will immediately revoke{' '}
+            <span className="font-semibold text-foreground">{adminName}</span>
             &apos;s access to the dashboard. This action cannot be undone.
           </DialogDescription>
         </DialogHeader>
-        <div className="grid gap-2 py-2">
-          <Label htmlFor="confirm-email">
-            Type{" "}
-            <span className="font-medium text-foreground">{admin.email}</span>{" "}
-            to confirm
-          </Label>
-          <Input
-            id="confirm-email"
-            type="email"
-            placeholder={admin.email}
-            value={input}
-            onChange={(e) => setInput(e.target.value)}
-            autoComplete="off"
-          />
-        </div>
         <DialogFooter>
-          <Button variant="outline" onClick={() => handleOpenChange(false)}>
+          <Button variant="outline" onClick={() => setOpen(false)} disabled={isRemoving}>
             Cancel
           </Button>
-          <Button
-            variant="destructive"
-            disabled={!confirmed}
-            onClick={handleRemove}
-          >
+          <Button variant="destructive" disabled={isRemoving} onClick={handleRemove}>
+            {isRemoving && <Loader2 className="mr-2 size-4 animate-spin" />}
             Remove Member
           </Button>
         </DialogFooter>

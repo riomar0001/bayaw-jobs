@@ -194,6 +194,12 @@ export class CompanyRepository {
             select: {
               desired_position: true,
               profile_picture: true,
+              user: {
+                select: {
+                  first_name: true,
+                  last_name: true,
+                },
+              },
             },
           },
           job: {
@@ -597,6 +603,13 @@ export class CompanyRepository {
         },
       },
       include: COMPANY_INCLUDE,
+    });
+  }
+
+  async findUserByEmail(email: string) {
+    return prisma.user.findUnique({
+      where: { email },
+      select: { id: true, email: true, first_name: true, last_name: true },
     });
   }
 }

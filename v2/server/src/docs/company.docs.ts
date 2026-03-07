@@ -1572,6 +1572,54 @@ const stats = {
   },
 };
 
+const getUserByEmail = {
+  '/business/users/{email}': {
+    get: {
+      tags: ['Business'],
+      summary: 'Get user by email',
+      description: 'Returns user information based on email address.',
+      security: [{ bearerAuth: [] }],
+      parameters: [
+        {
+          name: 'email',
+          in: 'path',
+          required: true,
+          schema: { type: 'string', format: 'email' },
+          description: 'Email address of the user to retrieve',
+        },
+      ],
+      responses: {
+        '200': {
+          description: 'User retrieved successfully',
+          content: {
+            'application/json': {
+              schema: {
+                type: 'object',
+                properties: {
+                  success: { type: 'boolean', example: true },
+                  message: { type: 'string', example: 'User retrieved successfully' },
+                  data: {
+                    type: 'object',
+                    properties: {
+                      id: { type: 'string', format: 'uuid' },
+                      email: { type: 'string', example: 'john.doe@example.com' },
+                      first_name: { type: 'string', example: 'John' },
+                      last_name: { type: 'string', example: 'Doe' },
+                    },
+                  },
+                },
+              },
+            },
+          },
+        },
+        '400': { description: 'Invalid email format' },
+        '401': { description: 'Unauthorized' },
+        '404': { description: 'User not found' },
+      },
+    },
+  },
+};
+
 export const companyDocs = {
   ...getTopCompanies,
   ...getAllCompanies,
@@ -1586,4 +1634,5 @@ export const companyDocs = {
   ...dashboard,
   ...applicantInfo,
   ...stats,
+  ...getUserByEmail,
 };

@@ -125,7 +125,7 @@ export type UpdateLocationInput = z.infer<typeof updateLocationSchema>['body'];
 
 export const addAdminSchema = z.object({
   body: z.object({
-    user_id: z.string().uuid('User ID must be a valid UUID'),
+    email: z.string().email('Must be a valid email address'),
     role: z.string().min(1, 'Role is required'),
     position: z.string().optional(),
     can_create: z.boolean({ error: '"can_create" must be a boolean' }).default(false),

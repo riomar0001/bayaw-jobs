@@ -23,11 +23,11 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { BusinessProfile } from "@/types/business";
 import { Loader2 } from "lucide-react";
 import { FieldInfo } from "@/components/company/dashboard/business/field-info";
 import { businessService } from "@/api";
 import { toast } from "sonner";
+import { CompanyInfo } from '@/api/types';
 
 const companyInfoSchema = z.object({
   company_name: z.string().min(2, "Company name must be at least 2 characters"),
@@ -54,7 +54,7 @@ const companyInfoSchema = z.object({
 type CompanyInfoValues = z.infer<typeof companyInfoSchema>;
 
 interface CompanyInfoFormProps {
-  business: BusinessProfile;
+  business: CompanyInfo;
 }
 
 export function CompanyInfoForm({ business }: CompanyInfoFormProps) {

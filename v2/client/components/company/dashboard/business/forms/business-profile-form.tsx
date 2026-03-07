@@ -76,16 +76,16 @@ export function BusinessProfileForm({ business }: BusinessProfileFormProps) {
   const form = useForm<BusinessFormValues>({
     resolver: zodResolver(businessFormSchema),
     defaultValues: {
-      name: business.name,
-      description: business.description,
+      name: business.company_name,
+      description: business.about,
       industry: business.industry,
-      companySize: business.companySize,
-      foundedYear: business.foundedYear,
+      companySize: business.company_size,
+      foundedYear: business.foundation_year,
       website: business.website || "",
-      contactEmail: business.contactEmail,
-      contactPhone: business.contactPhone || "",
-      linkedin: business.socialLinks.linkedin || "",
-      twitter: business.socialLinks.twitter || "",
+      contactEmail: business.contact.email,
+      contactPhone: business.contact.phone || "",
+      linkedin: business.social_links.linkedin || "",
+      twitter: business.social_links.twitter || "",
     },
   });
 

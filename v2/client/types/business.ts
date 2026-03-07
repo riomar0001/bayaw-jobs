@@ -1,16 +1,20 @@
 export interface BusinessProfile {
   id: string;
-  name: string;
+  company_name: string;
   logo?: string;
-  description: string;
+  about: string;
   industry: string;
-  companySize: CompanySize;
-  foundedYear: number;
+  company_size: CompanySize;
+  foundation_year: number;
   website?: string;
-  socialLinks: SocialLinks;
+  social_links: SocialLinks;
   locations: BusinessLocation[];
-  contactEmail: string;
-  contactPhone?: string;
+  contact: BusinessContact;
+}
+
+export interface BusinessContact {
+  email: string;
+  phone?: string;
 }
 
 export type CompanySize =
@@ -34,6 +38,6 @@ export interface BusinessLocation {
   city: string;
   state?: string;
   country: string;
-  postalCode?: string;
-  isHeadquarters: boolean;
+  postal_code?: string;
+  is_headquarter: boolean;
 }

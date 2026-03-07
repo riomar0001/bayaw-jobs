@@ -1,9 +1,9 @@
 export interface User {
   id: string;
   email: string;
-  firstName: string;
-  lastName: string;
-  fullName: string;
+  first_name: string;
+  last_name: string;
+  fullName?: string;
   avatar?: string;
   role: UserRole;
   phone?: string;
@@ -12,6 +12,14 @@ export interface User {
   notifications: NotificationSettings;
   createdAt: string;
   lastLogin: string;
+}
+
+export interface CompanyUser {
+  email: string;
+  first_name: string;
+  last_name: string;
+  profile_picture: string | null;
+  fullName: string;
 }
 
 export type UserRole = "Admin" | "Recruiter" | "Hiring Manager" | "Viewer";
