@@ -5,7 +5,13 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Footer } from "@/components/shared/footer";
-import { ArrowLeft, Briefcase, ChevronLeft, ChevronRight, AlertCircle } from "lucide-react";
+import {
+  ArrowLeft,
+  Briefcase,
+  ChevronLeft,
+  ChevronRight,
+  AlertCircle,
+} from "lucide-react";
 import { ApplicationFilters } from "@/components/applicants/applications/application-filters";
 import { ApplicationStats } from "@/components/applicants/applications/application-stats";
 import { ApplicationCard } from "@/components/applicants/applications/application-card";

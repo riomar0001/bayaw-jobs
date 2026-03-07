@@ -35,7 +35,9 @@ export function useApplications(): UseApplicationsReturn {
   const [isStatsLoading, setIsStatsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [page, setPage] = useState(1);
-  const [statusFilter, setStatusFilter] = useState<ApplicationStatus | "all">("all");
+  const [statusFilter, setStatusFilter] = useState<ApplicationStatus | "all">(
+    "all",
+  );
   const [searchQuery, setSearchQuery] = useState("");
 
   const fetchApplications = useCallback(async () => {
@@ -50,7 +52,9 @@ export function useApplications(): UseApplicationsReturn {
       setApplications(res.data);
       setMeta(res.meta);
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Failed to load applications");
+      setError(
+        err instanceof Error ? err.message : "Failed to load applications",
+      );
     } finally {
       setIsLoading(false);
     }

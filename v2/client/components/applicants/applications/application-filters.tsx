@@ -52,7 +52,9 @@ export function ApplicationFilters({
           <div className="w-full md:w-48">
             <Select
               value={statusFilter}
-              onValueChange={(v) => onStatusChange(v as ApplicationStatus | "all")}
+              onValueChange={(v) =>
+                onStatusChange(v as ApplicationStatus | "all")
+              }
             >
               <SelectTrigger>
                 <Filter className="h-4 w-4 mr-2" />
@@ -72,4 +74,3 @@ export function ApplicationFilters({
     </Card>
   );
 }
-

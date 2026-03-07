@@ -80,7 +80,7 @@ export function CareerStatusCard({
 
   return (
     <Card>
-      <CardHeader >
+      <CardHeader>
         <div className="flex items-center gap-2">
           <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center">
             <Target className="h-4 w-4 text-primary" />
