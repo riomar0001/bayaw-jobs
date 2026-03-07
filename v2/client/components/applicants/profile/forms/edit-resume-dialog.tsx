@@ -11,7 +11,9 @@ import {
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Upload, FileText } from "lucide-react";
+import { Upload, FileText, Loader2 } from "lucide-react";
+import { applicantService } from "@/api/services/applicant.service";
+import { toast } from "sonner";
 
 interface ResumeData {
   fileName: string;
@@ -34,6 +36,7 @@ export function EditResumeDialog({
 }: EditResumeDialogProps) {
   const [file, setFile] = useState<File | null>(null);
   const [isDragging, setIsDragging] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
@@ -63,25 +66,33 @@ export function EditResumeDialog({
     e.preventDefault();
 
     if (file) {
-      const resumeData: ResumeData = {
-        fileName: file.name,
-        fileSize: `${(file.size / 1024 / 1024).toFixed(2)} MB`,
-        uploadedAt: new Date().toISOString().split("T")[0],
-      };
+      try {
+        setIsSubmitting(true);
+        const res = await applicantService.updateResume(file);
 
-      await new Promise((resolve) => setTimeout(resolve, 500));
-      onSave(resumeData);
+        const resumeData: ResumeData = {
+          fileName: res.file_name,
+          // Since the backend doesn't return size, compute it from the file uploaded
+          fileSize: `${(file.size / 1024 / 1024).toFixed(2)} MB`,
+          uploadedAt: new Date().toISOString().split("T")[0],
+        };
+
+        toast.success("Resume updated successfully");
+        onSave(resumeData);
+        onOpenChange(false);
+      } catch (error) {
+        toast.error(
+          error instanceof Error ? error.message : "Failed to update resume",
+        );
+      } finally {
+        setIsSubmitting(false);
+      }
     } else if (!initialData) {
       onSave(null);
+      onOpenChange(false);
+    } else {
+      onOpenChange(false);
     }
-
-    onOpenChange(false);
-  };
-
-  const handleRemove = () => {
-    setFile(null);
-    onSave(null);
-    onOpenChange(false);
   };
 
   const displayFile = file || initialData;
@@ -106,7 +117,7 @@ export function EditResumeDialog({
           >
             {displayFile ? (
               <div className="space-y-4">
-                <div className="w-16 h-16 mx-auto rounded-2xl bg-gradient-to-br from-sky-400/20 to-cyan-500/20 flex items-center justify-center">
+                <div className="w-16 h-16 mx-auto rounded-2xl bg-linear-to-br from-sky-400/20 to-cyan-500/20 flex items-center justify-center">
                   <FileText className="h-8 w-8 text-primary" />
                 </div>
                 <div>
@@ -130,7 +141,7 @@ export function EditResumeDialog({
               </div>
             ) : (
               <div className="space-y-4">
-                <div className="w-16 h-16 mx-auto rounded-2xl bg-gradient-to-br from-sky-400/20 to-cyan-500/20 flex items-center justify-center">
+                <div className="w-16 h-16 mx-auto rounded-2xl bg-linear-to-br from-sky-400/20 to-cyan-500/20 flex items-center justify-center">
                   <Upload className="h-8 w-8 text-primary" />
                 </div>
                 <div>
@@ -158,16 +169,6 @@ export function EditResumeDialog({
           </div>
 
           <DialogFooter className="gap-2">
-            {initialData && (
-              <Button
-                type="button"
-                variant="destructive"
-                onClick={handleRemove}
-                className="mr-auto"
-              >
-                Remove Resume
-              </Button>
-            )}
             <Button
               type="button"
               variant="outline"
@@ -175,7 +176,15 @@ export function EditResumeDialog({
             >
               Cancel
             </Button>
-            <Button type="submit">Save Changes</Button>
+            <Button
+              type="submit"
+              disabled={isSubmitting || (!file && !initialData)}
+            >
+              {isSubmitting ? (
+                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+              ) : null}
+              {isSubmitting ? "Saving..." : "Save Changes"}
+            </Button>
           </DialogFooter>
         </form>
       </DialogContent>

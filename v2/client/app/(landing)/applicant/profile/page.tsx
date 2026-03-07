@@ -104,30 +104,32 @@ export default function ProfilePage() {
     );
   };
 
-  const handleSaveEducation = (data: {
-    school: string;
-    field: string;
-    monthGraduated: string;
-    yearGraduated: string;
-  }) => {
+  const handleSaveEducation = (
+    data: Array<{
+      id?: string;
+      school: string;
+      field: string;
+      fromYear: string;
+      toYear?: string;
+      currentlyEnrolled: boolean;
+    }>,
+  ) => {
     setProfile((prev) =>
       !prev
         ? prev
         : {
             ...prev,
-            applicantEducations: [
-              {
-                id: prev.applicantEducations?.[0]?.id ?? "",
-                applicant_profile_id: prev.id,
-                institution_name: data.school,
-                field_of_study: data.field,
-                start_year: prev.applicantEducations?.[0]?.start_year ?? 0,
-                end_year: data.yearGraduated
-                  ? parseInt(data.yearGraduated)
-                  : null,
-              },
-              ...(prev.applicantEducations?.slice(1) ?? []),
-            ],
+            applicantEducations: data.map((edu, i) => ({
+              id:
+                edu.id ?? prev.applicantEducations?.[i]?.id ?? `temp-edu-${i}`,
+              applicant_profile_id: prev.id,
+              institution_name: edu.school,
+              field_of_study: edu.field,
+              start_year: parseInt(edu.fromYear, 10),
+              end_year: edu.currentlyEnrolled
+                ? null
+                : parseInt(edu.toYear || "0", 10),
+            })),
           },
     );
   };
@@ -169,15 +171,17 @@ export default function ProfilePage() {
     setLocalResume(data);
   };
 
-  const handleSaveSkills = (skills: string[]) => {
+  const handleSaveSkills = (
+    skills: Array<{ id?: string; skill_name: string }>,
+  ) => {
     setProfile((prev) =>
       !prev
         ? prev
         : {
             ...prev,
-            applicantSkills: skills.map((name, i) => ({
-              id: prev.applicantSkills?.[i]?.id ?? `temp-skill-${i}`,
-              skill_name: name,
+            applicantSkills: skills.map((s, i) => ({
+              id: s.id ?? prev.applicantSkills?.[i]?.id ?? `temp-skill-${i}`,
+              skill_name: s.skill_name,
             })),
           },
     );
@@ -207,9 +211,16 @@ export default function ProfilePage() {
 
   const displayStatus = mapCareerStatus(profile?.career_status);
   const resumeFileName = `${user?.first_name ?? ""}-${user?.last_name ?? ""}-resume.pdf`;
-  const displayResume = (localResume ?? (profile?.resume_url ? { fileName: "", fileSize: "", uploadedAt: "" } : null))
-    ? { ...(localResume ?? { fileName: "", fileSize: "", uploadedAt: "" }), fileName: resumeFileName }
-    : null;
+  const displayResume =
+    (localResume ??
+    (profile?.resume_url
+      ? { fileName: "", fileSize: "", uploadedAt: "" }
+      : null))
+      ? {
+          ...(localResume ?? { fileName: "", fileSize: "", uploadedAt: "" }),
+          fileName: resumeFileName,
+        }
+      : null;
 
   if (isLoading) {
     return (
@@ -574,19 +585,14 @@ export default function ProfilePage() {
       <EditEducationDialog
         open={editEducationOpen}
         onOpenChange={setEditEducationOpen}
-        initialData={
-          profile.applicantEducations?.[0]
-            ? {
-                school: profile.applicantEducations[0].institution_name,
-                field: profile.applicantEducations[0].field_of_study,
-                monthGraduated: "01",
-                yearGraduated: String(
-                  profile.applicantEducations[0].end_year ??
-                    profile.applicantEducations[0].start_year,
-                ),
-              }
-            : { school: "", field: "", monthGraduated: "01", yearGraduated: "" }
-        }
+        initialData={(profile.applicantEducations ?? []).map((edu) => ({
+          id: edu.id,
+          school: edu.institution_name,
+          field: edu.field_of_study,
+          fromYear: String(edu.start_year),
+          toYear: edu.end_year ? String(edu.end_year) : undefined,
+          currentlyEnrolled: !edu.end_year,
+        }))}
         onSave={handleSaveEducation}
       />
 
@@ -594,6 +600,7 @@ export default function ProfilePage() {
         open={editExperienceOpen}
         onOpenChange={setEditExperienceOpen}
         initialData={(profile.applicantExperiences ?? []).map((exp) => ({
+          id: exp.id,
           companyName: exp.company_name,
           position: exp.position,
           fromYear: String(new Date(exp.start_date).getFullYear()),
@@ -615,7 +622,10 @@ export default function ProfilePage() {
       <EditSkillsDialog
         open={editSkillsOpen}
         onOpenChange={setEditSkillsOpen}
-        initialData={(profile.applicantSkills ?? []).map((s) => s.skill_name)}
+        initialData={(profile.applicantSkills ?? []).map((s) => ({
+          id: s.id,
+          skill_name: s.skill_name,
+        }))}
         onSave={handleSaveSkills}
       />
 
@@ -623,6 +633,7 @@ export default function ProfilePage() {
         open={editLanguagesOpen}
         onOpenChange={setEditLanguagesOpen}
         initialData={(profile.applicantLanguages ?? []).map((lang) => ({
+          id: lang.id,
           language: lang.language_name,
           proficiency: lang.proficiency_level.toLowerCase() as
             | "basic"

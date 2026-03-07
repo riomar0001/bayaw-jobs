@@ -1,5 +1,6 @@
 "use client";
 
+import { useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
@@ -14,6 +15,8 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import { applicantService } from "@/api/services/applicant.service";
+import { toast } from "sonner";
 
 const personalInfoSchema = z.object({
   phone: z.string().min(10, "Phone number must be at least 10 characters"),
@@ -46,18 +49,38 @@ export function EditPersonalInfoDialog({
     formState: { errors, isSubmitting },
     setValue,
     watch,
+    reset,
   } = useForm<PersonalInfoFormData>({
     resolver: zodResolver(personalInfoSchema),
     defaultValues: initialData,
   });
 
+  useEffect(() => {
+    if (open) {
+      reset(initialData);
+    }
+  }, [open, initialData, reset]);
+
   // eslint-disable-next-line react-hooks/incompatible-library
   const gender = watch("gender");
 
   const onSubmit = async (data: PersonalInfoFormData) => {
-    await new Promise((resolve) => setTimeout(resolve, 500));
-    onSave(data);
-    onOpenChange(false);
+    try {
+      await applicantService.updateProfile({
+        phone_number: data.phone,
+        age: parseInt(data.age, 10),
+        gender: data.gender,
+        location: data.location,
+        desired_position: data.desiredPosition,
+      });
+      toast.success("Profile updated successfully");
+      onSave(data);
+      onOpenChange(false);
+    } catch (error) {
+      toast.error(
+        error instanceof Error ? error.message : "Failed to update profile",
+      );
+    }
   };
 
   return (

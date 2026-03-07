@@ -246,6 +246,7 @@ export interface UpdateProfileInput {
   age?: number;
   location?: string;
   gender?: string;
+  phone_number?: string;
 }
 
 export interface AddEducationInput {
