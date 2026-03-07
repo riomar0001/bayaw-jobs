@@ -26,14 +26,16 @@ import { Switch } from "@/components/ui/switch";
 import { BusinessLocation } from "@/types/business";
 import { Loader2 } from "lucide-react";
 import { FieldInfo } from "@/components/company/dashboard/business/field-info";
+import { businessService } from "@/api";
+import { toast } from "sonner";
 
 const locationSchema = z.object({
   address: z.string().min(1, "Address is required"),
   city: z.string().min(1, "City is required"),
   state: z.string().optional(),
   country: z.string().min(1, "Country is required"),
-  postalCode: z.string().optional(),
-  isHeadquarters: z.boolean(),
+  postal_code: z.string().optional(),
+  is_headquarter: z.boolean(),
 });
 
 type LocationFormValues = z.infer<typeof locationSchema>;
@@ -60,19 +62,40 @@ export function LocationDialog({
       city: location?.city || "",
       state: location?.state || "",
       country: location?.country || "",
-      postalCode: location?.postalCode || "",
-      isHeadquarters: location?.isHeadquarters || false,
+      postal_code: location?.postal_code || "",
+      is_headquarter: location?.is_headquarter || false,
     },
   });
 
   async function onSubmit(data: LocationFormValues) {
     setIsSubmitting(true);
-    await new Promise((resolve) => setTimeout(resolve, 800));
-    console.log(isEditing ? "Location updated:" : "Location added:", data);
-    onSave?.(data);
-    setIsSubmitting(false);
-    setOpen(false);
-    if (!isEditing) form.reset();
+
+    const payload = {
+      ...data,
+      state: data.state ?? "",
+      postal_code: data.postal_code ?? "",
+    };
+
+    const action = isEditing
+      ? { success: "updated", error: "update" }
+      : { success: "added", error: "add" };
+
+    try {
+      const request = isEditing
+        ? businessService.updateLocation(location.id, payload)
+        : businessService.addLocation(payload);
+
+      await request;
+
+      toast.success(`Location ${action.success} successfully`);
+    } catch {
+      toast.error(`Failed to ${action.error} location`);
+    } finally {
+      onSave?.(payload);
+      setIsSubmitting(false);
+      setOpen(false);
+      if (!isEditing) form.reset();
+    }
   }
 
   return (
@@ -159,7 +182,7 @@ export function LocationDialog({
 
               <FormField
                 control={form.control}
-                name="postalCode"
+                name="postal_code"
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel className="flex items-center gap-1.5">
@@ -177,7 +200,7 @@ export function LocationDialog({
 
             <FormField
               control={form.control}
-              name="isHeadquarters"
+              name="is_headquarter"
               render={({ field }) => (
                 <FormItem className="flex items-center justify-between rounded-lg border p-3">
                   <FormLabel className="flex cursor-pointer items-center gap-1.5">

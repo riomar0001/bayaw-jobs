@@ -26,12 +26,14 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { BusinessProfile } from "@/types/business";
 import { Loader2 } from "lucide-react";
 import { FieldInfo } from "@/components/company/dashboard/business/field-info";
+import { businessService } from "@/api";
+import { toast } from "sonner";
 
 const companyInfoSchema = z.object({
-  name: z.string().min(2, "Company name must be at least 2 characters"),
+  company_name: z.string().min(2, "Company name must be at least 2 characters"),
   industry: z.string().min(1, "Industry is required"),
-  description: z.string().min(10, "Description must be at least 10 characters"),
-  companySize: z.enum([
+  about: z.string().min(10, "Description must be at least 10 characters"),
+  company_size: z.enum([
     "1-10",
     "11-50",
     "51-200",
@@ -39,7 +41,7 @@ const companyInfoSchema = z.object({
     "501-1000",
     "1000+",
   ]),
-  foundedYear: z.number().int().min(1800).max(new Date().getFullYear()),
+  foundation_year: z.number().int().min(1800).max(new Date().getFullYear()),
   website: z
     .string()
     .optional()
@@ -61,20 +63,26 @@ export function CompanyInfoForm({ business }: CompanyInfoFormProps) {
   const form = useForm<CompanyInfoValues>({
     resolver: zodResolver(companyInfoSchema),
     defaultValues: {
-      name: business.name,
+      company_name: business.company_name,
       industry: business.industry,
-      description: business.description,
-      companySize: business.companySize,
-      foundedYear: business.foundedYear,
+      about: business.about,
+      company_size: business.company_size,
+      foundation_year: business.foundation_year,
       website: business.website || "",
     },
   });
 
   async function onSubmit(data: CompanyInfoValues) {
     setIsSubmitting(true);
-    await new Promise((resolve) => setTimeout(resolve, 1000));
-    console.log("Company info updated:", data);
-    setIsSubmitting(false);
+    try {
+      await businessService.updateInfo(data);
+
+      toast.success('Company information updated successfully');
+    } catch {
+      toast.error('Failed to update company information. Please try again.');
+    } finally {
+      setIsSubmitting(false);
+    }
   }
 
   return (
@@ -88,7 +96,7 @@ export function CompanyInfoForm({ business }: CompanyInfoFormProps) {
             <div className="grid gap-6 md:grid-cols-2">
               <FormField
                 control={form.control}
-                name="name"
+                name="company_name"
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel className="flex items-center gap-1.5">
@@ -123,7 +131,7 @@ export function CompanyInfoForm({ business }: CompanyInfoFormProps) {
 
             <FormField
               control={form.control}
-              name="description"
+              name="about"
               render={({ field }) => (
                 <FormItem>
                   <FormLabel className="flex items-center gap-1.5">
@@ -145,7 +153,7 @@ export function CompanyInfoForm({ business }: CompanyInfoFormProps) {
             <div className="grid gap-6 md:grid-cols-2">
               <FormField
                 control={form.control}
-                name="companySize"
+                name="company_size"
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel className="flex items-center gap-1.5">
@@ -181,7 +189,7 @@ export function CompanyInfoForm({ business }: CompanyInfoFormProps) {
 
               <FormField
                 control={form.control}
-                name="foundedYear"
+                name="foundation_year"
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel className="flex items-center gap-1.5">

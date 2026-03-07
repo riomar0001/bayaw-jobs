@@ -1,10 +1,10 @@
-"use client";
+'use client';
 
-import { useState } from "react";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { useForm } from "react-hook-form";
-import * as z from "zod";
-import { Button } from "@/components/ui/button";
+import { useState } from 'react';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { useForm } from 'react-hook-form';
+import * as z from 'zod';
+import { Button } from '@/components/ui/button';
 import {
   Form,
   FormControl,
@@ -12,16 +12,19 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-} from "@/components/ui/form";
-import { Input } from "@/components/ui/input";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { BusinessProfile } from "@/types/business";
-import { Loader2 } from "lucide-react";
-import { FieldInfo } from "@/components/company/dashboard/business/field-info";
+} from '@/components/ui/form';
+import { Input } from '@/components/ui/input';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { BusinessProfile } from '@/types/business';
+import { Loader2 } from 'lucide-react';
+import { FieldInfo } from '@/components/company/dashboard/business/field-info';
+import { businessService } from '@/api/services/business.service';
+import { toast } from 'sonner';
 
 const contactInfoSchema = z.object({
-  contactEmail: z.string().email("Invalid email address"),
-  contactPhone: z.string().optional(),
+  company_id: z.string(),
+  email: z.string().email('Invalid email address'),
+  phone: z.string(),
 });
 
 type ContactInfoValues = z.infer<typeof contactInfoSchema>;
@@ -36,16 +39,22 @@ export function ContactInfoForm({ business }: ContactInfoFormProps) {
   const form = useForm<ContactInfoValues>({
     resolver: zodResolver(contactInfoSchema),
     defaultValues: {
-      contactEmail: business.contactEmail,
-      contactPhone: business.contactPhone || "",
+      company_id: business.id,
+      email: business.contact.email,
+      phone: business.contact.phone,
     },
   });
 
   async function onSubmit(data: ContactInfoValues) {
     setIsSubmitting(true);
-    await new Promise((resolve) => setTimeout(resolve, 1000));
-    console.log("Contact info updated:", data);
-    setIsSubmitting(false);
+    try {
+      await businessService.updateContact(data);
+      toast.success('Contact information updated successfully');
+    } catch {
+      toast.error('Failed to update contact information. Please try again.');
+    } finally {
+      setIsSubmitting(false);
+    }
   }
 
   return (
@@ -59,7 +68,7 @@ export function ContactInfoForm({ business }: ContactInfoFormProps) {
             <div className="grid gap-6 md:grid-cols-2">
               <FormField
                 control={form.control}
-                name="contactEmail"
+                name="email"
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel className="flex items-center gap-1.5">
@@ -76,7 +85,7 @@ export function ContactInfoForm({ business }: ContactInfoFormProps) {
 
               <FormField
                 control={form.control}
-                name="contactPhone"
+                name="phone"
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel className="flex items-center gap-1.5">
@@ -94,9 +103,7 @@ export function ContactInfoForm({ business }: ContactInfoFormProps) {
 
             <div className="flex justify-end">
               <Button type="submit" disabled={isSubmitting}>
-                {isSubmitting && (
-                  <Loader2 className="mr-2 size-4 animate-spin" />
-                )}
+                {isSubmitting && <Loader2 className="mr-2 size-4 animate-spin" />}
                 Save Changes
               </Button>
             </div>
