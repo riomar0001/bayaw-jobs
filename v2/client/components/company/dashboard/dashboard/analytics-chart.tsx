@@ -8,7 +8,7 @@ import {
   ChartTooltipContent,
 } from "@/components/ui/chart";
 import { Area, AreaChart, XAxis, YAxis } from "recharts";
-import { mockAnalytics } from "@/data";
+import type { ApplicantTrend } from "@/api/types";
 
 const chartConfig = {
   count: {
@@ -17,8 +17,16 @@ const chartConfig = {
   },
 } satisfies ChartConfig;
 
-export function AnalyticsChart() {
-  const data = mockAnalytics.applicantsTrend;
+interface AnalyticsChartProps {
+  data?: ApplicantTrend[];
+}
+
+export function AnalyticsChart({ data = [] }: AnalyticsChartProps) {
+  // Transform API data to chart format
+  const chartData = data.map((item) => ({
+    label: new Date(item.week_start).toLocaleDateString("en-US", { month: "short", day: "numeric" }),
+    count: item.count,
+  }));
 
   return (
     <Card>
@@ -28,7 +36,7 @@ export function AnalyticsChart() {
       <CardContent>
         <ChartContainer config={chartConfig} className="h-[300px] w-full">
           <AreaChart
-            data={data}
+            data={chartData}
             margin={{ top: 10, right: 10, left: 0, bottom: 0 }}
           >
             <defs>

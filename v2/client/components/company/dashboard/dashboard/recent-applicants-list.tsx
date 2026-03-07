@@ -1,42 +1,37 @@
-"use client";
+'use client';
 
-import Link from "next/link";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Badge } from "@/components/ui/badge";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { ArrowRight } from "lucide-react";
-import { mockCandidates, mockApplications, mockJobs } from "@/data";
-import { cn } from "@/lib/utils";
+import Link from 'next/link';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { Badge } from '@/components/ui/badge';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { ArrowRight } from 'lucide-react';
+import type { DashboardData } from '@/api/types';
+import { cn } from '@/lib/utils';
 
 const statusColors: Record<string, string> = {
-  New: "bg-blue-100 text-blue-800",
-  Screening: "bg-yellow-100 text-yellow-800",
-  Interview: "bg-purple-100 text-purple-800",
-  Offer: "bg-green-100 text-green-800",
-  Hired: "bg-emerald-100 text-emerald-800",
-  Rejected: "bg-red-100 text-red-800",
+  NEW: 'bg-blue-100 text-blue-800',
+  SCREENING: 'bg-yellow-100 text-yellow-800',
+  INTERVIEW: 'bg-purple-100 text-purple-800',
+  OFFER: 'bg-green-100 text-green-800',
+  HIRED: 'bg-emerald-100 text-emerald-800',
+  REJECTED: 'bg-red-100 text-red-800',
 };
 
-export function RecentApplicantsList() {
-  // Get recent applications and merge with candidate/job data
-  const recentApplications = mockApplications
-    .sort(
-      (a, b) =>
-        new Date(b.appliedAt).getTime() - new Date(a.appliedAt).getTime(),
-    )
-    .slice(0, 5)
-    .map((app) => {
-      const candidate = mockCandidates.find((c) => c.id === app.candidateId);
-      const job = mockJobs.find((j) => j.id === app.jobId);
-      return {
-        ...app,
-        candidate,
-        job,
-      };
-    })
-    .filter((app) => app.candidate && app.job);
+const statusLabels: Record<string, string> = {
+  NEW: 'New',
+  SCREENING: 'Screening',
+  INTERVIEW: 'Interview',
+  OFFER: 'Offer',
+  HIRED: 'Hired',
+  REJECTED: 'Rejected',
+};
 
+interface RecentApplicantsListProps {
+  applicants?: DashboardData['recent_applicants'];
+}
+
+export function RecentApplicantsList({ applicants = [] }: RecentApplicantsListProps) {
   return (
     <Card>
       <CardHeader className="flex flex-row items-center justify-between">
@@ -49,38 +44,42 @@ export function RecentApplicantsList() {
         </Button>
       </CardHeader>
       <CardContent className="space-y-4">
-        {recentApplications.map((app) => (
-          <Link
-            key={app.id}
-            href={`/company/applicants/${app.candidateId}`}
-            className="flex items-center justify-between rounded-lg p-2 transition-colors hover:bg-muted"
-          >
-            <div className="flex items-center gap-3">
-              <Avatar className="size-10">
-                <AvatarImage
-                  src={app.candidate?.profilePhoto}
-                  alt={app.candidate?.fullName}
-                />
-                <AvatarFallback>
-                  {app.candidate?.firstName[0]}
-                  {app.candidate?.lastName[0]}
-                </AvatarFallback>
-              </Avatar>
-              <div>
-                <p className="text-sm font-medium">{app.candidate?.fullName}</p>
-                <p className="text-xs text-muted-foreground">
-                  Applied for {app.job?.title}
-                </p>
-              </div>
-            </div>
-            <Badge
-              variant="secondary"
-              className={cn("text-xs", statusColors[app.status])}
+        {applicants.length === 0 ? (
+          <p className="text-sm text-muted-foreground text-center py-4">No recent applicants</p>
+        ) : (
+          applicants.map((app) => (
+            <Link
+              key={app.id}
+              href={`/company/applicants/${app.id}`}
+              className="flex items-center justify-between rounded-lg p-2 transition-colors hover:bg-muted"
             >
-              {app.status}
-            </Badge>
-          </Link>
-        ))}
+              <div className="flex items-center gap-3">
+                <Avatar className="size-10">
+                  <AvatarImage
+                    src={app.applicant_profile.profile_picture ?? undefined}
+                    alt={`${app.applicant_profile.user.first_name} ${app.applicant_profile.user.last_name}`}
+                  />
+                  <AvatarFallback>
+                    {app.applicant_profile.user.first_name[0]}
+                    {app.applicant_profile.user.last_name[0]}
+                  </AvatarFallback>
+                </Avatar>
+                <div>
+                  <p className="text-sm font-medium">
+                    {app.applicant_profile.user.first_name} {app.applicant_profile.user.last_name}
+                  </p>
+                  <p className="text-xs text-muted-foreground">Applied for {app.job.title}</p>
+                </div>
+              </div>
+              <Badge
+                variant="secondary"
+                className={cn('text-xs', statusColors[app.status] ?? 'bg-gray-100 text-gray-800')}
+              >
+                {statusLabels[app.status] ?? app.status}
+              </Badge>
+            </Link>
+          ))
+        )}
       </CardContent>
     </Card>
   );
