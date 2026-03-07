@@ -16,9 +16,6 @@ import { Label } from "@/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 
 const personalInfoSchema = z.object({
-  firstName: z.string().min(2, "First name must be at least 2 characters"),
-  lastName: z.string().min(2, "Last name must be at least 2 characters"),
-  email: z.string().email("Invalid email address"),
   phone: z.string().min(10, "Phone number must be at least 10 characters"),
   age: z.string().min(1, "Age is required"),
   gender: z.enum(["male", "female", "other", "prefer-not-to-say"]),
@@ -71,49 +68,6 @@ export function EditPersonalInfoDialog({
         </DialogHeader>
 
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
-          <div className="grid grid-cols-2 gap-4">
-            <div className="space-y-2">
-              <Label htmlFor="firstName">First Name</Label>
-              <Input
-                id="firstName"
-                {...register("firstName")}
-                className={errors.firstName ? "border-destructive" : ""}
-              />
-              {errors.firstName && (
-                <p className="text-sm text-destructive">
-                  {errors.firstName.message}
-                </p>
-              )}
-            </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="lastName">Last Name</Label>
-              <Input
-                id="lastName"
-                {...register("lastName")}
-                className={errors.lastName ? "border-destructive" : ""}
-              />
-              {errors.lastName && (
-                <p className="text-sm text-destructive">
-                  {errors.lastName.message}
-                </p>
-              )}
-            </div>
-          </div>
-
-          <div className="space-y-2">
-            <Label htmlFor="email">Email Address</Label>
-            <Input
-              id="email"
-              type="email"
-              {...register("email")}
-              className={errors.email ? "border-destructive" : ""}
-            />
-            {errors.email && (
-              <p className="text-sm text-destructive">{errors.email.message}</p>
-            )}
-          </div>
-
           <div className="space-y-2">
             <Label htmlFor="phone">Phone Number</Label>
             <Input
