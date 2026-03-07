@@ -4,7 +4,16 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Lock, Eye, EyeOff, CheckCircle, AlertCircle } from "lucide-react";
+import {
+  Lock,
+  Eye,
+  EyeOff,
+  CheckCircle,
+  AlertCircle,
+  Loader2,
+} from "lucide-react";
+import { authService } from "@/api/services/auth.service";
+import { ApiError } from "@/api/client";
 
 export function PasswordForm() {
   const [showCurrent, setShowCurrent] = useState(false);
@@ -12,6 +21,7 @@ export function PasswordForm() {
   const [showConfirm, setShowConfirm] = useState(false);
   const [saved, setSaved] = useState(false);
   const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
 
   const [form, setForm] = useState({
     current: "",
@@ -25,7 +35,7 @@ export function PasswordForm() {
     setError("");
   }
 
-  function handleSubmit(e: React.FormEvent) {
+  async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     if (form.newPassword.length < 8) {
       setError("New password must be at least 8 characters.");
@@ -35,9 +45,24 @@ export function PasswordForm() {
       setError("Passwords do not match.");
       return;
     }
-    // In a real app, call API here
-    setSaved(true);
-    setForm({ current: "", newPassword: "", confirm: "" });
+    setLoading(true);
+    try {
+      await authService.updatePassword({
+        current_password: form.current,
+        new_password: form.newPassword,
+        confirm_password: form.confirm,
+      });
+      setSaved(true);
+      setForm({ current: "", newPassword: "", confirm: "" });
+    } catch (err) {
+      setError(
+        err instanceof ApiError
+          ? err.message
+          : "Something went wrong. Please try again.",
+      );
+    } finally {
+      setLoading(false);
+    }
   }
 
   const strength = (() => {
@@ -188,7 +213,10 @@ export function PasswordForm() {
 
       {/* Actions */}
       <div className="flex items-center gap-4 pt-2">
-        <Button type="submit">Update Password</Button>
+        <Button type="submit" disabled={loading}>
+          {loading && <Loader2 className="h-4 w-4 mr-2 animate-spin" />}
+          Update Password
+        </Button>
         {saved && (
           <span className="flex items-center gap-1.5 text-sm text-green-600 dark:text-green-400">
             <CheckCircle className="h-4 w-4" />
