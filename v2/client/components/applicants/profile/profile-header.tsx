@@ -2,9 +2,9 @@
 
 import { useRef } from "react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
 import { Mail, Phone, Camera } from "lucide-react";
+import type { CareerStatus } from "@/api/types";
 
 interface ProfileHeaderProps {
   firstName: string;
@@ -12,22 +12,26 @@ interface ProfileHeaderProps {
   email: string;
   phone?: string;
   desiredPosition?: string;
-  status: "actively-looking" | "employed" | "open-to-opportunities";
+  status: CareerStatus;
   profilePictureUrl?: string | null;
 }
 
-const statusConfig = {
-  "actively-looking": {
+const STATUS_CONFIG: Record<CareerStatus, { label: string; className: string }> = {
+  ACTIVELY_LOOKING: {
     label: "Actively Looking",
-    variant: "default" as const,
+    className: "bg-green-100 text-green-700",
   },
-  employed: {
-    label: "Employed",
-    variant: "secondary" as const,
-  },
-  "open-to-opportunities": {
+  OPEN_TO_OPPORTUNITIES: {
     label: "Open to Opportunities",
-    variant: "outline" as const,
+    className: "bg-blue-100 text-blue-700",
+  },
+  EMPLOYED_NOT_LOOKING: {
+    label: "Employed",
+    className: "bg-yellow-100 text-yellow-700",
+  },
+  NOT_LOOKING: {
+    label: "Not Looking",
+    className: "bg-slate-100 text-slate-600",
   },
 };
 
@@ -42,7 +46,7 @@ export function ProfileHeader({
 }: ProfileHeaderProps) {
   const fullName = `${firstName} ${lastName}`;
   const initials = `${firstName[0]}${lastName[0]}`;
-  const statusInfo = statusConfig[status];
+  const statusInfo = STATUS_CONFIG[status];
 
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -96,7 +100,9 @@ export function ProfileHeader({
                 )}
               </div>
 
-              <Badge variant={statusInfo.variant}>{statusInfo.label}</Badge>
+              <span className={`text-xs font-medium px-2.5 py-1 rounded-full ${statusInfo.className}`}>
+                {statusInfo.label}
+              </span>
             </div>
 
             <div className="space-y-2">

@@ -268,7 +268,7 @@ export default function ProfilePage() {
                 email={user?.email ?? ""}
                 phone={profile.phone_number}
                 desiredPosition={profile.desired_position}
-                status={displayStatus}
+                status={profile.career_status ?? "NOT_LOOKING"}
                 profilePictureUrl={profile.profile_picture_url}
               />
             </div>
@@ -508,7 +508,12 @@ export default function ProfilePage() {
             <ActiveApplicationsCard />
 
             {/* Career Status */}
-            <CareerStatusCard status={displayStatus} />
+            <CareerStatusCard
+              status={profile.career_status ?? "NOT_LOOKING"}
+              onStatusChange={(s) =>
+                setProfile((prev) => prev ? { ...prev, career_status: s } : prev)
+              }
+            />
 
             {/* Personal Information Sidebar */}
             <ProfileSectionCard

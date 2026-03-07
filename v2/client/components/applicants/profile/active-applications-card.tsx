@@ -31,7 +31,7 @@ export function ActiveApplicationsCard() {
 
   return (
     <Card>
-      <CardHeader className="pb-4">
+      <CardHeader>
         <div className="flex items-center gap-2">
           <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center">
             <Briefcase className="h-4 w-4 text-primary" />
