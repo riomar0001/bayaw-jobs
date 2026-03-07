@@ -254,6 +254,11 @@ export class ApplicantRepository {
             location: true,
             employment_type: true,
             company_id: true,
+            company_information: {
+              select: {
+                company_name: true,
+              },
+            },
           },
         },
       },

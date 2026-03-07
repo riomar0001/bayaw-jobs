@@ -345,9 +345,7 @@ export default function ProfilePage() {
           {/* Right Column - Sidebar */}
           <div className="lg:col-span-1 space-y-6">
             {/* Active Applications */}
-            <ActiveApplicationsCard
-              applications={profile.currentlyApplyingFor}
-            />
+            <ActiveApplicationsCard />
 
             {/* Career Status */}
             <CareerStatusCard status={profile.status} />

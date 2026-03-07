@@ -289,6 +289,9 @@ export interface ActiveApplication {
     location: string;
     employment_type: EmploymentType;
     company_id: string;
+    company_information: {
+      company_name: string;
+    };
   };
 }
 

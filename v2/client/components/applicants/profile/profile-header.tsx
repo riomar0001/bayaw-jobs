@@ -89,9 +89,6 @@ export function ProfileHeader({
                     {desiredPosition}
                   </p>
                 )}
-                <p className="text-sm text-muted-foreground">
-                  Bayaw Jobs - Job Seeker
-                </p>
               </div>
 
               <Badge variant={statusInfo.variant}>{statusInfo.label}</Badge>
