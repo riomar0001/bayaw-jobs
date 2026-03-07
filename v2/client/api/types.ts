@@ -192,16 +192,18 @@ export interface Resume {
 export interface ApplicantProfile {
   id: string;
   user_id: string;
-  first_name: string;
-  last_name: string;
-  email: string;
+  first_name?: string;
+  last_name?: string;
+  email?: string;
   age: number;
   gender: string;
   desired_position: string;
   location: string;
+  phone_number: string;
   profile_picture: string | null;
   profile_picture_url: string | null;
   career_status?: CareerStatus | null;
+  resume_url?: string | null;
   created_at: string;
   updated_at: string;
   applicantEducations?: Education[];

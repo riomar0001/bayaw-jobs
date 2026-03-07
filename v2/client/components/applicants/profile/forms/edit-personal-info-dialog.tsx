@@ -84,8 +84,12 @@ export function EditPersonalInfoDialog({
             <Label htmlFor="desiredPosition">Desired Position</Label>
             <Input
               id="desiredPosition"
-              placeholder="e.g. Senior Frontend Developer"
-              {...register("desiredPosition")}
+              placeholder="e.g. Senior-Frontend-Developer"
+              {...register("desiredPosition", {
+                onChange: (e) => {
+                  e.target.value = e.target.value.replace(/ /g, "-");
+                },
+              })}
               className={errors.desiredPosition ? "border-destructive" : ""}
             />
             {errors.desiredPosition && (

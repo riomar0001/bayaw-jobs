@@ -1,7 +1,7 @@
 "use client";
 
 import { useRef } from "react";
-import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
 import { Mail, Phone, Camera } from "lucide-react";
@@ -13,6 +13,7 @@ interface ProfileHeaderProps {
   phone?: string;
   desiredPosition?: string;
   status: "actively-looking" | "employed" | "open-to-opportunities";
+  profilePictureUrl?: string | null;
 }
 
 const statusConfig = {
@@ -37,6 +38,7 @@ export function ProfileHeader({
   phone,
   desiredPosition,
   status,
+  profilePictureUrl,
 }: ProfileHeaderProps) {
   const fullName = `${firstName} ${lastName}`;
   const initials = `${firstName[0]}${lastName[0]}`;
@@ -49,9 +51,12 @@ export function ProfileHeader({
       <CardContent className="p-6">
         <div className="flex items-start gap-6">
           {/* Avatar with edit overlay */}
-          <div className="relative group flex-shrink-0">
+          <div className="relative group shrink-0">
             <Avatar className="h-20 w-20 border-2 border-border">
-              <AvatarFallback className="text-2xl font-bold bg-gradient-to-br from-sky-500 to-cyan-600 text-white">
+              {profilePictureUrl && (
+                <AvatarImage src={profilePictureUrl} alt={fullName} />
+              )}
+              <AvatarFallback className="text-2xl font-bold bg-linear-to-br from-sky-500 to-cyan-600 text-white">
                 {initials}
               </AvatarFallback>
             </Avatar>
