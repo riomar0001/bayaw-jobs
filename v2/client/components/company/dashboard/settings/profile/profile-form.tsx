@@ -16,22 +16,21 @@ import {
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { User } from "@/types/user";
+import { CompanyUser } from "@/types/user";
 import { Loader2, Upload } from "lucide-react";
+import { authService, businessService } from "@/api";
+import { toast } from "sonner";
 
 const profileFormSchema = z.object({
-  firstName: z.string().min(1, "First name is required"),
-  lastName: z.string().min(1, "Last name is required"),
+  first_name: z.string().min(1, "First name is required"),
+  last_name: z.string().min(1, "Last name is required"),
   email: z.email("Invalid email address"),
-  phone: z.string().optional(),
-  timezone: z.string().optional(),
-  language: z.string(),
 });
 
 type ProfileFormValues = z.infer<typeof profileFormSchema>;
 
 interface ProfileFormProps {
-  user: User;
+  user: CompanyUser;
 }
 
 export function ProfileForm({ user }: ProfileFormProps) {
@@ -40,21 +39,27 @@ export function ProfileForm({ user }: ProfileFormProps) {
   const form = useForm<ProfileFormValues>({
     resolver: zodResolver(profileFormSchema),
     defaultValues: {
-      firstName: user.firstName,
-      lastName: user.lastName,
+      first_name: user.first_name,
+      last_name: user.last_name,
       email: user.email,
-      phone: user.phone || "",
-      timezone: user.timezone || "",
-      language: user.language,
     },
   });
 
   async function onSubmit(data: ProfileFormValues) {
     setIsSubmitting(true);
-    // Simulate API call
-    await new Promise((resolve) => setTimeout(resolve, 1000));
-    console.log("Profile updated:", data);
-    setIsSubmitting(false);
+    try {
+      await authService.updateAccountInfo({
+        first_name: data.first_name,
+        last_name: data.last_name,
+        email: data.email,
+      });
+
+      toast.success("Profile updated successfully");
+    } catch {
+      toast.error("Failed to update profile");
+    } finally {
+      setIsSubmitting(false);
+    }
   }
 
   return (
@@ -67,10 +72,11 @@ export function ProfileForm({ user }: ProfileFormProps) {
           <CardContent>
             <div className="flex items-center gap-6">
               <Avatar className="size-24">
-                <AvatarImage src={user.avatar} alt={user.fullName} />
+                {user.profile_picture && (
+                  <AvatarImage src={user.profile_picture} alt={user.fullName} />
+                )}
                 <AvatarFallback className="text-2xl">
-                  {user.firstName[0]}
-                  {user.lastName[0]}
+                  Profile
                 </AvatarFallback>
               </Avatar>
               <div className="space-y-2">
@@ -94,7 +100,7 @@ export function ProfileForm({ user }: ProfileFormProps) {
             <div className="grid gap-6 md:grid-cols-2">
               <FormField
                 control={form.control}
-                name="firstName"
+                name="first_name"
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>First Name</FormLabel>
@@ -108,7 +114,7 @@ export function ProfileForm({ user }: ProfileFormProps) {
 
               <FormField
                 control={form.control}
-                name="lastName"
+                name="last_name"
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>Last Name</FormLabel>

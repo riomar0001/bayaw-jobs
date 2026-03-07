@@ -152,9 +152,9 @@ class BusinessService {
 
   // ── Admins ───────────────────────────────────────────────────────────────────
 
-  async getAdmins(): Promise<{ admins: CompanyAdmin[] }> {
+  async getAdmins(): Promise<{ admins: CompanyAdmin[]; my_rights: CompanyAdmin | null }> {
     const res =
-      await apiClient.get<ApiResponse<{ admins: CompanyAdmin[] }>>(
+      await apiClient.get<ApiResponse<{ admins: CompanyAdmin[]; my_rights: CompanyAdmin | null }>>(
         "/business/admins",
       );
     return unwrapResponse(res.data);
