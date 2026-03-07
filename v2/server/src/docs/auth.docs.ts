@@ -1114,6 +1114,92 @@ const loginHistory = {
   },
 };
 
+const accountInfo = {
+  '/auth/info': {
+    get: {
+      tags: ['Authentication'],
+      summary: 'Get account information',
+      description: "Returns the authenticated user's first name, last name, and email.",
+      security: [{ bearerAuth: [] }],
+      responses: {
+        200: {
+          description: 'Account info retrieved successfully',
+          content: {
+            'application/json': {
+              schema: {
+                type: 'object',
+                properties: {
+                  success: { type: 'boolean', example: true },
+                  message: { type: 'string', example: 'Account info retrieved successfully' },
+                  data: {
+                    type: 'object',
+                    properties: {
+                      first_name: { type: 'string', example: 'John' },
+                      last_name: { type: 'string', example: 'Doe' },
+                      email: { type: 'string', example: 'user@example.com' },
+                    },
+                  },
+                },
+              },
+            },
+          },
+        },
+        401: { description: 'Unauthorized' },
+        404: { description: 'User not found' },
+      },
+    },
+    patch: {
+      tags: ['Authentication'],
+      summary: 'Update account information',
+      description: "Updates the authenticated user's first name, last name, or email.",
+      security: [{ bearerAuth: [] }],
+      requestBody: {
+        required: true,
+        content: {
+          'application/json': {
+            schema: {
+              type: 'object',
+              properties: {
+                first_name: { type: 'string', example: 'John', maxLength: 50 },
+                last_name: { type: 'string', example: 'Smith', maxLength: 50 },
+                email: { type: 'string', format: 'email', example: 'john.smith@example.com' },
+              },
+            },
+          },
+        },
+      },
+      responses: {
+        200: {
+          description: 'Account info updated successfully',
+          content: {
+            'application/json': {
+              schema: {
+                type: 'object',
+                properties: {
+                  success: { type: 'boolean', example: true },
+                  message: { type: 'string', example: 'Account info updated successfully' },
+                  data: {
+                    type: 'object',
+                    properties: {
+                      first_name: { type: 'string', example: 'John' },
+                      last_name: { type: 'string', example: 'Smith' },
+                      email: { type: 'string', example: 'john.smith@example.com' },
+                    },
+                  },
+                },
+              },
+            },
+          },
+        },
+        400: { description: 'Validation error' },
+        401: { description: 'Unauthorized' },
+        404: { description: 'User not found' },
+        409: { description: 'Email already exists' },
+      },
+    },
+  },
+};
+
 export const authDocs = {
   ...register,
   ...verifyEmail,
@@ -1126,4 +1212,5 @@ export const authDocs = {
   ...resetPassword,
   ...updatePassword,
   ...loginHistory,
+  ...accountInfo,
 };

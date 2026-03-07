@@ -233,6 +233,30 @@ export class AuthController {
       next(error);
     }
   }
+
+  async getAccountInfo(req: Request, res: Response, next: NextFunction): Promise<void> {
+    try {
+      const userId = req.user?.user_id;
+      if (!userId) throw new Error('User ID missing in request');
+
+      const result = await authService.getAccountInfo(userId);
+      successResponse(res, result, 'Account info retrieved successfully');
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  async updateAccountInfo(req: Request, res: Response, next: NextFunction): Promise<void> {
+    try {
+      const userId = req.user?.user_id;
+      if (!userId) throw new Error('User ID missing in request');
+
+      const result = await authService.updateAccountInfo(userId, req.body);
+      successResponse(res, result, 'Account info updated successfully');
+    } catch (error) {
+      next(error);
+    }
+  }
 }
 
 export const authController = new AuthController();

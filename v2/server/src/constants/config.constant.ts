@@ -19,7 +19,7 @@ export const Config = {
   RATE_LIMIT: {
     WINDOW_MS: 15 * 60 * 1000, // 15 minutes
     MAX_REQUESTS: 100,
-    AUTH_WINDOW_MS: 15 * 60 * 1000, // 15 minutes
+    AUTH_WINDOW_MS: 5 * 60 * 1000, // 5 minutes
     AUTH_MAX_REQUESTS: 10,
   },
 

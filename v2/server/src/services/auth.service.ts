@@ -35,6 +35,7 @@ import {
   UpdatePasswordInput,
   ForgotPasswordInput,
   ResetPasswordInput,
+  UpdateAccountInfoInput,
 } from '@/validations/auth.validation';
 import { Request } from 'express';
 
@@ -438,6 +439,40 @@ export class AuthService {
 
   async getLoginHistory(userId: string, page: number, limit: number) {
     return userRepository.findLoginHistory(userId, page, limit);
+  }
+
+  async getAccountInfo(userId: string) {
+    const user = await userRepository.findById(userId);
+    if (!user) throw new NotFoundError('User');
+    return {
+      first_name: user.first_name,
+      last_name: user.last_name,
+      email: user.email,
+    };
+  }
+
+  async updateAccountInfo(userId: string, data: UpdateAccountInfoInput) {
+    const user = await userRepository.findById(userId);
+    if (!user) throw new NotFoundError('User');
+
+    if (data.email && data.email !== user.email) {
+      const existingUser = await userRepository.findByEmail(data.email);
+      if (existingUser) {
+        throw new ConflictError(ErrorMessages.AUTH.EMAIL_ALREADY_EXISTS);
+      }
+    }
+
+    const updateData: { first_name?: string; last_name?: string; email?: string } = {};
+    if (data.first_name !== undefined) updateData.first_name = data.first_name;
+    if (data.last_name !== undefined) updateData.last_name = data.last_name;
+    if (data.email !== undefined) updateData.email = data.email;
+
+    const updatedUser = await userRepository.update(userId, updateData);
+    return {
+      first_name: updatedUser.first_name,
+      last_name: updatedUser.last_name,
+      email: updatedUser.email,
+    };
   }
 }
 

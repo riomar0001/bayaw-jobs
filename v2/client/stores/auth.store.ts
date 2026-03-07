@@ -28,6 +28,7 @@ interface AuthState {
   clearError: () => void;
   resetLoginStep: () => void;
   setHasHydrated: (val: boolean) => void;
+  updateUser: (data: Partial<User>) => void;
 }
 
 export const useAuthStore = create<AuthState>()(
@@ -153,6 +154,10 @@ export const useAuthStore = create<AuthState>()(
         resetLoginStep: () =>
           set({ _loginStep: "idle", _tempToken: null, error: null }),
         setHasHydrated: (val) => set({ _hasHydrated: val }),
+        updateUser: (data) =>
+          set((state) => ({
+            user: state.user ? { ...state.user, ...data } : null,
+          })),
       };
     },
     {

@@ -120,6 +120,18 @@ export interface LoginHistoryItem {
   expires_at: string;
 }
 
+export interface AccountInfo {
+  first_name: string;
+  last_name: string;
+  email: string;
+}
+
+export interface UpdateAccountInfoInput {
+  first_name?: string;
+  last_name?: string;
+  email?: string;
+}
+
 // ─── Applicant ───────────────────────────────────────────────────────────────
 
 export type CareerStatus =

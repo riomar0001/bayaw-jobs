@@ -11,6 +11,7 @@ import {
   updatePasswordSchema,
   forgotPasswordSchema,
   resetPasswordSchema,
+  updateAccountInfoSchema,
 } from '@/validations/auth.validation';
 
 const router = Router();
@@ -55,5 +56,13 @@ router.post('/logout', authController.logout.bind(authController));
 router.post('/logout-all', authenticate, authController.logoutAll.bind(authController));
 
 router.get('/login-history', authenticate, authController.getLoginHistory.bind(authController));
+
+router.get('/info', authenticate, authController.getAccountInfo.bind(authController));
+router.patch(
+  '/info',
+  authenticate,
+  validate(updateAccountInfoSchema),
+  authController.updateAccountInfo.bind(authController)
+);
 
 export default router;

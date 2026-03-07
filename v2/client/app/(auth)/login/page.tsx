@@ -42,7 +42,7 @@ export default function LoginPage() {
     if (!isAuthenticated) return;
     // Route based on existing profile
     if (user?.applicant_profile_id) {
-      router.push("/applicant");
+      router.push("/");
       return;
     }
     if (user?.company_id) {
