@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
@@ -65,7 +65,9 @@ export function EditExperienceDialog({
         ],
   );
 
-  useEffect(() => {
+  const [prevOpen, setPrevOpen] = useState(false);
+  if (open !== prevOpen) {
+    setPrevOpen(open);
     if (open) {
       setExperiences(
         initialData.length > 0
@@ -81,7 +83,7 @@ export function EditExperienceDialog({
             ],
       );
     }
-  }, [open, initialData]);
+  }
 
   const {
     handleSubmit,

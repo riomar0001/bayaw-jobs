@@ -1,29 +1,32 @@
 "use client";
 
-import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
+import { Skeleton } from "@/components/ui/skeleton";
 import { Footer } from "@/components/shared/footer";
-import { ArrowLeft, Briefcase } from "lucide-react";
-import { candidateApplications } from "@/data";
+import { ArrowLeft, Briefcase, ChevronLeft, ChevronRight, AlertCircle } from "lucide-react";
 import { ApplicationFilters } from "@/components/applicants/applications/application-filters";
 import { ApplicationStats } from "@/components/applicants/applications/application-stats";
 import { ApplicationCard } from "@/components/applicants/applications/application-card";
+import { useApplications } from "@/hooks/use-applications";
 
 export default function ApplicationsPage() {
   const router = useRouter();
-  const [applications] = useState(candidateApplications);
-  const [searchQuery, setSearchQuery] = useState("");
-  const [statusFilter, setStatusFilter] = useState("all");
-
-  const filteredApplications = applications.filter((app) => {
-    const matchesSearch =
-      app.jobTitle.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      app.company.toLowerCase().includes(searchQuery.toLowerCase());
-    const matchesStatus = statusFilter === "all" || app.status === statusFilter;
-    return matchesSearch && matchesStatus;
-  });
+  const {
+    applications,
+    stats,
+    meta,
+    isLoading,
+    isStatsLoading,
+    error,
+    page,
+    setPage,
+    statusFilter,
+    setStatusFilter,
+    searchQuery,
+    setSearchQuery,
+  } = useApplications();
 
   return (
     <main className="min-h-screen bg-muted/30">
@@ -48,6 +51,8 @@ export default function ApplicationsPage() {
           </p>
         </div>
 
+        <ApplicationStats stats={stats} isLoading={isStatsLoading} />
+
         <ApplicationFilters
           searchQuery={searchQuery}
           onSearchChange={setSearchQuery}
@@ -55,12 +60,36 @@ export default function ApplicationsPage() {
           onStatusChange={setStatusFilter}
         />
 
-        <ApplicationStats applications={applications} />
+        {/* Error */}
+        {error && (
+          <Card className="mb-4 border-destructive/50">
+            <CardContent className="p-4 flex items-center gap-3 text-destructive">
+              <AlertCircle className="h-5 w-5 shrink-0" />
+              <p className="text-sm">{error}</p>
+            </CardContent>
+          </Card>
+        )}
 
         {/* Applications List */}
         <div className="space-y-4">
-          {filteredApplications.length > 0 ? (
-            filteredApplications.map((application) => (
+          {isLoading ? (
+            Array.from({ length: 3 }).map((_, i) => (
+              <Card key={i}>
+                <CardContent className="p-6">
+                  <div className="flex gap-6">
+                    <Skeleton className="w-14 h-14 rounded-lg shrink-0" />
+                    <div className="flex-1 space-y-3">
+                      <Skeleton className="h-5 w-48" />
+                      <Skeleton className="h-4 w-64" />
+                      <Skeleton className="h-4 w-40" />
+                    </div>
+                    <Skeleton className="h-9 w-24 shrink-0" />
+                  </div>
+                </CardContent>
+              </Card>
+            ))
+          ) : applications.length > 0 ? (
+            applications.map((application) => (
               <ApplicationCard key={application.id} application={application} />
             ))
           ) : (
@@ -86,6 +115,35 @@ export default function ApplicationsPage() {
             </Card>
           )}
         </div>
+
+        {/* Pagination */}
+        {meta && meta.totalPages > 1 && (
+          <div className="flex items-center justify-between mt-6">
+            <p className="text-sm text-muted-foreground">
+              Page {meta.page} of {meta.totalPages} &mdash; {meta.total} total
+            </p>
+            <div className="flex items-center gap-2">
+              <Button
+                variant="outline"
+                size="sm"
+                disabled={!meta.hasPreviousPage}
+                onClick={() => setPage(page - 1)}
+              >
+                <ChevronLeft className="h-4 w-4 mr-1" />
+                Previous
+              </Button>
+              <Button
+                variant="outline"
+                size="sm"
+                disabled={!meta.hasNextPage}
+                onClick={() => setPage(page + 1)}
+              >
+                Next
+                <ChevronRight className="h-4 w-4 ml-1" />
+              </Button>
+            </div>
+          </div>
+        )}
       </div>
 
       <Footer />

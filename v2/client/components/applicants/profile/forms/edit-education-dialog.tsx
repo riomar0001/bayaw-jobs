@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
@@ -73,7 +73,9 @@ export function EditEducationDialog({
     defaultValues: { educations },
   });
 
-  useEffect(() => {
+  const [prevOpen, setPrevOpen] = useState(false);
+  if (open !== prevOpen) {
+    setPrevOpen(open);
     if (open) {
       setEducations(
         initialData.length > 0
@@ -89,7 +91,7 @@ export function EditEducationDialog({
             ],
       );
     }
-  }, [open, initialData]);
+  }
 
   const addEducation = () => {
     setEducations([
