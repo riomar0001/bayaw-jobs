@@ -36,7 +36,6 @@ export default function DashboardLayout({
     <>
       {isAuthenticated && user?.company_id ? (
         <SidebarProvider>
-          <AppSidebar />
           <SidebarInset>{children}</SidebarInset>
         </SidebarProvider>
       ) : isOnboardingPath ? (
