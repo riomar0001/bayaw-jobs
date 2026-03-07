@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
-import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -21,7 +21,7 @@ import {
   Briefcase,
   Building2,
 } from "lucide-react";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useAuthStore } from "@/stores/auth.store";
 
 export function Navbar() {
@@ -30,6 +30,14 @@ export function Navbar() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   const { isAuthenticated, user, logout } = useAuthStore();
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setMounted(true);
+    }, 0);
+    return () => clearTimeout(timer);
+  }, []);
 
   const userInitials = user
     ? `${user.first_name[0] ?? ""}${user.last_name[0] ?? ""}`.toUpperCase()
@@ -105,11 +113,25 @@ export function Navbar() {
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
                   <button className="flex items-center gap-3 hover:opacity-80 transition-opacity">
-                    <Avatar className="h-9 w-9 border-2 border-primary/20">
-                      <AvatarFallback className="bg-gradient-to-br from-sky-500 to-cyan-600 text-white font-semibold">
-                        {userInitials}
-                      </AvatarFallback>
-                    </Avatar>
+                    {mounted ? (
+                      <Avatar className="h-9 w-9 border border-primary/20">
+                        {user?.profile_picture_url && (
+                          <AvatarImage
+                            src={user.profile_picture_url}
+                            alt={userName}
+                          />
+                        )}
+                        <AvatarFallback className="bg-linear-to-br from-sky-500 to-cyan-600 text-white font-semibold">
+                          {userInitials}
+                        </AvatarFallback>
+                      </Avatar>
+                    ) : (
+                      <Avatar className="h-9 w-9 border border-primary/20">
+                        <AvatarFallback className="bg-linear-to-br from-sky-500 to-cyan-600 text-white font-semibold">
+                          {userInitials}
+                        </AvatarFallback>
+                      </Avatar>
+                    )}
                     <span className="text-sm font-medium hidden lg:inline">
                       {userName}
                     </span>

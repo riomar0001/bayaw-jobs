@@ -59,6 +59,7 @@ export interface User {
   created_at?: string;
   applicant_profile_id?: string;
   company_id?: string;
+  profile_picture_url?: string;
 }
 
 export interface RegisterInput {

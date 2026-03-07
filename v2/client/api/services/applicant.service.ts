@@ -75,7 +75,7 @@ class ApplicantService {
     file: File,
   ): Promise<{ profile_picture: string; url: string }> {
     const form = new FormData();
-    form.append("profile_picture", file);
+    form.append("picture", file);
     const res = await apiClient.upload<
       ApiResponse<{ profile_picture: string; url: string }>
     >("/applicants/profile/picture", form);

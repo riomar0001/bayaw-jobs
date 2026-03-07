@@ -16,10 +16,7 @@ import { ActiveApplicationsCard } from "@/components/applicants/profile/active-a
 import { Button } from "@/components/ui/button";
 import { applicantService } from "@/api/services/applicant.service";
 import { useAuthStore } from "@/stores/auth.store";
-import type {
-  ApplicantProfile,
-  ProficiencyLevel,
-} from "@/api/types";
+import type { ApplicantProfile, ProficiencyLevel } from "@/api/types";
 import {
   User,
   GraduationCap,
@@ -36,13 +33,9 @@ import {
   Loader2,
 } from "lucide-react";
 
-
-
-
-
 export default function ProfilePage() {
   const router = useRouter();
-  const { user } = useAuthStore();
+  const { user, updateUser, refresh } = useAuthStore();
   const [profile, setProfile] = useState<ApplicantProfile | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -263,6 +256,13 @@ export default function ProfilePage() {
                 desiredPosition={profile.desired_position}
                 status={profile.career_status ?? "NOT_LOOKING"}
                 profilePictureUrl={profile.profile_picture_url}
+                onProfilePictureUpdate={(url) => {
+                  setProfile((prev) =>
+                    prev ? { ...prev, profile_picture_url: url } : prev,
+                  );
+                  updateUser({ profile_picture_url: url });
+                  void refresh();
+                }}
               />
             </div>
 
@@ -504,7 +504,9 @@ export default function ProfilePage() {
             <CareerStatusCard
               status={profile.career_status ?? "NOT_LOOKING"}
               onStatusChange={(s) =>
-                setProfile((prev) => prev ? { ...prev, career_status: s } : prev)
+                setProfile((prev) =>
+                  prev ? { ...prev, career_status: s } : prev,
+                )
               }
             />
 
