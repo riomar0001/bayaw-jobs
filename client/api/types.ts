@@ -325,7 +325,7 @@ export interface Application {
 // ─── Jobs ─────────────────────────────────────────────────────────────────────
 
 export type LocationType = 'ONSITE' | 'REMOTE' | 'HYBRID';
-export type JobStatus = 'OPEN' | 'CLOSED' | 'PAUSED';
+export type JobStatus = 'OPEN' | 'CLOSED' | 'PAUSED' | 'DRAFT';
 export type EmploymentType = 'FULL_TIME' | 'PART_TIME' | 'CONTRACT' | 'FREELANCE' | 'INTERN';
 
 export interface JobCompany {
