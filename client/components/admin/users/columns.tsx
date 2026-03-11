@@ -1,0 +1,127 @@
+'use client';
+
+import { ColumnDef } from '@tanstack/react-table';
+import { Avatar, AvatarFallback } from '@/components/ui/avatar';
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import { ArrowUpDown } from 'lucide-react';
+import { cn } from '@/lib/utils';
+import { formatDate } from '@/lib/formatters';
+
+export interface AdminUser {
+  id: string;
+  first_name: string | null;
+  last_name: string | null;
+  email: string;
+  role: string;
+  status: string;
+  email_verified: boolean;
+  created_at: string;
+  last_login_at: string | null;
+}
+
+const roleVariant: Record<string, string> = {
+  ADMIN: 'bg-red-100 text-red-800',
+  COMPANY_OWNER: 'bg-blue-100 text-blue-800',
+  USER: 'bg-gray-100 text-gray-800',
+};
+
+const statusVariant: Record<string, string> = {
+  ACTIVE: 'bg-green-100 text-green-800',
+  INACTIVE: 'bg-gray-100 text-gray-600',
+  SUSPENDED: 'bg-red-100 text-red-800',
+  PENDING_VERIFICATION: 'bg-yellow-100 text-yellow-800',
+  DELETED: 'bg-red-100 text-red-600',
+};
+
+export const userColumns: ColumnDef<AdminUser>[] = [
+  {
+    id: 'name',
+    accessorFn: (row) =>
+      `${row.first_name ?? ''} ${row.last_name ?? ''}`.trim() || row.email,
+    header: ({ column }) => (
+      <Button variant="ghost" onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}>
+        Name
+        <ArrowUpDown className="ml-2 h-4 w-4" />
+      </Button>
+    ),
+    cell: ({ row }) => {
+      const u = row.original;
+      const name = `${u.first_name ?? ''} ${u.last_name ?? ''}`.trim() || '—';
+      const initials = `${u.first_name?.[0] ?? ''}${u.last_name?.[0] ?? ''}`.toUpperCase() || u.email[0].toUpperCase();
+      return (
+        <div className="flex items-center gap-3 px-4">
+          <Avatar className="size-8">
+            <AvatarFallback className="text-xs">{initials}</AvatarFallback>
+          </Avatar>
+          <div>
+            <p className="font-medium leading-none text-sm">{name}</p>
+            <p className="text-xs text-muted-foreground mt-0.5">{u.email}</p>
+          </div>
+        </div>
+      );
+    },
+  },
+  {
+    accessorKey: 'role',
+    header: 'Role',
+    cell: ({ row }) => {
+      const role = row.getValue<string>('role');
+      return (
+        <Badge variant="secondary" className={cn('text-xs', roleVariant[role] ?? 'bg-gray-100')}>
+          {role}
+        </Badge>
+      );
+    },
+    filterFn: (row, _id, value) => value === '' || row.original.role === value,
+  },
+  {
+    accessorKey: 'status',
+    header: 'Status',
+    cell: ({ row }) => {
+      const status = row.getValue<string>('status');
+      return (
+        <Badge variant="secondary" className={cn('text-xs', statusVariant[status] ?? 'bg-gray-100')}>
+          {status.replace('_', ' ')}
+        </Badge>
+      );
+    },
+    filterFn: (row, _id, value) => value === '' || row.original.status === value,
+  },
+  {
+    accessorKey: 'email_verified',
+    header: 'Verified',
+    cell: ({ row }) =>
+      row.getValue<boolean>('email_verified') ? (
+        <Badge variant="secondary" className="bg-green-100 text-green-800 text-xs">Yes</Badge>
+      ) : (
+        <Badge variant="secondary" className="bg-yellow-100 text-yellow-800 text-xs">No</Badge>
+      ),
+  },
+  {
+    accessorKey: 'created_at',
+    header: ({ column }) => (
+      <Button variant="ghost" onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}>
+        Joined
+        <ArrowUpDown className="ml-2 h-4 w-4" />
+      </Button>
+    ),
+    cell: ({ row }) => (
+      <span className="text-sm text-muted-foreground px-4">
+        {formatDate(row.getValue('created_at'))}
+      </span>
+    ),
+  },
+  {
+    accessorKey: 'last_login_at',
+    header: 'Last Login',
+    cell: ({ row }) => {
+      const v = row.getValue<string | null>('last_login_at');
+      return (
+        <span className="text-sm text-muted-foreground">
+          {v ? formatDate(v) : '—'}
+        </span>
+      );
+    },
+  },
+];
