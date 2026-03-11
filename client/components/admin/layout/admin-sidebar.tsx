@@ -16,6 +16,7 @@ import {
   UserCheck,
   Briefcase,
   ShieldCheck,
+  ListTodo,
 } from 'lucide-react';
 
 export function AdminSidebar() {
@@ -46,6 +47,11 @@ export function AdminSidebar() {
       title: 'Jobs',
       href: '/admin/jobs',
       icon: Briefcase,
+    },
+    {
+      title: 'Queues',
+      href: '/admin/queues',
+      icon: ListTodo,
     },
   ];
 
