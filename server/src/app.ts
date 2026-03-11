@@ -9,6 +9,8 @@ import routes from '@/routes';
 import { errorMiddleware, notFoundMiddleware } from '@/middlewares/error.middleware';
 import { requestLogger } from '@/middlewares/requestLogger.middleware';
 import { generalRateLimiter } from '@/middlewares/rateLimit.middleware';
+import { metricsMiddleware, metricsAuth } from '@/middlewares/metrics.middleware';
+import registry from '@/configs/metrics.config';
 import openApiSpec from '@/docs/openapi';
 
 const app = express();
@@ -29,11 +31,20 @@ app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 app.use(cookieParser());
 
+// Prometheus metrics endpoint — registered before rate limiter so scrapes are never throttled
+app.get('/metrics', metricsAuth, async (_req, res) => {
+  res.set('Content-Type', registry.contentType);
+  res.end(await registry.metrics());
+});
+
 // Rate limiting
 app.use(generalRateLimiter);
 
 // HTTP request logging
 app.use(requestLogger);
+
+// Prometheus HTTP metrics collection
+app.use(metricsMiddleware);
 
 // Raw OpenAPI JSON endpoint (must be before Scalar middleware)
 app.get('/api/docs/openapi.json', (_req, res) => {

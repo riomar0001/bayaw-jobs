@@ -1,0 +1,18 @@
+global:
+  scrape_interval: 15s
+  evaluation_interval: 15s
+
+scrape_configs:
+  - job_name: 'bayaw-jobs-api'
+    static_configs:
+      - targets: ['host.docker.internal:4000']
+    metrics_path: /metrics
+    # Relabel to add an instance label
+    relabel_configs:
+      - source_labels: [__address__]
+        target_label: instance
+        replacement: 'bayaw-jobs-api'
+
+  - job_name: 'prometheus'
+    static_configs:
+      - targets: ['localhost:9090']

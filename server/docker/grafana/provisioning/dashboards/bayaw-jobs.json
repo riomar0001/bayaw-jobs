@@ -1,0 +1,241 @@
+{
+  "id": null,
+  "uid": "bayaw-jobs-api",
+  "title": "Bayaw Jobs API",
+  "tags": ["nodejs", "express", "api"],
+  "timezone": "browser",
+  "schemaVersion": 38,
+  "version": 1,
+  "refresh": "30s",
+  "time": { "from": "now-1h", "to": "now" },
+  "panels": [
+    {
+      "id": 1,
+      "type": "stat",
+      "title": "Request Rate (req/s)",
+      "gridPos": { "h": 4, "w": 6, "x": 0, "y": 0 },
+      "options": { "reduceOptions": { "calcs": ["lastNotNull"] }, "colorMode": "background", "graphMode": "area", "orientation": "auto" },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "reqps",
+          "color": { "mode": "thresholds" },
+          "thresholds": { "mode": "absolute", "steps": [{ "color": "green", "value": null }, { "color": "yellow", "value": 50 }, { "color": "red", "value": 200 }] }
+        }
+      },
+      "targets": [
+        {
+          "expr": "sum(rate(http_requests_total[1m]))",
+          "legendFormat": "req/s",
+          "refId": "A"
+        }
+      ]
+    },
+    {
+      "id": 2,
+      "type": "stat",
+      "title": "Error Rate (5xx/s)",
+      "gridPos": { "h": 4, "w": 6, "x": 6, "y": 0 },
+      "options": { "reduceOptions": { "calcs": ["lastNotNull"] }, "colorMode": "background", "graphMode": "area", "orientation": "auto" },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "reqps",
+          "color": { "mode": "thresholds" },
+          "thresholds": { "mode": "absolute", "steps": [{ "color": "green", "value": null }, { "color": "red", "value": 0.1 }] }
+        }
+      },
+      "targets": [
+        {
+          "expr": "sum(rate(http_requests_total{status_code=~\"5..\"}[1m]))",
+          "legendFormat": "5xx/s",
+          "refId": "A"
+        }
+      ]
+    },
+    {
+      "id": 3,
+      "type": "stat",
+      "title": "Median Latency (p50)",
+      "gridPos": { "h": 4, "w": 6, "x": 12, "y": 0 },
+      "options": { "reduceOptions": { "calcs": ["lastNotNull"] }, "colorMode": "background", "graphMode": "area", "orientation": "auto" },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "s",
+          "color": { "mode": "thresholds" },
+          "thresholds": { "mode": "absolute", "steps": [{ "color": "green", "value": null }, { "color": "yellow", "value": 0.2 }, { "color": "red", "value": 1 }] }
+        }
+      },
+      "targets": [
+        {
+          "expr": "histogram_quantile(0.50, sum(rate(http_request_duration_seconds_bucket[5m])) by (le))",
+          "legendFormat": "p50",
+          "refId": "A"
+        }
+      ]
+    },
+    {
+      "id": 4,
+      "type": "stat",
+      "title": "Active Connections",
+      "gridPos": { "h": 4, "w": 6, "x": 18, "y": 0 },
+      "options": { "reduceOptions": { "calcs": ["lastNotNull"] }, "colorMode": "background", "graphMode": "none", "orientation": "auto" },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "short",
+          "color": { "mode": "thresholds" },
+          "thresholds": { "mode": "absolute", "steps": [{ "color": "green", "value": null }, { "color": "yellow", "value": 100 }, { "color": "red", "value": 500 }] }
+        }
+      },
+      "targets": [
+        {
+          "expr": "http_active_connections",
+          "legendFormat": "connections",
+          "refId": "A"
+        }
+      ]
+    },
+    {
+      "id": 5,
+      "type": "timeseries",
+      "title": "HTTP Request Rate by Status",
+      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 4 },
+      "options": { "tooltip": { "mode": "multi" }, "legend": { "displayMode": "list", "placement": "bottom" } },
+      "fieldConfig": {
+        "defaults": { "unit": "reqps", "custom": { "lineWidth": 2 } }
+      },
+      "targets": [
+        { "expr": "sum(rate(http_requests_total{status_code=~\"2..\"}[1m])) by (status_code)", "legendFormat": "{{status_code}}", "refId": "A" },
+        { "expr": "sum(rate(http_requests_total{status_code=~\"4..\"}[1m])) by (status_code)", "legendFormat": "{{status_code}}", "refId": "B" },
+        { "expr": "sum(rate(http_requests_total{status_code=~\"5..\"}[1m])) by (status_code)", "legendFormat": "{{status_code}}", "refId": "C" }
+      ]
+    },
+    {
+      "id": 6,
+      "type": "timeseries",
+      "title": "Request Duration Percentiles",
+      "gridPos": { "h": 8, "w": 12, "x": 12, "y": 4 },
+      "options": { "tooltip": { "mode": "multi" }, "legend": { "displayMode": "list", "placement": "bottom" } },
+      "fieldConfig": {
+        "defaults": { "unit": "s", "custom": { "lineWidth": 2 } }
+      },
+      "targets": [
+        { "expr": "histogram_quantile(0.50, sum(rate(http_request_duration_seconds_bucket[5m])) by (le))", "legendFormat": "p50", "refId": "A" },
+        { "expr": "histogram_quantile(0.90, sum(rate(http_request_duration_seconds_bucket[5m])) by (le))", "legendFormat": "p90", "refId": "B" },
+        { "expr": "histogram_quantile(0.95, sum(rate(http_request_duration_seconds_bucket[5m])) by (le))", "legendFormat": "p95", "refId": "C" },
+        { "expr": "histogram_quantile(0.99, sum(rate(http_request_duration_seconds_bucket[5m])) by (le))", "legendFormat": "p99", "refId": "D" }
+      ]
+    },
+    {
+      "id": 7,
+      "type": "timeseries",
+      "title": "Top Routes by Request Rate",
+      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 12 },
+      "options": { "tooltip": { "mode": "multi" }, "legend": { "displayMode": "table", "placement": "right", "calcs": ["mean", "max"] } },
+      "fieldConfig": {
+        "defaults": { "unit": "reqps", "custom": { "lineWidth": 2 } }
+      },
+      "targets": [
+        {
+          "expr": "topk(10, sum(rate(http_requests_total[1m])) by (method, route))",
+          "legendFormat": "{{method}} {{route}}",
+          "refId": "A"
+        }
+      ]
+    },
+    {
+      "id": 8,
+      "type": "timeseries",
+      "title": "Node.js Memory Usage",
+      "gridPos": { "h": 8, "w": 12, "x": 12, "y": 12 },
+      "options": { "tooltip": { "mode": "multi" }, "legend": { "displayMode": "list", "placement": "bottom" } },
+      "fieldConfig": {
+        "defaults": { "unit": "bytes", "custom": { "lineWidth": 2 } }
+      },
+      "targets": [
+        { "expr": "nodejs_heap_size_used_bytes", "legendFormat": "Heap Used", "refId": "A" },
+        { "expr": "nodejs_heap_size_total_bytes", "legendFormat": "Heap Total", "refId": "B" },
+        { "expr": "nodejs_external_memory_bytes", "legendFormat": "External", "refId": "C" },
+        { "expr": "nodejs_heap_space_size_used_bytes{space=\"old\"}", "legendFormat": "Old Space", "refId": "D" }
+      ]
+    },
+    {
+      "id": 9,
+      "type": "timeseries",
+      "title": "Node.js Event Loop Lag",
+      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 20 },
+      "options": { "tooltip": { "mode": "multi" }, "legend": { "displayMode": "list", "placement": "bottom" } },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "s",
+          "custom": { "lineWidth": 2 },
+          "color": { "mode": "thresholds" },
+          "thresholds": { "mode": "absolute", "steps": [{ "color": "green", "value": null }, { "color": "yellow", "value": 0.1 }, { "color": "red", "value": 0.5 }] }
+        }
+      },
+      "targets": [
+        { "expr": "nodejs_eventloop_lag_seconds", "legendFormat": "Event Loop Lag", "refId": "A" },
+        { "expr": "nodejs_eventloop_lag_p99_seconds", "legendFormat": "p99 Lag", "refId": "B" }
+      ]
+    },
+    {
+      "id": 10,
+      "type": "timeseries",
+      "title": "Node.js CPU Usage (Process)",
+      "gridPos": { "h": 8, "w": 12, "x": 12, "y": 20 },
+      "options": { "tooltip": { "mode": "multi" }, "legend": { "displayMode": "list", "placement": "bottom" } },
+      "fieldConfig": {
+        "defaults": { "unit": "percentunit", "min": 0, "max": 1, "custom": { "lineWidth": 2 } }
+      },
+      "targets": [
+        { "expr": "rate(process_cpu_user_seconds_total[1m])", "legendFormat": "User CPU", "refId": "A" },
+        { "expr": "rate(process_cpu_system_seconds_total[1m])", "legendFormat": "System CPU", "refId": "B" }
+      ]
+    },
+    {
+      "id": 11,
+      "type": "timeseries",
+      "title": "Node.js Active Handles & Requests",
+      "gridPos": { "h": 6, "w": 12, "x": 0, "y": 28 },
+      "options": { "tooltip": { "mode": "multi" }, "legend": { "displayMode": "list", "placement": "bottom" } },
+      "fieldConfig": {
+        "defaults": { "unit": "short", "custom": { "lineWidth": 2 } }
+      },
+      "targets": [
+        { "expr": "nodejs_active_handles_total", "legendFormat": "Active Handles", "refId": "A" },
+        { "expr": "nodejs_active_requests_total", "legendFormat": "Active Requests", "refId": "B" }
+      ]
+    },
+    {
+      "id": 12,
+      "type": "stat",
+      "title": "Total Requests (Last Hour)",
+      "gridPos": { "h": 6, "w": 6, "x": 12, "y": 28 },
+      "options": { "reduceOptions": { "calcs": ["sum"] }, "colorMode": "value", "graphMode": "none", "orientation": "auto" },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "short",
+          "color": { "mode": "fixed", "fixedColor": "blue" }
+        }
+      },
+      "targets": [
+        { "expr": "increase(http_requests_total[1h])", "legendFormat": "total", "refId": "A" }
+      ]
+    },
+    {
+      "id": 13,
+      "type": "stat",
+      "title": "Total Errors (Last Hour)",
+      "gridPos": { "h": 6, "w": 6, "x": 18, "y": 28 },
+      "options": { "reduceOptions": { "calcs": ["sum"] }, "colorMode": "background", "graphMode": "none", "orientation": "auto" },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "short",
+          "color": { "mode": "thresholds" },
+          "thresholds": { "mode": "absolute", "steps": [{ "color": "green", "value": null }, { "color": "red", "value": 1 }] }
+        }
+      },
+      "targets": [
+        { "expr": "sum(increase(http_errors_total[1h]))", "legendFormat": "errors", "refId": "A" }
+      ]
+    }
+  ]
+}
