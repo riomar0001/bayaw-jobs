@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { BadgeCheck, Building2, ChevronsUpDown, LogOut } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
@@ -18,6 +19,7 @@ import {
   SidebarMenuItem,
   useSidebar,
 } from "@/components/ui/sidebar";
+import { useAuthStore } from "@/stores/auth.store";
 
 export function NavUser({
   user,
@@ -29,7 +31,14 @@ export function NavUser({
     role: string;
   };
 }) {
+  const router = useRouter();
   const { isMobile } = useSidebar();
+  const logout = useAuthStore((state) => state.logout);
+
+  const handleLogout = async () => {
+    await logout();
+    router.push("/");
+  };
 
   const initials = user.name
     .split(" ")
@@ -93,7 +102,12 @@ export function NavUser({
               </DropdownMenuItem>
             </DropdownMenuGroup>
             <DropdownMenuSeparator />
-            <DropdownMenuItem variant="destructive">
+            <DropdownMenuItem
+              variant="destructive"
+              onClick={() => {
+                void handleLogout();
+              }}
+            >
               <LogOut />
               Log out
             </DropdownMenuItem>

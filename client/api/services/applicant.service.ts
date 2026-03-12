@@ -84,7 +84,7 @@ class ApplicantService {
 
   /** Returns the URL to fetch profile picture — use directly as <img src> */
   getProfilePictureUrl(profileId: string): string {
-    return `${process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:5090"}/applicants/profile/picture/${profileId}`;
+    return `${process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:4000/api"}/applicants/profile/picture/${profileId}`;
   }
 
   // ── Education ────────────────────────────────────────────────────────────────

@@ -23,6 +23,7 @@ import {
 } from "lucide-react";
 import { useState, useEffect } from "react";
 import { useAuthStore } from "@/stores/auth.store";
+import { applicantService } from "@/api/services/applicant.service";
 
 export function Navbar() {
   const router = useRouter();
@@ -43,6 +44,9 @@ export function Navbar() {
     ? `${user.first_name[0] ?? ""}${user.last_name[0] ?? ""}`.toUpperCase()
     : "?";
   const userName = user ? `${user.first_name} ${user.last_name}` : "";
+  const profilePictureUrl = user?.applicant_profile_id
+    ? applicantService.getProfilePictureUrl(user.applicant_profile_id)
+    : user?.profile_picture_url;
 
   const isActivePath = (path: string) => {
     if (path === "/") return pathname === "/";
@@ -115,9 +119,9 @@ export function Navbar() {
                   <button className="flex items-center gap-3 hover:opacity-80 transition-opacity">
                     {mounted ? (
                       <Avatar className="h-9 w-9 border border-primary/20">
-                        {user?.profile_picture_url && (
+                        {profilePictureUrl && (
                           <AvatarImage
-                            src={user.profile_picture_url}
+                            src={profilePictureUrl}
                             alt={userName}
                           />
                         )}
