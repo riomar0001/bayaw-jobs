@@ -38,6 +38,8 @@ import {
   UpdateAccountInfoInput,
 } from '@/validations/auth.validation';
 import { Request } from 'express';
+import { securityEventService } from '@/services/securityEvent.service';
+import { security_event_type } from '@/generated/prisma/client';
 
 export class AuthService {
   async register(data: RegisterInput): Promise<{ user: UserData; verificationToken: string }> {
@@ -137,10 +139,19 @@ export class AuthService {
     };
   }
 
-  async login(data: LoginInput, _req: Request): Promise<LoginResponse> {
+  async login(data: LoginInput, req: Request): Promise<LoginResponse> {
+    const ip = req.ip;
+    const ua = req.headers['user-agent'];
+    const ipOpt = ip ? { ip_address: ip } : {};
+    const uaOpt = ua ? { user_agent: ua } : {};
+
     // Find user
     const user = await userRepository.findByEmail(data.email);
     if (!user) {
+      void securityEventService.log(security_event_type.LOGIN_FAILED, {
+        ...ipOpt, ...uaOpt,
+        metadata: { email: data.email, reason: 'user_not_found' },
+      });
       throw new AuthenticationError(ErrorMessages.AUTH.INVALID_CREDENTIALS);
     }
 
@@ -149,13 +160,28 @@ export class AuthService {
 
     // Check if account is locked
     if (user.locked_until && user.locked_until > new Date()) {
+      void securityEventService.log(security_event_type.ACCOUNT_LOCKED, {
+        user_id: user.id, ...ipOpt, ...uaOpt,
+        metadata: { locked_until: user.locked_until },
+      });
       throw new AuthenticationError(ErrorMessages.AUTH.ACCOUNT_LOCKED);
     }
 
     // Verify password
     const isValidPassword = await verifyPassword(data.password, user.password);
     if (!isValidPassword) {
+      const nextAttempts = user.failed_login_attempts + 1;
       await this.handleFailedLogin(user.id, user.failed_login_attempts);
+      void securityEventService.log(security_event_type.LOGIN_FAILED, {
+        user_id: user.id, ...ipOpt, ...uaOpt,
+        metadata: { reason: 'invalid_password', attempt: nextAttempts },
+      });
+      if (nextAttempts >= Config.AUTH.MAX_LOGIN_ATTEMPTS) {
+        void securityEventService.log(security_event_type.ACCOUNT_LOCKED, {
+          user_id: user.id, ...ipOpt, ...uaOpt,
+          metadata: { triggered_by: 'max_failed_attempts', attempts: nextAttempts },
+        });
+      }
       throw new AuthenticationError(ErrorMessages.AUTH.INVALID_CREDENTIALS);
     }
 
@@ -231,6 +257,12 @@ export class AuthService {
 
     // Update last login
     await userRepository.updateLastLogin(user.id);
+
+    void securityEventService.log(security_event_type.LOGIN_SUCCESS, {
+      user_id: user.id,
+      ...(ip && { ip_address: ip }),
+      ...(userAgent && { user_agent: userAgent }),
+    });
 
     const userData: UserData = {
       id: user.id,
@@ -384,6 +416,11 @@ export class AuthService {
       resetLink,
     });
 
+    void securityEventService.log(security_event_type.PASSWORD_RESET_REQUESTED, {
+      user_id: user.id,
+      metadata: { email: user.email },
+    });
+
     return process.env.NODE_ENV === 'development' ? token : undefined;
   }
 
@@ -411,6 +448,11 @@ export class AuthService {
       to: user.email,
       firstName: user.first_name ?? '',
     });
+
+    void securityEventService.log(security_event_type.PASSWORD_CHANGED, {
+      user_id: user.id,
+      metadata: { method: 'reset' },
+    });
   }
 
   async updatePassword(userId: string, data: UpdatePasswordInput): Promise<void> {
@@ -431,6 +473,11 @@ export class AuthService {
     });
 
     await refreshTokenRepository.revokeAllByUserId(userId);
+
+    void securityEventService.log(security_event_type.PASSWORD_CHANGED, {
+      user_id: userId,
+      metadata: { method: 'user_initiated' },
+    });
   }
 
   async getUserByEmail(email: string): Promise<UserData | null> {

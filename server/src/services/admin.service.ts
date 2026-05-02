@@ -6,6 +6,8 @@ export class AdminService {
     const oneWeekAgo = new Date();
     oneWeekAgo.setDate(oneWeekAgo.getDate() - 7);
 
+    const now = new Date();
+
     const [
       total_users,
       total_businesses,
@@ -13,6 +15,7 @@ export class AdminService {
       total_jobs,
       total_applications,
       new_users_this_week,
+      locked_accounts,
       recent_users,
       recent_businesses,
       recent_applicants,
@@ -23,6 +26,7 @@ export class AdminService {
       prisma.job.count(),
       prisma.applicant_applied_job.count(),
       prisma.user.count({ where: { created_at: { gte: oneWeekAgo } } }),
+      prisma.user.count({ where: { locked_until: { gt: now } } }),
 
       prisma.user.findMany({
         take: 8,
@@ -79,6 +83,7 @@ export class AdminService {
         total_jobs,
         total_applications,
         new_users_this_week,
+        locked_accounts,
       },
       recent_users,
       recent_businesses: recent_businesses.map(({ _count, ...b }) => ({

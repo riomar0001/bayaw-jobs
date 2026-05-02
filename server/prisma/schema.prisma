@@ -49,6 +49,7 @@ model user {
   companyInformations         company_information[]
   companyAdmins               company_admin[]
   companyAdminProfilePictures company_admin_profile_picture[]
+  security_events             security_event[]
 
   // Indexes for performance
   @@index([email])
@@ -111,6 +112,44 @@ model auth_code {
   @@index([user_id])
   @@index([expires_at])
   @@map("auth_codes")
+}
+
+model security_event {
+  id         String                @id @default(uuid())
+  type       security_event_type
+  severity   security_event_severity
+  user_id    String?
+  ip_address String?
+  user_agent String?
+  metadata   Json?
+  created_at DateTime              @default(now())
+
+  user user? @relation(fields: [user_id], references: [id], onDelete: SetNull)
+
+  @@index([type])
+  @@index([severity])
+  @@index([user_id])
+  @@index([created_at])
+  @@map("security_events")
+}
+
+enum security_event_type {
+  LOGIN_FAILED
+  ACCOUNT_LOCKED
+  ACCOUNT_UNLOCKED
+  RATE_LIMITED
+  LOGIN_SUCCESS
+  PASSWORD_CHANGED
+  PASSWORD_RESET_REQUESTED
+  EMAIL_VERIFIED
+  SUSPICIOUS_ACTIVITY
+}
+
+enum security_event_severity {
+  LOW
+  MEDIUM
+  HIGH
+  CRITICAL
 }
 
 model role {

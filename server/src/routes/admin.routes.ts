@@ -15,6 +15,10 @@ router.get('/businesses', adminController.getBusinesses.bind(adminController));
 router.get('/applicants', adminController.getApplicants.bind(adminController));
 router.get('/jobs', adminController.getJobs.bind(adminController));
 
+// ── Security events ──────────────────────────────────────────────────────────
+router.get('/security-events/stats', adminController.getSecurityStats.bind(adminController));
+router.get('/security-events', adminController.getSecurityEvents.bind(adminController));
+
 // ── Queue management ─────────────────────────────────────────────────────────
 router.get('/queues', queueController.getAllQueues.bind(queueController));
 router.get('/queues/:queue/jobs', queueController.getJobs.bind(queueController));

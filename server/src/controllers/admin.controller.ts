@@ -1,6 +1,8 @@
 import { Request, Response, NextFunction } from 'express';
 import { adminService } from '@/services/admin.service';
+import { securityEventService } from '@/services/securityEvent.service';
 import { successResponse } from '@/utils/apiResponse.util';
+import { security_event_type, security_event_severity } from '@/generated/prisma/client';
 
 export class AdminController {
   async getOverview(_req: Request, res: Response, next: NextFunction): Promise<void> {
@@ -43,6 +45,33 @@ export class AdminController {
     try {
       const data = await adminService.getJobs();
       successResponse(res, data, 'Jobs retrieved successfully');
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  async getSecurityEvents(req: Request, res: Response, next: NextFunction): Promise<void> {
+    try {
+      const { type, severity, user_id, from, to, page, limit } = req.query;
+      const data = await securityEventService.getEvents({
+        ...(type     && { type:     type as security_event_type }),
+        ...(severity && { severity: severity as security_event_severity }),
+        ...(user_id  && { user_id:  user_id as string }),
+        ...(from     && { from:     new Date(from as string) }),
+        ...(to       && { to:       new Date(to as string) }),
+        ...(page     && { page:     Number(page) }),
+        ...(limit    && { limit:    Number(limit) }),
+      });
+      successResponse(res, data, 'Security events retrieved successfully');
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  async getSecurityStats(_req: Request, res: Response, next: NextFunction): Promise<void> {
+    try {
+      const data = await securityEventService.getStats();
+      successResponse(res, data, 'Security stats retrieved successfully');
     } catch (error) {
       next(error);
     }
