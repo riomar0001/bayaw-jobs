@@ -1,7 +1,9 @@
 "use client";
 
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { BadgeCheck, Building2, ChevronsUpDown, LogOut } from "lucide-react";
+import { useAuthStore } from "@/stores/auth.store";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
   DropdownMenu,
@@ -21,6 +23,7 @@ import {
 
 export function NavUser({
   user,
+  isAdmin = false,
 }: {
   user: {
     name: string;
@@ -28,8 +31,16 @@ export function NavUser({
     avatar: string;
     role: string;
   };
+  isAdmin?: boolean;
 }) {
   const { isMobile } = useSidebar();
+  const router = useRouter();
+  const logout = useAuthStore((state) => state.logout);
+
+  const handleLogout = async () => {
+    await logout();
+    router.push("/");
+  };
 
   const initials = user.name
     .split(" ")
@@ -78,22 +89,24 @@ export function NavUser({
                 </div>
               </div>
             </DropdownMenuLabel>
-            <DropdownMenuGroup>
-              <DropdownMenuItem asChild>
-                <Link href="/company/settings/profile">
-                  <BadgeCheck />
-                  Account
-                </Link>
-              </DropdownMenuItem>
-              <DropdownMenuItem asChild>
-                <Link href="/company/business">
-                  <Building2 />
-                  Business Profile
-                </Link>
-              </DropdownMenuItem>
-            </DropdownMenuGroup>
+            {!isAdmin && (
+              <DropdownMenuGroup>
+                <DropdownMenuItem asChild>
+                  <Link href="/company/settings/profile">
+                    <BadgeCheck />
+                    Account
+                  </Link>
+                </DropdownMenuItem>
+                <DropdownMenuItem asChild>
+                  <Link href="/company/business">
+                    <Building2 />
+                    Business Profile
+                  </Link>
+                </DropdownMenuItem>
+              </DropdownMenuGroup>
+            )}
             <DropdownMenuSeparator />
-            <DropdownMenuItem variant="destructive">
+            <DropdownMenuItem variant="destructive" onClick={() => void handleLogout()}>
               <LogOut />
               Log out
             </DropdownMenuItem>

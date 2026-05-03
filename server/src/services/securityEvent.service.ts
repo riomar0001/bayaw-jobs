@@ -15,6 +15,9 @@ const SEVERITY_MAP: Record<security_event_type, security_event_severity> = {
   PASSWORD_RESET_REQUESTED:  security_event_severity.MEDIUM,
   EMAIL_VERIFIED:            security_event_severity.LOW,
   SUSPICIOUS_ACTIVITY:       security_event_severity.CRITICAL,
+  OTP_FAILED:                security_event_severity.HIGH,
+  SESSION_REVOKED:           security_event_severity.MEDIUM,
+  ADMIN_ACTION:              security_event_severity.HIGH,
 };
 
 export class SecurityEventService {

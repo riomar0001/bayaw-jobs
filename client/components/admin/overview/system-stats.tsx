@@ -1,4 +1,4 @@
-import { Users, Building2, UserCheck, Briefcase, FileText, TrendingUp } from 'lucide-react';
+import { Users, Building2, UserCheck, Briefcase, FileText, TrendingUp, ShieldAlert } from 'lucide-react';
 import { StatsCard } from '@/components/company/dashboard/dashboard/stats-card';
 
 export interface SystemStats {

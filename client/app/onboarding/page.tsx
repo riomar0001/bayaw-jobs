@@ -100,7 +100,7 @@ export default function OnboardingSelectionPage() {
       <div className="min-h-screen flex flex-col items-center justify-center bg-muted/30 px-4">
         <div className="w-full max-w-2xl">
           <div className="text-center mb-10">
-            <h1 className="text-3xl font-bold mb-2">Welcome to Bayaw Jobs</h1>
+            <h1 className="text-3xl font-bold mb-2">Welcome to Job Tally</h1>
             <p className="text-muted-foreground">
               How would you like to get started? You can always set up the other
               account later.

@@ -143,6 +143,9 @@ enum security_event_type {
   PASSWORD_RESET_REQUESTED
   EMAIL_VERIFIED
   SUSPICIOUS_ACTIVITY
+  OTP_FAILED
+  SESSION_REVOKED
+  ADMIN_ACTION
 }
 
 enum security_event_severity {

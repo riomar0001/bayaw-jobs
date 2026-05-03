@@ -1,12 +1,32 @@
 'use client';
 
+import { useEffect, useState } from 'react';
 import { ColumnDef } from '@tanstack/react-table';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { ArrowUpDown } from 'lucide-react';
+import { ArrowUpDown, Lock } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { formatDate } from '@/lib/formatters';
+
+function LockCountdown({ lockedUntil }: { lockedUntil: string }) {
+  const unlockAt = new Date(lockedUntil).getTime();
+  const [remaining, setRemaining] = useState(unlockAt - Date.now());
+
+  useEffect(() => {
+    const id = setInterval(() => setRemaining(unlockAt - Date.now()), 1000);
+    return () => clearInterval(id);
+  }, [unlockAt]);
+
+  if (remaining <= 0) return <span className="text-xs text-muted-foreground">Unlocking...</span>;
+  const mins = Math.floor(remaining / 60000);
+  const secs = Math.floor((remaining % 60000) / 1000);
+  return (
+    <span className="text-xs text-orange-700 font-medium">
+      {mins}m {secs}s
+    </span>
+  );
+}
 
 export interface AdminUser {
   id: string;
@@ -18,6 +38,7 @@ export interface AdminUser {
   email_verified: boolean;
   created_at: string;
   last_login_at: string | null;
+  locked_until: string | null;
 }
 
 const roleVariant: Record<string, string> = {
@@ -121,6 +142,20 @@ export const userColumns: ColumnDef<AdminUser>[] = [
         <span className="text-sm text-muted-foreground">
           {v ? formatDate(v) : '—'}
         </span>
+      );
+    },
+  },
+  {
+    accessorKey: 'locked_until',
+    header: 'Lock Expires',
+    cell: ({ row }) => {
+      const v = row.original.locked_until;
+      if (!v || new Date(v) <= new Date()) return <span className="text-xs text-muted-foreground">—</span>;
+      return (
+        <div className="flex items-center gap-1.5">
+          <Lock className="size-3 text-orange-600 shrink-0" />
+          <LockCountdown lockedUntil={v} />
+        </div>
       );
     },
   },

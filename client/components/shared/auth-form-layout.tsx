@@ -35,7 +35,7 @@ export function AuthFormLayout({
           <CardHeader className="space-y-1">
             <Link href="/" className="text-center">
               <h2 className="text-2xl font-bold text-primary mb-2">
-                Bayaw Jobs
+                Job Tally
               </h2>
             </Link>
             <CardTitle className="text-center">{title}</CardTitle>

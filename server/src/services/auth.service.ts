@@ -123,6 +123,12 @@ export class AuthService {
 
     const refreshToken = await generateRefreshToken(user.id, ip, userAgent);
 
+    void securityEventService.log(security_event_type.EMAIL_VERIFIED, {
+      user_id: user.id,
+      ...(ip && { ip_address: ip }),
+      ...(userAgent && { user_agent: userAgent }),
+    });
+
     return {
       user: {
         id: updatedUser.id,
@@ -231,6 +237,14 @@ export class AuthService {
     // Verify code
     const authCode = await authCodeRepository.findValidCode(userId, code);
     if (!authCode) {
+      const ip = req.ip;
+      const ua = req.headers['user-agent'];
+      void securityEventService.log(security_event_type.OTP_FAILED, {
+        user_id: userId,
+        ...(ip && { ip_address: ip }),
+        ...(ua && { user_agent: ua }),
+        metadata: { reason: 'invalid_or_expired_code' },
+      });
       throw new AuthenticationError(ErrorMessages.AUTH.INVALID_VERIFICATION_CODE);
     }
 
@@ -255,14 +269,39 @@ export class AuthService {
 
     const refreshToken = await generateRefreshToken(user.id, ip, userAgent);
 
-    // Update last login
+    const priorFailures = user.failed_login_attempts;
+    const wasLocked = user.locked_until !== null && user.locked_until !== undefined;
+
+    // Update last login (resets failed_login_attempts and locked_until)
     await userRepository.updateLastLogin(user.id);
+
+    if (wasLocked) {
+      void securityEventService.log(security_event_type.ACCOUNT_UNLOCKED, {
+        user_id: user.id,
+        ...(ip && { ip_address: ip }),
+        ...(userAgent && { user_agent: userAgent }),
+        metadata: { reason: 'lock_expired_successful_login' },
+      });
+    }
 
     void securityEventService.log(security_event_type.LOGIN_SUCCESS, {
       user_id: user.id,
       ...(ip && { ip_address: ip }),
       ...(userAgent && { user_agent: userAgent }),
+      ...(priorFailures > 0 && { metadata: { prior_failures: priorFailures } }),
     });
+
+    if (priorFailures >= 3) {
+      void securityEventService.log(security_event_type.SUSPICIOUS_ACTIVITY, {
+        user_id: user.id,
+        ...(ip && { ip_address: ip }),
+        ...(userAgent && { user_agent: userAgent }),
+        metadata: {
+          reason: 'login_success_after_failures',
+          prior_failures: priorFailures,
+        },
+      });
+    }
 
     const userData: UserData = {
       id: user.id,
@@ -348,6 +387,10 @@ export class AuthService {
     try {
       const decoded = verifyRefreshToken(token);
       await refreshTokenRepository.revoke(decoded.token_id);
+      void securityEventService.log(security_event_type.SESSION_REVOKED, {
+        user_id: decoded.user_id,
+        metadata: { reason: 'logout', sessions_revoked: 1 },
+      });
     } catch {
       // Token might be invalid or already revoked, just continue
     }
@@ -355,6 +398,10 @@ export class AuthService {
 
   async logoutAll(userId: string): Promise<void> {
     await refreshTokenRepository.revokeAllByUserId(userId);
+    void securityEventService.log(security_event_type.SESSION_REVOKED, {
+      user_id: userId,
+      metadata: { reason: 'logout_all' },
+    });
   }
 
   private async getProfileIds(

@@ -31,6 +31,7 @@ interface AdminDataTableProps<TData, TValue> {
   searchPlaceholder?: string;
   emptyMessage?: string;
   filters?: React.ReactNode;
+  onRowClick?: (row: TData) => void;
 }
 
 export function AdminDataTable<TData, TValue>({
@@ -40,6 +41,7 @@ export function AdminDataTable<TData, TValue>({
   searchPlaceholder = 'Search...',
   emptyMessage = 'No results found.',
   filters,
+  onRowClick,
 }: AdminDataTableProps<TData, TValue>) {
   const [sorting, setSorting] = React.useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>([]);
@@ -111,7 +113,11 @@ export function AdminDataTable<TData, TValue>({
             <TableBody>
               {table.getRowModel().rows?.length ? (
                 table.getRowModel().rows.map((row) => (
-                  <TableRow key={row.id}>
+                  <TableRow
+                    key={row.id}
+                    onClick={onRowClick ? () => onRowClick(row.original) : undefined}
+                    className={onRowClick ? 'cursor-pointer hover:bg-muted/60' : ''}
+                  >
                     {row.getVisibleCells().map((cell) => (
                       <TableCell key={cell.id}>
                         {flexRender(cell.column.columnDef.cell, cell.getContext())}

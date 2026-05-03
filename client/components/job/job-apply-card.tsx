@@ -59,7 +59,7 @@ export function JobApplyCard({ job, onApply, applying }: JobApplyCardProps) {
             </span>
           </div>
 
-          <Link href="/applications">
+          <Link href="/applicant/applications">
             <Button variant="outline" className="w-full" size="sm">
               View All Applications
             </Button>

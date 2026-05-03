@@ -18,7 +18,6 @@ import {
   User,
   LogOut,
   Settings,
-  Briefcase,
   Building2,
 } from "lucide-react";
 import { useState, useEffect } from "react";
@@ -64,7 +63,7 @@ export function Navbar() {
             className="flex items-center space-x-2 font-bold text-xl"
           >
             <span className="bg-gradient-to-r from-primary to-primary/70 bg-clip-text text-transparent">
-              Bayaw Jobs
+              Job Tally
             </span>
           </Link>
 
@@ -140,51 +139,47 @@ export function Navbar() {
                 <DropdownMenuContent align="end" className="w-56">
                   <DropdownMenuLabel>My Account</DropdownMenuLabel>
                   <DropdownMenuSeparator />
-                  {!user?.applicant_profile_id && !user?.company_id && (
+                  {user?.role === "ADMIN" ? (
                     <DropdownMenuItem asChild>
-                      <Link href="/onboarding" className="cursor-pointer">
-                        <User className="mr-2 h-4 w-4" />
-                        Complete Account Onboarding
+                      <Link href="/admin" className="cursor-pointer">
+                        <Settings className="mr-2 h-4 w-4" />
+                        Admin Dashboard
                       </Link>
                     </DropdownMenuItem>
+                  ) : (
+                    <>
+                      {!user?.applicant_profile_id && !user?.company_id && (
+                        <DropdownMenuItem asChild>
+                          <Link href="/onboarding" className="cursor-pointer">
+                            <User className="mr-2 h-4 w-4" />
+                            Complete Account Onboarding
+                          </Link>
+                        </DropdownMenuItem>
+                      )}
+                      {user?.applicant_profile_id && (
+                        <DropdownMenuItem asChild>
+                          <Link href="/applicant/profile" className="cursor-pointer">
+                            <User className="mr-2 h-4 w-4" />
+                            Applicant Profile
+                          </Link>
+                        </DropdownMenuItem>
+                      )}
+                      {user?.company_id && (
+                        <DropdownMenuItem asChild>
+                          <Link href="/company" className="cursor-pointer">
+                            <Building2 className="mr-2 h-4 w-4" />
+                            Company Dashboard
+                          </Link>
+                        </DropdownMenuItem>
+                      )}
+                      <DropdownMenuItem asChild>
+                        <Link href="/applicant/settings" className="cursor-pointer">
+                          <Settings className="mr-2 h-4 w-4" />
+                          Settings
+                        </Link>
+                      </DropdownMenuItem>
+                    </>
                   )}
-                  {user?.applicant_profile_id && (
-                    <DropdownMenuItem asChild>
-                      <Link
-                        href="/applicant/profile"
-                        className="cursor-pointer"
-                      >
-                        <User className="mr-2 h-4 w-4" />
-                        Applicant Profile
-                      </Link>
-                    </DropdownMenuItem>
-                  )}
-                  {user?.company_id && (
-                    <DropdownMenuItem asChild>
-                      <Link href="/company" className="cursor-pointer">
-                        <Building2 className="mr-2 h-4 w-4" />
-                        Company Dashboard
-                      </Link>
-                    </DropdownMenuItem>
-                  )}
-                  <DropdownMenuItem asChild>
-                    <Link href="/jobs" className="cursor-pointer">
-                      <Briefcase className="mr-2 h-4 w-4" />
-                      Find Jobs
-                    </Link>
-                  </DropdownMenuItem>
-                  <DropdownMenuItem asChild>
-                    <Link href="/companies" className="cursor-pointer">
-                      <Building2 className="mr-2 h-4 w-4" />
-                      Companies
-                    </Link>
-                  </DropdownMenuItem>
-                  <DropdownMenuItem asChild>
-                    <Link href="/applicant/settings" className="cursor-pointer">
-                      <Settings className="mr-2 h-4 w-4" />
-                      Settings
-                    </Link>
-                  </DropdownMenuItem>
                   <DropdownMenuSeparator />
                   <DropdownMenuItem
                     onClick={handleLogout}

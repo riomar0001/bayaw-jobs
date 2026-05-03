@@ -4,46 +4,63 @@ import { securityEventService } from '@/services/securityEvent.service';
 import { successResponse } from '@/utils/apiResponse.util';
 import { security_event_type, security_event_severity } from '@/generated/prisma/client';
 
+function logAdminAction(req: Request, action: string) {
+  const adminId = req.user?.user_id;
+  const ip = req.ip;
+  const ua = req.headers['user-agent'];
+  void securityEventService.log(security_event_type.ADMIN_ACTION, {
+    ...(adminId && { user_id: adminId }),
+    ...(ip && { ip_address: ip }),
+    ...(ua && { user_agent: ua }),
+    metadata: { action, path: req.path },
+  });
+}
+
 export class AdminController {
-  async getOverview(_req: Request, res: Response, next: NextFunction): Promise<void> {
+  async getOverview(req: Request, res: Response, next: NextFunction): Promise<void> {
     try {
       const data = await adminService.getOverview();
+      logAdminAction(req, 'view_overview');
       successResponse(res, data, 'Admin overview retrieved successfully');
     } catch (error) {
       next(error);
     }
   }
 
-  async getUsers(_req: Request, res: Response, next: NextFunction): Promise<void> {
+  async getUsers(req: Request, res: Response, next: NextFunction): Promise<void> {
     try {
       const data = await adminService.getUsers();
+      logAdminAction(req, 'view_users');
       successResponse(res, data, 'Users retrieved successfully');
     } catch (error) {
       next(error);
     }
   }
 
-  async getBusinesses(_req: Request, res: Response, next: NextFunction): Promise<void> {
+  async getBusinesses(req: Request, res: Response, next: NextFunction): Promise<void> {
     try {
       const data = await adminService.getBusinesses();
+      logAdminAction(req, 'view_businesses');
       successResponse(res, data, 'Businesses retrieved successfully');
     } catch (error) {
       next(error);
     }
   }
 
-  async getApplicants(_req: Request, res: Response, next: NextFunction): Promise<void> {
+  async getApplicants(req: Request, res: Response, next: NextFunction): Promise<void> {
     try {
       const data = await adminService.getApplicants();
+      logAdminAction(req, 'view_applicants');
       successResponse(res, data, 'Applicants retrieved successfully');
     } catch (error) {
       next(error);
     }
   }
 
-  async getJobs(_req: Request, res: Response, next: NextFunction): Promise<void> {
+  async getJobs(req: Request, res: Response, next: NextFunction): Promise<void> {
     try {
       const data = await adminService.getJobs();
+      logAdminAction(req, 'view_jobs');
       successResponse(res, data, 'Jobs retrieved successfully');
     } catch (error) {
       next(error);

@@ -104,7 +104,7 @@ export function CompanyInfoForm({ business }: CompanyInfoFormProps) {
                       <FieldInfo hint="Your registered company name as it appears publicly" />
                     </FormLabel>
                     <FormControl>
-                      <Input placeholder="e.g. Bayaw Technologies" {...field} />
+                      <Input placeholder="e.g. JT Technologies" {...field} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>

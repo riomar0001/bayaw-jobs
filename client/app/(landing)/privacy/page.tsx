@@ -26,7 +26,7 @@ export default function PrivacyPage() {
           <h1 className="text-4xl font-bold mb-3">Privacy Policy</h1>
           <p className="text-muted-foreground">Last updated: January 1, 2025</p>
           <p className="mt-4 text-muted-foreground leading-relaxed">
-            At Bayaw Jobs, we take your privacy seriously. This policy explains
+            At Job Tally, we take your privacy seriously. This policy explains
             what information we collect, how we use it, and the choices you have
             regarding your data.
           </p>
@@ -60,10 +60,10 @@ export default function PrivacyPage() {
           <p className="text-sm text-muted-foreground">
             Questions about this Privacy Policy? Reach us at{" "}
             <a
-              href="mailto:privacy@bayaw.jobs"
+              href="mailto:privacy@jobtally.com"
               className="text-primary hover:underline"
             >
-              privacy@bayaw.jobs
+              privacy@jobtally.com
             </a>
             .
           </p>

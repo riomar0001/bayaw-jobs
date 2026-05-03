@@ -41,6 +41,10 @@ export default function LoginPage() {
     const { isAuthenticated, user } = useAuthStore.getState();
     if (!isAuthenticated) return;
     // Route based on existing profile
+    if (user?.role === "ADMIN") {
+      router.push("/admin");
+      return;
+    }
     if (user?.applicant_profile_id) {
       router.push("/");
       return;

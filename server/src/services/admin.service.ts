@@ -116,6 +116,7 @@ export class AdminService {
           email_verified: true,
           created_at: true,
           last_login_at: true,
+          locked_until: true,
         },
       }),
       prisma.user.count({ where: { role: 'ADMIN' } }),

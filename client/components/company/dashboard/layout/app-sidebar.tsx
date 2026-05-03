@@ -53,7 +53,7 @@ export function AppSidebar() {
             B
           </div>
           <div className="flex flex-col">
-            <span className="text-sm font-semibold">Bayaw Jobs</span>
+            <span className="text-sm font-semibold">Job Tally</span>
             <span className="text-xs text-muted-foreground">Recruitment Dashboard</span>
           </div>
         </div>
