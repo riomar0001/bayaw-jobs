@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { Users, ShieldCheck, UserCheck, Clock } from 'lucide-react';
+import { Users, ShieldCheck, UserCheck, Clock, RefreshCw } from 'lucide-react';
 import { PageHeader } from '@/components/company/dashboard/layout/page-header';
 import { StatsCard } from '@/components/company/dashboard/dashboard/stats-card';
 import { AdminDataTable } from '@/components/admin/shared/admin-data-table';
@@ -16,6 +16,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
+import { Button } from '@/components/ui/button';
 import { apiClient } from '@/api/client';
 
 interface UserStats {
@@ -64,6 +65,17 @@ export default function AdminUsersPage() {
   };
 
   useEffect(() => { void fetchData(); }, []);
+
+  // Auto-refresh every 30s while any user is locked
+  useEffect(() => {
+    const now = new Date();
+    const hasLocked = data?.users.some(
+      (u) => u.locked_until && new Date(u.locked_until) > now
+    );
+    if (!hasLocked) return;
+    const id = setInterval(() => { void fetchData(); }, 30_000);
+    return () => clearInterval(id);
+  }, [data]);
 
   // Client-side filter applied via TanStack table column filters
   const filteredUsers = (data?.users ?? []).filter((u) => {
@@ -131,7 +143,12 @@ export default function AdminUsersPage() {
                       View and manage platform users across all roles.
                     </p>
                   </div>
-                  <Badge variant="outline">{data.stats.total} total</Badge>
+                  <div className="flex items-center gap-2">
+                    <Button variant="ghost" size="sm" onClick={() => void fetchData()} disabled={isLoading}>
+                      <RefreshCw className={`h-4 w-4 ${isLoading ? 'animate-spin' : ''}`} />
+                    </Button>
+                    <Badge variant="outline">{data.stats.total} total</Badge>
+                  </div>
                 </div>
               </div>
               <div className="p-6">
