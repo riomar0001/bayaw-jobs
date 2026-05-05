@@ -19,8 +19,10 @@ export const Config = {
   RATE_LIMIT: {
     WINDOW_MS: 5 * 60 * 1000, // 5 minutes
     MAX_REQUESTS: process.env.NODE_ENV === 'development' ? 1000 : 100,
-    AUTH_WINDOW_MS: 5 * 60 * 1000, // 5 minutes
-    AUTH_MAX_REQUESTS: process.env.NODE_ENV === 'development' ? 100 : 10,
+    // AUTH_WINDOW_MS: 5 * 60 * 1000, // 5 minutes
+    AUTH_WINDOW_MS: 30 * 1000, // 5 minutes
+    // AUTH_MAX_REQUESTS: process.env.NODE_ENV === 'development' ? 100 : 10,
+    AUTH_MAX_REQUESTS: 10,
   },
 
   // File Upload

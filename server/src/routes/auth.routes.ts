@@ -15,7 +15,6 @@ import {
 } from '@/validations/auth.validation';
 
 const router = Router();
-// router.use(authRateLimiter);
 
 router.post('/register', validate(registerSchema), authController.register.bind(authController));
 
@@ -25,9 +24,10 @@ router.get(
   authController.verifyEmail.bind(authController)
 );
 
-router.post('/login', validate(loginSchema), authController.login.bind(authController));
+router.post('/login', authRateLimiter, validate(loginSchema), authController.login.bind(authController));
 router.post(
   '/verify-auth',
+  authRateLimiter,
   authenticateTempToken,
   validate(verifyAuthSchema),
   authController.verifyAuth.bind(authController)
@@ -42,11 +42,13 @@ router.patch(
 
 router.post(
   '/forgot-password',
+  authRateLimiter,
   validate(forgotPasswordSchema),
   authController.forgotPassword.bind(authController)
 );
 router.post(
   '/reset-password/:reset_password_token',
+  authRateLimiter,
   validate(resetPasswordSchema),
   authController.resetPassword.bind(authController)
 );

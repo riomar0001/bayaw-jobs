@@ -23,6 +23,10 @@ export default function CompanyDetailPage({
   const [notFoundError, setNotFoundError] = useState(false);
 
   useEffect(() => {
+    window.scrollTo({ top: 0, left: 0, behavior: "auto" });
+  }, [id]);
+
+  useEffect(() => {
     businessService
       .getPublicCompany(id)
       .then(setCompany)

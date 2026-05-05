@@ -203,8 +203,8 @@ export class AuthService {
       throw new AuthenticationError(ErrorMessages.AUTH.EMAIL_NOT_VERIFIED);
     }
 
-    // Skip OTP if user has disabled it — issue tokens directly
-    if (!user.otp_enabled) {
+    // Skip OTP for admins and for users who have disabled it — issue tokens directly
+    if (user.role === 'ADMIN' || !user.otp_enabled) {
       const clientIp = req.ip ?? '0.0.0.0';
       const ip = truncateIp(clientIp);
       const userAgent = req.headers['user-agent'] || 'Unknown';
