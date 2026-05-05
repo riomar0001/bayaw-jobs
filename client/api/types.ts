@@ -52,11 +52,14 @@ export interface User {
   first_name: string;
   last_name: string;
   role: string;
+  status?: string;
   is_verified?: boolean;
   created_at?: string;
   applicant_profile_id?: string;
   company_id?: string;
   profile_picture_url?: string;
+  ban_reason?: string | null;
+  ban_expires_at?: string | null;
 }
 
 export interface RegisterInput {

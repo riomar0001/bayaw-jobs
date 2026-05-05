@@ -29,6 +29,11 @@ model user {
   failed_login_attempts Int       @default(0)
   locked_until          DateTime?
 
+  // Ban
+  ban_reason     String?
+  ban_expires_at DateTime?
+  banned_at      DateTime?
+
   // Activity tracking
   last_login_at    DateTime?
   last_activity_at DateTime?
@@ -146,6 +151,8 @@ enum security_event_type {
   OTP_FAILED
   SESSION_REVOKED
   ADMIN_ACTION
+  ACCOUNT_BANNED
+  ACCOUNT_UNBANNED
 }
 
 enum security_event_severity {
@@ -478,6 +485,7 @@ enum user_status {
   SUSPENDED
   PENDING_VERIFICATION
   DELETED
+  BANNED
 }
 
 enum application_status {

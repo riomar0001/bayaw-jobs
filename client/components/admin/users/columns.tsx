@@ -39,6 +39,9 @@ export interface AdminUser {
   created_at: string;
   last_login_at: string | null;
   locked_until: string | null;
+  ban_reason: string | null;
+  ban_expires_at: string | null;
+  banned_at: string | null;
 }
 
 const roleVariant: Record<string, string> = {
@@ -53,6 +56,7 @@ const statusVariant: Record<string, string> = {
   SUSPENDED: 'bg-red-100 text-red-800',
   PENDING_VERIFICATION: 'bg-yellow-100 text-yellow-800',
   DELETED: 'bg-red-100 text-red-600',
+  BANNED: 'bg-red-200 text-red-900',
 };
 
 export const userColumns: ColumnDef<AdminUser>[] = [

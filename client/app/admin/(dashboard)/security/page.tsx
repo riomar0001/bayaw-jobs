@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useState, useCallback } from 'react';
-import { ShieldAlert, ShieldX, AlertTriangle, Activity, ShieldCheck, KeyRound, LogOut, UserCheck, Settings, Lock, Unlock } from 'lucide-react';
+import { ShieldAlert, ShieldX, AlertTriangle, Activity, ShieldCheck, KeyRound, LogOut, UserCheck, Settings, Lock, Unlock, Ban, ShieldOff } from 'lucide-react';
 import { PageHeader } from '@/components/company/dashboard/layout/page-header';
 import { StatsCard } from '@/components/company/dashboard/dashboard/stats-card';
 import { AdminDataTable } from '@/components/admin/shared/admin-data-table';
@@ -30,7 +30,8 @@ type EventType =
   | 'LOGIN_FAILED' | 'ACCOUNT_LOCKED' | 'ACCOUNT_UNLOCKED'
   | 'RATE_LIMITED' | 'LOGIN_SUCCESS' | 'PASSWORD_CHANGED'
   | 'PASSWORD_RESET_REQUESTED' | 'EMAIL_VERIFIED' | 'SUSPICIOUS_ACTIVITY'
-  | 'OTP_FAILED' | 'SESSION_REVOKED' | 'ADMIN_ACTION';
+  | 'OTP_FAILED' | 'SESSION_REVOKED' | 'ADMIN_ACTION'
+  | 'ACCOUNT_BANNED' | 'ACCOUNT_UNBANNED';
 
 type Severity = 'LOW' | 'MEDIUM' | 'HIGH' | 'CRITICAL';
 
@@ -94,6 +95,8 @@ const TYPE_LABELS: Record<EventType, string> = {
   OTP_FAILED:               'OTP Failed',
   SESSION_REVOKED:          'Session Revoked',
   ADMIN_ACTION:             'Admin Action',
+  ACCOUNT_BANNED:           'Account Banned',
+  ACCOUNT_UNBANNED:         'Account Unbanned',
 };
 
 const TYPE_ICON: Record<EventType, React.ElementType> = {
@@ -109,6 +112,8 @@ const TYPE_ICON: Record<EventType, React.ElementType> = {
   OTP_FAILED:               ShieldX,
   SESSION_REVOKED:          LogOut,
   ADMIN_ACTION:             Settings,
+  ACCOUNT_BANNED:           Ban,
+  ACCOUNT_UNBANNED:         ShieldOff,
 };
 
 const TYPE_DESCRIPTION: Record<EventType, string> = {
@@ -124,6 +129,8 @@ const TYPE_DESCRIPTION: Record<EventType, string> = {
   OTP_FAILED:               'An invalid or expired OTP code was submitted during login.',
   SESSION_REVOKED:          'One or more active sessions were revoked (logout).',
   ADMIN_ACTION:             'An admin accessed a protected data endpoint.',
+  ACCOUNT_BANNED:           'A user account was banned by an administrator.',
+  ACCOUNT_UNBANNED:         'A banned user account was reinstated by an administrator.',
 };
 
 const EVENT_TYPES = Object.keys(TYPE_LABELS) as EventType[];

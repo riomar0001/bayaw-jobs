@@ -15,6 +15,10 @@ router.get('/businesses', adminController.getBusinesses.bind(adminController));
 router.get('/applicants', adminController.getApplicants.bind(adminController));
 router.get('/jobs', adminController.getJobs.bind(adminController));
 
+// ── User moderation ──────────────────────────────────────────────────────────
+router.patch('/users/:id/ban', adminController.banUser.bind(adminController));
+router.patch('/users/:id/unban', adminController.unbanUser.bind(adminController));
+
 // ── Security events ──────────────────────────────────────────────────────────
 router.get('/security-events/stats', adminController.getSecurityStats.bind(adminController));
 router.get('/security-events', adminController.getSecurityEvents.bind(adminController));

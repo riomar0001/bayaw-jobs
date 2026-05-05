@@ -5,6 +5,7 @@ export const ErrorMessages = {
     EMAIL_NOT_VERIFIED: 'Please verify your email before logging in',
     ACCOUNT_LOCKED: 'Account is temporarily locked due to too many failed login attempts',
     ACCOUNT_SUSPENDED: 'Your account has been suspended',
+    ACCOUNT_BANNED: 'Your account has been banned',
     ACCOUNT_DELETED: 'This account has been deleted',
     TOKEN_EXPIRED: 'Token has expired',
     TOKEN_INVALID: 'Invalid token',

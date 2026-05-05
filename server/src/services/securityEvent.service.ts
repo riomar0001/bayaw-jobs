@@ -18,6 +18,8 @@ const SEVERITY_MAP: Record<security_event_type, security_event_severity> = {
   OTP_FAILED:                security_event_severity.HIGH,
   SESSION_REVOKED:           security_event_severity.MEDIUM,
   ADMIN_ACTION:              security_event_severity.HIGH,
+  ACCOUNT_BANNED:            security_event_severity.HIGH,
+  ACCOUNT_UNBANNED:          security_event_severity.LOW,
 };
 
 export class SecurityEventService {

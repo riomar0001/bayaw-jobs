@@ -118,6 +118,7 @@ export class AuthService {
       role: user.role,
       first_name: user.first_name,
       last_name: user.last_name,
+      status: updatedUser.status,
       ...profileIds,
     });
 
@@ -152,13 +153,19 @@ export class AuthService {
     const uaOpt = ua ? { user_agent: ua } : {};
 
     // Find user
-    const user = await userRepository.findByEmail(data.email);
+    let user = await userRepository.findByEmail(data.email);
     if (!user) {
       void securityEventService.log(security_event_type.LOGIN_FAILED, {
         ...ipOpt, ...uaOpt,
         metadata: { email: data.email, reason: 'user_not_found' },
       });
       throw new AuthenticationError(ErrorMessages.AUTH.INVALID_CREDENTIALS);
+    }
+
+    // Auto-lift expired temporary ban before status check
+    if (user.status === user_status.BANNED && user.ban_expires_at && user.ban_expires_at < new Date()) {
+      await userRepository.unban(user.id);
+      user = (await userRepository.findByEmail(data.email))!;
     }
 
     // Check account status
@@ -264,6 +271,9 @@ export class AuthService {
       role: user.role,
       first_name: user.first_name,
       last_name: user.last_name,
+      status: user.status,
+      ...(user.ban_reason    && { ban_reason:     user.ban_reason }),
+      ...(user.ban_expires_at && { ban_expires_at: user.ban_expires_at.toISOString() }),
       ...profileIds,
     });
 
@@ -424,8 +434,15 @@ export class AuthService {
     };
   }
 
-  private checkAccountStatus(user: { status: user_status }): void {
+  private checkAccountStatus(user: { status: user_status; ban_expires_at?: Date | null }): void {
     switch (user.status) {
+      case user_status.BANNED: {
+        // If temporary ban has expired the auto-unban in login() will handle it — block for now
+        if (!user.ban_expires_at || user.ban_expires_at > new Date()) {
+          throw new AuthenticationError(ErrorMessages.AUTH.ACCOUNT_BANNED);
+        }
+        break;
+      }
       case user_status.SUSPENDED:
         throw new AuthenticationError(ErrorMessages.AUTH.ACCOUNT_SUSPENDED);
       case user_status.DELETED:

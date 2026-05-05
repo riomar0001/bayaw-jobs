@@ -23,6 +23,9 @@ export interface UpdateUserData {
   last_login_at?: Date | string | null;
   last_activity_at?: Date | string | null;
   login_count?: number;
+  ban_reason?: string | null;
+  ban_expires_at?: Date | string | null;
+  banned_at?: Date | string | null;
 }
 
 export class UserRepository {
@@ -134,6 +137,30 @@ export class UserRepository {
       where: { id },
       data: {
         last_activity_at: new Date(),
+      },
+    });
+  }
+
+  async ban(id: string, reason?: string, expiresAt?: Date) {
+    return prisma.user.update({
+      where: { id },
+      data: {
+        status: user_status.BANNED,
+        banned_at: new Date(),
+        ...(reason !== undefined && { ban_reason: reason }),
+        ...(expiresAt !== undefined && { ban_expires_at: expiresAt }),
+      },
+    });
+  }
+
+  async unban(id: string) {
+    return prisma.user.update({
+      where: { id },
+      data: {
+        status: user_status.ACTIVE,
+        ban_reason: null,
+        ban_expires_at: null,
+        banned_at: null,
       },
     });
   }
