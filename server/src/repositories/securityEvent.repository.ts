@@ -36,7 +36,14 @@ export class SecurityEventRepository {
   async findMany(filters: SecurityEventFilters = {}) {
     const { type, severity, user_id, from, to, page = 1, limit = 50 } = filters;
 
-    const where = {
+    const where: Prisma.security_eventWhereInput = {
+      // Exclude routine admin actions unless explicitly filtered by type
+      ...(!type && {
+        NOT: {
+          type: security_event_type.ADMIN_ACTION,
+          severity: { not: security_event_severity.CRITICAL },
+        },
+      }),
       ...(type && { type }),
       ...(severity && { severity }),
       ...(user_id && { user_id }),
@@ -69,11 +76,19 @@ export class SecurityEventRepository {
   async getStats() {
     const oneDayAgo = new Date(Date.now() - 24 * 60 * 60 * 1000);
 
+    // Exclude routine ADMIN_ACTION events (non-critical) — they're not security incidents
+    const excludeAdminActions = {
+      NOT: {
+        type: security_event_type.ADMIN_ACTION,
+        severity: { not: security_event_severity.CRITICAL },
+      },
+    };
+
     const [total, last24h, byType, bySeverity] = await Promise.all([
-      prisma.security_event.count(),
-      prisma.security_event.count({ where: { created_at: { gte: oneDayAgo } } }),
-      prisma.security_event.groupBy({ by: ['type'], _count: { type: true } }),
-      prisma.security_event.groupBy({ by: ['severity'], _count: { severity: true } }),
+      prisma.security_event.count({ where: excludeAdminActions }),
+      prisma.security_event.count({ where: { ...excludeAdminActions, created_at: { gte: oneDayAgo } } }),
+      prisma.security_event.groupBy({ by: ['type'], _count: { type: true }, where: excludeAdminActions }),
+      prisma.security_event.groupBy({ by: ['severity'], _count: { severity: true }, where: excludeAdminActions }),
     ]);
 
     return {

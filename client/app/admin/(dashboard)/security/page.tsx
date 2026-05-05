@@ -262,7 +262,11 @@ export default function SecurityEventsPage() {
         apiClient.get<{ success: boolean; data: SecurityStats }>('/admin/security-events/stats'),
       ]);
 
-      setEvents(eventsRes.data.data.events);
+      const allEvents = eventsRes.data.data.events;
+      const filtered = typeFilter === 'ADMIN_ACTION'
+        ? allEvents
+        : allEvents.filter((e) => e.type !== 'ADMIN_ACTION' || e.severity === 'CRITICAL');
+      setEvents(filtered);
       setTotal(eventsRes.data.data.total);
       setStats(statsRes.data.data);
     } catch (err) {
