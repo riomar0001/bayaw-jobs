@@ -65,4 +65,6 @@ router.patch(
   authController.updateAccountInfo.bind(authController)
 );
 
+router.patch('/settings/otp', authenticate, authController.updateOtpSetting.bind(authController));
+
 export default router;

@@ -28,6 +28,7 @@ model user {
   password_changed_at   DateTime  @default(now())
   failed_login_attempts Int       @default(0)
   locked_until          DateTime?
+  otp_enabled           Boolean   @default(true)
 
   // Ban
   ban_reason     String?

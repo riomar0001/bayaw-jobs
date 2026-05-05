@@ -203,6 +203,34 @@ export class AuthService {
       throw new AuthenticationError(ErrorMessages.AUTH.EMAIL_NOT_VERIFIED);
     }
 
+    // Skip OTP if user has disabled it — issue tokens directly
+    if (!user.otp_enabled) {
+      const clientIp = req.ip ?? '0.0.0.0';
+      const ip = truncateIp(clientIp);
+      const userAgent = req.headers['user-agent'] || 'Unknown';
+      const profileIds = await this.getProfileIds(user.id);
+      const accessToken = generateAccessToken({
+        user_id: user.id,
+        email: user.email,
+        role: user.role,
+        first_name: user.first_name,
+        last_name: user.last_name,
+        status: user.status,
+        ...(user.ban_reason    && { ban_reason:     user.ban_reason }),
+        ...(user.ban_expires_at && { ban_expires_at: user.ban_expires_at.toISOString() }),
+        ...profileIds,
+      });
+      const refreshToken = await generateRefreshToken(user.id, ip, userAgent);
+      await userRepository.updateLastLogin(user.id);
+      void securityEventService.log(security_event_type.LOGIN_SUCCESS, {
+        user_id: user.id,
+        ...(ip && { ip_address: ip }),
+        ...(userAgent && { user_agent: userAgent }),
+        metadata: { otp: false },
+      });
+      return { otpRequired: false, accessToken, refreshToken };
+    }
+
     // Generate auth code
     const code = generateAuthCode();
     const expiresAt = new Date(
@@ -226,10 +254,9 @@ export class AuthService {
     const tempToken = generateVerificationToken(user.id, user.email, 'auth_verification', '10m');
 
     return {
+      otpRequired: true,
       message: 'Verification code sent to your email',
       tempToken,
-      // Note: In production, don't return the code. This is for development/testing only.
-      // The code should be sent via email queue
       _code: process.env.NODE_ENV === 'development' ? code : undefined,
     };
   }
@@ -571,7 +598,14 @@ export class AuthService {
       first_name: user.first_name,
       last_name: user.last_name,
       email: user.email,
+      otp_enabled: user.otp_enabled,
     };
+  }
+
+  async updateOtpSetting(userId: string, enabled: boolean) {
+    const user = await userRepository.findById(userId);
+    if (!user) throw new NotFoundError('User');
+    await userRepository.update(userId, { otp_enabled: enabled });
   }
 
   async updateAccountInfo(userId: string, data: UpdateAccountInfoInput) {

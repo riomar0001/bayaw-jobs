@@ -93,9 +93,9 @@ export interface UpdatePasswordInput {
   confirm_password: string;
 }
 
-export interface LoginStep1Response {
-  tempToken: string;
-}
+export type LoginStep1Response =
+  | { otpRequired: true; tempToken: string; _code?: string }
+  | { otpRequired: false; accessToken: string };
 
 export interface LoginStep2Response {
   accessToken: string;
@@ -125,6 +125,7 @@ export interface AccountInfo {
   first_name: string;
   last_name: string;
   email: string;
+  otp_enabled: boolean;
 }
 
 export interface UpdateAccountInfoInput {

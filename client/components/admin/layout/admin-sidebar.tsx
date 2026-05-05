@@ -50,14 +50,12 @@ export function AdminSidebar() {
       icon: Briefcase,
     },
     {
-      title: 'Queues',
-      href: '/admin/queues',
-      icon: ListTodo,
-    },
-    {
       title: 'Security',
-      href: '/admin/security',
       icon: ShieldAlert,
+      items: [
+        { title: 'Event Log', href: '/admin/security' },
+        { title: 'Queues', href: '/admin/queues' },
+      ],
     },
   ];
 

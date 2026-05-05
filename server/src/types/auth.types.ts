@@ -34,11 +34,20 @@ export interface AuthResponse {
   refreshToken: string;
 }
 
-export interface LoginResponse {
+export interface LoginOtpResponse {
   message: string;
   tempToken: string;
+  otpRequired: true;
   _code?: string | undefined;
 }
+
+export interface LoginDirectResponse {
+  otpRequired: false;
+  accessToken: string;
+  refreshToken: string;
+}
+
+export type LoginResponse = LoginOtpResponse | LoginDirectResponse;
 
 export interface RefreshTokenResponse {
   accessToken: string;

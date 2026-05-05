@@ -73,8 +73,13 @@ export const useAuthStore = create<AuthState>()(
         login: async (email, password) => {
           set({ isLoading: true, error: null });
           try {
-            const { tempToken } = await authService.login({ email, password });
-            set({ _tempToken: tempToken, _loginStep: "otp", isLoading: false });
+            const result = await authService.login({ email, password });
+            if (!result.otpRequired) {
+              const user = decodeTokenUser(result.accessToken);
+              set({ user, isAuthenticated: true, _loginStep: "idle", isLoading: false });
+            } else {
+              set({ _tempToken: result.tempToken, _loginStep: "otp", isLoading: false });
+            }
           } catch (err) {
             set({ error: (err as Error).message, isLoading: false });
           }

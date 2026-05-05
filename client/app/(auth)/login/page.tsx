@@ -43,32 +43,30 @@ export default function LoginPage() {
     })();
   }, []);
 
+  const redirectAfterLogin = () => {
+    const { user } = useAuthStore.getState();
+    if (!user) return;
+    if (user.role === "ADMIN") { router.push("/admin"); return; }
+    if (user.applicant_profile_id) { router.push("/"); return; }
+    if (user.company_id) { router.push("/company"); return; }
+    router.push("/onboarding");
+  };
+
   const handleCredentials = async (e: React.FormEvent) => {
     e.preventDefault();
     clearError();
     await login(email, password);
+    const { isAuthenticated, _loginStep } = useAuthStore.getState();
+    if (isAuthenticated && _loginStep === "idle") redirectAfterLogin();
   };
 
   const handleOtp = async (e: React.FormEvent) => {
     e.preventDefault();
     clearError();
     await verifyOtp(otp);
-    const { isAuthenticated, user } = useAuthStore.getState();
+    const { isAuthenticated } = useAuthStore.getState();
     if (!isAuthenticated) return;
-    // Route based on existing profile
-    if (user?.role === "ADMIN") {
-      router.push("/admin");
-      return;
-    }
-    if (user?.applicant_profile_id) {
-      router.push("/");
-      return;
-    }
-    if (user?.company_id) {
-      router.push("/company");
-      return;
-    }
-    router.push("/onboarding");
+    redirectAfterLogin();
   };
 
   if (_loginStep === "otp") {

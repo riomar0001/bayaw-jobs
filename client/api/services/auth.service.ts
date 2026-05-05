@@ -33,13 +33,17 @@ class AuthService {
     });
   }
 
-  /** Step 1: submit email + password, receive temp_token */
+  /** Step 1: submit email + password. Returns OTP step or direct token if OTP disabled. */
   async login(data: LoginInput): Promise<LoginStep1Response> {
     const res = await apiClient.post<ApiResponse<LoginStep1Response>>(
       "/auth/login",
       data,
     );
-    return unwrapResponse(res.data);
+    const result = unwrapResponse(res.data);
+    if (!result.otpRequired) {
+      apiClient.setToken(result.accessToken);
+    }
+    return result;
   }
 
   /**
@@ -111,6 +115,10 @@ class AuthService {
       data,
     );
     return unwrapResponse(res.data);
+  }
+
+  async updateOtpSetting(enabled: boolean): Promise<void> {
+    await apiClient.patch("/auth/settings/otp", { enabled });
   }
 }
 

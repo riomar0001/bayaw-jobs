@@ -26,6 +26,7 @@ export interface UpdateUserData {
   ban_reason?: string | null;
   ban_expires_at?: Date | string | null;
   banned_at?: Date | string | null;
+  otp_enabled?: boolean;
 }
 
 export class UserRepository {

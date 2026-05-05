@@ -3,6 +3,7 @@
 import { PageHeader } from "@/components/company/dashboard/layout/page-header";
 import { PasswordForm } from "@/components/company/dashboard/settings/security/password-form";
 import { LoginHistory } from "@/components/company/dashboard/settings/security/login-history";
+import { OtpToggle } from "@/components/shared/otp-toggle";
 
 export default function SettingsSecurityPage() {
   return (
@@ -17,6 +18,7 @@ export default function SettingsSecurityPage() {
         ]}
       />
       <div className="flex flex-1 flex-col gap-6 p-6">
+        <OtpToggle />
         <PasswordForm />
         <LoginHistory />
       </div>
