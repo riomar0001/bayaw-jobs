@@ -1,7 +1,7 @@
 "use client";
 
-import { useState } from "react";
-import { useRouter } from "next/navigation";
+import { useState, useEffect } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { AuthFormLayout } from "@/components/shared/auth-form-layout";
 import { Button } from "@/components/ui/button";
@@ -14,10 +14,12 @@ import { Loader2, ArrowLeft } from "lucide-react";
 
 export default function LoginPage() {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const {
     login,
     verifyOtp,
     resetLoginStep,
+    refresh,
     isLoading,
     error,
     _loginStep,
@@ -28,28 +30,43 @@ export default function LoginPage() {
   const [password, setPassword] = useState("");
   const [otp, setOtp] = useState("");
 
+  useEffect(() => {
+    if (searchParams.get("verified") !== "true") return;
+    void (async () => {
+      await refresh();
+      const { user } = useAuthStore.getState();
+      if (!user) return;
+      if (user.role === "ADMIN") { router.replace("/admin"); return; }
+      if (user.applicant_profile_id) { router.replace("/"); return; }
+      if (user.company_id) { router.replace("/company"); return; }
+      router.replace("/onboarding");
+    })();
+  }, []);
+
+  const redirectAfterLogin = () => {
+    const { user } = useAuthStore.getState();
+    if (!user) return;
+    if (user.role === "ADMIN") { router.push("/admin"); return; }
+    if (user.applicant_profile_id) { router.push("/"); return; }
+    if (user.company_id) { router.push("/company"); return; }
+    router.push("/onboarding");
+  };
+
   const handleCredentials = async (e: React.FormEvent) => {
     e.preventDefault();
     clearError();
     await login(email, password);
+    const { isAuthenticated, _loginStep } = useAuthStore.getState();
+    if (isAuthenticated && _loginStep === "idle") redirectAfterLogin();
   };
 
   const handleOtp = async (e: React.FormEvent) => {
     e.preventDefault();
     clearError();
     await verifyOtp(otp);
-    const { isAuthenticated, user } = useAuthStore.getState();
+    const { isAuthenticated } = useAuthStore.getState();
     if (!isAuthenticated) return;
-    // Route based on existing profile
-    if (user?.applicant_profile_id) {
-      router.push("/");
-      return;
-    }
-    if (user?.company_id) {
-      router.push("/company");
-      return;
-    }
-    router.push("/onboarding");
+    redirectAfterLogin();
   };
 
   if (_loginStep === "otp") {

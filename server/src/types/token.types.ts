@@ -6,6 +6,9 @@ export interface AccessTokenPayload {
   last_name: string | null;
   applicant_profile_id?: string;
   company_id?: string;
+  status?: string;
+  ban_reason?: string | null;
+  ban_expires_at?: string | null;
 }
 
 export interface RefreshTokenPayload {

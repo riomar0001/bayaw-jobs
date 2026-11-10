@@ -17,6 +17,7 @@ import {
   Briefcase,
   ShieldCheck,
   ListTodo,
+  ShieldAlert,
 } from 'lucide-react';
 
 export function AdminSidebar() {
@@ -49,9 +50,12 @@ export function AdminSidebar() {
       icon: Briefcase,
     },
     {
-      title: 'Queues',
-      href: '/admin/queues',
-      icon: ListTodo,
+      title: 'Security',
+      icon: ShieldAlert,
+      items: [
+        { title: 'Event Log', href: '/admin/security' },
+        { title: 'Queues', href: '/admin/queues' },
+      ],
     },
   ];
 
@@ -63,7 +67,7 @@ export function AdminSidebar() {
             <ShieldCheck className="size-4" />
           </div>
           <div className="flex flex-col">
-            <span className="text-sm font-semibold">Bayaw Jobs</span>
+            <span className="text-sm font-semibold">Job Tally</span>
             <span className="text-xs text-muted-foreground">Super Admin Panel</span>
           </div>
         </div>
@@ -75,6 +79,7 @@ export function AdminSidebar() {
 
       <SidebarFooter className="border-t border-sidebar-border">
         <NavUser
+          isAdmin
           user={{
             name: user ? `${user.first_name} ${user.last_name}` : '',
             email: user?.email ?? '',

@@ -59,6 +59,18 @@ export class AuthController {
     try {
       const result = await authService.login(req.body, req);
 
+      if (!result.otpRequired) {
+        // OTP disabled — set refresh cookie and return access token directly
+        res.cookie(Config.COOKIES.REFRESH_TOKEN_NAME, result.refreshToken, {
+          httpOnly: Config.COOKIES.HTTP_ONLY,
+          secure: Config.COOKIES.SECURE,
+          sameSite: Config.COOKIES.SAME_SITE,
+          maxAge: Config.COOKIES.REFRESH_TOKEN_MAX_AGE,
+        });
+        successResponse(res, { otpRequired: false, accessToken: result.accessToken }, 'Login successful');
+        return;
+      }
+
       successResponse(res, result, 'Verification code sent to your email');
     } catch (error) {
       next(error);
@@ -253,6 +265,18 @@ export class AuthController {
 
       const result = await authService.updateAccountInfo(userId, req.body);
       successResponse(res, result, 'Account info updated successfully');
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  async updateOtpSetting(req: Request, res: Response, next: NextFunction): Promise<void> {
+    try {
+      const userId = req.user?.user_id;
+      if (!userId) throw new Error('User ID missing in request');
+      const { enabled } = req.body as { enabled: boolean };
+      await authService.updateOtpSetting(userId, enabled);
+      successResponse(res, { otp_enabled: enabled }, 'OTP setting updated successfully');
     } catch (error) {
       next(error);
     }

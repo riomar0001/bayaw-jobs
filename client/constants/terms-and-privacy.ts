@@ -41,7 +41,7 @@ export const privacy = [
       "You have the right to access, correct, or delete the personal data we hold about you.",
       "You may opt out of marketing communications at any time via your account settings.",
       "You may request a copy of your data in a portable format.",
-      "To exercise any of these rights, contact us at privacy@bayaw.jobs.",
+      "To exercise any of these rights, contact us at privacy@jobtally.com.",
     ],
   },
   {
@@ -73,7 +73,7 @@ export const terms = [
   {
     title: "Acceptance of Terms",
     content: [
-      "By accessing or using Bayaw Jobs, you agree to be bound by these Terms of Service.",
+      "By accessing or using Job Tally, you agree to be bound by these Terms of Service.",
       "If you do not agree to these terms, please discontinue use of the platform immediately.",
       "We reserve the right to update these terms at any time. Continued use constitutes acceptance of any changes.",
     ],
@@ -81,7 +81,7 @@ export const terms = [
   {
     title: "Eligibility",
     content: [
-      "You must be at least 18 years old to use Bayaw Jobs.",
+      "You must be at least 18 years old to use Job Tally.",
       "You must provide accurate and truthful information when creating your account.",
       "One person or entity may not maintain more than one account without prior written consent.",
     ],
@@ -91,7 +91,7 @@ export const terms = [
     content: [
       "You are responsible for maintaining the confidentiality of your account credentials.",
       "You are responsible for all activities that occur under your account.",
-      "Notify us immediately at support@bayaw.jobs if you suspect unauthorized access to your account.",
+      "Notify us immediately at support@jobtally.com if you suspect unauthorized access to your account.",
       "We reserve the right to suspend or terminate accounts that violate these terms.",
     ],
   },
@@ -126,7 +126,7 @@ export const terms = [
   {
     title: "Intellectual Property",
     content: [
-      "All content on Bayaw Jobs — including text, graphics, logos, and software — is owned by or licensed to us.",
+      "All content on Job Tally — including text, graphics, logos, and software — is owned by or licensed to us.",
       "You may not copy, reproduce, or distribute any content without prior written consent.",
       "By uploading content to our platform, you grant us a non-exclusive license to use it for operating and improving the service.",
     ],
@@ -134,7 +134,7 @@ export const terms = [
   {
     title: "Disclaimers and Limitation of Liability",
     content: [
-      'Bayaw Jobs is provided "as is" without warranties of any kind, express or implied.',
+      'Job Tally is provided "as is" without warranties of any kind, express or implied.',
       "We do not guarantee the accuracy, completeness, or suitability of any job listing or candidate profile.",
       "We are not responsible for the outcome of any hiring process facilitated through our platform.",
       "To the fullest extent permitted by law, our liability for any claim arising from use of the platform is limited to the amount you paid us in the preceding 12 months.",

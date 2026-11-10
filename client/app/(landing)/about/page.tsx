@@ -18,7 +18,7 @@ export default function AboutPage() {
     <main className="overflow-hidden">
       {/* Hero Section */}
       <HeroSection
-        title="About Bayaw Jobs"
+        title="About Job Tally"
         subtitle="Connecting talented professionals with amazing opportunities worldwide"
       />
 
@@ -43,7 +43,7 @@ export default function AboutPage() {
           {/* Left: Story */}
           <div className="space-y-6">
             <p className="text-lg text-muted-foreground leading-relaxed">
-              Bayaw Jobs was founded with a simple yet powerful mission: to make
+              Job Tally was founded with a simple yet powerful mission: to make
               finding the perfect job or the ideal candidate easier, faster, and
               more meaningful. We understand that careers are more than just
               paychecks—they&apos;re about growth, purpose, and fulfillment.
@@ -172,7 +172,7 @@ export default function AboutPage() {
       <section className="container mx-auto px-4 py-20">
         <CTABanner
           title="Join Our Growing Community"
-          description="Whether you're looking for talent or your next opportunity, Bayaw Jobs is here to help you succeed"
+          description="Whether you're looking for talent or your next opportunity, Job Tally is here to help you succeed"
           buttonText="Get Started"
           buttonHref="/signup"
         />

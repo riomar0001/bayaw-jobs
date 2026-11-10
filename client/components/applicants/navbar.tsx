@@ -55,7 +55,7 @@ export function Navbar() {
             className="flex items-center space-x-2 font-bold text-xl"
           >
             <span className="bg-gradient-to-r from-primary to-primary/70 bg-clip-text text-transparent">
-              Bayaw Jobs
+              Job Tally
             </span>
           </Link>
 

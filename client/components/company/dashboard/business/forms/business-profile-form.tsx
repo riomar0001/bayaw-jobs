@@ -113,7 +113,7 @@ export function BusinessProfileForm({ business }: BusinessProfileFormProps) {
                   <FormItem>
                     <FormLabel>Company Name</FormLabel>
                     <FormControl>
-                      <Input placeholder="e.g. Bayaw Technologies" {...field} />
+                      <Input placeholder="e.g. JT Technologies" {...field} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>

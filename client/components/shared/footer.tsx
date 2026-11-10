@@ -25,7 +25,7 @@ export function Footer() {
               className="flex items-center space-x-2 font-bold text-2xl"
             >
               <span className="bg-gradient-to-r from-primary to-primary/70 bg-clip-text text-transparent">
-                Bayaw Jobs
+                Job Tally
               </span>
             </Link>
             <p className="text-sm text-muted-foreground mt-2 max-w-xs">
@@ -128,7 +128,7 @@ export function Footer() {
         {/* Bottom Section */}
         <div className="flex flex-col md:flex-row justify-between items-center text-sm text-muted-foreground">
           <p>
-            &copy; {new Date().getFullYear()} Bayaw Jobs. All rights reserved.
+            &copy; {new Date().getFullYear()} Job Tally. All rights reserved.
           </p>
         </div>
       </div>

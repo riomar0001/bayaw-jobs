@@ -31,6 +31,10 @@ export default function JobDetailPage({
   const [applying, setApplying] = useState(false);
 
   useEffect(() => {
+    window.scrollTo({ top: 0, left: 0, behavior: "auto" });
+  }, [id]);
+
+  useEffect(() => {
     jobsService
       .getJob(id)
       .then(setJob)

@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { BadgeCheck, Building2, ChevronsUpDown, LogOut } from "lucide-react";
+import { useAuthStore } from "@/stores/auth.store";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
   DropdownMenu,
@@ -19,10 +20,10 @@ import {
   SidebarMenuItem,
   useSidebar,
 } from "@/components/ui/sidebar";
-import { useAuthStore } from "@/stores/auth.store";
 
 export function NavUser({
   user,
+  isAdmin = false,
 }: {
   user: {
     name: string;
@@ -30,6 +31,7 @@ export function NavUser({
     avatar: string;
     role: string;
   };
+  isAdmin?: boolean;
 }) {
   const router = useRouter();
   const { isMobile } = useSidebar();
@@ -87,20 +89,22 @@ export function NavUser({
                 </div>
               </div>
             </DropdownMenuLabel>
-            <DropdownMenuGroup>
-              <DropdownMenuItem asChild>
-                <Link href="/company/settings/profile">
-                  <BadgeCheck />
-                  Account
-                </Link>
-              </DropdownMenuItem>
-              <DropdownMenuItem asChild>
-                <Link href="/company/business">
-                  <Building2 />
-                  Business Profile
-                </Link>
-              </DropdownMenuItem>
-            </DropdownMenuGroup>
+            {!isAdmin && (
+              <DropdownMenuGroup>
+                <DropdownMenuItem asChild>
+                  <Link href="/company/settings/profile">
+                    <BadgeCheck />
+                    Account
+                  </Link>
+                </DropdownMenuItem>
+                <DropdownMenuItem asChild>
+                  <Link href="/company/business">
+                    <Building2 />
+                    Business Profile
+                  </Link>
+                </DropdownMenuItem>
+              </DropdownMenuGroup>
+            )}
             <DropdownMenuSeparator />
             <DropdownMenuItem
               variant="destructive"

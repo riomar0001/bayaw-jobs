@@ -38,6 +38,8 @@ import {
   UpdateAccountInfoInput,
 } from '@/validations/auth.validation';
 import { Request } from 'express';
+import { securityEventService } from '@/services/securityEvent.service';
+import { security_event_type } from '@/generated/prisma/client';
 
 export class AuthService {
   async register(data: RegisterInput): Promise<{ user: UserData; verificationToken: string }> {
@@ -116,10 +118,17 @@ export class AuthService {
       role: user.role,
       first_name: user.first_name,
       last_name: user.last_name,
+      status: updatedUser.status,
       ...profileIds,
     });
 
     const refreshToken = await generateRefreshToken(user.id, ip, userAgent);
+
+    void securityEventService.log(security_event_type.EMAIL_VERIFIED, {
+      user_id: user.id,
+      ...(ip && { ip_address: ip }),
+      ...(userAgent && { user_agent: userAgent }),
+    });
 
     return {
       user: {
@@ -137,11 +146,26 @@ export class AuthService {
     };
   }
 
-  async login(data: LoginInput, _req: Request): Promise<LoginResponse> {
+  async login(data: LoginInput, req: Request): Promise<LoginResponse> {
+    const ip = req.ip;
+    const ua = req.headers['user-agent'];
+    const ipOpt = ip ? { ip_address: ip } : {};
+    const uaOpt = ua ? { user_agent: ua } : {};
+
     // Find user
-    const user = await userRepository.findByEmail(data.email);
+    let user = await userRepository.findByEmail(data.email);
     if (!user) {
+      void securityEventService.log(security_event_type.LOGIN_FAILED, {
+        ...ipOpt, ...uaOpt,
+        metadata: { email: data.email, reason: 'user_not_found' },
+      });
       throw new AuthenticationError(ErrorMessages.AUTH.INVALID_CREDENTIALS);
+    }
+
+    // Auto-lift expired temporary ban before status check
+    if (user.status === user_status.BANNED && user.ban_expires_at && user.ban_expires_at < new Date()) {
+      await userRepository.unban(user.id);
+      user = (await userRepository.findByEmail(data.email))!;
     }
 
     // Check account status
@@ -149,19 +173,62 @@ export class AuthService {
 
     // Check if account is locked
     if (user.locked_until && user.locked_until > new Date()) {
+      void securityEventService.log(security_event_type.ACCOUNT_LOCKED, {
+        user_id: user.id, ...ipOpt, ...uaOpt,
+        metadata: { locked_until: user.locked_until },
+      });
       throw new AuthenticationError(ErrorMessages.AUTH.ACCOUNT_LOCKED);
     }
 
     // Verify password
     const isValidPassword = await verifyPassword(data.password, user.password);
     if (!isValidPassword) {
+      const nextAttempts = user.failed_login_attempts + 1;
       await this.handleFailedLogin(user.id, user.failed_login_attempts);
+      void securityEventService.log(security_event_type.LOGIN_FAILED, {
+        user_id: user.id, ...ipOpt, ...uaOpt,
+        metadata: { reason: 'invalid_password', attempt: nextAttempts },
+      });
+      if (nextAttempts >= Config.AUTH.MAX_LOGIN_ATTEMPTS) {
+        void securityEventService.log(security_event_type.ACCOUNT_LOCKED, {
+          user_id: user.id, ...ipOpt, ...uaOpt,
+          metadata: { triggered_by: 'max_failed_attempts', attempts: nextAttempts },
+        });
+      }
       throw new AuthenticationError(ErrorMessages.AUTH.INVALID_CREDENTIALS);
     }
 
     // Check if email is verified
     if (!user.email_verified) {
       throw new AuthenticationError(ErrorMessages.AUTH.EMAIL_NOT_VERIFIED);
+    }
+
+    // Skip OTP for admins and for users who have disabled it — issue tokens directly
+    if (user.role === 'ADMIN' || !user.otp_enabled) {
+      const clientIp = req.ip ?? '0.0.0.0';
+      const ip = truncateIp(clientIp);
+      const userAgent = req.headers['user-agent'] || 'Unknown';
+      const profileIds = await this.getProfileIds(user.id);
+      const accessToken = generateAccessToken({
+        user_id: user.id,
+        email: user.email,
+        role: user.role,
+        first_name: user.first_name,
+        last_name: user.last_name,
+        status: user.status,
+        ...(user.ban_reason    && { ban_reason:     user.ban_reason }),
+        ...(user.ban_expires_at && { ban_expires_at: user.ban_expires_at.toISOString() }),
+        ...profileIds,
+      });
+      const refreshToken = await generateRefreshToken(user.id, ip, userAgent);
+      await userRepository.updateLastLogin(user.id);
+      void securityEventService.log(security_event_type.LOGIN_SUCCESS, {
+        user_id: user.id,
+        ...(ip && { ip_address: ip }),
+        ...(userAgent && { user_agent: userAgent }),
+        metadata: { otp: false },
+      });
+      return { otpRequired: false, accessToken, refreshToken };
     }
 
     // Generate auth code
@@ -187,10 +254,9 @@ export class AuthService {
     const tempToken = generateVerificationToken(user.id, user.email, 'auth_verification', '10m');
 
     return {
+      otpRequired: true,
       message: 'Verification code sent to your email',
       tempToken,
-      // Note: In production, don't return the code. This is for development/testing only.
-      // The code should be sent via email queue
       _code: process.env.NODE_ENV === 'development' ? code : undefined,
     };
   }
@@ -205,6 +271,14 @@ export class AuthService {
     // Verify code
     const authCode = await authCodeRepository.findValidCode(userId, code);
     if (!authCode) {
+      const ip = req.ip;
+      const ua = req.headers['user-agent'];
+      void securityEventService.log(security_event_type.OTP_FAILED, {
+        user_id: userId,
+        ...(ip && { ip_address: ip }),
+        ...(ua && { user_agent: ua }),
+        metadata: { reason: 'invalid_or_expired_code' },
+      });
       throw new AuthenticationError(ErrorMessages.AUTH.INVALID_VERIFICATION_CODE);
     }
 
@@ -224,13 +298,47 @@ export class AuthService {
       role: user.role,
       first_name: user.first_name,
       last_name: user.last_name,
+      status: user.status,
+      ...(user.ban_reason    && { ban_reason:     user.ban_reason }),
+      ...(user.ban_expires_at && { ban_expires_at: user.ban_expires_at.toISOString() }),
       ...profileIds,
     });
 
     const refreshToken = await generateRefreshToken(user.id, ip, userAgent);
 
-    // Update last login
+    const priorFailures = user.failed_login_attempts;
+    const wasLocked = user.locked_until !== null && user.locked_until !== undefined;
+
+    // Update last login (resets failed_login_attempts and locked_until)
     await userRepository.updateLastLogin(user.id);
+
+    if (wasLocked) {
+      void securityEventService.log(security_event_type.ACCOUNT_UNLOCKED, {
+        user_id: user.id,
+        ...(ip && { ip_address: ip }),
+        ...(userAgent && { user_agent: userAgent }),
+        metadata: { reason: 'lock_expired_successful_login' },
+      });
+    }
+
+    void securityEventService.log(security_event_type.LOGIN_SUCCESS, {
+      user_id: user.id,
+      ...(ip && { ip_address: ip }),
+      ...(userAgent && { user_agent: userAgent }),
+      ...(priorFailures > 0 && { metadata: { prior_failures: priorFailures } }),
+    });
+
+    if (priorFailures >= 3) {
+      void securityEventService.log(security_event_type.SUSPICIOUS_ACTIVITY, {
+        user_id: user.id,
+        ...(ip && { ip_address: ip }),
+        ...(userAgent && { user_agent: userAgent }),
+        metadata: {
+          reason: 'login_success_after_failures',
+          prior_failures: priorFailures,
+        },
+      });
+    }
 
     const userData: UserData = {
       id: user.id,
@@ -316,6 +424,10 @@ export class AuthService {
     try {
       const decoded = verifyRefreshToken(token);
       await refreshTokenRepository.revoke(decoded.token_id);
+      void securityEventService.log(security_event_type.SESSION_REVOKED, {
+        user_id: decoded.user_id,
+        metadata: { reason: 'logout', sessions_revoked: 1 },
+      });
     } catch {
       // Token might be invalid or already revoked, just continue
     }
@@ -323,6 +435,10 @@ export class AuthService {
 
   async logoutAll(userId: string): Promise<void> {
     await refreshTokenRepository.revokeAllByUserId(userId);
+    void securityEventService.log(security_event_type.SESSION_REVOKED, {
+      user_id: userId,
+      metadata: { reason: 'logout_all' },
+    });
   }
 
   private async getProfileIds(
@@ -345,8 +461,15 @@ export class AuthService {
     };
   }
 
-  private checkAccountStatus(user: { status: user_status }): void {
+  private checkAccountStatus(user: { status: user_status; ban_expires_at?: Date | null }): void {
     switch (user.status) {
+      case user_status.BANNED: {
+        // If temporary ban has expired the auto-unban in login() will handle it — block for now
+        if (!user.ban_expires_at || user.ban_expires_at > new Date()) {
+          throw new AuthenticationError(ErrorMessages.AUTH.ACCOUNT_BANNED);
+        }
+        break;
+      }
       case user_status.SUSPENDED:
         throw new AuthenticationError(ErrorMessages.AUTH.ACCOUNT_SUSPENDED);
       case user_status.DELETED:
@@ -384,6 +507,11 @@ export class AuthService {
       resetLink,
     });
 
+    void securityEventService.log(security_event_type.PASSWORD_RESET_REQUESTED, {
+      user_id: user.id,
+      metadata: { email: user.email },
+    });
+
     return process.env.NODE_ENV === 'development' ? token : undefined;
   }
 
@@ -411,6 +539,11 @@ export class AuthService {
       to: user.email,
       firstName: user.first_name ?? '',
     });
+
+    void securityEventService.log(security_event_type.PASSWORD_CHANGED, {
+      user_id: user.id,
+      metadata: { method: 'reset' },
+    });
   }
 
   async updatePassword(userId: string, data: UpdatePasswordInput): Promise<void> {
@@ -431,6 +564,11 @@ export class AuthService {
     });
 
     await refreshTokenRepository.revokeAllByUserId(userId);
+
+    void securityEventService.log(security_event_type.PASSWORD_CHANGED, {
+      user_id: userId,
+      metadata: { method: 'user_initiated' },
+    });
   }
 
   async getUserByEmail(email: string): Promise<UserData | null> {
@@ -460,7 +598,14 @@ export class AuthService {
       first_name: user.first_name,
       last_name: user.last_name,
       email: user.email,
+      otp_enabled: user.otp_enabled,
     };
+  }
+
+  async updateOtpSetting(userId: string, enabled: boolean) {
+    const user = await userRepository.findById(userId);
+    if (!user) throw new NotFoundError('User');
+    await userRepository.update(userId, { otp_enabled: enabled });
   }
 
   async updateAccountInfo(userId: string, data: UpdateAccountInfoInput) {

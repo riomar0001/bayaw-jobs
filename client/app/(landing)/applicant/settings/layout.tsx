@@ -2,17 +2,14 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { User, Lock, History } from "lucide-react";
+import { User, Lock, History, ShieldCheck } from "lucide-react";
 import { Footer } from "@/components/shared/footer";
 
 const navItems = [
   { label: "Information", href: "/applicant/settings/information", icon: User },
   { label: "Password", href: "/applicant/settings/password", icon: Lock },
-  {
-    label: "Login History",
-    href: "/applicant/settings/login-history",
-    icon: History,
-  },
+  { label: "Security", href: "/applicant/settings/security", icon: ShieldCheck },
+  { label: "Login History", href: "/applicant/settings/login-history", icon: History },
 ];
 
 export default function SettingsLayout({

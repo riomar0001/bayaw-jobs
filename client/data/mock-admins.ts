@@ -21,7 +21,7 @@ export const mockAdmins: AdminUser[] = [
   {
     id: "1",
     name: "Rayan Osman",
-    email: "rayan.osman@bayawjobs.com",
+    email: "rayan.osman@jobtally.com",
     position: "CEO",
     role: "Owner",
     permissions: { canEdit: true, canDelete: true, canPostJob: true },
@@ -32,7 +32,7 @@ export const mockAdmins: AdminUser[] = [
   {
     id: "2",
     name: "Sofia Reyes",
-    email: "sofia.reyes@bayawjobs.com",
+    email: "sofia.reyes@jobtally.com",
     position: "HR Manager",
     role: "Admin",
     permissions: { canEdit: true, canDelete: true, canPostJob: true },
@@ -43,7 +43,7 @@ export const mockAdmins: AdminUser[] = [
   {
     id: "3",
     name: "Marco Vitale",
-    email: "marco.vitale@bayawjobs.com",
+    email: "marco.vitale@jobtally.com",
     position: "Recruiter",
     role: "Recruiter",
     permissions: { canEdit: true, canDelete: false, canPostJob: true },
@@ -54,7 +54,7 @@ export const mockAdmins: AdminUser[] = [
   {
     id: "4",
     name: "Aisha Tan",
-    email: "aisha.tan@bayawjobs.com",
+    email: "aisha.tan@jobtally.com",
     position: "Talent Acquisition",
     role: "Recruiter",
     permissions: { canEdit: true, canDelete: false, canPostJob: false },
@@ -65,7 +65,7 @@ export const mockAdmins: AdminUser[] = [
   {
     id: "5",
     name: "Daniel Park",
-    email: "daniel.park@bayawjobs.com",
+    email: "daniel.park@jobtally.com",
     position: "Recruiter",
     role: "Recruiter",
     permissions: { canEdit: false, canDelete: false, canPostJob: true },
@@ -76,7 +76,7 @@ export const mockAdmins: AdminUser[] = [
   {
     id: "6",
     name: "Priya Nair",
-    email: "priya.nair@bayawjobs.com",
+    email: "priya.nair@jobtally.com",
     position: "HR Coordinator",
     role: "Recruiter",
     permissions: { canEdit: false, canDelete: false, canPostJob: false },
@@ -87,7 +87,7 @@ export const mockAdmins: AdminUser[] = [
   {
     id: "7",
     name: "Lucas Ferreira",
-    email: "lucas.ferreira@bayawjobs.com",
+    email: "lucas.ferreira@jobtally.com",
     position: "Hiring Manager",
     role: "Admin",
     permissions: { canEdit: true, canDelete: true, canPostJob: false },

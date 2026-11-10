@@ -1,11 +1,11 @@
-"use client";
-import { Footer } from "@/components/shared/footer";
-import { ArrowLeft, FileText } from "lucide-react";
-import { terms as sections } from "@/constants/terms-and-privacy";
-import { useRouter } from "next/navigation";
+'use client'
+import { Footer } from '@/components/shared/footer'
+import { ArrowLeft, FileText } from 'lucide-react'
+import { terms as sections } from '@/constants/terms-and-privacy'
+import { useRouter } from 'next/navigation'
 
 export default function TermsPage() {
-  const router = useRouter();
+  const router = useRouter()
   return (
     <main className="min-h-screen bg-gradient-to-b from-muted/30 to-background">
       <div className="container mx-auto px-4 py-16 max-w-3xl">
@@ -26,9 +26,9 @@ export default function TermsPage() {
           <h1 className="text-4xl font-bold mb-3">Terms of Service</h1>
           <p className="text-muted-foreground">Last updated: January 1, 2025</p>
           <p className="mt-4 text-muted-foreground leading-relaxed">
-            Please read these Terms of Service carefully before using Bayaw
-            Jobs. By accessing or using our platform, you agree to be bound by
-            the terms described below.
+            Please read these Terms of Service carefully before using Job Tally.
+            By accessing or using our platform, you agree to be bound by the
+            terms described below.
           </p>
         </div>
 
@@ -58,13 +58,13 @@ export default function TermsPage() {
         <div className="mt-12 p-6 rounded-xl bg-muted/50 border">
           <h2 className="font-semibold mb-1">Questions?</h2>
           <p className="text-sm text-muted-foreground">
-            Contact us at{" "}
+            Contact us at{' '}
             <a
-              href="mailto:legal@bayaw.jobs"
+              href="mailto:legal@jobtally.com"
               className="text-primary hover:underline"
             >
-              legal@bayaw.jobs
-            </a>{" "}
+              legal@jobtally.com
+            </a>{' '}
             for any questions regarding these Terms of Service.
           </p>
         </div>
@@ -72,5 +72,5 @@ export default function TermsPage() {
 
       <Footer />
     </main>
-  );
+  )
 }

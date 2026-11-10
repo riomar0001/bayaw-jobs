@@ -11,7 +11,7 @@ export default function CompanyNoAccessPage() {
 
       <h1 className="text-2xl font-bold mb-2">No Company Account Found</h1>
       <p className="text-muted-foreground max-w-md mb-8">
-        You&apos;re not associated with any company on Bayaw Jobs. Create a
+        You&apos;re not associated with any company on Job Tally. Create a
         hiring account to post jobs and manage applicants.
       </p>
 

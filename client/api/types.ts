@@ -52,11 +52,14 @@ export interface User {
   first_name: string;
   last_name: string;
   role: string;
+  status?: string;
   is_verified?: boolean;
   created_at?: string;
   applicant_profile_id?: string;
   company_id?: string;
   profile_picture_url?: string;
+  ban_reason?: string | null;
+  ban_expires_at?: string | null;
 }
 
 export interface RegisterInput {
@@ -90,9 +93,9 @@ export interface UpdatePasswordInput {
   confirm_password: string;
 }
 
-export interface LoginStep1Response {
-  tempToken: string;
-}
+export type LoginStep1Response =
+  | { otpRequired: true; tempToken: string; _code?: string }
+  | { otpRequired: false; accessToken: string };
 
 export interface LoginStep2Response {
   accessToken: string;
@@ -122,6 +125,7 @@ export interface AccountInfo {
   first_name: string;
   last_name: string;
   email: string;
+  otp_enabled: boolean;
 }
 
 export interface UpdateAccountInfoInput {

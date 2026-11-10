@@ -82,7 +82,7 @@ export default function SignupPage() {
   return (
     <AuthFormLayout
       title="Create Your Account"
-      description="Join Bayaw Jobs and connect with top employers and opportunities"
+      description="Join Job Tally and connect with top employers and opportunities"
     >
       <form onSubmit={handleSubmit} className="space-y-6" autoComplete="off">
         <FieldGroup>
@@ -174,11 +174,11 @@ export default function SignupPage() {
             className="text-sm font-normal leading-relaxed cursor-pointer"
           >
             I agree to the{" "}
-            <Link href="/terms" className="text-primary hover:underline">
+            <Link href="/terms" className="text-primary hover:underline" target="_blank" rel="noopener noreferrer">
               Terms of Service
             </Link>{" "}
             and{" "}
-            <Link href="/privacy" className="text-primary hover:underline">
+            <Link href="/privacy" className="text-primary hover:underline" target="_blank" rel="noopener noreferrer">
               Privacy Policy
             </Link>
           </Label>

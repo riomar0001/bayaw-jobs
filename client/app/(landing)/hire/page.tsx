@@ -49,7 +49,7 @@ export default function CompaniesLandingPage() {
       <section className="container mx-auto px-4 py-20">
         <div className="mb-12 text-center">
           <h2 className="text-3xl font-semibold mb-2">
-            Why Choose Bayaw Jobs?
+            Why Choose Job Tally?
           </h2>
           <p className="text-muted-foreground">
             Everything you need to find and hire the best talent
@@ -81,7 +81,7 @@ export default function CompaniesLandingPage() {
       <section className="container mx-auto px-4 py-20">
         <CTABanner
           title="Ready to Start Hiring?"
-          description="Join hundreds of companies finding their next great hire on Bayaw Jobs"
+          description="Join hundreds of companies finding their next great hire on Job Tally"
           buttonText="Get Started"
           buttonHref="/signup"
         />
