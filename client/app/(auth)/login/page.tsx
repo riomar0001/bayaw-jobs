@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { AuthFormLayout } from "@/components/shared/auth-form-layout";
@@ -12,7 +12,7 @@ import { AuthError } from "@/components/auth/auth-error";
 import { useAuthStore } from "@/stores/auth.store";
 import { Loader2, ArrowLeft } from "lucide-react";
 
-export default function LoginPage() {
+function LoginPageContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const {
@@ -165,5 +165,14 @@ export default function LoginPage() {
         </p>
       </form>
     </AuthFormLayout>
+  );
+}
+
+// useSearchParams needs a Suspense boundary or the static prerender of /login fails.
+export default function LoginPage() {
+  return (
+    <Suspense>
+      <LoginPageContent />
+    </Suspense>
   );
 }
