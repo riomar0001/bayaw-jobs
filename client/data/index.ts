@@ -35,8 +35,6 @@ export {
   getPipelineStages,
   getQuickStats,
 } from "./mock-analytics";
-export { mockBusiness, getBusinessProfile } from "./mock-business";
-export { mockUser, getCurrentUser } from "./mock-user";
 
 // Applicant profile data
 export { mockUserProfile, type UserProfile } from "./mockData";
