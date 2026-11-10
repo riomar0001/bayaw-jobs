@@ -98,28 +98,6 @@ services:
     extra_hosts:
       - "host.docker.internal:host-gateway"
 
-  grafana:
-    image: grafana/grafana:latest
-    container_name: grafana_bayaw_jobs
-    restart: unless-stopped
-    networks:
-      - bayaw_jobs_network
-    ports:
-      - "3001:3000"
-    environment:
-      GF_SECURITY_ADMIN_USER: ${GRAFANA_ADMIN_USER:-admin}
-      GF_SECURITY_ADMIN_PASSWORD: ${GRAFANA_ADMIN_PASSWORD:-password}
-      GF_SECURITY_SECRET_KEY: ${GRAFANA_SECRET_KEY:-tlfQS8ZrK6Ww11HmjPl2nZJs9IiT7tAt}
-      GF_USERS_ALLOW_SIGN_UP: 'false'
-      GF_ANALYTICS_REPORTING_ENABLED: 'false'
-      GF_AUTH_ANONYMOUS_ENABLED: 'false'
-      GF_SERVER_ROOT_URL: http://localhost:3001
-    volumes:
-      - grafana_data:/var/lib/grafana
-      - ./grafana/provisioning:/etc/grafana/provisioning:ro
-    depends_on:
-      - prometheus
-
 volumes:
   postgres_data:
     driver: local
@@ -128,8 +106,6 @@ volumes:
   pgadmin_data:
     driver: local
   prometheus_data:
-    driver: local
-  grafana_data:
     driver: local
 
 networks:
