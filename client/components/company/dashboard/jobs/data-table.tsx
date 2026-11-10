@@ -35,11 +35,11 @@ import { CompanyJob, JobStatus, EmploymentType } from '@/api/types';
 
 const JOB_STATUSES: JobStatus[] = ['OPEN', 'PAUSED', 'CLOSED'];
 const EMPLOYMENT_TYPES: EmploymentType[] = [
-  'Fulltime',
-  'Part-time',
-  'Contract',
-  'Freelance',
-  'Internship',
+  'FULL_TIME',
+  'PART_TIME',
+  'CONTRACT',
+  'FREELANCE',
+  'INTERN',
 ];
 
 interface DataTableProps<TData, TValue> {

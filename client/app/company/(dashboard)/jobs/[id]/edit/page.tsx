@@ -32,8 +32,11 @@ import { formatSalaryRange } from '@/lib/formatters';
 import { Job, JobStatus } from '@/api/types';
 import { toast } from 'sonner';
 
+// The API can't set DRAFT, so it is never offered as a status change.
+type SettableStatus = Exclude<JobStatus, 'DRAFT'>;
+
 const STATUS_ACTIONS: Record<
-  JobStatus,
+  SettableStatus,
   { label: string; icon: React.ElementType; className?: string }
 > = {
   OPEN: { label: 'Publish', icon: CheckCircle2, className: 'text-green-600' },
@@ -45,7 +48,7 @@ const STATUS_ACTIONS: Record<
   CLOSED: { label: 'Close Job', icon: XCircle, className: 'text-destructive' },
 };
 
-const ALL_STATUSES: JobStatus[] = ['OPEN', 'PAUSED', 'CLOSED'];
+const ALL_STATUSES: SettableStatus[] = ['OPEN', 'PAUSED', 'CLOSED'];
 
 interface EditJobPageProps {
   params: Promise<{ id: string }>;

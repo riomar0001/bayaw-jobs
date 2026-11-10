@@ -57,6 +57,10 @@ export const jobFormSchema = z.object({
 
 type JobFormValues = z.infer<typeof jobFormSchema>;
 
+// The API only accepts OPEN, PAUSED and CLOSED; Save as Draft already stores PAUSED.
+const toFormStatus = (status: JobStatus): JobFormValues['status'] =>
+  status === 'DRAFT' ? 'PAUSED' : status;
+
 interface JobFormProps {
   job?: Job;
   mode: 'create' | 'edit';
@@ -84,7 +88,7 @@ export function JobForm({ job, mode, onSuccess }: JobFormProps) {
           responsibilities: job.responsibilities.join('\n'),
           qualifications: job.qualifications.join('\n'),
           benefits: job.benefits.join('\n'),
-          status: job.status,
+          status: toFormStatus(job.status),
         }
       : {
           title: '',
@@ -99,14 +103,14 @@ export function JobForm({ job, mode, onSuccess }: JobFormProps) {
           responsibilities: '',
           qualifications: '',
           benefits: '',
-          status: 'OPEN' as JobStatus,
+          status: 'OPEN',
         },
   });
 
   // Sync status from props when it changes (e.g., from parent's status update dropdown)
   useEffect(() => {
-    if (job?.status && job.status !== form.getValues('status')) {
-      form.setValue('status', job.status);
+    if (job?.status && toFormStatus(job.status) !== form.getValues('status')) {
+      form.setValue('status', toFormStatus(job.status));
     }
   }, [job?.status, form]);
 
