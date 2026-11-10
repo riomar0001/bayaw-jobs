@@ -15,7 +15,7 @@ import {
 } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { BusinessProfile } from '@/types/business';
+import { CompanyInfo, CompanySocial } from '@/api/types';
 import { Loader2 } from 'lucide-react';
 import { FieldInfo } from '@/components/company/dashboard/business/field-info';
 import { businessService } from '@/api';
@@ -36,8 +36,12 @@ const socialLinksSchema = z.object({
 type SocialLinksValues = z.infer<typeof socialLinksSchema>;
 
 interface SocialLinksFormProps {
-  business: BusinessProfile;
+  business: CompanyInfo;
 }
+
+// The API returns socials as a list of { platform, url }, not a keyed object.
+const socialUrl = (business: CompanyInfo, platform: CompanySocial['platform']) =>
+  business.social_links?.find((s) => s.platform === platform)?.url ?? '';
 
 export function SocialLinksForm({ business }: SocialLinksFormProps) {
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -45,10 +49,10 @@ export function SocialLinksForm({ business }: SocialLinksFormProps) {
   const form = useForm<SocialLinksValues>({
     resolver: zodResolver(socialLinksSchema),
     defaultValues: {
-      facebook: business.social_links?.facebook || '',
-      twitter: business.social_links?.twitter || '',
-      linkedin: business.social_links?.linkedin || '',
-      instagram: business.social_links?.instagram || '',
+      facebook: socialUrl(business, 'FACEBOOK'),
+      twitter: socialUrl(business, 'TWITTER'),
+      linkedin: socialUrl(business, 'LINKEDIN'),
+      instagram: socialUrl(business, 'INSTAGRAM'),
     },
   });
 

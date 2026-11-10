@@ -10,6 +10,7 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { useEffect, useState } from 'react';
 import { CompanyInfo } from '@/api/types';
 import { businessService } from '@/api/services/business.service';
+import { ErrorAlert } from '@/components/common/error-alert';
 
 const FormLoadingSkeleton = () => {
   return (
@@ -60,7 +61,7 @@ export default function BusinessPage() {
         {!isLoading && !error && data && (
           <>
             <div className="p-6">
-              <CompanyLogo name={data.company_name} logo={data.logo_url} />
+              <CompanyLogo name={data.company_name} logo={data.logo_url ?? undefined} />
             </div>
             <div className="px-6">
               <CompanyInfoForm business={data} />

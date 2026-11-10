@@ -15,7 +15,7 @@ import {
 } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { BusinessProfile } from '@/types/business';
+import { CompanyInfo } from '@/api/types';
 import { Loader2 } from 'lucide-react';
 import { FieldInfo } from '@/components/company/dashboard/business/field-info';
 import { businessService } from '@/api/services/business.service';
@@ -30,7 +30,7 @@ const contactInfoSchema = z.object({
 type ContactInfoValues = z.infer<typeof contactInfoSchema>;
 
 interface ContactInfoFormProps {
-  business: BusinessProfile;
+  business: CompanyInfo;
 }
 
 export function ContactInfoForm({ business }: ContactInfoFormProps) {
@@ -40,8 +40,8 @@ export function ContactInfoForm({ business }: ContactInfoFormProps) {
     resolver: zodResolver(contactInfoSchema),
     defaultValues: {
       company_id: business.id,
-      email: business.contact.email,
-      phone: business.contact.phone,
+      email: business.contact?.email ?? '',
+      phone: business.contact?.phone ?? '',
     },
   });
 
