@@ -1,5 +1,5 @@
 {
-  "name": "project-cert",
+  "name": "bayaw-jobs-api",
   "version": "1.0.0",
   "description": "Certification API built with Express and TypeScript",
   "main": "dist/server.js",

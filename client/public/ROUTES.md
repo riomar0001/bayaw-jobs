@@ -1,4 +1,4 @@
-# Routes — bayaw-jobs-v2
+# Routes — bayaw-jobs
 
 > Route groups like `(auth)`, `(applicant)`, `(landing)`, and `(dashboard)` are layout groupings only and do not appear in the URL.
 

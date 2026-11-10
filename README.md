@@ -1,4 +1,4 @@
-# Job Portal
+# Bayaw Jobs
 
 This project is a job portal application built with React, Express, Prisma, Supabase, and PostgreSQL for both database and storage.
 
