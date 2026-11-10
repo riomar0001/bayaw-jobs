@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, Suspense } from "react";
 import { useSearchParams } from "next/navigation";
 import { Footer } from "@/components/shared/footer";
 import { SearchBar } from "@/components/home/search-bar";
@@ -14,7 +14,7 @@ import { Loader2 } from "lucide-react";
 
 const JOBS_PER_PAGE = 12;
 
-export default function JobsPage() {
+function JobsPageContent() {
   const searchParams = useSearchParams();
 
   const [jobs, setJobs] = useState<JobSummary[]>([]);
@@ -166,5 +166,14 @@ export default function JobsPage() {
 
       <Footer />
     </main>
+  );
+}
+
+// useSearchParams needs a Suspense boundary or the static prerender of /jobs fails.
+export default function JobsPage() {
+  return (
+    <Suspense>
+      <JobsPageContent />
+    </Suspense>
   );
 }
