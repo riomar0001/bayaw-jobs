@@ -5,12 +5,13 @@
 // Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
 
 datasource db {
-  provider = "postgresql"
+  provider = "sqlite"
 }
 
 generator client {
   provider = "prisma-client"
   output   = "../src/generated/prisma"
+  runtime  = "cloudflare"
 }
 
 model user {
@@ -165,8 +166,8 @@ enum security_event_severity {
 
 model role {
   id          String            @id @default(uuid())
-  name        String            @unique @db.VarChar(100)
-  description String?           @db.Text
+  name        String            @unique
+  description String?          
   created_at  DateTime          @default(now()) @map("created_at")
   updated_at  DateTime          @updatedAt @map("updated_at")
   users       user_role[]
@@ -177,8 +178,8 @@ model role {
 
 model permission {
   id          String            @id @default(uuid())
-  resource    String            @unique @db.VarChar(100)
-  description String?           @db.Text
+  resource    String            @unique
+  description String?          
   created_at  DateTime          @default(now()) @map("created_at")
   updated_at  DateTime          @updatedAt @map("updated_at")
   roles       role_permission[]
@@ -449,9 +450,9 @@ model job {
   maximum_salary   String
   currency         String
   description      String
-  responsibilities String[]
-  qualifications   String[]
-  benefits         String[]
+  responsibilities Json  
+  qualifications   Json  
+  benefits         Json  
   status           job_status
   created_at       DateTime      @default(now())
   updated_at       DateTime      @updatedAt
@@ -539,4 +540,52 @@ enum employment_type {
   CONTRACT
   FREELANCE
   INTERN
+}
+
+// ─── Demo infrastructure ─────────────────────────────────────────────────────
+
+// Cloudflare Queues can't list or retry messages, so every email job is
+// mirrored here to back the admin Queues page.
+model email_job {
+  id            String          @id @default(uuid())
+  queue         String          @default("email")
+  type          String
+  to            String
+  subject       String
+  html          String
+  status        email_job_status @default(WAITING)
+  attempts_made Int             @default(0)
+  max_attempts  Int             @default(3)
+  failed_reason String?
+  created_at    DateTime        @default(now())
+  processed_at  DateTime?
+  finished_at   DateTime?
+
+  @@index([queue, status])
+  @@map("email_jobs")
+}
+
+enum email_job_status {
+  WAITING
+  ACTIVE
+  COMPLETED
+  FAILED
+}
+
+model queue_setting {
+  name      String  @id
+  is_paused Boolean @default(false)
+
+  @@map("queue_settings")
+}
+
+// Per-user daily action counters for the demo activity limits.
+model user_activity {
+  user_id String
+  action  String
+  day     String
+  count   Int    @default(0)
+
+  @@id([user_id, action, day])
+  @@map("user_activities")
 }

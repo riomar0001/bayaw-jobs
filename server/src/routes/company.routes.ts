@@ -3,6 +3,7 @@ import multer from 'multer';
 import { companyController } from '@/controllers/company.controller';
 import { validate } from '@/middlewares/validation.middleware';
 import { authenticate } from '@/middlewares/auth.middleware';
+import { limitActivity } from '@/middlewares/activityLimit.middleware';
 import {
   addAdminSchema,
   addLocationSchema,
@@ -116,6 +117,7 @@ router.get(
 router.post(
   '/onboarding',
   authenticate,
+  limitActivity('UPLOAD'),
   uploadImage.single('logo'),
   parseOnboardingData,
   validate(businessOnboardingSchema),
@@ -125,6 +127,7 @@ router.post(
 router.patch(
   '/logo',
   authenticate,
+  limitActivity('UPLOAD'),
   uploadImage.single('logo'),
   companyController.updateLogo.bind(companyController)
 );
@@ -150,6 +153,7 @@ router.delete(
 router.patch(
   '/admins/profile-picture',
   authenticate,
+  limitActivity('UPLOAD'),
   uploadImage.single('picture'),
   companyController.updateAdminProfilePicture.bind(companyController)
 );

@@ -80,11 +80,11 @@ export class JobRepository {
       status: job_status.OPEN,
       ...(employment_type && { employment_type }),
       ...(locType && { location_type: locType }),
-      ...(location && { location: { contains: location, mode: 'insensitive' } }),
+      ...(location && { location: { contains: location } }),
       ...(search && {
         OR: [
-          { title: { contains: search, mode: 'insensitive' } },
-          { department: { contains: search, mode: 'insensitive' } },
+          { title: { contains: search } },
+          { department: { contains: search } },
         ],
       }),
     };

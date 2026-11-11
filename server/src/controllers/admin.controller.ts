@@ -3,6 +3,7 @@ import { adminService } from '@/services/admin.service';
 import { banService } from '@/services/ban.service';
 import { securityEventService } from '@/services/securityEvent.service';
 import { successResponse } from '@/utils/apiResponse.util';
+import { BadRequestError } from '@/utils/errors.util';
 import { security_event_type, security_event_severity } from '@/generated/prisma/client';
 
 function logAdminAction(req: Request, action: string) {
@@ -98,6 +99,7 @@ export class AdminController {
   async banUser(req: Request, res: Response, next: NextFunction): Promise<void> {
     try {
       const { id } = req.params;
+      if (typeof id !== 'string' || id.length === 0) throw new BadRequestError('User id is required');
       const adminId = req.user!.user_id;
       await banService.banUser(id, adminId, req.body as { reason?: string; expires_at?: string });
       successResponse(res, null, 'User banned successfully');
@@ -109,6 +111,7 @@ export class AdminController {
   async unbanUser(req: Request, res: Response, next: NextFunction): Promise<void> {
     try {
       const { id } = req.params;
+      if (typeof id !== 'string' || id.length === 0) throw new BadRequestError('User id is required');
       const adminId = req.user!.user_id;
       await banService.unbanUser(id, adminId);
       successResponse(res, null, 'User unbanned successfully');

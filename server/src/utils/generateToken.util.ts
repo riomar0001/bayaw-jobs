@@ -7,7 +7,6 @@ import {
   RefreshTokenPayload,
   VerificationTokenPayload,
 } from '@/types/token.types';
-import '@/configs/dotenv.config';
 
 export const generateAccessToken = (tokenPayload: AccessTokenPayload): string => {
   const SECRET = process.env.JWT_ACCESS_TOKEN_SECRET;

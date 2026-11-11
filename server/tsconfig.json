@@ -1,8 +1,6 @@
 {
   "compilerOptions": {
     // File Layout
-    "rootDir": "./src",
-    "outDir": "./dist",
     "paths": {
       "@/*": ["./src/*"]
     },
@@ -15,9 +13,7 @@
     "types": ["node"],
 
     // Output Settings
-    "sourceMap": true,
-    "declaration": true,
-    "declarationMap": true,
+    "noEmit": true,
 
     // Strict Type Checking
     "strict": true,
@@ -38,6 +34,6 @@
     // Performance
     "skipLibCheck": true
   },
-  "include": ["src/**/*"],
+  "include": ["src/**/*", "worker-configuration.d.ts"],
   "exclude": ["node_modules", "dist"]
 }

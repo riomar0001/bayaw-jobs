@@ -1,70 +1,42 @@
-import winston from 'winston';
+// Workers Logs collects console output; one JSON object per line keeps it queryable.
+type Level = 'debug' | 'info' | 'warn' | 'error';
 
-const { combine, timestamp, colorize, printf, errors } = winston.format;
+const LEVELS: Record<Level, number> = { debug: 10, info: 20, warn: 30, error: 40 };
 
-const isProduction = process.env.NODE_ENV === 'production';
+function minLevel(): number {
+  const configured = process.env.LOG_LEVEL as Level | undefined;
+  if (configured && configured in LEVELS) return LEVELS[configured];
+  return process.env.NODE_ENV === 'production' ? LEVELS.info : LEVELS.debug;
+}
 
-/**
- * Pretty Console Format (NO JSON)
- */
-const consoleFormat = combine(
-  timestamp({ format: 'YYYY-MM-DD HH:mm:ss' }),
-  errors({ stack: true }),
-  printf(({ level, message, timestamp, stack }) => {
-    let log = `${timestamp} [${level}]: ${message}`;
-    if (stack) log += `\n${stack}`;
-    return log;
-  })
-);
+function serialize(meta: unknown): unknown {
+  if (meta instanceof Error) return { name: meta.name, message: meta.message, stack: meta.stack };
+  if (meta && typeof meta === 'object') {
+    return Object.fromEntries(
+      Object.entries(meta).map(([k, v]) => [k, v instanceof Error ? serialize(v) : v])
+    );
+  }
+  return meta;
+}
 
-/**
- * Colored version only for dev console
- */
-const coloredConsoleFormat = combine(colorize({ all: true }), consoleFormat);
+function write(level: Level, message: string, meta?: unknown) {
+  if (LEVELS[level] < minLevel()) return;
+  const entry = { level, message, time: new Date().toISOString(), ...(meta !== undefined && { meta: serialize(meta) }) };
+  const line = JSON.stringify(entry);
+  if (level === 'error') console.error(line);
+  else if (level === 'warn') console.warn(line);
+  else console.log(line);
+}
 
-export const logger = winston.createLogger({
-  level: process.env.LOG_LEVEL ?? (isProduction ? 'info' : 'debug'),
-  transports: [
-    // Console (colored in dev, plain in prod)
-    new winston.transports.Console({
-      format: isProduction ? consoleFormat : coloredConsoleFormat,
-    }),
+export const logger = {
+  debug: (message: string, meta?: unknown) => write('debug', message, meta),
+  info: (message: string, meta?: unknown) => write('info', message, meta),
+  warn: (message: string, meta?: unknown) => write('warn', message, meta),
+  error: (message: string, meta?: unknown) => write('error', message, meta),
+};
 
-    // Error file (NO COLOR, NO JSON duplication in console)
-    new winston.transports.File({
-      filename: 'logs/error.log',
-      level: 'error',
-      format: combine(timestamp(), errors({ stack: true }), winston.format.json()),
-    }),
-
-    // Combined file
-    new winston.transports.File({
-      filename: 'logs/combined.log',
-      format: combine(timestamp(), errors({ stack: true }), winston.format.json()),
-    }),
-  ],
-});
-
-const jsonFileFormat = combine(timestamp(), winston.format.json());
-
-export const requestFileLogger = winston.createLogger({
-  level: 'info',
-  transports: [
-    new winston.transports.File({
-      filename: 'logs/request.log',
-      format: jsonFileFormat,
-    }),
-  ],
-});
-
-export const responseFileLogger = winston.createLogger({
-  level: 'info',
-  transports: [
-    new winston.transports.File({
-      filename: 'logs/response.log',
-      format: jsonFileFormat,
-    }),
-  ],
-});
+// Request/response logs used to go to separate files; on Workers they share the console.
+export const requestFileLogger = logger;
+export const responseFileLogger = logger;
 
 export default logger;

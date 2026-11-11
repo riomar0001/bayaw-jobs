@@ -15,16 +15,6 @@ export const Config = {
     PASSWORD_MIN_LENGTH: 8,
   },
 
-  // Rate Limiting
-  RATE_LIMIT: {
-    WINDOW_MS: 5 * 60 * 1000, // 5 minutes
-    MAX_REQUESTS: process.env.NODE_ENV === 'development' ? 1000 : 100,
-    // AUTH_WINDOW_MS: 5 * 60 * 1000, // 5 minutes
-    AUTH_WINDOW_MS: 30 * 1000, // 5 minutes
-    // AUTH_MAX_REQUESTS: process.env.NODE_ENV === 'development' ? 100 : 10,
-    AUTH_MAX_REQUESTS: 10,
-  },
-
   // File Upload
   UPLOAD: {
     MAX_FILE_SIZE: 10 * 1024 * 1024, // 10MB
@@ -50,6 +40,19 @@ export const Config = {
     HTTP_ONLY: true,
     SECURE: process.env.NODE_ENV === 'production',
     SAME_SITE: 'strict' as const,
+  },
+
+  // Demo deployment: auto-verify signups and skip email OTP, since demo email is
+  // never delivered. Off unless DEMO_MODE is exactly "true".
+  DEMO_MODE: process.env.DEMO_MODE === 'true',
+
+  // Daily per-user activity caps (demo). Counters reset with the nightly data reset.
+  ACTIVITY_LIMITS: {
+    APPLY: 10,
+    POST_JOB: 5,
+    UPLOAD: 10,
+    WRITE: 100,
+    SIGNUP: 5,
   },
 
   // Frontend

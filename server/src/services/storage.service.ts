@@ -1,234 +1,127 @@
-import {
-  supabase,
-  PROFILE_PICTURE_BUCKET,
-  RESUME_BUCKET,
-  COMPANY_LOGO_BUCKET,
-} from '@/configs/supabase.config';
+import { env } from 'cloudflare:workers';
 import { AppError } from '@/utils/errors.util';
 import { ErrorMessages } from '@/constants/errorMessages.constant';
-import { readFileSync } from 'fs';
-import { join, dirname } from 'path';
-import { fileURLToPath } from 'url';
 import logger from '@/configs/logger.config';
+import defaultProfilePicture from '../assets/default-profile-picture.jpg';
 
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = dirname(__filename);
+// One R2 bucket; the old Supabase buckets become key prefixes.
+const PROFILE_PICTURE_PREFIX = 'profile-picture/';
+const RESUME_PREFIX = 'resume/';
+const COMPANY_LOGO_PREFIX = 'company-logo/';
+const DELETE_BATCH_LIMIT = 1000; // R2 delete() accepts at most 1000 keys
+
+function imageContentType(filename: string): string {
+  const extension = filename.split('.').pop()?.toLowerCase();
+  if (extension === 'png') return 'image/png';
+  if (extension === 'webp') return 'image/webp';
+  return 'image/jpeg';
+}
+
+function extensionOf(originalFilename: string): string {
+  return originalFilename.split('.').pop()?.toLowerCase() || 'jpg';
+}
+
+async function put(key: string, body: ArrayBuffer | Uint8Array, contentType: string): Promise<void> {
+  try {
+    await env.FILES.put(key, body, { httpMetadata: { contentType } });
+  } catch (error) {
+    logger.error('Storage upload error', { key, error });
+    throw new AppError(500, ErrorMessages.STORAGE.UPLOAD_FAILED);
+  }
+}
+
+async function get(key: string): Promise<Buffer> {
+  const object = await env.FILES.get(key);
+  if (!object) {
+    logger.error('Storage object not found', { key });
+    throw new AppError(404, ErrorMessages.STORAGE.FILE_NOT_FOUND);
+  }
+  return Buffer.from(await object.arrayBuffer());
+}
+
+async function remove(key: string): Promise<void> {
+  try {
+    await env.FILES.delete(key);
+  } catch (error) {
+    // A leftover file is harmless and the nightly reset clears the bucket anyway.
+    logger.error('Storage delete error', { key, error });
+  }
+}
 
 export class StorageService {
   // ─── Profile Picture ────────────────────────────────────────────────────────
 
   async uploadDefaultProfilePicture(userId: string): Promise<string> {
-    if (!supabase) {
-      throw new AppError(500, 'Storage service not configured');
-    }
-
-    const assetPath = join(__dirname, '../assets/default-profile-picture.jpg');
-    const buffer = readFileSync(assetPath);
     const filename = `profile_${userId}.jpg`;
-
-    const { error } = await supabase.storage.from(PROFILE_PICTURE_BUCKET).upload(filename, buffer, {
-      contentType: 'image/jpeg',
-      upsert: true,
-    });
-
-    if (error) {
-      logger.error('Storage upload error', { error });
-      throw new AppError(500, ErrorMessages.STORAGE.UPLOAD_FAILED);
-    }
-
+    await put(PROFILE_PICTURE_PREFIX + filename, defaultProfilePicture, 'image/jpeg');
     return filename;
   }
 
-  async uploadProfilePicture(
-    buffer: Buffer,
-    userId: string,
-    originalFilename: string
-  ): Promise<string> {
-    if (!supabase) {
-      throw new AppError(500, 'Storage service not configured');
-    }
-
-    const extension = originalFilename.split('.').pop()?.toLowerCase() || 'jpg';
+  async uploadProfilePicture(buffer: Buffer, userId: string, originalFilename: string): Promise<string> {
+    const extension = extensionOf(originalFilename);
     const filename = `profile_${userId}.${extension}`;
-
-    const { error } = await supabase.storage.from(PROFILE_PICTURE_BUCKET).upload(filename, buffer, {
-      contentType: `image/${extension}`,
-      upsert: true,
-    });
-
-    if (error) {
-      logger.error('Storage upload error', { error });
-      throw new AppError(500, ErrorMessages.STORAGE.UPLOAD_FAILED);
-    }
-
+    await put(PROFILE_PICTURE_PREFIX + filename, buffer, `image/${extension}`);
     return filename;
-  }
-
-  async getProfilePictureUrl(filename: string): Promise<string> {
-    if (!supabase) {
-      return '';
-    }
-
-    const { data } = supabase.storage.from(PROFILE_PICTURE_BUCKET).getPublicUrl(filename);
-    return data.publicUrl;
   }
 
   async downloadProfilePicture(filename: string): Promise<{ buffer: Buffer; contentType: string }> {
-    if (!supabase) {
-      throw new AppError(500, 'Storage service not configured');
-    }
-
-    const { data, error } = await supabase.storage.from(PROFILE_PICTURE_BUCKET).download(filename);
-
-    if (error || !data) {
-      logger.error('Storage download error', { error });
-      throw new AppError(500, ErrorMessages.STORAGE.UPLOAD_FAILED);
-    }
-
-    const extension = filename.split('.').pop()?.toLowerCase() || 'jpg';
-    const contentType =
-      extension === 'png' ? 'image/png' : extension === 'webp' ? 'image/webp' : 'image/jpeg';
-
-    return { buffer: Buffer.from(await data.arrayBuffer()), contentType };
+    return { buffer: await get(PROFILE_PICTURE_PREFIX + filename), contentType: imageContentType(filename) };
   }
 
   async deleteProfilePicture(filename: string): Promise<void> {
-    await this.deleteFile(PROFILE_PICTURE_BUCKET, filename);
+    await remove(PROFILE_PICTURE_PREFIX + filename);
   }
 
-  async uploadAdminProfilePicture(
-    buffer: Buffer,
-    userId: string,
-    originalFilename: string
-  ): Promise<string> {
-    if (!supabase) {
-      throw new AppError(500, 'Storage service not configured');
-    }
-
-    const extension = originalFilename.split('.').pop()?.toLowerCase() || 'jpg';
+  async uploadAdminProfilePicture(buffer: Buffer, userId: string, originalFilename: string): Promise<string> {
+    const extension = extensionOf(originalFilename);
     const filename = `company_admin_${userId}.${extension}`;
-
-    const { error } = await supabase.storage.from(PROFILE_PICTURE_BUCKET).upload(filename, buffer, {
-      contentType: `image/${extension}`,
-      upsert: true,
-    });
-
-    if (error) {
-      logger.error('Storage upload error', { error });
-      throw new AppError(500, ErrorMessages.STORAGE.UPLOAD_FAILED);
-    }
-
+    await put(PROFILE_PICTURE_PREFIX + filename, buffer, `image/${extension}`);
     return filename;
   }
 
   // ─── Resume ─────────────────────────────────────────────────────────────────
 
   async uploadResume(buffer: Buffer, userId: string): Promise<string> {
-    if (!supabase) {
-      throw new AppError(500, 'Storage service not configured');
-    }
-
     const filename = `resume_${userId}.pdf`;
-
-    const { error } = await supabase.storage.from(RESUME_BUCKET).upload(filename, buffer, {
-      contentType: 'application/pdf',
-      upsert: true,
-    });
-
-    if (error) {
-      logger.error('Storage upload error', { error });
-      throw new AppError(500, ErrorMessages.STORAGE.UPLOAD_FAILED);
-    }
-
+    await put(RESUME_PREFIX + filename, buffer, 'application/pdf');
     return filename;
   }
 
-  async getResumeUrl(filename: string): Promise<string> {
-    if (!supabase) {
-      return '';
-    }
-
-    const { data } = supabase.storage.from(RESUME_BUCKET).getPublicUrl(filename);
-    return data.publicUrl;
-  }
-
   async downloadResume(filename: string): Promise<Buffer> {
-    if (!supabase) {
-      throw new AppError(500, 'Storage service not configured');
-    }
-
-    const { data, error } = await supabase.storage.from(RESUME_BUCKET).download(filename);
-
-    if (error || !data) {
-      logger.error('Storage download error', { error });
-      throw new AppError(500, ErrorMessages.STORAGE.UPLOAD_FAILED);
-    }
-
-    return Buffer.from(await data.arrayBuffer());
+    return get(RESUME_PREFIX + filename);
   }
 
   async deleteResumeFile(filename: string): Promise<void> {
-    await this.deleteFile(RESUME_BUCKET, filename);
+    await remove(RESUME_PREFIX + filename);
   }
 
   // ─── Company Logo ────────────────────────────────────────────────────────────
 
-  async uploadCompanyLogo(
-    buffer: Buffer,
-    userId: string,
-    originalFilename: string
-  ): Promise<string> {
-    if (!supabase) {
-      throw new AppError(500, 'Storage service not configured');
-    }
-
-    const extension = originalFilename.split('.').pop()?.toLowerCase() || 'jpg';
+  async uploadCompanyLogo(buffer: Buffer, userId: string, originalFilename: string): Promise<string> {
+    const extension = extensionOf(originalFilename);
     const filename = `logo_${userId}.${extension}`;
-
-    const { error } = await supabase.storage.from(COMPANY_LOGO_BUCKET).upload(filename, buffer, {
-      contentType: `image/${extension}`,
-      upsert: true,
-    });
-
-    if (error) {
-      logger.error('Storage upload error', { error });
-      throw new AppError(500, ErrorMessages.STORAGE.UPLOAD_FAILED);
-    }
-
+    await put(COMPANY_LOGO_PREFIX + filename, buffer, `image/${extension}`);
     return filename;
   }
 
   async downloadCompanyLogo(filename: string): Promise<{ buffer: Buffer; contentType: string }> {
-    if (!supabase) {
-      throw new AppError(500, 'Storage service not configured');
-    }
-
-    const { data, error } = await supabase.storage.from(COMPANY_LOGO_BUCKET).download(filename);
-
-    if (error || !data) {
-      logger.error('Storage download error', { error });
-      throw new AppError(500, ErrorMessages.STORAGE.UPLOAD_FAILED);
-    }
-
-    const extension = filename.split('.').pop()?.toLowerCase() || 'jpg';
-    const contentType =
-      extension === 'png' ? 'image/png' : extension === 'webp' ? 'image/webp' : 'image/jpeg';
-
-    return { buffer: Buffer.from(await data.arrayBuffer()), contentType };
+    return { buffer: await get(COMPANY_LOGO_PREFIX + filename), contentType: imageContentType(filename) };
   }
 
-  // ─── Shared ──────────────────────────────────────────────────────────────────
+  // ─── Demo reset ──────────────────────────────────────────────────────────────
 
-  private async deleteFile(bucket: string, path: string): Promise<void> {
-    if (!supabase) {
-      return;
-    }
-
-    const { error } = await supabase.storage.from(bucket).remove([path]);
-
-    if (error) {
-      logger.error('Storage delete error', { error });
-    }
+  /** Deletes every object in the bucket. Returns how many were removed. */
+  async deleteAll(): Promise<number> {
+    let removed = 0;
+    let cursor: string | undefined;
+    do {
+      const page = await env.FILES.list({ limit: DELETE_BATCH_LIMIT, ...(cursor && { cursor }) });
+      const keys = page.objects.map((o) => o.key);
+      if (keys.length > 0) await env.FILES.delete(keys);
+      removed += keys.length;
+      cursor = page.truncated ? page.cursor : undefined;
+    } while (cursor);
+    return removed;
   }
 }
 

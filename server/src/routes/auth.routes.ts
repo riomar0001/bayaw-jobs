@@ -2,6 +2,7 @@ import { Router } from 'express';
 import { authController } from '@/controllers/auth.controller';
 import { validate } from '@/middlewares/validation.middleware';
 import { authenticate, authenticateTempToken } from '@/middlewares/auth.middleware';
+import { limitSignupsByIp } from '@/middlewares/activityLimit.middleware';
 import { authRateLimiter } from '@/middlewares/rateLimit.middleware';
 import {
   registerSchema,
@@ -16,7 +17,7 @@ import {
 
 const router = Router();
 
-router.post('/register', validate(registerSchema), authController.register.bind(authController));
+router.post('/register', limitSignupsByIp, validate(registerSchema), authController.register.bind(authController));
 
 router.get(
   '/verify-email',

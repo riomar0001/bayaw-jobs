@@ -3,6 +3,7 @@ import multer from 'multer';
 import { applicantController } from '@/controllers/applicant.controller';
 import { validate } from '@/middlewares/validation.middleware';
 import { authenticate } from '@/middlewares/auth.middleware';
+import { limitActivity } from '@/middlewares/activityLimit.middleware';
 import {
   onboardingSchema,
   updateProfileSchema,
@@ -59,6 +60,7 @@ function parseOnboardingData(req: Request, _res: Response, next: NextFunction): 
 router.post(
   '/onboarding',
   authenticate,
+  limitActivity('UPLOAD'),
   upload.single('resume'),
   parseOnboardingData,
   validate(onboardingSchema),
@@ -194,6 +196,7 @@ router.get(
 router.post(
   '/jobs/:jobId/apply',
   authenticate,
+  limitActivity('APPLY'),
   applicantController.applyToJob.bind(applicantController)
 );
 
@@ -202,6 +205,7 @@ router.get('/resume/:id', applicantController.getResume.bind(applicantController
 router.patch(
   '/resume',
   authenticate,
+  limitActivity('UPLOAD'),
   upload.single('resume'),
   applicantController.updateResume.bind(applicantController)
 );
@@ -211,6 +215,7 @@ router.get('/profile/picture/:id', applicantController.getProfilePicture.bind(ap
 router.patch(
   '/profile/picture',
   authenticate,
+  limitActivity('UPLOAD'),
   uploadImage.single('picture'),
   applicantController.updateProfilePicture.bind(applicantController)
 );

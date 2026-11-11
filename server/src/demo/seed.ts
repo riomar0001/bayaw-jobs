@@ -1,16 +1,9 @@
-import { PrismaClient, social_platform, employment_type } from '../src/generated/prisma/client.js';
-import { PrismaPg } from '@prisma/adapter-pg';
-import pg from 'pg';
-import bcrypt from 'bcryptjs';
-import 'dotenv/config';
+import { PrismaClient, social_platform, employment_type } from '@/generated/prisma/client';
 
-const pool = new pg.Pool({ connectionString: process.env.DIRECT_URL ?? process.env.DATABASE_URL });
-const adapter = new PrismaPg(pool);
-const prisma = new PrismaClient({ adapter });
-
-async function hash(password: string) {
-  return bcrypt.hash(password, 10);
-}
+// bcrypt hashes of the published demo passwords, precomputed so the nightly
+// reset doesn't spend Worker CPU hashing. Admin: Admin@1234, everyone else: Test@1234.
+const DEFAULT_PASSWORD_HASH = '$2b$10$Nqj8tfoF4Gb1in60jBkopOUAXXVDjojmKyZ8.no86i45RNG7ocL0S';
+const ADMIN_PASSWORD_HASH = '$2b$10$c.EVctMvKac3tWJfMLz0fesc7kdtzIlmfPLhfHKkvHSfOO6Ugmpgu';
 
 // ─── Raw Data ─────────────────────────────────────────────────────────────────
 
@@ -329,10 +322,10 @@ function daysAgo(days: number): Date {
   return d;
 }
 
-// ─── Cleanup ──────────────────────────────────────────────────────────────────
+// ─── Reset ────────────────────────────────────────────────────────────────────
 
-async function cleanup() {
-  console.log('Cleaning up...');
+// Children before parents: D1 enforces foreign keys and has no TRUNCATE ... CASCADE.
+async function wipe(prisma: PrismaClient) {
   await prisma.applicant_applied_job.deleteMany();
   await prisma.applicant_skill.deleteMany();
   await prisma.applicant_language.deleteMany();
@@ -350,20 +343,18 @@ async function cleanup() {
   await prisma.company_information.deleteMany();
   await prisma.refresh_token.deleteMany();
   await prisma.auth_code.deleteMany();
+  await prisma.security_event.deleteMany();
+  await prisma.user_role.deleteMany();
   await prisma.user.deleteMany();
+  await prisma.email_job.deleteMany();
+  await prisma.queue_setting.deleteMany();
+  await prisma.user_activity.deleteMany();
 }
 
-// ─── Main ─────────────────────────────────────────────────────────────────────
+/** Wipes every table and loads the demo data set. */
+export async function resetDemoData(prisma: PrismaClient): Promise<void> {
+  await wipe(prisma);
 
-async function main() {
-  await cleanup();
-
-  const DEFAULT_PASSWORD_HASH = await hash('Test@1234');
-  const ADMIN_PASSWORD_HASH   = await hash('Admin@1234');
-
-  // ── Admin user ───────────────────────────────────────────────────────────────
-
-  console.log('Seeding admin...');
   await prisma.user.create({
     data: {
       email: 'admin@bayaw.com',
@@ -377,42 +368,34 @@ async function main() {
     },
   });
 
-  // ── Company owners (10) ──────────────────────────────────────────────────────
-
-  console.log('Seeding companies and jobs...');
-  const companyUsers = await Promise.all(
-    COMPANY_DATA.map((c) =>
-      prisma.user.create({
-        data: {
-          email: c.owner.email,
-          first_name: c.owner.first_name,
-          last_name: c.owner.last_name,
-          password: DEFAULT_PASSWORD_HASH,
-          role: 'USER',
-          status: 'ACTIVE',
-          email_verified: true,
-          email_verified_at: new Date(),
-        },
-      })
-    )
-  );
-
-  // ── Companies, admins, and jobs ──────────────────────────────────────────────
-
   const allJobs: { id: string }[][] = [];
 
+  // Sequential on purpose: D1 runs one query at a time per database anyway.
   for (let i = 0; i < COMPANY_DATA.length; i++) {
     const cData = COMPANY_DATA[i]!;
-    const user = companyUsers[i]!;
-    const jobTemplates = JOB_DATA[i]!;
+    const jobTemplates = JOB_DATA[i];
+    if (!jobTemplates) throw new Error(`Seed data has no jobs for company ${i}`);
+
+    const user = await prisma.user.create({
+      data: {
+        email: cData.owner.email,
+        first_name: cData.owner.first_name,
+        last_name: cData.owner.last_name,
+        password: DEFAULT_PASSWORD_HASH,
+        role: 'USER',
+        status: 'ACTIVE',
+        email_verified: true,
+        email_verified_at: new Date(),
+      },
+    });
 
     const company = await prisma.company_information.create({
       data: {
         user_id: user.id,
         ...cData.info,
-        companyContacts:    { create: cData.contact },
+        companyContacts: { create: cData.contact },
         companySocialLinks: { create: cData.socials },
-        companyLocations:   { create: cData.hq },
+        companyLocations: { create: cData.hq },
       },
     });
 
@@ -429,82 +412,61 @@ async function main() {
       },
     });
 
-    const jobs = await Promise.all(
-      jobTemplates.map((j) =>
-        prisma.job.create({ data: { company_id: company.id, ...j } })
-      )
-    );
-
-    allJobs.push(jobs.map((j) => ({ id: j.id })));
+    const jobs: { id: string }[] = [];
+    for (const j of jobTemplates) {
+      jobs.push(await prisma.job.create({ data: { company_id: company.id, ...j }, select: { id: true } }));
+    }
+    allJobs.push(jobs);
   }
 
-  // ── Applicants (50) ──────────────────────────────────────────────────────────
+  const profiles: { id: string }[] = [];
+  for (const a of APPLICANTS) {
+    const user = await prisma.user.create({
+      data: {
+        email: a.email,
+        first_name: a.first_name,
+        last_name: a.last_name,
+        password: DEFAULT_PASSWORD_HASH,
+        role: 'USER',
+        status: 'ACTIVE',
+        email_verified: true,
+        email_verified_at: new Date(),
+      },
+    });
 
-  console.log('Seeding applicants...');
-  const applicantUsers = await Promise.all(
-    APPLICANTS.map((a) =>
-      prisma.user.create({
+    profiles.push(
+      await prisma.applicant_profile.create({
         data: {
-          email: a.email,
-          first_name: a.first_name,
-          last_name: a.last_name,
-          password: DEFAULT_PASSWORD_HASH,
-          role: 'USER',
-          status: 'ACTIVE',
-          email_verified: true,
-          email_verified_at: new Date(),
-        },
-      })
-    )
-  );
-
-  const profiles = await Promise.all(
-    APPLICANTS.map((a, idx) =>
-      prisma.applicant_profile.create({
-        data: {
-          user_id: applicantUsers[idx]!.id,
+          user_id: user.id,
           age: a.age,
           gender: a.gender,
           desired_position: a.desired_position,
           location: a.location,
           phone_number: a.phone_number,
-          applicantEducations:    { create: a.education },
-          applicantExperiences:   { create: a.experience },
-          applicantSkills:        { create: a.skills.map((s) => ({ skill_name: s })) },
-          applicantLanguages:     { create: a.languages },
+          applicantEducations: { create: a.education },
+          applicantExperiences: { create: a.experience },
+          applicantSkills: { create: a.skills.map((s) => ({ skill_name: s })) },
+          applicantLanguages: { create: a.languages },
           applicantCareerStatuses: { create: { status: a.career_status } },
         },
+        select: { id: true },
       })
-    )
-  );
+    );
+  }
 
-  // ── Applications (50) ────────────────────────────────────────────────────────
+  for (const app of APPLICATION_DATA) {
+    const profile = profiles[app.applicantIdx];
+    const jobId = allJobs[app.jobCompanyIdx]?.[app.jobIdx]?.id;
+    if (!profile || !jobId) throw new Error(`Seed application points at missing data: ${JSON.stringify(app)}`);
 
-  console.log('Seeding applications...');
-  await Promise.all(
-    APPLICATION_DATA.map((app) => {
-      const profile = profiles[app.applicantIdx]!;
-      const jobId   = allJobs[app.jobCompanyIdx]![app.jobIdx]!.id;
-      return prisma.applicant_applied_job.create({
-        data: {
-          applicant_profile_id: profile.id,
-          job_id: jobId,
-          jobId,
-          status: app.status,
-          application_date: daysAgo(app.days_ago),
-        },
-      });
-    })
-  );
-
-  console.log('\n✓ Seed completed!');
-  console.log('\nCredentials (all use the same password per role):');
-  console.log('  Admin:      admin@bayaw.com  / Admin@1234');
-  console.log('  Companies:  owner@<company>.com  / Test@1234');
-  console.log('  Applicants: <name>@gmail.com  / Test@1234');
-  console.log('\nCounts: 1 admin, 10 companies, 50 jobs, 50 applicants, 50 applications');
+    await prisma.applicant_applied_job.create({
+      data: {
+        applicant_profile_id: profile.id,
+        job_id: jobId,
+        jobId,
+        status: app.status,
+        application_date: daysAgo(app.days_ago),
+      },
+    });
+  }
 }
-
-main()
-  .catch((e) => { console.error('Seed failed:', e); process.exit(1); })
-  .finally(async () => { await prisma.$disconnect(); await pool.end(); });

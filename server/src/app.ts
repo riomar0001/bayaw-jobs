@@ -1,4 +1,3 @@
-import '@/configs/dotenv.config';
 import express from 'express';
 import helmet from 'helmet';
 import cors from 'cors';
@@ -12,6 +11,16 @@ import { generalRateLimiter } from '@/middlewares/rateLimit.middleware';
 import openApiSpec from '@/docs/openapi';
 
 const app = express();
+
+// Workers have no client socket. Cloudflare sets CF-Connecting-IP itself
+// (overwriting any client value), so it's the trustworthy source for req.ip.
+app.use((req, _res, next) => {
+  const ip = req.headers['cf-connecting-ip'];
+  if (typeof ip === 'string' && ip.length > 0) {
+    Object.defineProperty(req, 'ip', { value: ip, configurable: true });
+  }
+  next();
+});
 
 // Security middleware
 app.use(helmet(helmetConfig));

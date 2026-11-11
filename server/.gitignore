@@ -97,3 +97,7 @@ service-account.json
 /prisma/migrations 
 /src/generated/prisma
 /.claude
+# cloudflare
+.wrangler/
+.dev.vars*
+prisma/unused.db

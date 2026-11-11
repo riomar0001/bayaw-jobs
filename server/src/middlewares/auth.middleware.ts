@@ -2,6 +2,9 @@ import { Request, Response, NextFunction } from 'express';
 import { verifyAccessToken, verifyVerificationToken } from '@/utils/generateToken.util';
 import { AuthenticationError } from '@/utils/errors.util';
 import { ErrorMessages } from '@/constants/errorMessages.constant';
+import { activityLimitService } from '@/services/activityLimit.service';
+
+const WRITE_METHODS = new Set(['POST', 'PUT', 'PATCH', 'DELETE']);
 
 export const authenticate = async (
   req: Request,
@@ -23,7 +26,6 @@ export const authenticate = async (
 
     const decoded = verifyAccessToken(token);
     req.user = decoded;
-    next();
   } catch (error) {
     if (error instanceof AuthenticationError) {
       next(error);
@@ -34,6 +36,20 @@ export const authenticate = async (
     } else {
       next(new AuthenticationError(ErrorMessages.AUTH.TOKEN_INVALID));
     }
+    return;
+  }
+
+  // Every authenticated write counts toward the user's daily demo cap.
+  if (!WRITE_METHODS.has(req.method)) {
+    next();
+    return;
+  }
+
+  try {
+    await activityLimitService.consume(req.user.user_id, 'WRITE');
+    next();
+  } catch (error) {
+    next(error);
   }
 };
 

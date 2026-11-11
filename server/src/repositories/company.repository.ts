@@ -84,13 +84,12 @@ export class CompanyRepository {
   }
 
   async upsertAdminProfilePicture(userId: string, companyId: string, fileName: string) {
-    return prisma.$transaction(async (tx) => {
-      await tx.company_admin_profile_picture.deleteMany({
-        where: { user_id: userId, company_id: companyId },
-      });
-      return tx.company_admin_profile_picture.create({
-        data: { user_id: userId, company_id: companyId, file_name: fileName },
-      });
+    // D1 has no transactions; if the create fails the admin just falls back to no picture.
+    await prisma.company_admin_profile_picture.deleteMany({
+      where: { user_id: userId, company_id: companyId },
+    });
+    return prisma.company_admin_profile_picture.create({
+      data: { user_id: userId, company_id: companyId, file_name: fileName },
     });
   }
 
@@ -290,7 +289,7 @@ export class CompanyRepository {
       ...(params.industry ? { industry: params.industry } : {}),
       ...(params.company_size ? { company_size: params.company_size } : {}),
       ...(params.search
-        ? { company_name: { contains: params.search, mode: 'insensitive' as const } }
+        ? { company_name: { contains: params.search } }
         : {}),
     };
 

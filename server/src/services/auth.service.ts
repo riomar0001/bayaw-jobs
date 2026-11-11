@@ -53,7 +53,7 @@ export class AuthService {
     const hashedPassword = await hashPassword(data.password);
 
     // Create user
-    const user = await userRepository.create({
+    const created = await userRepository.create({
       email: data.email,
       password: hashedPassword,
       first_name: data.first_name,
@@ -61,14 +61,18 @@ export class AuthService {
     });
 
     // Generate verification token
-    const verificationToken = generateVerificationToken(user.id, user.email, 'email_verification');
+    const verificationToken = generateVerificationToken(created.id, created.email, 'email_verification');
 
-    // Send verification email
-    await emailService.sendVerificationEmail({
-      to: user.email,
-      firstName: user.first_name ?? '',
-      verificationLink: emailService.getVerificationLink(verificationToken),
-    });
+    // Demo email is never delivered, so a verification link could never be clicked.
+    const user = Config.DEMO_MODE ? await userRepository.verifyEmail(created.id) : created;
+
+    if (!Config.DEMO_MODE) {
+      await emailService.sendVerificationEmail({
+        to: user.email,
+        firstName: user.first_name ?? '',
+        verificationLink: emailService.getVerificationLink(verificationToken),
+      });
+    }
 
     const userData: UserData = {
       id: user.id,
@@ -203,8 +207,9 @@ export class AuthService {
       throw new AuthenticationError(ErrorMessages.AUTH.EMAIL_NOT_VERIFIED);
     }
 
-    // Skip OTP for admins and for users who have disabled it — issue tokens directly
-    if (user.role === 'ADMIN' || !user.otp_enabled) {
+    // Skip OTP for admins, for users who have disabled it, and in demo mode
+    // (where the OTP email would never arrive) — issue tokens directly
+    if (Config.DEMO_MODE || user.role === 'ADMIN' || !user.otp_enabled) {
       const clientIp = req.ip ?? '0.0.0.0';
       const ip = truncateIp(clientIp);
       const userAgent = req.headers['user-agent'] || 'Unknown';

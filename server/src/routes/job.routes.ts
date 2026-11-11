@@ -2,6 +2,7 @@ import { Router } from 'express';
 import { jobController } from '@/controllers/job.controller';
 import { validate } from '@/middlewares/validation.middleware';
 import { authenticate, authenticateOptional } from '@/middlewares/auth.middleware';
+import { limitActivity } from '@/middlewares/activityLimit.middleware';
 import {
   getAllJobsSchema,
   getJobByIdSchema,
@@ -42,6 +43,7 @@ router.get(
 router.post(
   '/create',
   authenticate,
+  limitActivity('POST_JOB'),
   validate(createJobSchema),
   jobController.createJob.bind(jobController)
 );

@@ -1,0 +1,49 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "bayaw-jobs-api",
+  "main": "src/worker.ts",
+  "compatibility_date": "2026-11-10",
+  "compatibility_flags": ["nodejs_compat"],
+  "rules": [{ "type": "Data", "globs": ["**/*.jpg"] }],
+  "vars": {
+    "NODE_ENV": "production",
+    "DEMO_MODE": "true",
+    "APP_NAME": "Bayaw Jobs",
+    "APP_URL": "https://bayaw-jobs-api.inguitomario00.workers.dev",
+    "FRONTEND_URL": "https://bayaw-jobs.inguitomario00.workers.dev",
+    "CORS_ORIGIN": "https://bayaw-jobs.inguitomario00.workers.dev"
+  },
+  "d1_databases": [
+    {
+      "binding": "DB",
+      "database_name": "bayaw-jobs-db",
+      "database_id": "b5fbb062-acd9-47c3-aa91-ec2a8b15ebbe",
+      "migrations_dir": "prisma/migrations-d1"
+    }
+  ],
+  "ratelimits": [
+    { "name": "GENERAL_RATE_LIMITER", "namespace_id": "1001", "simple": { "limit": 60, "period": 60 } },
+    { "name": "AUTH_RATE_LIMITER", "namespace_id": "1002", "simple": { "limit": 10, "period": 60 } },
+    { "name": "STRICT_RATE_LIMITER", "namespace_id": "1003", "simple": { "limit": 5, "period": 60 } }
+  ],
+  "r2_buckets": [{ "binding": "FILES", "bucket_name": "bayaw-jobs-files" }],
+  "queues": {
+    "producers": [{ "binding": "EMAIL_QUEUE", "queue": "bayaw-jobs-email" }],
+    "consumers": [
+      {
+        "queue": "bayaw-jobs-email",
+        "max_retries": 3,
+        "dead_letter_queue": "bayaw-jobs-email-dlq"
+      },
+      { "queue": "bayaw-jobs-email-dlq" }
+    ]
+  },
+  "triggers": {
+    // 12:00 AM Asia/Manila (UTC+8); cron triggers run in UTC.
+    "crons": ["0 16 * * *"]
+  },
+  "observability": {
+    "enabled": true,
+    "traces": { "enabled": true }
+  }
+}
