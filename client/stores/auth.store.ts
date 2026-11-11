@@ -20,7 +20,8 @@ interface AuthState {
   // Actions
   login: (email: string, password: string) => Promise<void>;
   verifyOtp: (code: string) => Promise<void>;
-  register: (data: RegisterInput) => Promise<void>;
+  /** Resolves true when the account is already verified (demo API) and can log in right away. */
+  register: (data: RegisterInput) => Promise<boolean>;
   logout: () => Promise<void>;
   refresh: () => Promise<void>;
   forgotPassword: (email: string) => Promise<void>;
@@ -106,10 +107,12 @@ export const useAuthStore = create<AuthState>()(
         register: async (data) => {
           set({ isLoading: true, error: null });
           try {
-            await authService.register(data);
+            const user = await authService.register(data);
             set({ isLoading: false });
+            return user.email_verified === true;
           } catch (err) {
             set({ error: (err as Error).message, isLoading: false });
+            return false;
           }
         },
 

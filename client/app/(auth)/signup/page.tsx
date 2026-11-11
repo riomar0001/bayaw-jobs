@@ -14,7 +14,7 @@ import {
   isPasswordValid,
 } from "@/components/auth/password-strength";
 import { useAuthStore } from "@/stores/auth.store";
-import { Loader2, Mail } from "lucide-react";
+import { CheckCircle2, Loader2, Mail } from "lucide-react";
 
 export default function SignupPage() {
   const { register, isLoading, error, clearError } = useAuthStore();
@@ -28,6 +28,7 @@ export default function SignupPage() {
     agreeToTerms: false,
   });
   const [registered, setRegistered] = useState(false);
+  const [alreadyVerified, setAlreadyVerified] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -35,7 +36,7 @@ export default function SignupPage() {
     if (formData.password !== formData.confirmPassword) return;
     if (!isPasswordValid(formData.password)) return;
 
-    await register({
+    const verified = await register({
       first_name: formData.first_name,
       last_name: formData.last_name,
       email: formData.email,
@@ -44,8 +45,37 @@ export default function SignupPage() {
 
     // If no error, registration succeeded
     const { error: storeError } = useAuthStore.getState();
-    if (!storeError) setRegistered(true);
+    if (storeError) return;
+    setAlreadyVerified(verified);
+    setRegistered(true);
   };
+
+  // The demo API verifies new accounts immediately because it never sends email.
+  if (registered && alreadyVerified) {
+    return (
+      <AuthFormLayout
+        title="Account Created"
+        description="Your account is ready to use"
+      >
+        <div className="space-y-6">
+          <div className="flex flex-col items-center gap-4 py-8">
+            <div className="flex size-16 items-center justify-center rounded-full bg-primary/10">
+              <CheckCircle2 className="size-8 text-primary" aria-hidden="true" />
+            </div>
+            <div className="text-center space-y-2">
+              <p className="font-medium">{formData.email}</p>
+              <p className="text-sm text-muted-foreground">
+                This demo skips email verification, so you can log in now.
+              </p>
+            </div>
+          </div>
+          <Button asChild className="w-full">
+            <Link href="/login">Go to Login</Link>
+          </Button>
+        </div>
+      </AuthFormLayout>
+    );
+  }
 
   if (registered) {
     return (

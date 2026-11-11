@@ -54,6 +54,7 @@ export interface User {
   role: string;
   status?: string;
   is_verified?: boolean;
+  email_verified?: boolean;
   created_at?: string;
   applicant_profile_id?: string;
   company_id?: string;
