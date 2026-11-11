@@ -67,7 +67,7 @@ export function AdminSidebar() {
             <ShieldCheck className="size-4" />
           </div>
           <div className="flex flex-col">
-            <span className="text-sm font-semibold">Job Tally</span>
+            <span className="text-sm font-semibold">Bayaw Jobs</span>
             <span className="text-xs text-muted-foreground">Super Admin Panel</span>
           </div>
         </div>

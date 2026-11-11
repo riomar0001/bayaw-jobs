@@ -83,10 +83,10 @@ export default function ContactPage() {
                 Send us an email and we&apos;ll respond within 24 hours
               </p>
               <a
-                href="mailto:support@jobtally.com"
+                href="mailto:support@bayawjobs.com"
                 className="text-primary hover:underline font-medium"
               >
-                support@jobtally.com
+                support@bayawjobs.com
               </a>
             </CardContent>
           </Card>

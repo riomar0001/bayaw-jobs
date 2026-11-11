@@ -26,7 +26,7 @@ export default function TermsPage() {
           <h1 className="text-4xl font-bold mb-3">Terms of Service</h1>
           <p className="text-muted-foreground">Last updated: January 1, 2025</p>
           <p className="mt-4 text-muted-foreground leading-relaxed">
-            Please read these Terms of Service carefully before using Job Tally.
+            Please read these Terms of Service carefully before using Bayaw Jobs.
             By accessing or using our platform, you agree to be bound by the
             terms described below.
           </p>
@@ -60,10 +60,10 @@ export default function TermsPage() {
           <p className="text-sm text-muted-foreground">
             Contact us at{' '}
             <a
-              href="mailto:legal@jobtally.com"
+              href="mailto:legal@bayawjobs.com"
               className="text-primary hover:underline"
             >
-              legal@jobtally.com
+              legal@bayawjobs.com
             </a>{' '}
             for any questions regarding these Terms of Service.
           </p>

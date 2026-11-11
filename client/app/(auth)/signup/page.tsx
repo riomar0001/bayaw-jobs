@@ -82,7 +82,7 @@ export default function SignupPage() {
   return (
     <AuthFormLayout
       title="Create Your Account"
-      description="Join Job Tally and connect with top employers and opportunities"
+      description="Join Bayaw Jobs and connect with top employers and opportunities"
     >
       <form onSubmit={handleSubmit} className="space-y-6" autoComplete="off">
         <FieldGroup>

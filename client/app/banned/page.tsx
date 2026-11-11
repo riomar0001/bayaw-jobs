@@ -21,7 +21,7 @@ export default function BannedPage() {
         <div className="space-y-2">
           <h1 className="text-2xl font-bold tracking-tight">Account Suspended</h1>
           <p className="text-muted-foreground text-sm">
-            Your account has been banned from Job Tally.
+            Your account has been banned from Bayaw Jobs.
           </p>
         </div>
 
@@ -45,7 +45,7 @@ export default function BannedPage() {
 
         <p className="text-xs text-muted-foreground">
           If you believe this is a mistake, please contact support at{' '}
-          <span className="font-medium">support@jobtally.com</span>.
+          <span className="font-medium">support@bayawjobs.com</span>.
         </p>
       </div>
     </div>

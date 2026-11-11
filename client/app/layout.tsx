@@ -11,7 +11,7 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
-  title: "Job Tally - Find Your Dream Job",
+  title: "Bayaw Jobs - Find Your Dream Job",
   description:
     "Connect with top companies and discover opportunities that match your skills and career goals.",
 };

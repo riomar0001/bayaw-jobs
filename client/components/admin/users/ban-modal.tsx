@@ -71,7 +71,7 @@ export function BanModal({ user, open, onClose, onConfirm }: BanModalProps) {
         <DialogHeader>
           <DialogTitle>Ban User</DialogTitle>
           <DialogDescription>
-            Ban <span className="font-medium">{name}</span> from Job Tally. Their active sessions will be revoked and their jobs will be unpublished.
+            Ban <span className="font-medium">{name}</span> from Bayaw Jobs. Their active sessions will be revoked and their jobs will be unpublished.
           </DialogDescription>
         </DialogHeader>
 
