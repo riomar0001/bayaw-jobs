@@ -3,6 +3,7 @@ import { Inter } from "next/font/google";
 import { Toaster } from "sonner";
 import "./globals.css";
 import { AuthProvider } from "@/components/shared/auth-provider";
+import { DemoBanner } from "@/components/shared/demo-banner";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -27,6 +28,7 @@ export default function RootLayout({
         className={`${inter.variable} font-sans antialiased`}
         suppressHydrationWarning
       >
+        <DemoBanner />
         <AuthProvider>{children}</AuthProvider>
         <Toaster richColors position="top-right" />
       </body>
