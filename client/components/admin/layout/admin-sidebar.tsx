@@ -18,6 +18,7 @@ import {
   ShieldCheck,
   ListTodo,
   ShieldAlert,
+  Settings,
 } from 'lucide-react';
 
 export function AdminSidebar() {
@@ -56,6 +57,11 @@ export function AdminSidebar() {
         { title: 'Event Log', href: '/admin/security' },
         { title: 'Queues', href: '/admin/queues' },
       ],
+    },
+    {
+      title: 'Settings',
+      href: '/admin/settings',
+      icon: Settings,
     },
   ];
 
