@@ -141,6 +141,20 @@ export const deleteAdminSchema = z.object({
   }),
 });
 
+export const updateAdminSchema = z.object({
+  params: z.object({
+    id: z.string().uuid('Admin ID must be a valid UUID'),
+  }),
+  body: z
+    .object({
+      position: z.string().trim().max(100, 'Position is too long').optional(),
+      can_create: z.boolean({ error: '"can_create" must be a boolean' }).optional(),
+      can_update: z.boolean({ error: '"can_update" must be a boolean' }).optional(),
+      can_delete: z.boolean({ error: '"can_delete" must be a boolean' }).optional(),
+    })
+    .refine((b) => Object.values(b).some((v) => v !== undefined), 'Nothing to update'),
+});
+
 export const updateApplicationStatusSchema = z.object({
   params: z.object({
     id: z.string().uuid('Application ID must be a valid UUID'),
@@ -153,4 +167,5 @@ export const updateApplicationStatusSchema = z.object({
 });
 
 export type AddAdminInput = z.infer<typeof addAdminSchema>['body'];
+export type UpdateAdminInput = z.infer<typeof updateAdminSchema>['body'];
 export type UpdateApplicationStatusInput = z.infer<typeof updateApplicationStatusSchema>['body'];

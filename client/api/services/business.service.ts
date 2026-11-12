@@ -1,6 +1,7 @@
 import { apiClient } from '../client';
 import {
   AddAdminInput,
+  UpdateAdminInput,
   AddLocationInput,
   ApiResponse,
   ApplicantStats,
@@ -139,6 +140,11 @@ class BusinessService {
 
   async addAdmin(data: AddAdminInput): Promise<CompanyAdmin> {
     const res = await apiClient.post<ApiResponse<CompanyAdmin>>('/business/admins', data);
+    return unwrapResponse(res.data);
+  }
+
+  async updateAdmin(id: string, data: UpdateAdminInput): Promise<CompanyAdmin> {
+    const res = await apiClient.patch<ApiResponse<CompanyAdmin>>(`/business/admins/${id}`, data);
     return unwrapResponse(res.data);
   }
 

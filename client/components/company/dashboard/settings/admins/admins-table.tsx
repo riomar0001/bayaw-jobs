@@ -17,17 +17,19 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Check, Minus, MoreHorizontal } from 'lucide-react';
-import { CompanyAdmin } from '@/api/types';
+import { CompanyAdmin, UpdateAdminInput } from '@/api/types';
 import { formatDate } from '@/lib/formatters';
 import { cn } from '@/lib/utils';
 import { roleConfig } from './admin-config';
 import { RemoveDialog } from './remove-dialog';
+import { EditMemberDialog } from './edit-member-dialog';
 
 interface AdminsTableProps {
   admins: CompanyAdmin[];
   currentUserId?: string;
   canManage: boolean;
   onRemove: (id: string) => void;
+  onUpdate: (id: string, data: UpdateAdminInput) => Promise<void>;
   isSubmitting?: boolean;
 }
 
@@ -45,6 +47,7 @@ export function AdminsTable({
   currentUserId,
   canManage,
   onRemove,
+  onUpdate,
   isSubmitting,
 }: AdminsTableProps) {
   return (
@@ -163,6 +166,7 @@ export function AdminsTable({
                           </Button>
                         </DropdownMenuTrigger>
                         <DropdownMenuContent align="end">
+                          <EditMemberDialog admin={admin} onUpdate={onUpdate} />
                           <RemoveDialog
                             adminName={fullName}
                             adminId={admin.id}

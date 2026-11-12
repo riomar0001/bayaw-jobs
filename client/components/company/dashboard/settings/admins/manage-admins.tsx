@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { CompanyAdmin, AddAdminInput } from '@/api/types';
+import { CompanyAdmin, AddAdminInput, UpdateAdminInput } from '@/api/types';
 import { businessService } from '@/api';
 import { InviteDialog } from './invite-dialog';
 import { AdminsTable } from './admins-table';
@@ -35,6 +35,23 @@ export function ManageAdmins({ admins = [], currentUserRights, onSuccess }: Mana
       }
     } catch (err) {
       const message = err instanceof Error ? err.message : 'Failed to add admin';
+      toast.error(message);
+      throw err;
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  const handleUpdate = async (adminId: string, data: UpdateAdminInput) => {
+    try {
+      setIsSubmitting(true);
+      await businessService.updateAdmin(adminId, data);
+      toast.success('Admin updated successfully');
+      if (onSuccess) {
+        await onSuccess();
+      }
+    } catch (err) {
+      const message = err instanceof Error ? err.message : 'Failed to update admin';
       toast.error(message);
       throw err;
     } finally {
@@ -94,6 +111,7 @@ export function ManageAdmins({ admins = [], currentUserRights, onSuccess }: Mana
             currentUserId={currentUserRights?.user_id}
             canManage={canManageAdmins ?? false}
             onRemove={handleRemove}
+            onUpdate={handleUpdate}
             isSubmitting={isSubmitting}
           />
         </div>

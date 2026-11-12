@@ -3,6 +3,7 @@ import { userRepository } from '@/repositories/user.repository';
 import { AuthorizationError, ConflictError, NotFoundError } from '@/utils/errors.util';
 import {
   AddAdminInput,
+  UpdateAdminInput,
   AddLocationInput,
   BusinessOnboardingInput,
   UpdateCompanyInfoInput,
@@ -162,6 +163,37 @@ export class CompanyService {
       can_read: data.can_read,
       can_update: data.can_update,
       can_delete: data.can_delete,
+    });
+  }
+
+  async updateAdmin(requesterId: string, companyId: string, adminId: string, data: UpdateAdminInput) {
+    const requester = await companyRepository.findAdminByUserAndCompany(requesterId, companyId);
+    if (
+      !requester ||
+      !requester.can_create ||
+      !requester.can_read ||
+      !requester.can_update ||
+      !requester.can_delete
+    ) {
+      throw new AuthorizationError('Only admins with full rights can edit admins');
+    }
+
+    const target = await companyRepository.findAdminById(adminId);
+    if (!target || target.company_id !== companyId) {
+      throw new NotFoundError('Admin not found');
+    }
+    if (target.user_id === requesterId) {
+      throw new AuthorizationError('You cannot change your own permissions');
+    }
+    if (target.role === 'COMPANY_OWNER') {
+      throw new AuthorizationError("The company owner's permissions can't be changed");
+    }
+
+    return companyRepository.updateAdmin(adminId, {
+      ...(data.position !== undefined && { position: data.position }),
+      ...(data.can_create !== undefined && { can_create: data.can_create }),
+      ...(data.can_update !== undefined && { can_update: data.can_update }),
+      ...(data.can_delete !== undefined && { can_delete: data.can_delete }),
     });
   }
 

@@ -517,6 +517,13 @@ export interface CompanyContact {
   phone: string;
 }
 
+export interface UpdateAdminInput {
+  position?: string;
+  can_create?: boolean;
+  can_update?: boolean;
+  can_delete?: boolean;
+}
+
 export interface CompanyAdmin {
   id: string;
   company_id: string;

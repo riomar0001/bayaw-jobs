@@ -125,6 +125,13 @@ export class CompanyRepository {
     return prisma.company_admin.create({ data });
   }
 
+  async updateAdmin(
+    adminId: string,
+    data: { position?: string; can_create?: boolean; can_update?: boolean; can_delete?: boolean }
+  ) {
+    return prisma.company_admin.update({ where: { id: adminId }, data });
+  }
+
   async removeAdmin(adminId: string) {
     return prisma.company_admin.delete({ where: { id: adminId } });
   }

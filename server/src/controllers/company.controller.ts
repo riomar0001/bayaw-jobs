@@ -1,7 +1,7 @@
 import { Request, Response, NextFunction } from 'express';
 import { companyService } from '@/services/company.service';
 import { createdResponse, successResponse } from '@/utils/apiResponse.util';
-import { BadRequestError } from '@/utils/errors.util';
+import { AuthorizationError, BadRequestError } from '@/utils/errors.util';
 
 export class CompanyController {
   async getTopCompanies(_req: Request, res: Response, next: NextFunction): Promise<void> {
@@ -72,6 +72,26 @@ export class CompanyController {
 
       const admin = await companyService.addAdmin(userId, companyId, req.body);
       createdResponse(res, admin, 'Admin added successfully');
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  async updateAdmin(req: Request, res: Response, next: NextFunction): Promise<void> {
+    try {
+      const userId = req.user?.user_id;
+      const companyId = req.user?.company_id;
+      if (!userId || !companyId) {
+        throw new AuthorizationError('Only company users can edit admins');
+      }
+
+      const { id } = req.params;
+      if (!id || typeof id !== 'string') {
+        throw new BadRequestError('Admin ID is required');
+      }
+
+      const result = await companyService.updateAdmin(userId, companyId, id, req.body);
+      successResponse(res, result, 'Admin updated successfully');
     } catch (error) {
       next(error);
     }

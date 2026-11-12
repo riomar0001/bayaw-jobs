@@ -15,6 +15,7 @@ import {
   updateLocationSchema,
   updateSocialLinksSchema,
   updateApplicationStatusSchema,
+  updateAdminSchema,
 } from '@/validations/company.validation';
 import { BadRequestError } from '@/utils/errors.util';
 
@@ -156,6 +157,14 @@ router.patch(
   limitActivity('UPLOAD'),
   uploadImage.single('picture'),
   companyController.updateAdminProfilePicture.bind(companyController)
+);
+
+// After PATCH /admins/profile-picture so that path isn't read as an admin id.
+router.patch(
+  '/admins/:id',
+  authenticate,
+  validate(updateAdminSchema),
+  companyController.updateAdmin.bind(companyController)
 );
 
 router.get(
