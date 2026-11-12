@@ -72,7 +72,7 @@ The D1 database, R2 bucket and queues are named in `server/wrangler.jsonc`.
 
 ```sh
 cd client
-NEXT_PUBLIC_API_URL=https://<api-worker-host>/api npm run deploy
+NEXT_PUBLIC_API_URL=https://bayawjobs-api.riomar.dev/api npm run deploy
 ```
 
 `NEXT_PUBLIC_API_URL` is inlined at build time, so redeploy the frontend after changing it.
