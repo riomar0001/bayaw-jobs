@@ -120,7 +120,7 @@ npm run db:migrate:local
 
 ## License
 
-This project is licensed under the MIT License.
+This project is licensed under the MIT License. See [LICENSE](LICENSE).
 
 ## Acknowledgements
 
