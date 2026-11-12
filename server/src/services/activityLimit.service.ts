@@ -7,6 +7,7 @@ export type ActivityAction = keyof typeof Config.ACTIVITY_LIMITS;
 const ACTION_LABELS: Record<ActivityAction, string> = {
   APPLY: 'job applications',
   SIGNUP: 'sign-ups from this network',
+  CONTACT: 'contact messages from this network',
   POST_JOB: 'job posts',
   UPLOAD: 'file uploads',
   WRITE: 'changes',

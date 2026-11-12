@@ -4,7 +4,7 @@ import { Config } from '@/constants/config.constant';
 import logger from '@/configs/logger.config';
 
 export interface EmailJobData {
-  type: 'verification' | 'auth_code' | 'certificate';
+  type: 'verification' | 'auth_code' | 'certificate' | 'contact';
   to: string;
   subject: string;
   html: string;

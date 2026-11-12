@@ -4,6 +4,7 @@ import applicantRoutes from './applicant.routes';
 import companyRoutes from './company.routes';
 import jobRoutes from './job.routes';
 import adminRoutes from './admin.routes';
+import contactRoutes from './contact.routes';
 
 const router = Router();
 
@@ -31,5 +32,6 @@ router.use('/applicants', applicantRoutes);
 router.use('/business', companyRoutes);
 router.use('/jobs', jobRoutes);
 router.use('/admin', adminRoutes);
+router.use('/contact', contactRoutes);
 
 export default router;

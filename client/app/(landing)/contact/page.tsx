@@ -14,6 +14,8 @@ import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { Mail, Phone, MapPin, Send, HelpCircle } from "lucide-react";
 import Link from "next/link";
+import { apiClient } from "@/api/client";
+import { AuthError } from "@/components/auth/auth-error";
 
 const contactFormSchema = z.object({
   name: z.string().min(2, "Name must be at least 2 characters"),
@@ -26,6 +28,7 @@ type ContactFormData = z.infer<typeof contactFormSchema>;
 
 export default function ContactPage() {
   const [isSubmitted, setIsSubmitted] = useState(false);
+  const [submitError, setSubmitError] = useState<string | null>(null);
 
   const {
     register,
@@ -37,12 +40,16 @@ export default function ContactPage() {
   });
 
   const onSubmit = async (data: ContactFormData) => {
-    console.log("Contact form submitted:", data);
-    // TODO: Submit to backend
-    await new Promise((resolve) => setTimeout(resolve, 1000));
+    setSubmitError(null);
+    setIsSubmitted(false);
+    try {
+      await apiClient.post("/contact", data);
+    } catch (err) {
+      setSubmitError(err instanceof Error ? err.message : "Couldn't send your message. Please try again.");
+      return;
+    }
     setIsSubmitted(true);
     reset();
-    setTimeout(() => setIsSubmitted(false), 3000);
   };
 
   return (
@@ -220,6 +227,8 @@ export default function ContactPage() {
                     </>
                   )}
                 </Button>
+
+                <AuthError message={submitError} />
 
                 {/* Success Message */}
                 {isSubmitted && (

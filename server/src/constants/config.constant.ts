@@ -57,7 +57,11 @@ export const Config = {
     UPLOAD: 10,
     WRITE: 100,
     SIGNUP: 5,
+    CONTACT: 5,
   },
+
+  // Inbox for contact form messages (queued like every other email).
+  SUPPORT_EMAIL: process.env.SUPPORT_EMAIL ?? 'support@bayawjobs.com',
 
   // Frontend
   FRONTEND_URL: process.env.FRONTEND_URL ?? 'http://localhost:3000',

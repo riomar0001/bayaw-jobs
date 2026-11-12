@@ -5,6 +5,8 @@ import { passwordResetTemplate } from '@/templates/passwordReset.template';
 import { passwordChangedTemplate } from '@/templates/passwordChanged.template';
 import { applicationStatusTemplate } from '@/templates/applicationStatus.template';
 import type { ApplicationStatus } from '@/templates/applicationStatus.template';
+import { contactMessageTemplate, ContactMessage } from '@/templates/contactMessage.template';
+import { Config } from '@/constants/config.constant';
 import logger from '@/configs/logger.config';
 
 export interface VerificationEmailData {
@@ -143,6 +145,18 @@ export class EmailService {
 
     await addEmailJob(jobData);
     logger.info('Password changed email queued', { to: data.to });
+  }
+
+  async sendContactMessage(data: ContactMessage): Promise<void> {
+    // Strip line breaks so visitor input can't add extra lines to the subject.
+    const subject = data.subject.replace(/[\r\n]+/g, ' ');
+    await addEmailJob({
+      type: 'contact',
+      to: Config.SUPPORT_EMAIL,
+      subject: `[Contact] ${subject} - ${this.appName}`,
+      html: contactMessageTemplate(data, this.appName),
+    });
+    logger.info('Contact message queued');
   }
 
   getVerificationLink(token: string): string {

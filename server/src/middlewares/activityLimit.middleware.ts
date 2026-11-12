@@ -21,18 +21,18 @@ export const limitActivity =
     }
   };
 
-/** Signups have no user yet, so they are capped per client IP instead. */
-export const limitSignupsByIp = async (
-  req: Request,
-  _res: Response,
-  next: NextFunction
-): Promise<void> => {
-  // Fail closed: without a client IP every anonymous caller would share one bucket anyway.
-  const ip = req.ip ?? 'unknown';
-  try {
-    await activityLimitService.consume(`ip:${ip}`, 'SIGNUP');
-    next();
-  } catch (error) {
-    next(error);
-  }
-};
+/** Daily cap for anonymous actions (signups, contact form), counted per client IP. */
+export const limitByIp =
+  (action: ActivityAction) =>
+  async (req: Request, _res: Response, next: NextFunction): Promise<void> => {
+    // Fail closed: without a client IP every anonymous caller shares one bucket.
+    const ip = req.ip ?? 'unknown';
+    try {
+      await activityLimitService.consume(`ip:${ip}`, action);
+      next();
+    } catch (error) {
+      next(error);
+    }
+  };
+
+export const limitSignupsByIp = limitByIp('SIGNUP');
