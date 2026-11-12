@@ -53,6 +53,12 @@ router.put(
   validate(updateJobSchema),
   jobController.updateJob.bind(jobController)
 );
+router.delete(
+  '/:id',
+  authenticate,
+  validate(getJobByIdSchema),
+  jobController.deleteJob.bind(jobController)
+);
 router.patch(
   '/:id/status',
   authenticate,

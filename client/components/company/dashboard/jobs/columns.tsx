@@ -15,7 +15,7 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 
-export const columns: ColumnDef<CompanyJob>[] = [
+export const getJobColumns = (onDelete: (job: CompanyJob) => void): ColumnDef<CompanyJob>[] => [
   {
     accessorKey: 'title',
     header: ({ column }) => {
@@ -121,7 +121,7 @@ export const columns: ColumnDef<CompanyJob>[] = [
               </Link>
             </DropdownMenuItem>
             <DropdownMenuSeparator />
-            <DropdownMenuItem className="text-destructive">
+            <DropdownMenuItem className="text-destructive" onSelect={() => onDelete(job)}>
               <Trash2 className="mr-2 size-4" />
               Delete Job
             </DropdownMenuItem>

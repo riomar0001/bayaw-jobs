@@ -3,6 +3,8 @@ import { jobService } from '@/services/job.service';
 import { applicantService } from '@/services/applicant.service';
 import { successResponse, createdResponse } from '@/utils/apiResponse.util';
 import { Config } from '@/constants/config.constant';
+import { ErrorMessages } from '@/constants/errorMessages.constant';
+import { AuthenticationError, AuthorizationError } from '@/utils/errors.util';
 
 export class JobController {
   async getTopJobs(_req: Request, res: Response, next: NextFunction): Promise<void> {
@@ -148,6 +150,21 @@ export class JobController {
         companyId
       );
       successResponse(res, result, 'Job status updated successfully');
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  async deleteJob(req: Request<{ id: string }>, res: Response, next: NextFunction): Promise<void> {
+    try {
+      const userId = req.user?.user_id;
+      if (!userId) throw new AuthenticationError(ErrorMessages.AUTH.TOKEN_REQUIRED);
+
+      const companyId = req.user?.company_id;
+      if (!companyId) throw new AuthorizationError('Only company users can delete job postings');
+
+      const result = await jobService.deleteJob(req.params.id, userId, companyId);
+      successResponse(res, result, 'Job deleted successfully');
     } catch (error) {
       next(error);
     }

@@ -6,11 +6,22 @@ import { PageHeader } from '@/components/company/dashboard/layout/page-header';
 import { Button } from '@/components/ui/button';
 import { StatsCard } from '@/components/company/dashboard/dashboard/stats-card';
 import { DataTable } from '@/components/company/dashboard/jobs/data-table';
-import { columns } from '@/components/company/dashboard/jobs/columns';
+import { getJobColumns } from '@/components/company/dashboard/jobs/columns';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from '@/components/ui/alert-dialog';
+import { toast } from 'sonner';
 import { ErrorAlert } from '@/components/common/error-alert';
 import { businessService } from '@/api/services/business.service';
 import { jobsService } from '@/api/services/jobs.service';
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { CompanyJob, JobStats } from '@/api/types';
 import { Skeleton } from '@/components/ui/skeleton';
 
@@ -54,6 +65,24 @@ export default function JobsPage() {
   useEffect(() => {
     void fetchData();
   }, []);
+
+  const [deleteTarget, setDeleteTarget] = useState<CompanyJob | null>(null);
+  const [isDeleting, setIsDeleting] = useState(false);
+  const columns = useMemo(() => getJobColumns(setDeleteTarget), []);
+
+  const handleDelete = async (job: CompanyJob) => {
+    setIsDeleting(true);
+    try {
+      await jobsService.deleteJob(job.id);
+      toast.success(`"${job.title}" was deleted`);
+      setDeleteTarget(null);
+      void fetchData();
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : 'Failed to delete job');
+    } finally {
+      setIsDeleting(false);
+    }
+  };
 
   return (
     <>
@@ -102,6 +131,37 @@ export default function JobsPage() {
           </>
         )}
       </div>
+
+      <AlertDialog
+        open={deleteTarget !== null}
+        onOpenChange={(open) => {
+          if (!open && !isDeleting) setDeleteTarget(null);
+        }}
+      >
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Delete this job?</AlertDialogTitle>
+            <AlertDialogDescription>
+              &ldquo;{deleteTarget?.title}&rdquo; and all of its applications will be permanently
+              deleted. This can&apos;t be undone. To stop new applications but keep the history,
+              close the job instead.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel disabled={isDeleting}>Cancel</AlertDialogCancel>
+            <AlertDialogAction
+              disabled={isDeleting}
+              className="bg-destructive text-white hover:bg-destructive/90"
+              onClick={(e) => {
+                e.preventDefault();
+                if (deleteTarget) void handleDelete(deleteTarget);
+              }}
+            >
+              {isDeleting ? 'Deleting…' : 'Delete job'}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </>
   );
 }

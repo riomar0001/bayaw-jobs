@@ -87,6 +87,11 @@ class JobsService {
     return unwrapResponse(res.data);
   }
 
+  async deleteJob(id: string): Promise<{ removedApplications: number }> {
+    const res = await apiClient.delete<ApiResponse<{ removedApplications: number }>>(`/jobs/${id}`);
+    return unwrapResponse(res.data);
+  }
+
   async updateJobStatus(id: string, status: JobStatus): Promise<Job> {
     const res = await apiClient.patch<ApiResponse<Job>>(`/jobs/${id}/status`, {
       status,

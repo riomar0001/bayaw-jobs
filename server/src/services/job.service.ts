@@ -139,6 +139,29 @@ export class JobService {
     return jobRepository.updateStatus(jobId, companyId, status);
   }
 
+  async deleteJob(id: string, userId: string, companyId: string) {
+    const existingJob = await jobRepository.findById(id);
+    if (!existingJob || existingJob.company_id !== companyId) {
+      throw new NotFoundError('Job not found');
+    }
+
+    const user = await userRepository.findById(userId, { companyAdmins: true });
+    if (!user) {
+      throw new NotFoundError('User not found');
+    }
+
+    const isAuthorized = user.companyAdmins.some(
+      (admin: CompanyAdmin) =>
+        admin.company_id === companyId && (admin.role === 'COMPANY_OWNER' || admin.can_delete)
+    );
+
+    if (!isAuthorized) {
+      throw new AuthorizationError('Only company admins with delete rights can delete job postings');
+    }
+
+    return jobRepository.delete(id, companyId);
+  }
+
   async updateJob(id: string, data: Partial<CreateJobData>, userId: string, companyId: string) {
     const existingJob = await jobRepository.findById(id);
     if (!existingJob) {

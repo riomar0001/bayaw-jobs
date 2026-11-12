@@ -262,6 +262,19 @@ export class JobRepository {
     });
   }
 
+  /**
+   * Deletes a job and its applications. Applications link to jobs through a plain
+   * job_id column (no cascade), so they are removed first to avoid dangling rows.
+   * D1 has no transactions: if the job delete fails, the applications are already gone.
+   */
+  async delete(id: string, company_id: string) {
+    const { count: removedApplications } = await prisma.applicant_applied_job.deleteMany({
+      where: { OR: [{ job_id: id }, { jobId: id }] },
+    });
+    await prisma.job.delete({ where: { id, company_id } });
+    return { removedApplications };
+  }
+
   async findTopJobs(limit: number = 8) {
     return prisma.job.findMany({
       where: { status: job_status.OPEN },
