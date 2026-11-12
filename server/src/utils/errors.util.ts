@@ -39,7 +39,8 @@ export class AuthorizationError extends AppError {
 
 export class NotFoundError extends AppError {
   constructor(resource = 'Resource') {
-    super(404, `${resource} not found`, true, 'NOT_FOUND');
+    // Many callers pass a full sentence ("Job not found"); don't append it twice.
+    super(404, /not found$/i.test(resource) ? resource : `${resource} not found`, true, 'NOT_FOUND');
     Object.setPrototypeOf(this, NotFoundError.prototype);
   }
 }
