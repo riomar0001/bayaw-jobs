@@ -327,6 +327,11 @@ function daysAgo(days: number): Date {
 const ADMINS = [
   { email: 'admin@bayaw.com', first_name: 'Super', last_name: 'Admin' },
   { email: 'm.inguito.484470@umindanao.edu.ph', first_name: 'Mario', last_name: 'Inguito' },
+  // First names aren't known from the email addresses; only the initial is used.
+  { email: 'd.arzadon.548554@umindanao.edu.ph', first_name: 'D.', last_name: 'Arzadon' },
+  { email: 'a.dumalogdog.547692@umindanao.edu.ph', first_name: 'A.', last_name: 'Dumalogdog' },
+  { email: 'j.eborda.536024@umindanao.edu.ph', first_name: 'J.', last_name: 'Eborda' },
+  { email: 'a.nerosa.545679@umindanao.edu.ph', first_name: 'A.', last_name: 'Nerosa' },
 ];
 
 // Companies and jobs keep the same IDs across nightly resets so their public
