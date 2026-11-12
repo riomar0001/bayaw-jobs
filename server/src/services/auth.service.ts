@@ -17,6 +17,7 @@ import {
 import { truncateIp } from '@/utils/truncateIp.util';
 import {
   AuthenticationError,
+  AuthorizationError,
   ConflictError,
   NotFoundError,
   BadRequestError,
@@ -40,6 +41,15 @@ import {
 import { Request } from 'express';
 import { securityEventService } from '@/services/securityEvent.service';
 import { security_event_type } from '@/generated/prisma/client';
+
+/** Published demo logins are shared by every visitor, so their credentials stay fixed. */
+function assertNotSharedDemoAccount(email: string, what: 'password' | 'email'): void {
+  if (!Config.DEMO_MODE) return;
+  if (!(Config.DEMO_SHARED_ACCOUNTS as readonly string[]).includes(email.toLowerCase())) return;
+  throw new AuthorizationError(
+    `The ${what} of shared demo accounts can't be changed. Create your own account to try this.`
+  );
+}
 
 export class AuthService {
   async register(data: RegisterInput): Promise<{ user: UserData; verificationToken: string }> {
@@ -532,6 +542,8 @@ export class AuthService {
       throw new NotFoundError('User');
     }
 
+    assertNotSharedDemoAccount(user.email, 'password');
+
     const hashedPassword = await hashPassword(data.new_password);
     await userRepository.update(user.id, {
       password: hashedPassword,
@@ -556,6 +568,8 @@ export class AuthService {
     if (!user) {
       throw new NotFoundError('User');
     }
+
+    assertNotSharedDemoAccount(user.email, 'password');
 
     const isValid = await verifyPassword(data.current_password, user.password);
     if (!isValid) {
@@ -618,6 +632,7 @@ export class AuthService {
     if (!user) throw new NotFoundError('User');
 
     if (data.email && data.email !== user.email) {
+      assertNotSharedDemoAccount(user.email, 'email');
       const existingUser = await userRepository.findByEmail(data.email);
       if (existingUser) {
         throw new ConflictError(ErrorMessages.AUTH.EMAIL_ALREADY_EXISTS);

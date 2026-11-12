@@ -46,6 +46,10 @@ export const Config = {
   // never delivered. Off unless DEMO_MODE is exactly "true".
   DEMO_MODE: process.env.DEMO_MODE === 'true',
 
+  // Logins published on the demo login page. In demo mode their password and
+  // email are locked so one visitor can't lock everyone else out until the reset.
+  DEMO_SHARED_ACCOUNTS: ['admin@bayaw.com', 'owner@techcorp.com', 'kathleen.reyes@gmail.com'],
+
   // Daily per-user activity caps (demo). Counters reset with the nightly data reset.
   ACTIVITY_LIMITS: {
     APPLY: 10,
