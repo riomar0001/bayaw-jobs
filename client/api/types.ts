@@ -551,8 +551,14 @@ export interface CompanyInfo {
   logo_url: string | null;
   contact: CompanyContact | null;
   locations: CompanyLocation[];
-  social_links: CompanySocial[];
+  // GET /business/info returns socials keyed by platform, not as a list.
+  social_links: CompanySocialLinks | null;
 }
+
+export type CompanySocialLinks = Record<
+  "facebook" | "linkedin" | "twitter" | "instagram",
+  string | null
+>;
 
 export interface PublicCompanyJobOpening {
   id: string;
