@@ -4,6 +4,18 @@
 
 A job portal: a Next.js frontend and an Express API, both running on Cloudflare Workers.
 
+- **Live site:** https://bayawjobs.riomar.dev
+- **API:** https://bayawjobs-api.riomar.dev/api (interactive docs at `/api/docs`)
+
+## Features
+
+| Role | What they can do |
+| --- | --- |
+| Visitor | Browse and search jobs and companies, send a message through the contact form |
+| Applicant | Build a profile (education, experience, skills, languages, résumé, photo), apply to jobs, track applications, manage password, login history and two-step login |
+| Company | Set up a company profile, post, edit, close and delete jobs, move applicants through hiring stages (status emails are queued), invite team members and edit their permissions |
+| Admin | Overview of users, companies, applicants and jobs, ban/unban users, promote users to admin, security event log, email queue management, change own password |
+
 ## Architecture
 
 | Part | Runs on |
@@ -16,17 +28,29 @@ A job portal: a Next.js frontend and an Express API, both running on Cloudflare 
 | Rate limiting | Workers Rate Limiting bindings, plus per-user daily caps stored in D1 |
 | Nightly reset | Cron trigger `0 16 * * *` (12:00 AM UTC+8) wipes D1 and R2 and reloads the demo data |
 
-### Demo limits (per user, per day)
+### Demo mode
 
-10 job applications · 5 job posts · 10 file uploads · 100 other changes · 5 sign-ups per IP
+`DEMO_MODE=true` (set in `server/wrangler.jsonc`) turns on:
+
+- **No real email.** Emails are queued and shown on the admin Queues page but never delivered. New sign-ups are verified immediately and email OTP is skipped at login.
+- **Locked shared accounts.** The password and email of the three accounts below can't be changed, so one visitor can't lock everyone else out.
+- **Daily limits per user:** 10 job applications · 5 job posts · 10 file uploads · 100 other changes. Per IP: 5 sign-ups and 5 contact messages. All limits reset at 12:00 AM (PHT).
 
 ### Demo accounts
+
+These are also one-click buttons on the login page.
 
 | Role | Email | Password |
 | --- | --- | --- |
 | Admin | admin@bayaw.com | Admin@1234 |
 | Company owner | owner@techcorp.com (and the other seeded companies) | Test@1234 |
 | Applicant | kathleen.reyes@gmail.com (and the other seeded applicants) | Test@1234 |
+
+The team's own admin accounts are seeded too (see `ADMINS` in `server/src/demo/seed.ts`) and are restored with the demo admin password every night.
+
+### Search engines
+
+Public pages have their own titles, descriptions, canonical URLs and share images. `robots.txt` keeps crawlers out of signed-in areas, and `sitemap.xml` lists every job and company. Seeded jobs and companies keep fixed IDs, so their URLs survive the nightly reset.
 
 ## Local development
 
@@ -66,7 +90,9 @@ npm run deploy
 npm run db:seed:remote           # first deploy only; afterwards the nightly cron reseeds
 ```
 
-The D1 database, R2 bucket and queues are named in `server/wrangler.jsonc`.
+The D1 database, R2 bucket, queues, cron schedule and the `bayawjobs-api.riomar.dev` custom domain are set in `server/wrangler.jsonc`. Optional variables there: `SUPPORT_EMAIL` (where contact messages go) and `DEMO_MODE`.
+
+`npm run db:seed:remote` replaces all data in the remote database with the demo set. Use it to reset by hand at any time.
 
 ### Frontend
 
@@ -75,7 +101,11 @@ cd client
 NEXT_PUBLIC_API_URL=https://bayawjobs-api.riomar.dev/api npm run deploy
 ```
 
-`NEXT_PUBLIC_API_URL` is inlined at build time, so redeploy the frontend after changing it.
+`NEXT_PUBLIC_API_URL` is inlined at build time, so redeploy the frontend after changing it. The frontend is served only on `bayawjobs.riomar.dev`, because the API allows CORS from that origin alone.
+
+## Troubleshooting
+
+**"Network error" on login, with a 403 that has no body.** Cloudflare's security on the `riomar.dev` zone blocked the request before it reached the API. It has happened with Chrome over HTTP/3 (QUIC). Look up the request's Ray ID under **Analytics → Events** for the zone, then turn off the feature that fired, or add a WAF **Skip** rule for `http.host eq "bayawjobs-api.riomar.dev"`. Turning off **HTTP/3** under **Speed → Settings → Protocol Optimization** also works around it.
 
 ### Schema changes
 
@@ -94,11 +124,10 @@ This project is licensed under the MIT License.
 
 ## Acknowledgements
 
-- [React](https://reactjs.org/)
+- [Next.js](https://nextjs.org/) and [OpenNext](https://opennext.js.org/cloudflare)
 - [Express](https://expressjs.com/)
 - [Prisma](https://www.prisma.io/)
-- [Supabase](https://supabase.io/)
-- [PostgreSQL](https://www.postgresql.org/)
+- [Cloudflare Workers, D1, R2 and Queues](https://developers.cloudflare.com/workers/)
 
 ## Authors
 
