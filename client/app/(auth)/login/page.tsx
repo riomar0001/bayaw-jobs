@@ -9,6 +9,7 @@ import { Input } from "@/components/ui/input";
 import { Field, FieldGroup, FieldLabel } from "@/components/ui/field";
 import { OtpInput } from "@/components/auth/otp-input";
 import { AuthError } from "@/components/auth/auth-error";
+import { DemoAccounts } from "@/components/auth/demo-accounts";
 import { useAuthStore } from "@/stores/auth.store";
 import { Loader2, ArrowLeft } from "lucide-react";
 
@@ -164,6 +165,16 @@ function LoginPageContent() {
           </Link>
         </p>
       </form>
+
+      <div className="mt-6">
+        <DemoAccounts
+          onSelect={(demoEmail, demoPassword) => {
+            clearError();
+            setEmail(demoEmail);
+            setPassword(demoPassword);
+          }}
+        />
+      </div>
     </AuthFormLayout>
   );
 }
