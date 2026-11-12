@@ -1,5 +1,9 @@
 import prisma from '@/configs/prisma.config';
-import { job_status } from '@/generated/prisma/client';
+import { job_status, security_event_type, user_status } from '@/generated/prisma/client';
+import { userRepository } from '@/repositories/user.repository';
+import { refreshTokenRepository } from '@/repositories/refreshToken.repository';
+import { securityEventService } from '@/services/securityEvent.service';
+import { BadRequestError, NotFoundError } from '@/utils/errors.util';
 
 export class AdminService {
   async getOverview() {
@@ -261,6 +265,22 @@ export class AdminService {
         applicant_count: _count.applicant_applied_job,
       })),
     };
+  }
+
+  /** Grants the ADMIN role. Sessions are revoked so the new role applies on next sign-in. */
+  async promoteToAdmin(targetId: string, adminId: string) {
+    const user = await userRepository.findById(targetId);
+    if (!user) throw new NotFoundError('User');
+    if (user.role === 'ADMIN') throw new BadRequestError('User is already an admin');
+    if (user.status === user_status.BANNED) throw new BadRequestError('Unban the user before promoting them');
+
+    await userRepository.update(targetId, { role: 'ADMIN' });
+    await refreshTokenRepository.revokeAllByUserId(targetId);
+
+    void securityEventService.log(security_event_type.ADMIN_ACTION, {
+      user_id: targetId,
+      metadata: { action: 'promote_to_admin', promoted_by: adminId, previous_role: user.role },
+    });
   }
 }
 

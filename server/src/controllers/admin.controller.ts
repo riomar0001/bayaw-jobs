@@ -119,6 +119,19 @@ export class AdminController {
       next(error);
     }
   }
+
+  async promoteUser(req: Request, res: Response, next: NextFunction): Promise<void> {
+    try {
+      const { id } = req.params;
+      if (typeof id !== 'string' || id.length === 0) throw new BadRequestError('User id is required');
+      const adminId = req.user!.user_id;
+      await adminService.promoteToAdmin(id, adminId);
+      logAdminAction(req, 'promote_to_admin');
+      successResponse(res, null, 'User promoted to admin successfully');
+    } catch (error) {
+      next(error);
+    }
+  }
 }
 
 export const adminController = new AdminController();

@@ -18,6 +18,7 @@ router.get('/jobs', adminController.getJobs.bind(adminController));
 // ── User moderation ──────────────────────────────────────────────────────────
 router.patch('/users/:id/ban', adminController.banUser.bind(adminController));
 router.patch('/users/:id/unban', adminController.unbanUser.bind(adminController));
+router.patch('/users/:id/promote', adminController.promoteUser.bind(adminController));
 
 // ── Security events ──────────────────────────────────────────────────────────
 router.get('/security-events/stats', adminController.getSecurityStats.bind(adminController));

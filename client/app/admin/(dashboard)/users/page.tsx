@@ -20,7 +20,17 @@ import {
 } from '@/components/ui/select';
 import { ColumnDef } from '@tanstack/react-table';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
-import { ArrowUpDown, Lock, Ban, ShieldCheck as ShieldCheckIcon } from 'lucide-react';
+import { ArrowUpDown, Lock, Ban, ShieldCheck as ShieldCheckIcon, ShieldPlus } from 'lucide-react';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from '@/components/ui/alert-dialog';
 import { cn } from '@/lib/utils';
 import { formatDate } from '@/lib/formatters';
 import { apiClient } from '@/api/client';
@@ -89,6 +99,8 @@ export default function AdminUsersPage() {
   const [statusFilter, setStatusFilter] = useState('all');
   const [banTarget, setBanTarget] = useState<AdminUser | null>(null);
   const [banModalOpen, setBanModalOpen] = useState(false);
+  const [promoteTarget, setPromoteTarget] = useState<AdminUser | null>(null);
+  const [isPromoting, setIsPromoting] = useState(false);
 
   const fetchData = async () => {
     try {
@@ -117,6 +129,20 @@ export default function AdminUsersPage() {
     await apiClient.patch(`/admin/users/${userId}/ban`, { reason: reason || undefined, expires_at: expiresAt });
     toast.success('User banned successfully');
     void fetchData();
+  };
+
+  const handlePromote = async (user: AdminUser) => {
+    setIsPromoting(true);
+    try {
+      await apiClient.patch(`/admin/users/${user.id}/promote`, {});
+      toast.success(`${user.email} is now an admin`);
+      setPromoteTarget(null);
+      void fetchData();
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : 'Failed to promote user');
+    } finally {
+      setIsPromoting(false);
+    }
   };
 
   const handleUnban = async (userId: string) => {
@@ -234,15 +260,26 @@ export default function AdminUsersPage() {
           );
         }
         return (
-          <Button
-            variant="outline"
-            size="sm"
-            className="text-xs h-7 text-red-600 border-red-200 hover:bg-red-50 hover:text-red-700"
-            onClick={() => { setBanTarget(u); setBanModalOpen(true); }}
-          >
-            <Ban className="size-3 mr-1" />
-            Ban
-          </Button>
+          <div className="flex items-center gap-2">
+            <Button
+              variant="outline"
+              size="sm"
+              className="text-xs h-7"
+              onClick={() => setPromoteTarget(u)}
+            >
+              <ShieldPlus className="size-3 mr-1" />
+              Make admin
+            </Button>
+            <Button
+              variant="outline"
+              size="sm"
+              className="text-xs h-7 text-red-600 border-red-200 hover:bg-red-50 hover:text-red-700"
+              onClick={() => { setBanTarget(u); setBanModalOpen(true); }}
+            >
+              <Ban className="size-3 mr-1" />
+              Ban
+            </Button>
+          </div>
         );
       },
     },
@@ -338,6 +375,31 @@ export default function AdminUsersPage() {
         onClose={() => { setBanModalOpen(false); setBanTarget(null); }}
         onConfirm={handleBan}
       />
+
+      <AlertDialog open={promoteTarget !== null} onOpenChange={(open) => { if (!open && !isPromoting) setPromoteTarget(null); }}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Make this user an admin?</AlertDialogTitle>
+            <AlertDialogDescription>
+              {promoteTarget?.email} will get full access to the admin panel, including user
+              management and bans. They&apos;ll be signed out and get the new role the next time
+              they sign in.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel disabled={isPromoting}>Cancel</AlertDialogCancel>
+            <AlertDialogAction
+              disabled={isPromoting}
+              onClick={(e) => {
+                e.preventDefault();
+                if (promoteTarget) void handlePromote(promoteTarget);
+              }}
+            >
+              {isPromoting ? 'Promoting…' : 'Make admin'}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </>
   );
 }
