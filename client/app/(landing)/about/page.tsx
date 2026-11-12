@@ -1,3 +1,5 @@
+import type { Metadata } from "next";
+import { pageMetadata } from "@/lib/site";
 import { HeroSection } from "@/components/shared/hero-section";
 import { ValueProposition } from "@/components/shared/value-proposition";
 import { CTABanner } from "@/components/shared/cta-banner";
@@ -12,6 +14,12 @@ import {
   Briefcase,
   CheckCircle,
 } from "lucide-react";
+
+export const metadata: Metadata = pageMetadata(
+  "About Us",
+  "Learn about Bayaw Jobs and our mission to connect job seekers with the companies hiring them.",
+  "/about",
+);
 
 export default function AboutPage() {
   return (
