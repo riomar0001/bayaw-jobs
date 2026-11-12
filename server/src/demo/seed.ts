@@ -322,6 +322,24 @@ function daysAgo(days: number): Date {
   return d;
 }
 
+// ─── Stable IDs ───────────────────────────────────────────────────────────────
+
+const ADMINS = [
+  { email: 'admin@bayaw.com', first_name: 'Super', last_name: 'Admin' },
+  { email: 'm.inguito.484470@umindanao.edu.ph', first_name: 'Mario', last_name: 'Inguito' },
+];
+
+// Companies and jobs keep the same IDs across nightly resets so their public
+// URLs (shared links, search engine results, the sitemap) don't break each day.
+const COMPANY_ID_KIND = 1;
+const JOB_ID_KIND = 2;
+
+/** A valid v4-format UUID that is the same for the same (kind, n) every reset. */
+function demoId(kind: number, n: number): string {
+  if (!Number.isInteger(n) || n < 0 || n > 99_999_999_999) throw new Error(`demoId out of range: ${n}`);
+  return `00000000-0000-4000-8000-${kind}${String(n).padStart(11, '0')}`;
+}
+
 // ─── Reset ────────────────────────────────────────────────────────────────────
 
 // Children before parents: D1 enforces foreign keys and has no TRUNCATE ... CASCADE.
@@ -355,18 +373,18 @@ async function wipe(prisma: PrismaClient) {
 export async function resetDemoData(prisma: PrismaClient): Promise<void> {
   await wipe(prisma);
 
-  await prisma.user.create({
-    data: {
-      email: 'admin@bayaw.com',
-      first_name: 'Super',
-      last_name: 'Admin',
-      password: ADMIN_PASSWORD_HASH,
-      role: 'ADMIN',
-      status: 'ACTIVE',
-      email_verified: true,
-      email_verified_at: new Date(),
-    },
-  });
+  for (const admin of ADMINS) {
+    await prisma.user.create({
+      data: {
+        ...admin,
+        password: ADMIN_PASSWORD_HASH,
+        role: 'ADMIN',
+        status: 'ACTIVE',
+        email_verified: true,
+        email_verified_at: new Date(),
+      },
+    });
+  }
 
   const allJobs: { id: string }[][] = [];
 
@@ -391,6 +409,7 @@ export async function resetDemoData(prisma: PrismaClient): Promise<void> {
 
     const company = await prisma.company_information.create({
       data: {
+        id: demoId(COMPANY_ID_KIND, i),
         user_id: user.id,
         ...cData.info,
         companyContacts: { create: cData.contact },
@@ -413,8 +432,13 @@ export async function resetDemoData(prisma: PrismaClient): Promise<void> {
     });
 
     const jobs: { id: string }[] = [];
-    for (const j of jobTemplates) {
-      jobs.push(await prisma.job.create({ data: { company_id: company.id, ...j }, select: { id: true } }));
+    for (const [jobIdx, j] of jobTemplates.entries()) {
+      jobs.push(
+        await prisma.job.create({
+          data: { id: demoId(JOB_ID_KIND, i * 100 + jobIdx), company_id: company.id, ...j },
+          select: { id: true },
+        })
+      );
     }
     allJobs.push(jobs);
   }

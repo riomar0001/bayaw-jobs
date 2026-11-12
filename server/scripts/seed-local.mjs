@@ -3,7 +3,8 @@
 // With --remote it then copies that data into the remote D1 database (first deploy).
 import { spawn, spawnSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
-import { readFileSync, writeFileSync } from 'node:fs';
+import { readFileSync, readdirSync, writeFileSync } from 'node:fs';
+import { join } from 'node:path';
 
 const PORT = 8799;
 const READY_TIMEOUT_MS = 60_000;
@@ -19,15 +20,31 @@ function wrangler(args) {
   if (result.status !== 0) throw new Error(`wrangler ${args.join(' ')} failed (exit ${result.status})`);
 }
 
+/** Every table created by the D1 migrations. */
+function appTables() {
+  const dir = fileURLToPath(new URL('../prisma/migrations-d1/', import.meta.url));
+  const tables = readdirSync(dir)
+    .filter((f) => f.endsWith('.sql'))
+    .flatMap((f) => [...readFileSync(join(dir, f), 'utf8').matchAll(/CREATE TABLE "([^"]+)"/g)].map((m) => m[1]));
+  if (tables.length === 0) throw new Error('No tables found in prisma/migrations-d1');
+  return [...new Set(tables)];
+}
+
 /** Copies the freshly seeded local data into the remote database. */
 function pushToRemote() {
   wrangler(['d1', 'export', DATABASE, '--local', '--no-schema', '--output', EXPORT_FILE]);
   // The remote database keeps its own migration history; never overwrite it.
-  const sql = readFileSync(EXPORT_FILE, 'utf8')
+  const lines = readFileSync(EXPORT_FILE, 'utf8')
     .split('\n')
-    .filter((line) => !line.startsWith('INSERT INTO "d1_migrations"'))
-    .join('\n');
-  writeFileSync(EXPORT_FILE, sql);
+    .filter((line) => !line.startsWith('INSERT INTO "d1_migrations"'));
+  // Clear every app table first so this also works on a database that already has data.
+  // The file runs as one transaction and foreign keys are deferred, so order doesn't matter.
+  const wipe = appTables().map((table) => `DELETE FROM "${table}";`);
+  const [pragma, ...inserts] = lines;
+  if (!pragma?.startsWith('PRAGMA defer_foreign_keys')) {
+    throw new Error('Unexpected export format: missing PRAGMA defer_foreign_keys header');
+  }
+  writeFileSync(EXPORT_FILE, [pragma, ...wipe, ...inserts].join('\n'));
   wrangler(['d1', 'execute', DATABASE, '--remote', '--file', EXPORT_FILE, '--yes']);
 }
 
