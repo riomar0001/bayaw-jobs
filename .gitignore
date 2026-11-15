@@ -64,3 +64,5 @@ prisma/dev.db-journal
 tmp/
 temp/
 /.claude
+# Committed env templates
+!.env.example

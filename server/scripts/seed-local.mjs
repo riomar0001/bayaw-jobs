@@ -30,16 +30,29 @@ function appTables() {
   return [...new Set(tables)];
 }
 
+/**
+ * BayawSec tables hold real assessment evidence. Seeding never wipes them remotely and
+ * never pushes local test assessment data to production.
+ */
+function preservedTables() {
+  const file = fileURLToPath(new URL('../prisma/migrations-d1/0002_bayawsec.sql', import.meta.url));
+  return new Set([...readFileSync(file, 'utf8').matchAll(/CREATE TABLE "([^"]+)"/g)].map((m) => m[1]));
+}
+
 /** Copies the freshly seeded local data into the remote database. */
 function pushToRemote() {
   wrangler(['d1', 'export', DATABASE, '--local', '--no-schema', '--output', EXPORT_FILE]);
+  const preserved = preservedTables();
   // The remote database keeps its own migration history; never overwrite it.
   const lines = readFileSync(EXPORT_FILE, 'utf8')
     .split('\n')
-    .filter((line) => !line.startsWith('INSERT INTO "d1_migrations"'));
+    .filter((line) => !line.startsWith('INSERT INTO "d1_migrations"'))
+    .filter((line) => ![...preserved].some((table) => line.startsWith(`INSERT INTO "${table}"`)));
   // Clear every app table first so this also works on a database that already has data.
   // The file runs as one transaction and foreign keys are deferred, so order doesn't matter.
-  const wipe = appTables().map((table) => `DELETE FROM "${table}";`);
+  const wipe = appTables()
+    .filter((table) => !preserved.has(table))
+    .map((table) => `DELETE FROM "${table}";`);
   const [pragma, ...inserts] = lines;
   if (!pragma?.startsWith('PRAGMA defer_foreign_keys')) {
     throw new Error('Unexpected export format: missing PRAGMA defer_foreign_keys header');

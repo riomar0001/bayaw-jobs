@@ -589,3 +589,276 @@ model user_activity {
   @@id([user_id, action, day])
   @@map("user_activities")
 }
+
+// ─── BayawSec: AI-assisted security assessment ───────────────────────────────
+// Assessor ids are plain columns (no FK to user) with an email snapshot, so the
+// nightly demo reset, which deletes users, never deletes the assessment trail.
+
+model assessment_target {
+  id                 String    @id @default(uuid())
+  name               String
+  base_url           String
+  description        String?
+  authorization_note String?
+  test_window_start  DateTime?
+  test_window_end    DateTime?
+  created_by         String?
+  created_by_email   String?
+  created_at         DateTime  @default(now())
+  updated_at         DateTime  @updatedAt
+
+  scope_rules scope_rule[]
+  scans       scan[]
+  findings    finding[]
+
+  @@map("assessment_targets")
+}
+
+model scope_rule {
+  id         String          @id @default(uuid())
+  target_id  String
+  asset_type scope_asset_type
+  value      String
+  in_scope   Boolean         @default(true)
+  notes      String?
+  created_at DateTime        @default(now())
+
+  target assessment_target @relation(fields: [target_id], references: [id], onDelete: Cascade)
+
+  @@index([target_id])
+  @@map("scope_rules")
+}
+
+enum scope_asset_type {
+  HOST
+  URL
+  PORT_RANGE
+}
+
+model scan {
+  id             String      @id @default(uuid())
+  target_id      String
+  tool           scan_tool
+  source         scan_source
+  status         scan_status @default(QUEUED)
+  params         Json?
+  raw_output_key String?
+  error          String?
+  started_by     String?
+  started_at     DateTime?
+  finished_at    DateTime?
+  created_at     DateTime    @default(now())
+
+  target   assessment_target @relation(fields: [target_id], references: [id], onDelete: Cascade)
+  results  scan_result[]
+  findings finding[]
+
+  @@index([target_id, created_at])
+  @@index([status])
+  @@map("scans")
+}
+
+enum scan_tool {
+  HTTP_CHECK
+  DNS
+  OPENAPI
+  NMAP
+  ZAP
+  MANUAL
+}
+
+enum scan_source {
+  WORKER
+  IMPORT
+  AGENT
+}
+
+enum scan_status {
+  QUEUED
+  RUNNING
+  DONE
+  FAILED
+}
+
+model scan_result {
+  id         String           @id @default(uuid())
+  scan_id    String
+  type       scan_result_type
+  data       Json
+  created_at DateTime         @default(now())
+
+  scan     scan       @relation(fields: [scan_id], references: [id], onDelete: Cascade)
+  evidence evidence[]
+
+  @@index([scan_id])
+  @@map("scan_results")
+}
+
+enum scan_result_type {
+  PORT
+  SERVICE
+  DNS_RECORD
+  ENDPOINT
+  ALERT
+  HEADER
+  COOKIE
+  CORS
+  REDIRECT
+}
+
+model finding {
+  id             String           @id @default(uuid())
+  target_id      String
+  scan_id        String?
+  title          String
+  category       finding_category
+  description    String
+  affected_asset String
+  source         finding_source
+  ai_severity    severity_level?
+  final_severity severity_level?
+  cvss_vector    String?
+  cvss_score     Float?
+  owasp_top10    String?
+  wstg_id        String?
+  status         finding_status   @default(PENDING)
+  remediation    String?
+  created_at     DateTime         @default(now())
+  updated_at     DateTime         @updatedAt
+
+  target            assessment_target  @relation(fields: [target_id], references: [id], onDelete: Cascade)
+  scan              scan?              @relation(fields: [scan_id], references: [id], onDelete: SetNull)
+  evidence          evidence[]
+  ai_analyses       ai_analysis[]
+  verification_logs verification_log[]
+
+  @@index([target_id, status])
+  @@index([scan_id])
+  @@map("findings")
+}
+
+enum finding_category {
+  AUTHENTICATION
+  ACCESS_CONTROL
+  SECURITY_CONFIG
+}
+
+enum finding_source {
+  TOOL
+  AI
+  MANUAL
+}
+
+enum severity_level {
+  CRITICAL
+  HIGH
+  MEDIUM
+  LOW
+  INFO
+}
+
+enum finding_status {
+  PENDING
+  CONFIRMED
+  REJECTED
+  FALSE_POSITIVE
+  FIXED
+}
+
+model evidence {
+  id             String        @id @default(uuid())
+  finding_id     String
+  scan_result_id String?
+  type           evidence_type
+  r2_key         String?
+  content        String?
+  created_by     String?
+  created_at     DateTime      @default(now())
+
+  finding     finding      @relation(fields: [finding_id], references: [id], onDelete: Cascade)
+  scan_result scan_result? @relation(fields: [scan_result_id], references: [id], onDelete: SetNull)
+
+  @@index([finding_id])
+  @@map("evidence")
+}
+
+enum evidence_type {
+  SCREENSHOT
+  HTTP_EXCHANGE
+  TOOL_OUTPUT
+}
+
+// Every AI call is recorded, so the report can show what the AI said and when.
+model ai_analysis {
+  id         String  @id @default(uuid())
+  scan_id    String?
+  finding_id String?
+  task       ai_task
+  provider   String
+  model      String
+  input_hash String
+  output     Json
+  tokens_in  Int?
+  tokens_out Int?
+  created_by String?
+  created_at DateTime @default(now())
+
+  finding finding? @relation(fields: [finding_id], references: [id], onDelete: Cascade)
+
+  @@index([scan_id])
+  @@index([finding_id])
+  @@map("ai_analyses")
+}
+
+enum ai_task {
+  INTERPRET
+  REMEDIATE
+}
+
+model verification_log {
+  id             String         @id @default(uuid())
+  finding_id     String
+  assessor_id    String?
+  assessor_email String?
+  old_status     finding_status
+  new_status     finding_status
+  notes          String
+  created_at     DateTime       @default(now())
+
+  finding finding @relation(fields: [finding_id], references: [id], onDelete: Cascade)
+
+  @@index([finding_id])
+  @@map("verification_logs")
+}
+
+// Mirrors email_job: the queue message carries only { jobId }.
+model assessment_job {
+  id            String                @id @default(uuid())
+  type          assessment_job_type
+  ref_id        String
+  status        assessment_job_status @default(WAITING)
+  payload       Json?
+  attempts_made Int                   @default(0)
+  failed_reason String?
+  created_by    String?
+  created_at    DateTime              @default(now())
+  processed_at  DateTime?
+  finished_at   DateTime?
+
+  @@index([type, status])
+  @@map("assessment_jobs")
+}
+
+enum assessment_job_type {
+  RUN_CHECK
+  INTERPRET
+  REMEDIATE
+  AGENT_SCAN
+}
+
+enum assessment_job_status {
+  WAITING
+  ACTIVE
+  COMPLETED
+  FAILED
+}

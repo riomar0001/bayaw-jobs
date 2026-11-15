@@ -2,6 +2,7 @@ import { authDocs } from './auth.docs';
 import { applicantDocs } from './applicant.docs';
 import { companyDocs } from './company.docs';
 import { jobDocs } from './job.docs';
+import { assessmentDocs } from './assessment.docs';
 
 export const openApiSpec = {
   openapi: '3.0.3',
@@ -44,6 +45,15 @@ export const openApiSpec = {
       name: 'Jobs',
       description: 'Job posting management',
     },
+    {
+      name: 'BayawSec',
+      description:
+        'AI-assisted security assessment (admin only, non-shared accounts). Targets, scope, scans, imports, AI analysis, verification, dashboard and report data.',
+    },
+    {
+      name: 'BayawSec Agent',
+      description: 'Optional scanner agent endpoints (bearer SCANNER_AGENT_TOKEN, off by default).',
+    },
   ],
   components: {
     securitySchemes: {
@@ -66,6 +76,7 @@ export const openApiSpec = {
     ...applicantDocs,
     ...companyDocs,
     ...jobDocs,
+    ...assessmentDocs,
   },
 };
 

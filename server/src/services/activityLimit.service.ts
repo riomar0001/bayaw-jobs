@@ -11,6 +11,7 @@ const ACTION_LABELS: Record<ActivityAction, string> = {
   POST_JOB: 'job posts',
   UPLOAD: 'file uploads',
   WRITE: 'changes',
+  AI_ANALYZE: 'AI analyses',
 };
 
 const MANILA_OFFSET_MS = 8 * 60 * 60 * 1000;

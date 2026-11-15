@@ -2,7 +2,9 @@ import { httpServerHandler } from 'cloudflare:node';
 import app from './app';
 import logger from '@/configs/logger.config';
 import { handleEmailBatch, handleEmailDeadLetters } from '@/queues/email.consumer';
+import { handleAssessmentBatch, handleAssessmentDeadLetters } from '@/queues/assessment.consumer';
 import { runNightlyReset } from '@/demo/reset';
+import { Config } from '@/constants/config.constant';
 
 const PORT = 8080;
 const EMAIL_DLQ = 'bayaw-jobs-email-dlq';
@@ -27,6 +29,14 @@ export default {
   },
 
   async queue(batch) {
+    if (batch.queue === Config.BAYAWSEC.QUEUE_NAME) {
+      await handleAssessmentBatch(batch);
+      return;
+    }
+    if (batch.queue === Config.BAYAWSEC.DLQ_NAME) {
+      await handleAssessmentDeadLetters(batch);
+      return;
+    }
     if (batch.queue === EMAIL_DLQ) {
       await handleEmailDeadLetters(batch);
       return;

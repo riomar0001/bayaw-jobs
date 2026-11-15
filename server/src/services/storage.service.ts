@@ -8,6 +8,8 @@ import defaultProfilePicture from '../assets/default-profile-picture.jpg';
 const PROFILE_PICTURE_PREFIX = 'profile-picture/';
 const RESUME_PREFIX = 'resume/';
 const COMPANY_LOGO_PREFIX = 'company-logo/';
+// BayawSec evidence and raw reports. Excluded from the nightly reset (see deleteAll).
+const ASSESSMENT_PREFIX = 'assessments/';
 const DELETE_BATCH_LIMIT = 1000; // R2 delete() accepts at most 1000 keys
 
 function imageContentType(filename: string): string {
@@ -49,6 +51,25 @@ async function remove(key: string): Promise<void> {
 }
 
 export class StorageService {
+  // ─── BayawSec assessment files (kept across the nightly demo reset) ─────────
+
+  /** Stores a raw tool report or evidence file under assessments/. Returns the R2 key. */
+  async uploadAssessmentFile(path: string, body: ArrayBuffer | Uint8Array, contentType: string): Promise<string> {
+    const key = ASSESSMENT_PREFIX + path;
+    await put(key, body, contentType);
+    return key;
+  }
+
+  async downloadAssessmentFile(key: string): Promise<{ buffer: Buffer; contentType: string }> {
+    if (!key.startsWith(ASSESSMENT_PREFIX)) throw new AppError(404, ErrorMessages.STORAGE.FILE_NOT_FOUND);
+    const object = await env.FILES.get(key);
+    if (!object) throw new AppError(404, ErrorMessages.STORAGE.FILE_NOT_FOUND);
+    return {
+      buffer: Buffer.from(await object.arrayBuffer()),
+      contentType: object.httpMetadata?.contentType ?? 'application/octet-stream',
+    };
+  }
+
   // ─── Profile Picture ────────────────────────────────────────────────────────
 
   async uploadDefaultProfilePicture(userId: string): Promise<string> {
@@ -110,13 +131,16 @@ export class StorageService {
 
   // ─── Demo reset ──────────────────────────────────────────────────────────────
 
-  /** Deletes every object in the bucket. Returns how many were removed. */
+  /**
+   * Deletes every demo object in the bucket. Returns how many were removed.
+   * BayawSec files (assessments/) are kept: they are the group's assessment evidence.
+   */
   async deleteAll(): Promise<number> {
     let removed = 0;
     let cursor: string | undefined;
     do {
       const page = await env.FILES.list({ limit: DELETE_BATCH_LIMIT, ...(cursor && { cursor }) });
-      const keys = page.objects.map((o) => o.key);
+      const keys = page.objects.map((o) => o.key).filter((key) => !key.startsWith(ASSESSMENT_PREFIX));
       if (keys.length > 0) await env.FILES.delete(keys);
       removed += keys.length;
       cursor = page.truncated ? page.cursor : undefined;

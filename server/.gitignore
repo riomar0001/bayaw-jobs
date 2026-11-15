@@ -100,4 +100,5 @@ service-account.json
 # cloudflare
 .wrangler/
 .dev.vars*
+!.dev.vars.example
 prisma/unused.db

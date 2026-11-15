@@ -1,0 +1,15 @@
+{
+  "name": "bayawsec-scanner-agent",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Optional BayawSec agent: runs Nmap / OWASP ZAP locally for scans queued in the API",
+  "type": "module",
+  "engines": {
+    "node": ">=20.6"
+  },
+  "scripts": {
+    "start": "node --env-file=.env index.mjs",
+    "once": "node --env-file=.env index.mjs --once"
+  },
+  "license": "MIT"
+}

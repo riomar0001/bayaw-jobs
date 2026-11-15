@@ -47,6 +47,31 @@ export const ErrorMessages = {
     TOO_MANY_REQUESTS: 'Too many requests, please try again later',
     SERVICE_UNAVAILABLE: 'Service temporarily unavailable',
   },
+
+  // BayawSec (security assessment)
+  BAYAWSEC: {
+    DISABLED: 'Not found',
+    SHARED_ACCOUNT: 'BayawSec is not available to shared demo accounts. Use a personal admin account.',
+    TARGET_NOT_FOUND: 'Assessment target not found',
+    SCAN_NOT_FOUND: 'Scan not found',
+    FINDING_NOT_FOUND: 'Finding not found',
+    EVIDENCE_NOT_FOUND: 'Evidence not found',
+    JOB_NOT_FOUND: 'Assessment job not found',
+    ANALYSIS_NOT_FOUND: 'AI analysis not found',
+    HOST_NOT_ALLOWED: 'This host is not on the BayawSec allowlist (ASSESSMENT_ALLOWED_HOSTS)',
+    OUT_OF_SCOPE: 'Request is outside the authorized scope for this target',
+    INVALID_URL: 'Target URL must be an http(s) URL',
+    SCAN_NOT_DONE: 'The scan has not finished yet',
+    SCAN_HAS_NO_RESULTS: 'The scan has no results to analyze',
+    AGENT_DISABLED: 'The scanner agent is disabled (SCANNER_AGENT_ENABLED=false)',
+    IMPORT_FILE_REQUIRED: 'A report file is required',
+    IMPORT_INVALID: 'The uploaded file is not a valid report for this tool',
+    AI_NOT_CONFIGURED: 'AI is not configured: set OPENAI_API_KEY or AI_PROVIDER=ollama',
+    AI_FAILED: 'The AI request failed',
+    AI_BAD_OUTPUT: 'The AI returned output in an unexpected format',
+    CONFIRM_NEEDS_SEVERITY: 'Confirming a finding requires final_severity and cvss_score',
+    FIXED_NEEDS_CONFIRMED: 'Only a confirmed finding can be marked as fixed',
+  },
 } as const;
 
 export default ErrorMessages;

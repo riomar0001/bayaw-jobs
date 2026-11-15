@@ -58,6 +58,32 @@ export const Config = {
     WRITE: 100,
     SIGNUP: 5,
     CONTACT: 5,
+    // BayawSec AI calls (interpret + remediate) per assessor per day. Applies outside demo mode too.
+    AI_ANALYZE: Number(process.env.AI_DAILY_LIMIT ?? 20),
+  },
+
+  // BayawSec: AI-assisted security assessment module (admin only).
+  BAYAWSEC: {
+    ENABLED: process.env.BAYAWSEC_ENABLED === 'true',
+    // Hosts any target, scope rule, upload or agent job may point at. Set in wrangler.jsonc.
+    ALLOWED_HOSTS: (process.env.ASSESSMENT_ALLOWED_HOSTS ?? '')
+      .split(',')
+      .map((h) => h.trim().toLowerCase())
+      .filter(Boolean),
+    AI_PROVIDER: (process.env.AI_PROVIDER === 'ollama' ? 'ollama' : 'openai') as 'openai' | 'ollama',
+    OPENAI_MODEL: process.env.OPENAI_MODEL ?? 'gpt-4.1-mini',
+    OLLAMA_URL: process.env.OLLAMA_URL ?? 'http://localhost:11434',
+    OLLAMA_MODEL: process.env.OLLAMA_MODEL ?? 'llama3.1:8b',
+    AI_TEMPERATURE: 0.2,
+    // Upper bound on tool output sent to the AI in one prompt (keeps cost and context small).
+    AI_MAX_INPUT_CHARS: 12000,
+    AI_TIMEOUT_MS: 60000,
+    TOOL_TIMEOUT_MS: 15000,
+    MAX_IMPORT_SIZE: 5 * 1024 * 1024, // 5MB Nmap XML / ZAP JSON
+    SCANNER_AGENT_ENABLED: process.env.SCANNER_AGENT_ENABLED === 'true',
+    QUEUE_NAME: 'bayaw-jobs-assessment',
+    DLQ_NAME: 'bayaw-jobs-assessment-dlq',
+    STORAGE_PREFIX: 'assessments/',
   },
 
   // Inbox for contact form messages (queued like every other email).

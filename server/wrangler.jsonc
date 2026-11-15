@@ -11,7 +11,18 @@
     "APP_NAME": "Bayaw Jobs",
     "APP_URL": "https://bayawjobs-api.riomar.dev",
     "FRONTEND_URL": "https://bayawjobs.riomar.dev",
-    "CORS_ORIGIN": "https://bayawjobs.riomar.dev"
+    "CORS_ORIGIN": "https://bayawjobs.riomar.dev",
+
+    // BayawSec (AI-assisted security assessment). Secrets go in `wrangler secret put`
+    // or .dev.vars: OPENAI_API_KEY, SCANNER_AGENT_TOKEN.
+    "BAYAWSEC_ENABLED": "true",
+    "AI_PROVIDER": "openai",
+    "OPENAI_MODEL": "gpt-4.1-mini",
+    "AI_DAILY_LIMIT": "20",
+    // Hard allowlist: no target, scope rule or upload can reach a host outside this list.
+    "ASSESSMENT_ALLOWED_HOSTS": "bayawjobs.riomar.dev,bayawjobs-api.riomar.dev",
+    // Optional local scanner agent (Nmap/ZAP). Off unless exactly "true".
+    "SCANNER_AGENT_ENABLED": "false"
   },
   "routes": [{ "pattern": "bayawjobs-api.riomar.dev", "custom_domain": true }],
   "workers_dev": false,
@@ -31,14 +42,24 @@
   ],
   "r2_buckets": [{ "binding": "FILES", "bucket_name": "bayaw-jobs-files" }],
   "queues": {
-    "producers": [{ "binding": "EMAIL_QUEUE", "queue": "bayaw-jobs-email" }],
+    "producers": [
+      { "binding": "EMAIL_QUEUE", "queue": "bayaw-jobs-email" },
+      { "binding": "ASSESSMENT_QUEUE", "queue": "bayaw-jobs-assessment" }
+    ],
     "consumers": [
       {
         "queue": "bayaw-jobs-email",
         "max_retries": 3,
         "dead_letter_queue": "bayaw-jobs-email-dlq"
       },
-      { "queue": "bayaw-jobs-email-dlq" }
+      { "queue": "bayaw-jobs-email-dlq" },
+      {
+        "queue": "bayaw-jobs-assessment",
+        "max_batch_size": 1,
+        "max_retries": 2,
+        "dead_letter_queue": "bayaw-jobs-assessment-dlq"
+      },
+      { "queue": "bayaw-jobs-assessment-dlq" }
     ]
   },
   "triggers": {
