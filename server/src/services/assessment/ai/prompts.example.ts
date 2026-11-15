@@ -1,10 +1,10 @@
 // ─────────────────────────────────────────────────────────────────────────────
 // BayawSec AI prompts: TEMPLATE (committed).
 //
-// The real prompts live in prompts.ts next to this file. prompts.ts is gitignored,
-// so each developer keeps their own version. On a fresh clone,
-// `npm run dev`, `npm run type-check` and `npm run deploy` copy this file to prompts.ts
-// automatically (scripts/ensure-prompts.mjs). Then edit prompts.ts, not this file.
+// The services import prompts.ts next to this file. The AI integration role writes the
+// team's real prompts in prompts.ts and commits it. Until that file exists in the repo,
+// `npm run dev`, `npm run type-check` and `npm run deploy` copy this template to prompts.ts
+// automatically (scripts/ensure-prompts.mjs), so the build never breaks.
 //
 // The placeholders below work, but give weak results. Replace them.
 //

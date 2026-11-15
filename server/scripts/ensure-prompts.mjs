@@ -1,6 +1,6 @@
-// BayawSec keeps its real AI prompts in a gitignored file (src/services/assessment/ai/prompts.ts).
-// If a fresh clone doesn't have it yet, copy the committed example so dev, type-check and
-// deploy still work. The example prompts are placeholders; replace them in prompts.ts.
+// The AI services import src/services/assessment/ai/prompts.ts. The AI integration role writes
+// and commits that file. Until it exists, copy the committed template so dev, type-check and
+// deploy still work. The template's prompts are placeholders.
 import { copyFileSync, existsSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';

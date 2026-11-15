@@ -96,10 +96,10 @@ Follow the Methodology section of Deliverable 1 (NIST SP 800-115 phases, OWASP W
 
 ## AI integration (AI)
 
-Work in `server/src/services/assessment/ai/`. Edit **`prompts.example.ts`** (the committed template). Its
-`TODO(AI integration)` comments list what each prompt must cover. To test a change locally, delete your local `prompts.ts`
-and run `npm run dev` to regenerate it from the template. Don't change the reply fields in `schemas.ts` without agreeing with
-the backend and frontend roles, because the database and UI depend on them.
+Work in `server/src/services/assessment/ai/`. Write the prompts in **`prompts.ts`** (the file the services import) and
+**commit it** as part of your tickets. Start from `prompts.example.ts`: its `TODO(AI integration)` comments list what each
+prompt must cover (`npm run dev` copies it to `prompts.ts` if you don't have one yet). Don't change the reply fields in
+`schemas.ts` without agreeing with the backend and frontend roles, because the database and UI depend on them.
 
 | ID   | Ticket                                                                                                                                                                                                                                                                       | Size | Depends on | Done when                                                                                              |
 | ---- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---- | ---------- | ------------------------------------------------------------------------------------------------------ |

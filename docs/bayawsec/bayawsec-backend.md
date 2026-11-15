@@ -36,8 +36,9 @@ npm run dev                           # http://localhost:8787/api
 
 ## AI prompts
 
-- `src/services/assessment/ai/prompts.example.ts` is committed. It explains, in `TODO(AI integration)` comments, what each prompt must cover.
-  `npm run dev`, `type-check` and `deploy` create it from the example if it's missing.
+- The services import `src/services/assessment/ai/prompts.ts`. The AI integration role writes the team's prompts there and commits it.
+- `prompts.example.ts` is the template. Its `TODO(AI integration)` comments explain what each prompt must cover.
+  Until `prompts.ts` is in the repo, `npm run dev`, `type-check` and `deploy` create it from the template.
 - The reply format is fixed in `ai/schemas.ts`. Change the prompt wording freely; don't change the fields.
 
 ## API flow for the frontend

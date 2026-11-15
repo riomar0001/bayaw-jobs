@@ -10,6 +10,7 @@ Work happens on the **`feat/bayawsec-dev`** branch.
 |---|---|
 | [setup.md](setup.md) | run the API and frontend on your machine, fill in `.dev.vars` / `.env.local`, log in, try the flow |
 | [architecture.md](architecture.md) | understand how the backend is structured: request chain, folders, data model, tools, AI pipeline |
+| [schema.md](schema.md) | look up every database table and column (BayawSec and Bayaw Jobs), enums, keys, indexes and JSON shapes |
 | [tasks.md](tasks.md) | see what each role still has to do, broken into small tickets |
 | [bayawsec-backend.md](bayawsec-backend.md) | get the short API flow for the frontend |
 | [../../scanner-agent/README.md](../../scanner-agent/README.md) | run the optional Nmap/ZAP scanner agent |

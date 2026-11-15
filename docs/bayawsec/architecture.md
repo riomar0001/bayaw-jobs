@@ -101,6 +101,8 @@ Files outside the module that changed: `wrangler.jsonc` (queue and vars), `src/w
 
 ## 4. Data model
 
+Full column-by-column reference (types, nullability, defaults, keys, enums, JSON shapes): [schema.md](schema.md).
+
 ```mermaid
 erDiagram
     assessment_targets ||--o{ scope_rules : has
@@ -198,9 +200,9 @@ Safety controls, mapped to the OWASP Top 10 for LLM Applications (2025):
 Unknown evidence references from the AI (hallucinated `r` numbers) are ignored rather than linked.
 Remediation output is a **draft**. The assessor accepts or edits it with `PATCH /findings/:id/remediation`.
 
-**Prompts:** `ai/prompts.example.ts` is the committed template and documents what each prompt must cover.
-The services import `ai/prompts.ts`, which `scripts/ensure-prompts.mjs` creates from the template when it's missing.
-That file is gitignored. To change what the team ships, edit the template.
+**Prompts:** the services import `ai/prompts.ts`. The AI integration role writes the team's real prompts there and
+commits it. `ai/prompts.example.ts` is the template: its `TODO(AI integration)` comments document what each prompt must cover.
+Until `prompts.ts` is in the repo, `scripts/ensure-prompts.mjs` creates it from the template so builds keep working.
 
 ## 7. Configuration
 
